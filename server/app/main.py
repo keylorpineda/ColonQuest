@@ -10,6 +10,7 @@ from app.api import classes, dashboard, events, health, negotiation, sessions, s
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
 from app.game_master.service import GameMaster
+from app.logging_config import configure_logging
 from app.negotiation.service import Negotiator
 from app.providers.meta import MetaProvider
 from app.response_cache import TTLCache
@@ -39,6 +40,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def create_app() -> FastAPI:
     """Build the FastAPI application with middleware and routers."""
     settings = get_settings()
+    configure_logging(settings.log_level)
     app = FastAPI(
         title="Colón Quest API",
         version="0.1.0",
