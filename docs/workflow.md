@@ -18,13 +18,20 @@
 
 ## Sprints
 
+Submission deadline: **Monday, November 2, 2026**. Everything must be finished by Nov 1–2.
+
 | Sprint | Dates (2026) | Goal |
 | --- | --- | --- |
-| Sprint 1 — Foundations | Oct 26 – Oct 27 | Every Meta model answers from the backend; the player walks between stations |
-| Sprint 2 — Playable Month | Oct 28 – Oct 30 | One full month playable end to end |
-| Sprint 3 — Negotiation | Oct 30 – Oct 31 | Negotiation works in the web build (voice, or text as fallback) |
-| Sprint 4 — Pilot & Deploy | Nov 1 – Nov 2 | Deployed build tested with students |
-| Sprint 5 — Submission & Campaign | Nov 3 – Nov 8 | Submitted before Nov 4, 8:00 p.m. CR; demo stays up; X campaign |
+| Sprint 1: Foundations | Oct 26 – Oct 27 | Every Meta model answers from the backend; the player walks between stations |
+| Sprint 2: Playable Month | Oct 28 – Oct 29 | One full month playable end to end |
+| Sprint 3: Negotiation & Deploy | Oct 30 – Oct 31 | Negotiation works in the deployed web build (voice, or text as fallback) |
+| Sprint 4: Pilot & Submission | Nov 1 – Nov 2 | Pilot with students, video, README and gallery submission |
+
+Decision gates: open-weights provider on **Oct 28** (only if credits are approved). The agentic
+game master stays in the backlog and only starts if the playable month is done by **Oct 29**.
+
+If something slips, cut in this order: agentic game master, open-weights provider, Class Mode,
+real-time images, web voice (text stays). The playable month and text negotiation are never cut.
 
 ## Definition of Done
 
