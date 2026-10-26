@@ -59,6 +59,17 @@ def request(
         return error.code, dict(error.headers), json.loads(error.read() or b"null")
 
 
+def request_bytes(path: str) -> tuple[int, dict[str, str], bytes]:
+    req = urllib.request.Request(  # noqa: S310 - URL comes from the operator's environment
+        API_URL + path, method="GET"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT_S) as response:  # noqa: S310
+            return response.status, dict(response.headers), response.read()
+    except urllib.error.HTTPError as error:
+        return error.code, dict(error.headers), error.read()
+
+
 def check(name: str, condition: bool, detail: object = "") -> None:
     print(f"[{'PASS' if condition else 'FAIL'}] {name}" + (f" -> {detail}" if not condition else ""))
     if not condition:
@@ -181,6 +192,19 @@ def main() -> int:
 
     status, _, invalid = request("POST", f"{base}/event", STATE | {"cash": 10.5})
     check("float money rejected", status in {409, 422}, status)
+
+    img_status, img_headers, img_bytes = request_bytes("/api/images/scene_taller_mecanico")
+    img_source = img_headers.get("X-Image-Source") or img_headers.get("x-image-source")
+    check(
+        "cached image endpoint returns PNG",
+        img_status == 200 and img_bytes.startswith(b"\x89PNG\r\n\x1a\n"),
+        img_status,
+    )
+    check(
+        "cached image source header",
+        img_source in {"model", "cache", "fallback"},
+        img_source,
+    )
 
     print(f"\n{len(failures)} failed" if failures else "\nAll checks passed")
     return 1 if failures else 0
