@@ -170,3 +170,19 @@ async def test_transcribe_errors(status: int, error: type[Exception]) -> None:
 def test_api_key_is_never_in_repr() -> None:
     settings = Settings(model_api_key=SecretStr("super-secret"), _env_file=None)  # type: ignore[call-arg]
     assert "super-secret" not in repr(settings)
+
+
+async def test_missing_api_key_fails_fast_without_network() -> None:
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        raise AssertionError("no request should be sent without an API key")
+
+    settings = Settings(_env_file=None)  # type: ignore[call-arg]
+    provider = MetaProvider(
+        settings, http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(handler))
+    )
+    with pytest.raises(ProviderUnavailableError, match="MODEL_API_KEY"):
+        await provider.structured(model="m", system="s", user="u", output=Greeting)
+    with pytest.raises(ProviderUnavailableError):
+        await provider.transcribe(b"RIFF")
+    with pytest.raises(ProviderUnavailableError):
+        await provider.generate_image("x")
