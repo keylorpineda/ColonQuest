@@ -57,6 +57,12 @@ class GeneratedImage:
     latency_ms: int
 
 
+class Transcriber(Protocol):
+    async def transcribe(
+        self, wav: bytes, *, language_bias: list[str] | None = None
+    ) -> Transcription: ...
+
+
 class ModelProvider(Protocol):
     """Interface shared by the Meta API provider and the optional open-weights provider."""
 
