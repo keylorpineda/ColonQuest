@@ -1,0 +1,239 @@
+{
+  "$defs": {
+    "Choice": {
+      "additionalProperties": false,
+      "properties": {
+        "effects": {
+          "items": {
+            "$ref": "#/$defs/Effect"
+          },
+          "maxItems": 5,
+          "title": "Effects",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_ñ]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "effects"
+      ],
+      "title": "Choice",
+      "type": "object"
+    },
+    "Effect": {
+      "additionalProperties": false,
+      "description": "A bounded change the finance engine knows how to apply.\n\n``amount`` may be negative only for savings_change and wellbeing_change.\n``months`` is required for new_installment and new_informal_loan.",
+      "properties": {
+        "amount": {
+          "maximum": 100000000,
+          "minimum": -100000000,
+          "title": "Amount",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/EffectKind"
+        },
+        "months": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Months"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoneySource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind",
+        "amount"
+      ],
+      "title": "Effect",
+      "type": "object"
+    },
+    "EffectKind": {
+      "enum": [
+        "expense",
+        "income",
+        "new_installment",
+        "new_informal_loan",
+        "savings_change",
+        "wellbeing_change",
+        "price_inflation"
+      ],
+      "title": "EffectKind",
+      "type": "string"
+    },
+    "EventType": {
+      "enum": [
+        "income",
+        "expense",
+        "emergency",
+        "offer",
+        "scam",
+        "macro_news",
+        "bonus"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "MoneySource": {
+      "enum": [
+        "cash",
+        "savings",
+        "emergency_fund",
+        "credit_card"
+      ],
+      "title": "MoneySource",
+      "type": "string"
+    },
+    "Npc": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_ñ]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "role": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "role"
+      ],
+      "title": "Npc",
+      "type": "object"
+    },
+    "TeachingConcept": {
+      "enum": [
+        "budget",
+        "emergency_fund",
+        "compound_interest",
+        "minimum_payment",
+        "installments_total_cost",
+        "informal_lending",
+        "pyramid_scheme",
+        "inflation",
+        "exchange_rate",
+        "payroll_deductions"
+      ],
+      "title": "TeachingConcept",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "choices": {
+      "items": {
+        "$ref": "#/$defs/Choice"
+      },
+      "maxItems": 4,
+      "minItems": 2,
+      "title": "Choices",
+      "type": "array"
+    },
+    "eventId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[a-z0-9_ñ]+$",
+      "title": "Eventid",
+      "type": "string"
+    },
+    "imageKey": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_ñ]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Imagekey"
+    },
+    "narrative": {
+      "maxLength": 280,
+      "minLength": 1,
+      "title": "Narrative",
+      "type": "string"
+    },
+    "npc": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Npc"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "teachingConcept": {
+      "$ref": "#/$defs/TeachingConcept"
+    },
+    "title": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/EventType"
+    }
+  },
+  "required": [
+    "eventId",
+    "type",
+    "title",
+    "narrative",
+    "choices",
+    "teachingConcept"
+  ],
+  "title": "GameEvent",
+  "type": "object"
+}
