@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "BudgetInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "budgetUsd": {
+          "title": "Budgetusd",
+          "type": "number"
+        },
+        "mode": {
+          "enum": [
+            "normal",
+            "downgraded",
+            "fallback_only"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "remainingUsd": {
+          "title": "Remainingusd",
+          "type": "number"
+        },
+        "spentUsd": {
+          "title": "Spentusd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "spentUsd",
+        "budgetUsd",
+        "remainingUsd",
+        "mode"
+      ],
+      "title": "BudgetInfo",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "budget": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BudgetInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "database": {
+      "enum": [
+        "ok",
+        "unavailable",
+        "not_configured"
+      ],
+      "title": "Database",
+      "type": "string"
+    },
+    "status": {
+      "const": "ok",
+      "title": "Status",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "version",
+    "database"
+  ],
+  "title": "HealthResponse",
+  "type": "object"
+}

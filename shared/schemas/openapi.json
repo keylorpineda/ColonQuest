@@ -1,10 +1,187 @@
 {
   "components": {
     "schemas": {
-      "HealthResponse": {
-        "description": "Service status reported to the Unity client and uptime monitors.",
+      "BudgetInfo": {
+        "additionalProperties": false,
         "properties": {
+          "budgetUsd": {
+            "title": "Budgetusd",
+            "type": "number"
+          },
+          "mode": {
+            "enum": [
+              "normal",
+              "downgraded",
+              "fallback_only"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "remainingUsd": {
+            "title": "Remainingusd",
+            "type": "number"
+          },
+          "spentUsd": {
+            "title": "Spentusd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "spentUsd",
+          "budgetUsd",
+          "remainingUsd",
+          "mode"
+        ],
+        "title": "BudgetInfo",
+        "type": "object"
+      },
+      "CreateSessionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "classCode": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z0-9]{4,8}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classcode"
+          }
+        },
+        "title": "CreateSessionRequest",
+        "type": "object"
+      },
+      "CreditCard": {
+        "additionalProperties": false,
+        "properties": {
+          "balance": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Balance",
+            "type": "integer"
+          },
+          "limit": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "minPaymentPct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Minpaymentpct",
+            "type": "number"
+          },
+          "monthlyRatePct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Monthlyratepct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "balance",
+          "limit",
+          "monthlyRatePct",
+          "minPaymentPct"
+        ],
+        "title": "CreditCard",
+        "type": "object"
+      },
+      "DecisionRecorded": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "title": "Decisionid",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "title": "DecisionRecorded",
+        "type": "object"
+      },
+      "DecisionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "choiceId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Choiceid",
+            "type": "string"
+          },
+          "eventId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Eventid",
+            "type": "string"
+          },
+          "month": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Month",
+            "type": "integer"
+          },
+          "stateAfter": {
+            "$ref": "#/components/schemas/PlayerState"
+          },
+          "teachingConcept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          }
+        },
+        "required": [
+          "month",
+          "eventId",
+          "teachingConcept",
+          "choiceId",
+          "stateAfter"
+        ],
+        "title": "DecisionRequest",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BudgetInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "database": {
+            "enum": [
+              "ok",
+              "unavailable",
+              "not_configured"
+            ],
+            "title": "Database",
+            "type": "string"
+          },
           "status": {
+            "const": "ok",
             "title": "Status",
             "type": "string"
           },
@@ -15,9 +192,222 @@
         },
         "required": [
           "status",
-          "version"
+          "version",
+          "database"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "InformalLoan": {
+        "additionalProperties": false,
+        "properties": {
+          "balance": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Balance",
+            "type": "integer"
+          },
+          "lender": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Lender",
+            "type": "string"
+          },
+          "monthlyRatePct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Monthlyratepct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lender",
+          "balance",
+          "monthlyRatePct"
+        ],
+        "title": "InformalLoan",
+        "type": "object"
+      },
+      "Installment": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Item",
+            "type": "string"
+          },
+          "monthly": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Monthly",
+            "type": "integer"
+          },
+          "monthsLeft": {
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Monthsleft",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "item",
+          "monthly",
+          "monthsLeft"
+        ],
+        "title": "Installment",
+        "type": "object"
+      },
+      "PlayerState": {
+        "additionalProperties": false,
+        "properties": {
+          "cash": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Cash",
+            "type": "integer"
+          },
+          "creditCard": {
+            "$ref": "#/components/schemas/CreditCard"
+          },
+          "emergencyFund": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Emergencyfund",
+            "type": "integer"
+          },
+          "history": {
+            "items": {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "History",
+            "type": "array"
+          },
+          "informalLoans": {
+            "items": {
+              "$ref": "#/components/schemas/InformalLoan"
+            },
+            "maxItems": 10,
+            "title": "Informalloans",
+            "type": "array"
+          },
+          "installments": {
+            "items": {
+              "$ref": "#/components/schemas/Installment"
+            },
+            "maxItems": 20,
+            "title": "Installments",
+            "type": "array"
+          },
+          "month": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Month",
+            "type": "integer"
+          },
+          "salaryNet": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Salarynet",
+            "type": "integer"
+          },
+          "savings": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Savings",
+            "type": "integer"
+          },
+          "wellbeing": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Wellbeing",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "month",
+          "salaryNet",
+          "cash",
+          "savings",
+          "emergencyFund",
+          "creditCard",
+          "wellbeing"
+        ],
+        "title": "PlayerState",
+        "type": "object"
+      },
+      "SessionCreated": {
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {
+            "format": "uuid",
+            "title": "Sessionid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "title": "SessionCreated",
+        "type": "object"
+      },
+      "TeachingConcept": {
+        "enum": [
+          "budget",
+          "emergency_fund",
+          "compound_interest",
+          "minimum_payment",
+          "installments_total_cost",
+          "informal_lending",
+          "pyramid_scheme",
+          "inflation",
+          "exchange_rate",
+          "payroll_deductions"
+        ],
+        "title": "TeachingConcept",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
         "type": "object"
       }
     }
@@ -31,7 +421,7 @@
   "paths": {
     "/api/health": {
       "get": {
-        "description": "Report that the service is up.",
+        "description": "Always answers 200 so uptime checks see the process; the body says what is degraded.",
         "operationId": "get_health_api_health_get",
         "responses": {
           "200": {
@@ -48,6 +438,102 @@
         "summary": "Get Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/sessions": {
+      "post": {
+        "description": "Start a game. A classCode joins the session to a Class Mode class.",
+        "operationId": "create_session_api_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/decisions": {
+      "post": {
+        "description": "Store the choice the player made and the resulting state (impact telemetry).",
+        "operationId": "record_decision_api_sessions__session_id__decisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionRecorded"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record Decision",
+        "tags": [
+          "sessions"
         ]
       }
     }

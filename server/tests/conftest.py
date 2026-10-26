@@ -2,6 +2,12 @@ import os
 from collections.abc import AsyncIterator
 from pathlib import Path
 
+# Tests must never reach real services configured in a developer's server/.env (Neon, Meta).
+# Environment variables take precedence over the .env file in pydantic-settings.
+os.environ["DATABASE_URL"] = ""
+os.environ["MODEL_API_KEY"] = ""
+
+import httpx2
 import pytest
 from alembic import command
 from alembic.config import Config
@@ -50,3 +56,22 @@ async def db(migrated_database: str) -> AsyncIterator[AsyncSession]:
             await session.close()
             await transaction.rollback()
     await engine.dispose()
+
+
+@pytest.fixture
+async def api(db: AsyncSession) -> AsyncIterator[httpx2.AsyncClient]:
+    """HTTP client for the app with the request session bound to the test transaction."""
+    from app.api.deps import get_optional_session
+    from app.db.session import get_session
+    from app.main import create_app
+
+    app = create_app()
+
+    async def override_session() -> AsyncIterator[AsyncSession]:
+        yield db
+
+    app.dependency_overrides[get_session] = override_session
+    app.dependency_overrides[get_optional_session] = override_session
+    transport = httpx2.ASGITransport(app=app)
+    async with httpx2.AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
