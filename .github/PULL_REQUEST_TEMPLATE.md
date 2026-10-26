@@ -1,8 +1,8 @@
-<!-- Title format: <type>(<scope>): <imperative summary> [CQ-<number>] -->
+<!-- Title format: <type>(<scope>): <imperative summary> [SCRUM-<number>] -->
 
 ## Jira ticket
 
-[CQ-XXX](https://keylorpineda.atlassian.net/browse/CQ-XXX)
+[SCRUM-XXX](https://keylorpineda.atlassian.net/browse/SCRUM-XXX)
 
 ## Summary
 

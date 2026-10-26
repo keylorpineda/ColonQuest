@@ -321,8 +321,8 @@ colon-quest/
 ```
 
 - `main` solo tiene versiones estables; `develop` es la rama de integración y la rama por defecto.
-- Ramas por ticket de Jira creadas desde `develop` (`feat/CQ-12-game-master`,
-  `feat/CQ-30-negotiation-ui`), PR pequeños a `develop`. A `main` solo llegan PRs de release
+- Ramas por ticket de Jira creadas desde `develop` (`feat/SCRUM-12-game-master`,
+  `feat/SCRUM-30-negotiation-ui`), PR pequeños a `develop`. A `main` solo llegan PRs de release
   desde `develop` (`release: vX.Y.Z`) o `hotfix/*`. Convenciones completas en `CONTRIBUTING.md`.
 - Cada uno trabaja en su carpeta para no pisarse. Cambios al contrato en `shared/` se avisan.
 - Commits todos los días: el historial demuestra que el proyecto se hizo durante el hackathon.
@@ -332,7 +332,7 @@ colon-quest/
 Lo marcado como **[SI DA TIEMPO]** o **[CONDICIONAL]** se hace solo si se cumple su puerta de
 decisión. Si no, ese tiempo va a pulir lo obligatorio.
 
-Cada fase es un sprint de Jira (proyecto `CQ`). Detalle en `docs/workflow.md`.
+Cada fase es un sprint de Jira (proyecto `SCRUM`). Detalle en `docs/workflow.md`.
 
 | Sprint y fechas | Keylor (backend, IA, motor) | Jefferson (Unity, arte, flujo) | Listo cuando |
 | --- | --- | --- | --- |

@@ -5,7 +5,7 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: Day-to-day work is tracked in Jira (project `CQ`). Use this form for bugs found by players or reviewers.
+      value: Day-to-day work is tracked in Jira (project `SCRUM`). Use this form for bugs found by players or reviewers.
   - type: textarea
     id: description
     attributes:

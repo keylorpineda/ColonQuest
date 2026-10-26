@@ -58,7 +58,7 @@ uv run mypy app
 
 ## Contributing
 
-We track work in Jira (project key `CQ`) and link every branch, commit and pull request to a ticket. `main` holds stable releases; all work branches off `develop` and returns to it through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
+We track work in Jira (project key `SCRUM`) and link every branch, commit and pull request to a ticket. `main` holds stable releases; all work branches off `develop` and returns to it through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
 ## License
 
