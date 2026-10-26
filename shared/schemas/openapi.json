@@ -89,6 +89,42 @@
         "title": "Choice",
         "type": "object"
       },
+      "ClassCreated": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z0-9]{4,8}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "ClassCreated",
+        "type": "object"
+      },
+      "CreateClassRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateClassRequest",
+        "type": "object"
+      },
       "CreateSessionRequest": {
         "additionalProperties": false,
         "properties": {
@@ -827,6 +863,48 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/classes": {
+      "post": {
+        "description": "Create a class and return the short code students type when they start a game.",
+        "operationId": "create_class_api_classes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClassRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Class",
+        "tags": [
+          "classes"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "description": "Always answers 200 so uptime checks see the process; the body says what is degraded.",
