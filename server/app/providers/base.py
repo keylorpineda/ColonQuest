@@ -63,6 +63,10 @@ class Transcriber(Protocol):
     ) -> Transcription: ...
 
 
+class ImageGenerator(Protocol):
+    async def generate_image(self, prompt: str, *, size: str = "1024x1024") -> GeneratedImage: ...
+
+
 class ModelProvider(Protocol):
     """Interface shared by the Meta API provider and the optional open-weights provider."""
 
