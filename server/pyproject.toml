@@ -10,6 +10,8 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "openai>=3.38",
+    "httpx2>=2.16",
 ]
 
 [dependency-groups]
@@ -19,7 +21,6 @@ dev = [
     "mypy>=1.13",
     "pytest-xdist>=3.8.0",
     "pytest-cov>=7.1.0",
-    "httpx2>=2.16.0",
 ]
 
 [tool.uv]
