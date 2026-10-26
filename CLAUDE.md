@@ -7,7 +7,8 @@ personajes que intentan engañarlo (cuotas con cargos escondidos, préstamos "go
 esquemas piramidales).
 
 - **Equipo:** DoWhile Team. Keylor (backend, IA, motor financiero) y Jefferson (Unity, arte, flujo).
-- **Entrega:** martes 4 de noviembre, 9:00 p. m. hora del Este (8:00 p. m. Costa Rica).
+- **Entrega:** lunes 2 de noviembre de 2026. Todo debe estar terminado el domingo 1 o, a más
+  tardar, el lunes 2. Hora exacta de cierre por confirmar.
 - **Objetivo de alcance:** un *vertical slice* pulido. Un mes jugable de 2 a 3 minutos que
   funcione en vivo es mejor que un año completo a medias.
 
@@ -31,7 +32,7 @@ negociación funcionando.** Nada de esta tabla se hace a costa de eso.
 | Most Viral Project | $20K | **Entra seguro.** Es campaña, no código | Post del demo en X con más interacción hasta el 8 nov, 11:59 p. m. ET |
 | Community Vote | $10K | **Entra seguro.** Es campaña, no código | Más votos en la galería pública (ganador el 16 nov) |
 | Best Build on Meta Open Weights | $10K | **Condicional.** Solo si aprueban créditos de Baseten o Modal antes del 28 oct | Parte central del proyecto corriendo en Muse Glimmer o Muse Spark Open |
-| Best Agentic Use-Case | $5K | **Solo si da tiempo.** Únicamente si el mes jugable está listo el 30 oct | Agentes que deciden y ejecutan tareas de varios pasos |
+| Best Agentic Use-Case | $5K | **Solo si da tiempo.** Únicamente si el mes jugable está listo el 29 oct | Agentes que deciden y ejecutan tareas de varios pasos |
 
 Pendiente de confirmar en Discord: si un proyecto puede ganar un premio de track y uno extra,
 y si para Open Weights basta con que una parte central use el modelo abierto.
@@ -103,7 +104,7 @@ Variable de entorno `GAME_MASTER_MODEL` para cambiar entre Wonder y Spark sin to
 
 ### Modelos open-weight (CONDICIONAL: solo si aprueban créditos de Baseten o Modal)
 
-**Puerta de decisión: martes 28 de octubre.** Si para entonces no hay créditos aprobados en
+**Puerta de decisión: miércoles 28 de octubre.** Si para entonces no hay créditos aprobados en
 Baseten o Modal, esta sección se descarta y todo sigue en la API de Meta.
 
 Si hay créditos:
@@ -123,7 +124,7 @@ Si hay créditos:
 - Registrar en `model_calls` qué proveedor respondió, para demostrarle al socio que el
   proyecto corre en un modelo abierto elegible.
 - Ventaja extra: la parte de más volumen (la negociación) deja de gastar los $150 de la API
-  de Meta, lo que protege la demo durante la evaluación del 4 al 8 de noviembre.
+  de Meta, lo que protege la demo durante la evaluación, desde la entrega del 2 de noviembre.
 
 ## Contrato entre Unity y el backend
 
@@ -225,7 +226,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 
 ## Game master agéntico (SOLO SI DA TIEMPO, para Best Agentic Use-Case)
 
-**Puerta de decisión: jueves 30 de octubre.** Solo se empieza si ese día ya hay un mes
+**Puerta de decisión: jueves 29 de octubre.** Solo se empieza si ese día ya hay un mes
 jugable de punta a punta con la negociación por texto funcionando. Si no, se descarta.
 
 La versión base del game master hace una llamada por mes. La versión agéntica:
@@ -319,7 +320,10 @@ colon-quest/
   docs/              # Arquitectura, decisiones, resultados de la prueba piloto
 ```
 
-- Ramas por tarea (`feat/game-master`, `feat/negotiation-ui`), PR pequeños a `main`.
+- `main` solo tiene versiones estables; `develop` es la rama de integración y la rama por defecto.
+- Ramas por ticket de Jira creadas desde `develop` (`feat/CQ-12-game-master`,
+  `feat/CQ-30-negotiation-ui`), PR pequeños a `develop`. A `main` solo llegan PRs de release
+  desde `develop` (`release: vX.Y.Z`) o `hotfix/*`. Convenciones completas en `CONTRIBUTING.md`.
 - Cada uno trabaja en su carpeta para no pisarse. Cambios al contrato en `shared/` se avisan.
 - Commits todos los días: el historial demuestra que el proyecto se hizo durante el hackathon.
 
@@ -328,25 +332,26 @@ colon-quest/
 Lo marcado como **[SI DA TIEMPO]** o **[CONDICIONAL]** se hace solo si se cumple su puerta de
 decisión. Si no, ese tiempo va a pulir lo obligatorio.
 
-| Fechas | Keylor (backend, IA, motor) | Jefferson (Unity, arte, flujo) | Listo cuando |
+Cada fase es un sprint de Jira (proyecto `CQ`). Detalle en `docs/workflow.md`.
+
+| Sprint y fechas | Keylor (backend, IA, motor) | Jefferson (Unity, arte, flujo) | Listo cuando |
 | --- | --- | --- | --- |
-| 26 y 27 oct | Repo, FastAPI, proveedor de Meta, prueba de cada modelo (Wonder JSON, transcripción en español tico, una imagen). Esquemas Pydantic y contrato en `shared/`. Pedir créditos de Baseten, Modal y Fireworks | Proyecto Unity 2D, mapa cenital con 3 estaciones (cajero, tienda, casa), movimiento y colisiones | Cada modelo responde desde el backend; el personaje camina entre estaciones |
-| 28 al 30 oct | Game master con validación, recorte de montos y eventos de respaldo. Control de costos. Motor financiero C# con tests. **[CONDICIONAL, decidir el 28]** proveedor open-weight para los personajes | Paneles overlay: alerta SINPE, estado de cuenta, ventana de decisión. Conexión al endpoint de eventos | Un mes completo jugable de punta a punta |
-| 30 y 31 oct | Negociación por texto y voz: transcripción, ficha oculta del vendedor, `keyQuestionsAsked`. Imágenes pre-generadas. **[SI DA TIEMPO, decidir el 30]** game master con herramientas | Grabación de voz (jslib en WebGL), panel de negociación, retratos | La negociación funciona en el build web (voz, o texto como respaldo) |
-| 1 y 2 nov | Telemetría, Modo Clase y panel del profesor. Despliegue en Render | Build WebGL desplegado, pulido, sonido, pantalla final | **Prueba piloto con estudiantes** |
-| 3 y 4 nov | Correcciones de la prueba, métricas para el video, README, publicar en la galería | Video de 3 min para los jueces y clip vertical de 30 a 45 s para X | Entrega antes de las 8:00 p. m. hora de Costa Rica |
-| 4 al 8 nov | Vigilar gasto y errores de la demo en vivo | Campaña en X | Post en X con la mayor interacción posible |
+| **Sprint 1: Foundations** (lun 26 y mar 27 oct) | Repo, FastAPI, proveedor de Meta, prueba de cada modelo (Wonder JSON, transcripción en español tico, una imagen). Esquemas Pydantic y contrato en `shared/`. Neon y migración base. Pedir créditos de Baseten, Modal y Fireworks | Proyecto Unity 2D, mapa cenital con 3 estaciones (cajero, tienda, casa), movimiento y colisiones | Cada modelo responde desde el backend; el personaje camina entre estaciones |
+| **Sprint 2: Playable Month** (mié 28 y jue 29 oct) | Game master con validación, recorte de montos y eventos de respaldo. Control de costos. Motor financiero C# con tests. **[CONDICIONAL, decidir el 28]** proveedor open-weight para los personajes | Paneles overlay: alerta SINPE, estado de cuenta, ventana de decisión. Conexión al endpoint de eventos | Un mes completo jugable de punta a punta |
+| **Sprint 3: Negotiation & Deploy** (vie 30 y sáb 31 oct) | Negociación por texto y voz: transcripción, ficha oculta del vendedor, `keyQuestionsAsked`. Imágenes pre-generadas. Telemetría. Despliegue en Render. **[SI DA TIEMPO, decidir el 29]** game master con herramientas | Grabación de voz (jslib en WebGL), panel de negociación, retratos. Build WebGL desplegado | La negociación funciona en el build web desplegado (voz, o texto como respaldo) |
+| **Sprint 4: Pilot & Submission** (dom 1 y lun 2 nov) | **Prueba piloto con estudiantes** (mañana del 1). Modo Clase y panel del profesor si da tiempo. Correcciones, métricas para el video, README, publicar en la galería | Pulido, sonido, pantalla final. Video de 3 min para los jueces y clip vertical de 30 a 45 s para X | **Proyecto entregado el 2 de noviembre** |
+| Después de la entrega (hasta el 8 nov) | Vigilar gasto y errores de la demo en vivo | Campaña en X | Post en X con la mayor interacción posible |
 | Hasta el 16 nov | Campaña de votos de la comunidad | Campaña de votos de la comunidad | Votos en la galería pública |
 
 ## Campaña para Most Viral y Community Vote (no es código)
 
 - **Cuenta de X:** crearla o reactivarla ya. Publicar avances cortos durante el hackathon
-  (un GIF del personaje, el vendedor tico, el panel SINPE) para llegar al 4 de noviembre con
+  (un GIF del personaje, el vendedor tico, el panel SINPE) para llegar al 2 de noviembre con
   algo de audiencia.
 - **Clip para X (30 a 45 s, vertical):** la negociación con el vendedor que intenta meter el
   seguro escondido. Español con subtítulos en inglés. Terminar con el link a la demo y a la
   galería. Mencionar las cuentas oficiales del hackathon.
-- **Publicar el 4 o 5 de noviembre** y moverlo en grupos de la UNA, comunidades tech de Costa
+- **Publicar el 2 o 3 de noviembre**, apenas se entregue, y moverlo en grupos de la UNA, comunidades tech de Costa
   Rica, y con los estudiantes de la prueba piloto.
 - **Community Vote:** pedir votos con el link directo a la galería. Mensaje: un juego
   costarricense compitiendo en un hackathon mundial de Meta.
@@ -356,7 +361,7 @@ decisión. Si no, ese tiempo va a pulir lo obligatorio.
 
 - **Latencia del game master:** mostrar una animación mientras responde; timeout de 8 s con
   evento de respaldo.
-- **Micrófono en WebGL:** probarlo el 30 de octubre como máximo; el respaldo de texto debe existir siempre.
+- **Micrófono en WebGL:** probarlo el 30 de octubre como máximo (inicio del Sprint 3); el respaldo de texto debe existir siempre.
 - **Unity WebGL pesado:** comprimir assets y probar la carga en una conexión lenta.
 - **Alcance:** si algo se atrasa, se recorta en este orden:
   1. Game master agéntico **[SI DA TIEMPO]**.
@@ -367,7 +372,7 @@ decisión. Si no, ese tiempo va a pulir lo obligatorio.
 
   El mes jugable y la negociación por texto **no se recortan nunca**.
 - **Créditos:** verificar en los Credit Terms cuándo vencen; la demo debe seguir funcionando
-  del 4 al 8 de noviembre durante la evaluación.
+  desde la entrega del 2 de noviembre y durante toda la evaluación.
 
 ## Comandos
 
