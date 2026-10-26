@@ -35,6 +35,39 @@
         "title": "BudgetInfo",
         "type": "object"
       },
+      "Choice": {
+        "additionalProperties": false,
+        "properties": {
+          "effects": {
+            "items": {
+              "$ref": "#/components/schemas/Effect"
+            },
+            "maxItems": 5,
+            "title": "Effects",
+            "type": "array"
+          },
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "effects"
+        ],
+        "title": "Choice",
+        "type": "object"
+      },
       "CreateSessionRequest": {
         "additionalProperties": false,
         "properties": {
@@ -143,6 +176,149 @@
           "stateAfter"
         ],
         "title": "DecisionRequest",
+        "type": "object"
+      },
+      "Effect": {
+        "additionalProperties": false,
+        "description": "A bounded change the finance engine knows how to apply.\n\n``amount`` may be negative only for savings_change and wellbeing_change.\n``months`` is required for new_installment and new_informal_loan.",
+        "properties": {
+          "amount": {
+            "maximum": 100000000.0,
+            "minimum": -100000000.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/EffectKind"
+          },
+          "months": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MoneySource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "amount"
+        ],
+        "title": "Effect",
+        "type": "object"
+      },
+      "EffectKind": {
+        "enum": [
+          "expense",
+          "income",
+          "new_installment",
+          "new_informal_loan",
+          "savings_change",
+          "wellbeing_change",
+          "price_inflation"
+        ],
+        "title": "EffectKind",
+        "type": "string"
+      },
+      "EventType": {
+        "enum": [
+          "income",
+          "expense",
+          "emergency",
+          "offer",
+          "scam",
+          "macro_news",
+          "bonus"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
+      "GameEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "maxItems": 4,
+            "minItems": 2,
+            "title": "Choices",
+            "type": "array"
+          },
+          "eventId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Eventid",
+            "type": "string"
+          },
+          "imageKey": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[a-z0-9_ñ]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imagekey"
+          },
+          "narrative": {
+            "maxLength": 280,
+            "minLength": 1,
+            "title": "Narrative",
+            "type": "string"
+          },
+          "npc": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Npc"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teachingConcept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          },
+          "title": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EventType"
+          }
+        },
+        "required": [
+          "eventId",
+          "type",
+          "title",
+          "narrative",
+          "choices",
+          "teachingConcept"
+        ],
+        "title": "GameEvent",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -256,6 +432,47 @@
           "monthsLeft"
         ],
         "title": "Installment",
+        "type": "object"
+      },
+      "MoneySource": {
+        "enum": [
+          "cash",
+          "savings",
+          "emergency_fund",
+          "credit_card"
+        ],
+        "title": "MoneySource",
+        "type": "string"
+      },
+      "Npc": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ],
+        "title": "Npc",
         "type": "object"
       },
       "PlayerState": {
@@ -534,6 +751,60 @@
         "summary": "Record Decision",
         "tags": [
           "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/event": {
+      "post": {
+        "description": "Return this month's event. Never fails because of the model: it falls back instead.\n\nThe ``X-Event-Source`` header says whether the event came from the model, the cache or the\nhand-written fallback catalog.",
+        "operationId": "next_event_api_sessions__session_id__event_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameEvent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Next Event",
+        "tags": [
+          "events"
         ]
       }
     }

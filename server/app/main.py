@@ -1,10 +1,33 @@
 """FastAPI application entry point."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, sessions
+from app.api import events, health, sessions
 from app.config import get_settings
+from app.game_master.service import GameMaster
+from app.providers.meta import MetaProvider
+from app.response_cache import TTLCache
+from app.schemas import GameEvent
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Create one provider and one game master per process and close them on shutdown."""
+    settings = get_settings()
+    provider = MetaProvider(settings)
+    cache: TTLCache[GameEvent] = TTLCache(
+        max_entries=settings.response_cache_max_entries, ttl_s=settings.response_cache_ttl_s
+    )
+    app.state.provider = provider
+    app.state.game_master = GameMaster(provider, settings, cache)
+    try:
+        yield
+    finally:
+        await provider.aclose()
 
 
 def create_app() -> FastAPI:
@@ -14,15 +37,18 @@ def create_app() -> FastAPI:
         title="Colón Quest API",
         version="0.1.0",
         description="Backend for the Colón Quest financial-literacy game.",
+        lifespan=lifespan,
     )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
         allow_methods=["GET", "POST"],
         allow_headers=["*"],
+        expose_headers=["X-Event-Source"],
     )
     app.include_router(health.router, prefix="/api")
     app.include_router(sessions.router, prefix="/api")
+    app.include_router(events.router, prefix="/api")
     return app
 
 
