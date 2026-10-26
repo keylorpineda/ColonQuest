@@ -93,6 +93,8 @@ async def test_structured_rejects_invalid_content(content: str | None) -> None:
     [
         (429, ProviderUnavailableError),
         (503, ProviderUnavailableError),
+        (401, ProviderUnavailableError),
+        (403, ProviderUnavailableError),
         (400, ProviderResponseError),
     ],
 )
@@ -155,6 +157,7 @@ async def test_transcribe_sends_multipart_wav() -> None:
     [
         (429, ProviderUnavailableError),
         (500, ProviderUnavailableError),
+        (401, ProviderUnavailableError),
         (400, ProviderResponseError),
     ],
 )
