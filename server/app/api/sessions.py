@@ -44,7 +44,7 @@ async def record_decision(
     """Store the choice the player made and the resulting state (impact telemetry)."""
     await get_active_session(db, session_id)
     if body.state_after.month != body.month:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "stateAfter.month must match")
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "stateAfter.month must match")
     decision = Decision(
         session_id=session_id,
         month=body.month,
