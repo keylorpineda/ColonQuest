@@ -693,6 +693,75 @@
         "title": "SessionCreated",
         "type": "object"
       },
+      "SessionSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "conceptsTaught": {
+            "items": {
+              "$ref": "#/components/schemas/TeachingConcept"
+            },
+            "title": "Conceptstaught",
+            "type": "array"
+          },
+          "dealsAccepted": {
+            "title": "Dealsaccepted",
+            "type": "integer"
+          },
+          "decisions": {
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "keyQuestionsAsked": {
+            "items": {
+              "$ref": "#/components/schemas/KeyQuestion"
+            },
+            "title": "Keyquestionsasked",
+            "type": "array"
+          },
+          "monthsPlayed": {
+            "title": "Monthsplayed",
+            "type": "integer"
+          },
+          "narrative": {
+            "title": "Narrative",
+            "type": "string"
+          },
+          "negotiations": {
+            "title": "Negotiations",
+            "type": "integer"
+          },
+          "netWorth": {
+            "title": "Networth",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "model",
+              "fallback"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "totalDebt": {
+            "title": "Totaldebt",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "monthsPlayed",
+          "decisions",
+          "conceptsTaught",
+          "negotiations",
+          "dealsAccepted",
+          "keyQuestionsAsked",
+          "totalDebt",
+          "netWorth",
+          "narrative",
+          "source"
+        ],
+        "title": "SessionSummary",
+        "type": "object"
+      },
       "TeachingConcept": {
         "enum": [
           "budget",
@@ -1035,6 +1104,60 @@
         "summary": "Negotiate Voice",
         "tags": [
           "negotiation"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/summary": {
+      "post": {
+        "description": "Compute the final figures, write the narrative and close the session (409 afterwards).",
+        "operationId": "finish_session_api_sessions__session_id__summary_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish Session",
+        "tags": [
+          "summary"
         ]
       }
     }
