@@ -1,0 +1,30 @@
+# Render Blueprint for the Colón Quest FastAPI backend (SCRUM-52).
+# Deploys from `main` only after GitHub Actions CI passes.
+services:
+  - type: web
+    name: colon-quest-api
+    runtime: python
+    branch: main
+    rootDir: server
+    plan: free
+    autoDeployTrigger: checksPass
+    buildCommand: pip install --upgrade uv && uv sync --frozen --no-dev
+    startCommand: uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: MODEL_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: GAME_MASTER_MODEL
+        value: "muse-wonder-1.0"
+      - key: SUMMARY_MODEL
+        value: "muse-spark-1.3"
+      - key: DAILY_BUDGET_USD
+        value: "5.0"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: CLIENT_HASH_SALT
+        generateValue: true
