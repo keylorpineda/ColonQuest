@@ -23,7 +23,8 @@ Nobody pushes directly to `main` or `develop`; everything goes through a pull re
    ```
 3. Commit using [Conventional Commits](https://www.conventionalcommits.org/) with the ticket key.
 4. Open a small pull request **into `develop`** using the PR template. CI must pass.
-5. Squash-merge. Jira picks up the branch, commits and PR automatically through the GitHub for Jira app.
+5. Rebase-merge, so every small commit stays in `develop`'s history. Jira picks up the branch,
+   commits and PR automatically through the GitHub for Atlassian app.
 
 ### Releases
 
@@ -86,7 +87,8 @@ SCRUM-7 #done
 
 - Title follows the commit format: `feat(server): add health endpoint [SCRUM-7]`. CI checks it.
 - Feature PRs target `develop`; only release and hotfix PRs target `main`.
-- Keep PRs small and focused on a single ticket.
+- Keep PRs small and focused on a single ticket, but split the work into several commits
+  (e.g. migration, logic, endpoint, tests, contract export), each one building and passing tests.
 - Fill in every section of the template.
 - Changes to the API contract in `shared/` must be announced to the other teammate.
 
