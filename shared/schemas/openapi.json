@@ -109,6 +109,117 @@
         "title": "ClassCreated",
         "type": "object"
       },
+      "ClassDashboard": {
+        "additionalProperties": false,
+        "properties": {
+          "averageFinalDebt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Averagefinaldebt"
+          },
+          "code": {
+            "pattern": "^[A-Z0-9]{4,8}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "concepts": {
+            "items": {
+              "$ref": "#/components/schemas/ConceptStat"
+            },
+            "title": "Concepts",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "finishedGames": {
+            "title": "Finishedgames",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "negotiations": {
+            "title": "Negotiations",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "model",
+              "fallback"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "trapDetectionPct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trapdetectionpct"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "students",
+          "finishedGames",
+          "negotiations",
+          "trapDetectionPct",
+          "averageFinalDebt",
+          "concepts",
+          "explanation",
+          "source"
+        ],
+        "title": "ClassDashboard",
+        "type": "object"
+      },
+      "ConceptStat": {
+        "additionalProperties": false,
+        "properties": {
+          "concept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          },
+          "decisions": {
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "riskyChoicePct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Riskychoicepct"
+          }
+        },
+        "required": [
+          "concept",
+          "decisions",
+          "riskyChoicePct"
+        ],
+        "title": "ConceptStat",
+        "type": "object"
+      },
       "CreateClassRequest": {
         "additionalProperties": false,
         "properties": {
@@ -900,6 +1011,49 @@
           }
         },
         "summary": "Create Class",
+        "tags": [
+          "classes"
+        ]
+      }
+    },
+    "/api/classes/{code}/dashboard": {
+      "get": {
+        "operationId": "class_dashboard_api_classes__code__dashboard_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Z0-9]{4,8}$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassDashboard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Class Dashboard",
         "tags": [
           "classes"
         ]
