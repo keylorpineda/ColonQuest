@@ -13,6 +13,15 @@ from app.schemas.player_state import PlayerState
 ClassCode = Annotated[str, Field(pattern=r"^[A-Z0-9]{4,8}$")]
 
 
+class CreateClassRequest(ContractModel):
+    name: Annotated[str, Field(min_length=1, max_length=80)]
+
+
+class ClassCreated(ContractModel):
+    code: ClassCode
+    name: str
+
+
 class CreateSessionRequest(ContractModel):
     class_code: ClassCode | None = None
 
