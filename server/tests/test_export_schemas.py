@@ -12,6 +12,7 @@ def test_documents_are_valid_deterministic_json() -> None:
         "CreateSessionRequest.schema.json",
         "DecisionRequest.schema.json",
         "HealthResponse.schema.json",
+        "NegotiationRequest.schema.json",
         "openapi.json",
     }
     assert first == build_documents()

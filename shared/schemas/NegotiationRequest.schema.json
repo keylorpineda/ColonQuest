@@ -1,0 +1,22 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "offerId": {
+      "pattern": "^[a-z0-9_]{1,40}$",
+      "title": "Offerid",
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "offerId",
+    "text"
+  ],
+  "title": "NegotiationRequest",
+  "type": "object"
+}
