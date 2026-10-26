@@ -1081,6 +1081,48 @@
         ]
       }
     },
+    "/api/images/{key}": {
+      "get": {
+        "description": "Return a cached portrait or scene by key, generating it with Muse Image only if missing.",
+        "operationId": "get_image_api_images__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "pattern": "^[a-z0-9_ñ]+$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {}
+            },
+            "description": "Cached or newly generated pixel-art PNG image."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Image",
+        "tags": [
+          "images"
+        ]
+      }
+    },
     "/api/sessions": {
       "post": {
         "description": "Start a game. A classCode joins the session to a Class Mode class.",
