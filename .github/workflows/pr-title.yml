@@ -7,10 +7,15 @@ on:
 permissions:
   pull-requests: read
 
+concurrency:
+  group: pr-conventions-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   title:
     name: Title and branch reference a Jira ticket
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Check PR title
         env:

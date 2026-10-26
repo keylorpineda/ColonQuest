@@ -33,6 +33,35 @@ game master stays in the backlog and only starts if the playable month is done b
 If something slips, cut in this order: agentic game master, open-weights provider, Class Mode,
 real-time images, web voice (text stays). The playable month and text negotiation are never cut.
 
+## Continuous integration
+
+Two workflows run on every pull request into `develop` or `main`. Branch protection requires
+both checks and an up-to-date branch, and pull request runs test the merge commit, so CI always
+validates exactly what will land.
+
+| Required check | Workflow | What it does |
+| --- | --- | --- |
+| `CI passed` | `.github/workflows/ci.yml` | Gate job over every CI job below |
+| `Title and branch reference a Jira ticket` | `.github/workflows/pr-title.yml` | Enforces `type(scope): summary [CQ-n]` and the branch rules |
+
+Jobs in `ci.yml`, run in parallel and only when their area changed:
+
+| Job | Runs when | Notes |
+| --- | --- | --- |
+| Server / lint | `server/` or `shared/` changed | Ruff lint and format check |
+| Server / type-check | `server/` or `shared/` changed | `mypy --strict` |
+| Server / test | `server/` or `shared/` changed | pytest with coverage; any warning fails the test |
+| Unity / EditMode tests | `unity/` changed and the Unity project exists | Needs `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` secrets |
+| Workflows / actionlint | `.github/workflows/` changed | Lints the workflow files |
+
+Speed techniques:
+
+- Path filtering: unaffected jobs are skipped, and the gate treats them as passed.
+- Caching: uv packages and the Python install (`setup-uv`), Ruff and mypy caches, and the Unity `Library` folder.
+- `uv sync --frozen` with a committed `uv.lock`: no dependency resolution in CI.
+- Superseded runs on the same PR are cancelled; runs on `main` and `develop` never are.
+- Every job has a short timeout so a hung run cannot block merges.
+
 ## Definition of Done
 
 - Code merged into `develop` through a reviewed PR with green CI.

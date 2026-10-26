@@ -1,0 +1,243 @@
+name: CI
+
+# Pull request runs check the merge result (refs/pull/N/merge), and branch
+# protection requires the branch to be up to date with its base, so what is
+# tested is exactly what lands on develop or main.
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Cancel superseded PR runs, but never cancel runs on main or develop.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FORCE_COLOR: "1"
+  UV_LOCKED: "1"
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      server: ${{ steps.filter.outputs.server }}
+      unity: ${{ steps.filter.outputs.unity }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+      unity-project: ${{ steps.unity.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'server/**'
+              - 'shared/**'
+              - '.github/workflows/ci.yml'
+            unity:
+              - 'unity/**'
+              - 'shared/**'
+              - '.github/workflows/ci.yml'
+            workflows:
+              - '.github/workflows/**'
+
+      - name: Check for a Unity project
+        id: unity
+        run: |
+          if [[ -f unity/ProjectSettings/ProjectVersion.txt ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  server-lint:
+    name: Server / lint
+    needs: changes
+    if: needs.changes.outputs.server == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          working-directory: server
+          enable-cache: true
+          cache-python: true
+          cache-dependency-glob: server/uv.lock
+
+      - name: Restore Ruff cache
+        uses: actions/cache@v6
+        with:
+          path: server/.ruff_cache
+          key: ruff-${{ runner.os }}-${{ hashFiles('server/uv.lock') }}-${{ github.sha }}
+          restore-keys: ruff-${{ runner.os }}-${{ hashFiles('server/uv.lock') }}-
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Ruff lint
+        run: uv run ruff check . --output-format=github
+
+      - name: Ruff format
+        run: uv run ruff format --check .
+
+  server-types:
+    name: Server / type-check
+    needs: changes
+    if: needs.changes.outputs.server == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          working-directory: server
+          enable-cache: true
+          cache-python: true
+          cache-dependency-glob: server/uv.lock
+
+      - name: Restore mypy cache
+        uses: actions/cache@v6
+        with:
+          path: server/.mypy_cache
+          key: mypy-${{ runner.os }}-${{ hashFiles('server/uv.lock') }}-${{ github.sha }}
+          restore-keys: mypy-${{ runner.os }}-${{ hashFiles('server/uv.lock') }}-
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Mypy
+        run: uv run mypy app
+
+  server-test:
+    name: Server / test
+    needs: changes
+    if: needs.changes.outputs.server == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          working-directory: server
+          enable-cache: true
+          cache-python: true
+          cache-dependency-glob: server/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      # pytest-xdist is installed; add `-n auto` once the suite is large enough
+      # that parallel workers save more time than they cost to start.
+      - name: Pytest
+        run: uv run pytest --cov=app --cov-report=term-missing:skip-covered --junitxml=pytest.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pytest-report
+          path: server/pytest.xml
+          retention-days: 7
+
+  unity-test:
+    name: Unity / EditMode tests
+    needs: changes
+    if: needs.changes.outputs.unity == 'true' && needs.changes.outputs.unity-project == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - name: Check Unity license secrets
+        id: license
+        run: |
+          if [[ -z "$UNITY_LICENSE" ]]; then
+            echo "::notice::UNITY_LICENSE secret is not set; skipping Unity tests."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.license.outputs.available == 'true'
+        with:
+          lfs: true
+
+      - name: Restore Unity Library cache
+        if: steps.license.outputs.available == 'true'
+        uses: actions/cache@v6
+        with:
+          path: unity/Library
+          key: unity-library-${{ hashFiles('unity/Assets/**', 'unity/Packages/**', 'unity/ProjectSettings/**') }}
+          restore-keys: unity-library-
+
+      - name: Run EditMode tests
+        if: steps.license.outputs.available == 'true'
+        uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: unity
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Unity EditMode results
+
+  workflows-lint:
+    name: Workflows / actionlint
+    needs: changes
+    if: needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run actionlint
+        run: |
+          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
+          ./actionlint -color
+
+  # Single required status check. Skipped jobs (nothing changed in that area)
+  # count as success; any failure or cancellation blocks the merge.
+  ci-passed:
+    name: CI passed
+    needs: [changes, server-lint, server-types, server-test, unity-test, workflows-lint]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Evaluate job results
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "Job results: $RESULTS"
+          if [[ "$RESULTS" == *failure* || "$RESULTS" == *cancelled* ]]; then
+            echo "::error::At least one CI job failed or was cancelled."
+            exit 1
+          fi
+          echo "All required jobs passed or were not needed."
