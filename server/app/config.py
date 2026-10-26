@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     response_cache_max_entries: int = Field(default=500, ge=1)
     client_hash_salt: SecretStr = SecretStr("")
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
+    log_level: str = "INFO"
 
     @field_validator("allowed_origins", mode="before")
     @classmethod
