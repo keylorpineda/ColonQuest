@@ -1,0 +1,236 @@
+{
+  "$defs": {
+    "CreditCard": {
+      "additionalProperties": false,
+      "properties": {
+        "balance": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Balance",
+          "type": "integer"
+        },
+        "limit": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "minPaymentPct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Minpaymentpct",
+          "type": "number"
+        },
+        "monthlyRatePct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Monthlyratepct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "balance",
+        "limit",
+        "monthlyRatePct",
+        "minPaymentPct"
+      ],
+      "title": "CreditCard",
+      "type": "object"
+    },
+    "InformalLoan": {
+      "additionalProperties": false,
+      "properties": {
+        "balance": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Balance",
+          "type": "integer"
+        },
+        "lender": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Lender",
+          "type": "string"
+        },
+        "monthlyRatePct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Monthlyratepct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lender",
+        "balance",
+        "monthlyRatePct"
+      ],
+      "title": "InformalLoan",
+      "type": "object"
+    },
+    "Installment": {
+      "additionalProperties": false,
+      "properties": {
+        "item": {
+          "maxLength": 60,
+          "minLength": 1,
+          "title": "Item",
+          "type": "string"
+        },
+        "monthly": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Monthly",
+          "type": "integer"
+        },
+        "monthsLeft": {
+          "maximum": 120,
+          "minimum": 0,
+          "title": "Monthsleft",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "item",
+        "monthly",
+        "monthsLeft"
+      ],
+      "title": "Installment",
+      "type": "object"
+    },
+    "PlayerState": {
+      "additionalProperties": false,
+      "properties": {
+        "cash": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Cash",
+          "type": "integer"
+        },
+        "creditCard": {
+          "$ref": "#/$defs/CreditCard"
+        },
+        "emergencyFund": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Emergencyfund",
+          "type": "integer"
+        },
+        "history": {
+          "items": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "History",
+          "type": "array"
+        },
+        "informalLoans": {
+          "items": {
+            "$ref": "#/$defs/InformalLoan"
+          },
+          "maxItems": 10,
+          "title": "Informalloans",
+          "type": "array"
+        },
+        "installments": {
+          "items": {
+            "$ref": "#/$defs/Installment"
+          },
+          "maxItems": 20,
+          "title": "Installments",
+          "type": "array"
+        },
+        "month": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Month",
+          "type": "integer"
+        },
+        "salaryNet": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Salarynet",
+          "type": "integer"
+        },
+        "savings": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Savings",
+          "type": "integer"
+        },
+        "wellbeing": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Wellbeing",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "month",
+        "salaryNet",
+        "cash",
+        "savings",
+        "emergencyFund",
+        "creditCard",
+        "wellbeing"
+      ],
+      "title": "PlayerState",
+      "type": "object"
+    },
+    "TeachingConcept": {
+      "enum": [
+        "budget",
+        "emergency_fund",
+        "compound_interest",
+        "minimum_payment",
+        "installments_total_cost",
+        "informal_lending",
+        "pyramid_scheme",
+        "inflation",
+        "exchange_rate",
+        "payroll_deductions"
+      ],
+      "title": "TeachingConcept",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "choiceId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[a-z0-9_ñ]+$",
+      "title": "Choiceid",
+      "type": "string"
+    },
+    "eventId": {
+      "maxLength": 64,
+      "minLength": 1,
+      "pattern": "^[a-z0-9_ñ]+$",
+      "title": "Eventid",
+      "type": "string"
+    },
+    "month": {
+      "maximum": 12,
+      "minimum": 1,
+      "title": "Month",
+      "type": "integer"
+    },
+    "stateAfter": {
+      "$ref": "#/$defs/PlayerState"
+    },
+    "teachingConcept": {
+      "$ref": "#/$defs/TeachingConcept"
+    }
+  },
+  "required": [
+    "month",
+    "eventId",
+    "teachingConcept",
+    "choiceId",
+    "stateAfter"
+  ],
+  "title": "DecisionRequest",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "classCode": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Z0-9]{4,8}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Classcode"
+    }
+  },
+  "title": "CreateSessionRequest",
+  "type": "object"
+}
