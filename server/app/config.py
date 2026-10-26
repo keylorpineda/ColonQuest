@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
+    downgrade_model: str = "muse-spark-1.3"
+    max_calls_per_session: int = Field(default=40, ge=1)
+    max_calls_per_client_per_day: int = Field(default=200, ge=1)
+    response_cache_ttl_s: int = Field(default=3600, ge=0)
+    response_cache_max_entries: int = Field(default=500, ge=1)
+    client_hash_salt: SecretStr = SecretStr("")
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
 
     @field_validator("allowed_origins", mode="before")

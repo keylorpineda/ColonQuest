@@ -4,6 +4,7 @@ daily budget (DAILY_BUDGET_USD).
 Prices are USD per million tokens from the Meta Model API price list in CLAUDE.md.
 """
 
+import hashlib
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, time
@@ -13,7 +14,8 @@ from enum import StrEnum
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import ModelCall
+from app.config import Settings
+from app.db import GameSession, ModelCall
 from app.providers.base import Usage
 
 MILLION = Decimal(1_000_000)
@@ -127,3 +129,55 @@ async def budget_status(db: AsyncSession, budget_usd: float) -> BudgetStatus:
     spent = await spent_today(db)
     budget = Decimal(str(budget_usd))
     return BudgetStatus(spent_usd=spent, budget_usd=budget, mode=budget_mode(spent, budget))
+
+
+def select_text_model(configured: str, mode: BudgetMode, settings: Settings) -> str | None:
+    """Model to use for a text call, or None when only fallbacks are allowed.
+
+    Downgraded mode swaps Muse Wonder for the cheaper Spark model; Spark stays as is.
+    """
+    if mode == BudgetMode.FALLBACK_ONLY:
+        return None
+    if mode == BudgetMode.DOWNGRADED and configured.startswith("muse-wonder"):
+        return settings.downgrade_model
+    return configured
+
+
+def client_hash(client_ip: str, salt: str) -> str:
+    """Pseudonymous client id for per-IP limits; raw IPs are never stored."""
+    return hashlib.sha256(f"{salt}:{client_ip}".encode()).hexdigest()
+
+
+class LimitExceeded(StrEnum):
+    SESSION = "session"
+    CLIENT = "client"
+
+
+async def calls_for_session(db: AsyncSession, session_id: uuid.UUID) -> int:
+    count = await db.scalar(
+        select(func.count()).select_from(ModelCall).where(ModelCall.session_id == session_id)
+    )
+    return int(count or 0)
+
+
+async def calls_for_client_today(db: AsyncSession, hashed_client: str) -> int:
+    count = await db.scalar(
+        select(func.count())
+        .select_from(ModelCall)
+        .join(GameSession, GameSession.id == ModelCall.session_id)
+        .where(GameSession.client_hash == hashed_client, ModelCall.created_at >= start_of_day())
+    )
+    return int(count or 0)
+
+
+async def check_limits(
+    db: AsyncSession, settings: Settings, session_id: uuid.UUID, hashed_client: str | None
+) -> LimitExceeded | None:
+    """Return which limit is exceeded, if any. Callers serve a fallback instead of the model."""
+    if await calls_for_session(db, session_id) >= settings.max_calls_per_session:
+        return LimitExceeded.SESSION
+    if hashed_client is not None:
+        client_calls = await calls_for_client_today(db, hashed_client)
+        if client_calls >= settings.max_calls_per_client_per_day:
+            return LimitExceeded.CLIENT
+    return None
