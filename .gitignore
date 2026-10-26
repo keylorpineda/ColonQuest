@@ -26,6 +26,8 @@ unity/[Ll]ogs/
 unity/[Uu]ser[Ss]ettings/
 unity/[Mm]emoryCaptures/
 unity/[Rr]ecordings/
+unity/**/bin/
+unity/**/obj/
 unity/*.csproj
 unity/*.sln
 unity/*.suo
