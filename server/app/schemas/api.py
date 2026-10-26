@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from app.schemas.base import ContractModel
-from app.schemas.enums import TeachingConcept
+from app.schemas.enums import KeyQuestion, TeachingConcept
 from app.schemas.game_event import Identifier
 from app.schemas.player_state import PlayerState
 
@@ -36,6 +36,19 @@ class DecisionRecorded(ContractModel):
 class NegotiationRequest(ContractModel):
     offer_id: Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
     text: Annotated[str, Field(min_length=1, max_length=500)]
+
+
+class SessionSummary(ContractModel):
+    months_played: int
+    decisions: int
+    concepts_taught: list[TeachingConcept]
+    negotiations: int
+    deals_accepted: int
+    key_questions_asked: list[KeyQuestion]
+    total_debt: int
+    net_worth: int
+    narrative: str
+    source: Literal["model", "fallback"]
 
 
 class BudgetInfo(ContractModel):

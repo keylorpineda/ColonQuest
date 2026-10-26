@@ -6,13 +6,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import events, health, negotiation, sessions
+from app.api import events, health, negotiation, sessions, summary
 from app.config import get_settings
 from app.game_master.service import GameMaster
 from app.negotiation.service import Negotiator
 from app.providers.meta import MetaProvider
 from app.response_cache import TTLCache
 from app.schemas import GameEvent
+from app.summary.writer import SummaryWriter
 
 
 @asynccontextmanager
@@ -26,6 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.provider = provider
     app.state.game_master = GameMaster(provider, settings, cache)
     app.state.negotiator = Negotiator(provider, settings)
+    app.state.summary_writer = SummaryWriter(provider, settings)
     try:
         yield
     finally:
@@ -52,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(sessions.router, prefix="/api")
     app.include_router(events.router, prefix="/api")
     app.include_router(negotiation.router, prefix="/api")
+    app.include_router(summary.router, prefix="/api")
     return app
 
 
