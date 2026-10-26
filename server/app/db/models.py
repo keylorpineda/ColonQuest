@@ -77,7 +77,10 @@ class Negotiation(Base):
     session_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("sessions.id", ondelete="CASCADE"), index=True, nullable=False
     )
+    offer_id: Mapped[str] = mapped_column(String(40), nullable=False, server_default="unknown")
     transcript: Mapped[str] = mapped_column(Text, nullable=False)
+    npc_reply: Mapped[str] = mapped_column(Text, nullable=False, server_default="")
+    source: Mapped[str] = mapped_column(String(10), nullable=False, server_default="model")
     key_questions_asked: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     revealed_facts: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     deal_status: Mapped[str] = mapped_column(String(20), nullable=False)

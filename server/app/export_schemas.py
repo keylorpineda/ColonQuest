@@ -15,7 +15,12 @@ from pydantic import BaseModel
 
 from app.main import create_app
 from app.schemas import GameEvent, NegotiationReply, PlayerState
-from app.schemas.api import CreateSessionRequest, DecisionRequest, HealthResponse
+from app.schemas.api import (
+    CreateSessionRequest,
+    DecisionRequest,
+    HealthResponse,
+    NegotiationRequest,
+)
 
 OUTPUT_DIR = Path(__file__).resolve().parents[2] / "shared" / "schemas"
 CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
@@ -25,6 +30,7 @@ CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
     CreateSessionRequest,
     DecisionRequest,
     HealthResponse,
+    NegotiationRequest,
 )
 
 

@@ -33,6 +33,11 @@ class DecisionRecorded(ContractModel):
     decision_id: int
 
 
+class NegotiationRequest(ContractModel):
+    offer_id: Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
+    text: Annotated[str, Field(min_length=1, max_length=500)]
+
+
 class BudgetInfo(ContractModel):
     spent_usd: float
     budget_usd: float

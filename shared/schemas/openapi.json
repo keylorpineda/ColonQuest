@@ -124,6 +124,16 @@
         "title": "CreditCard",
         "type": "object"
       },
+      "DealStatus": {
+        "enum": [
+          "open",
+          "accepted",
+          "rejected",
+          "walked_away"
+        ],
+        "title": "DealStatus",
+        "type": "string"
+      },
       "DecisionRecorded": {
         "additionalProperties": false,
         "properties": {
@@ -434,6 +444,19 @@
         "title": "Installment",
         "type": "object"
       },
+      "KeyQuestion": {
+        "description": "Questions a financially literate player should ask (impact metric).",
+        "enum": [
+          "total_cost",
+          "hidden_fees",
+          "interest_rate",
+          "term",
+          "cash_price",
+          "insurance"
+        ],
+        "title": "KeyQuestion",
+        "type": "string"
+      },
       "MoneySource": {
         "enum": [
           "cash",
@@ -443,6 +466,70 @@
         ],
         "title": "MoneySource",
         "type": "string"
+      },
+      "NegotiationReply": {
+        "additionalProperties": false,
+        "properties": {
+          "dealStatus": {
+            "$ref": "#/components/schemas/DealStatus"
+          },
+          "keyQuestionsAsked": {
+            "items": {
+              "$ref": "#/components/schemas/KeyQuestion"
+            },
+            "maxItems": 6,
+            "title": "Keyquestionsasked",
+            "type": "array"
+          },
+          "npcReply": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Npcreply",
+            "type": "string"
+          },
+          "revealedFacts": {
+            "items": {
+              "$ref": "#/components/schemas/SellerFact"
+            },
+            "maxItems": 7,
+            "title": "Revealedfacts",
+            "type": "array"
+          },
+          "transcript": {
+            "maxLength": 1000,
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript",
+          "npcReply",
+          "dealStatus"
+        ],
+        "title": "NegotiationReply",
+        "type": "object"
+      },
+      "NegotiationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "offerId": {
+            "pattern": "^[a-z0-9_]{1,40}$",
+            "title": "Offerid",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offerId",
+          "text"
+        ],
+        "title": "NegotiationRequest",
+        "type": "object"
       },
       "Npc": {
         "additionalProperties": false,
@@ -555,6 +642,20 @@
         ],
         "title": "PlayerState",
         "type": "object"
+      },
+      "SellerFact": {
+        "description": "Facts on the hidden seller sheet that the NPC can reveal.",
+        "enum": [
+          "cash_price",
+          "monthly_payment",
+          "term_months",
+          "interest_rate",
+          "insurance_fee",
+          "commission",
+          "total_cost"
+        ],
+        "title": "SellerFact",
+        "type": "string"
       },
       "SessionCreated": {
         "additionalProperties": false,
@@ -805,6 +906,60 @@
         "summary": "Next Event",
         "tags": [
           "events"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/negotiation": {
+      "post": {
+        "description": "One negotiation turn with typed text (always available as the fallback to voice).",
+        "operationId": "negotiate_text_api_sessions__session_id__negotiation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NegotiationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NegotiationReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Negotiate Text",
+        "tags": [
+          "negotiation"
         ]
       }
     }
