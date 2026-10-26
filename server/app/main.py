@@ -6,10 +6,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import classes, dashboard, events, health, negotiation, sessions, summary
+from app.api import classes, dashboard, events, health, images, negotiation, sessions, summary
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
 from app.game_master.service import GameMaster
+from app.images.service import ImageService
 from app.logging_config import configure_logging
 from app.negotiation.service import Negotiator
 from app.providers.meta import MetaProvider
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.negotiator = Negotiator(provider, settings)
     app.state.summary_writer = SummaryWriter(provider, settings)
     app.state.class_explainer = ClassExplainer(provider, settings)
+    app.state.image_service = ImageService(provider, settings)
     try:
         yield
     finally:
@@ -52,7 +54,7 @@ def create_app() -> FastAPI:
         allow_origins=settings.allowed_origins,
         allow_methods=["GET", "POST"],
         allow_headers=["*"],
-        expose_headers=["X-Event-Source", "X-Reply-Source"],
+        expose_headers=["X-Event-Source", "X-Reply-Source", "X-Image-Source"],
     )
     app.include_router(health.router, prefix="/api")
     app.include_router(sessions.router, prefix="/api")
@@ -61,6 +63,7 @@ def create_app() -> FastAPI:
     app.include_router(events.router, prefix="/api")
     app.include_router(negotiation.router, prefix="/api")
     app.include_router(summary.router, prefix="/api")
+    app.include_router(images.router, prefix="/api")
     return app
 
 
