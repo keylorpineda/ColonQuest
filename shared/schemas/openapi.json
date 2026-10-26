@@ -1,6 +1,27 @@
 {
   "components": {
     "schemas": {
+      "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "description": "WAV clip, 16-bit PCM, up to 15 s",
+            "title": "Audio",
+            "type": "string"
+          },
+          "offerId": {
+            "pattern": "^[a-z0-9_]{1,40}$",
+            "title": "Offerid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offerId",
+          "audio"
+        ],
+        "title": "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post",
+        "type": "object"
+      },
       "BudgetInfo": {
         "additionalProperties": false,
         "properties": {
@@ -958,6 +979,60 @@
           }
         },
         "summary": "Negotiate Text",
+        "tags": [
+          "negotiation"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/negotiation/voice": {
+      "post": {
+        "description": "One negotiation turn spoken by the player.\n\nValidation happens before paying for transcription. If voice fails the response is 503 and\nthe client switches to the text endpoint, so the negotiation never blocks.",
+        "operationId": "negotiate_voice_api_sessions__session_id__negotiation_voice_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NegotiationReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Negotiate Voice",
         "tags": [
           "negotiation"
         ]
