@@ -8,22 +8,23 @@ Thanks for helping! This guide keeps the repository tidy and every change tracea
 | --- | --- | --- |
 | `main` | Stable, demo-ready releases only. Every merge is tagged (`v0.1.0`, ...) | `develop` (release PR) or `hotfix/*` |
 | `develop` | Integration branch. All day-to-day work lands here | Feature branches (`feat/*`, `fix/*`, `chore/*`, ...) |
-| `<type>/CQ-<n>-...` | One branch per Jira ticket, always created from `develop` | — |
-| `hotfix/CQ-<n>-...` | Urgent fix for the live demo, created from `main` | — |
+| `<type>/SCRUM-<n>-...` | One branch per Jira ticket, always created from `develop` | — |
+| `hotfix/SCRUM-<n>-...` | Urgent fix for the live demo, created from `main` | — |
 
 Nobody pushes directly to `main` or `develop`; everything goes through a pull request.
 
 ## Workflow at a glance
 
-1. Pick a ticket in Jira (project key **`CQ`**) and move it to **In Progress**.
+1. Pick a ticket in Jira (project key **`SCRUM`**) and move it to **In Progress**.
 2. Update `develop` and branch from it:
    ```bash
    git switch develop && git pull
-   git switch -c feat/CQ-12-game-master-endpoint
+   git switch -c feat/SCRUM-12-game-master-endpoint
    ```
 3. Commit using [Conventional Commits](https://www.conventionalcommits.org/) with the ticket key.
 4. Open a small pull request **into `develop`** using the PR template. CI must pass.
-5. Squash-merge. Jira picks up the branch, commits and PR automatically through the GitHub for Jira app.
+5. Rebase-merge, so every small commit stays in `develop`'s history. Jira picks up the branch,
+   commits and PR automatically through the GitHub for Atlassian app.
 
 ### Releases
 
@@ -37,20 +38,20 @@ git tag -a v0.1.0 -m "v0.1.0" && git push origin v0.1.0
 
 ### Hotfixes
 
-Branch `hotfix/CQ-<n>-...` from `main`, open the PR into `main`, then merge `main` back into `develop`.
+Branch `hotfix/SCRUM-<n>-...` from `main`, open the PR into `main`, then merge `main` back into `develop`.
 
 ## Branch names
 
 ```
-<type>/CQ-<number>-<short-kebab-description>
+<type>/SCRUM-<number>-<short-kebab-description>
 ```
 
-Examples: `feat/CQ-12-game-master-endpoint`, `fix/CQ-40-negative-cash-balance`, `chore/CQ-1-repository-setup`.
+Examples: `feat/SCRUM-12-game-master-endpoint`, `fix/SCRUM-40-negative-cash-balance`, `chore/SCRUM-1-repository-setup`.
 
 ## Commit messages
 
 ```
-<type>(<scope>): <imperative summary> [CQ-<number>]
+<type>(<scope>): <imperative summary> [SCRUM-<number>]
 
 <optional body: what and why, wrapped at 72 characters>
 
@@ -64,7 +65,7 @@ Examples: `feat/CQ-12-game-master-endpoint`, `fix/CQ-40-negative-cash-balance`, 
 Example:
 
 ```
-feat(server): add health endpoint with remaining budget [CQ-7]
+feat(server): add health endpoint with remaining budget [SCRUM-7]
 ```
 
 Enable the local template once per clone:
@@ -78,15 +79,16 @@ git config commit.template .gitmessage
 You can transition or comment on a ticket from a commit footer:
 
 ```
-CQ-7 #comment Health check now reports the daily budget
-CQ-7 #done
+SCRUM-7 #comment Health check now reports the daily budget
+SCRUM-7 #done
 ```
 
 ## Pull requests
 
-- Title follows the commit format: `feat(server): add health endpoint [CQ-7]`. CI checks it.
+- Title follows the commit format: `feat(server): add health endpoint [SCRUM-7]`. CI checks it.
 - Feature PRs target `develop`; only release and hotfix PRs target `main`.
-- Keep PRs small and focused on a single ticket.
+- Keep PRs small and focused on a single ticket, but split the work into several commits
+  (e.g. migration, logic, endpoint, tests, contract export), each one building and passing tests.
 - Fill in every section of the template.
 - Changes to the API contract in `shared/` must be announced to the other teammate.
 

@@ -10,14 +10,21 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "openai>=3.38",
+    "httpx2>=2.16",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "psycopg[binary]>=3.2",
+    "alembic>=1.14",
+    "python-multipart>=0.0.20",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=8.3",
-    "httpx>=0.27",
     "ruff>=0.7",
     "mypy>=1.13",
+    "pytest-xdist>=3.8.0",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.uv]
@@ -31,7 +38,7 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ASYNC", "S"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+"tests/**" = ["S101", "S311"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -41,3 +48,8 @@ plugins = ["pydantic.mypy"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]

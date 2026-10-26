@@ -1,0 +1,1439 @@
+{
+  "components": {
+    "schemas": {
+      "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "description": "WAV clip, 16-bit PCM, up to 15 s",
+            "title": "Audio",
+            "type": "string"
+          },
+          "offerId": {
+            "pattern": "^[a-z0-9_]{1,40}$",
+            "title": "Offerid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offerId",
+          "audio"
+        ],
+        "title": "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post",
+        "type": "object"
+      },
+      "BudgetInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "budgetUsd": {
+            "title": "Budgetusd",
+            "type": "number"
+          },
+          "mode": {
+            "enum": [
+              "normal",
+              "downgraded",
+              "fallback_only"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "remainingUsd": {
+            "title": "Remainingusd",
+            "type": "number"
+          },
+          "spentUsd": {
+            "title": "Spentusd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "spentUsd",
+          "budgetUsd",
+          "remainingUsd",
+          "mode"
+        ],
+        "title": "BudgetInfo",
+        "type": "object"
+      },
+      "Choice": {
+        "additionalProperties": false,
+        "properties": {
+          "effects": {
+            "items": {
+              "$ref": "#/components/schemas/Effect"
+            },
+            "maxItems": 5,
+            "title": "Effects",
+            "type": "array"
+          },
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "effects"
+        ],
+        "title": "Choice",
+        "type": "object"
+      },
+      "ClassCreated": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z0-9]{4,8}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "ClassCreated",
+        "type": "object"
+      },
+      "ClassDashboard": {
+        "additionalProperties": false,
+        "properties": {
+          "averageFinalDebt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Averagefinaldebt"
+          },
+          "code": {
+            "pattern": "^[A-Z0-9]{4,8}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "concepts": {
+            "items": {
+              "$ref": "#/components/schemas/ConceptStat"
+            },
+            "title": "Concepts",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "finishedGames": {
+            "title": "Finishedgames",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "negotiations": {
+            "title": "Negotiations",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "model",
+              "fallback"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "trapDetectionPct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trapdetectionpct"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "students",
+          "finishedGames",
+          "negotiations",
+          "trapDetectionPct",
+          "averageFinalDebt",
+          "concepts",
+          "explanation",
+          "source"
+        ],
+        "title": "ClassDashboard",
+        "type": "object"
+      },
+      "ConceptStat": {
+        "additionalProperties": false,
+        "properties": {
+          "concept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          },
+          "decisions": {
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "riskyChoicePct": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Riskychoicepct"
+          }
+        },
+        "required": [
+          "concept",
+          "decisions",
+          "riskyChoicePct"
+        ],
+        "title": "ConceptStat",
+        "type": "object"
+      },
+      "CreateClassRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateClassRequest",
+        "type": "object"
+      },
+      "CreateSessionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "classCode": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z0-9]{4,8}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classcode"
+          }
+        },
+        "title": "CreateSessionRequest",
+        "type": "object"
+      },
+      "CreditCard": {
+        "additionalProperties": false,
+        "properties": {
+          "balance": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Balance",
+            "type": "integer"
+          },
+          "limit": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "minPaymentPct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Minpaymentpct",
+            "type": "number"
+          },
+          "monthlyRatePct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Monthlyratepct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "balance",
+          "limit",
+          "monthlyRatePct",
+          "minPaymentPct"
+        ],
+        "title": "CreditCard",
+        "type": "object"
+      },
+      "DealStatus": {
+        "enum": [
+          "open",
+          "accepted",
+          "rejected",
+          "walked_away"
+        ],
+        "title": "DealStatus",
+        "type": "string"
+      },
+      "DecisionRecorded": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "title": "Decisionid",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "title": "DecisionRecorded",
+        "type": "object"
+      },
+      "DecisionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "choiceId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Choiceid",
+            "type": "string"
+          },
+          "eventId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Eventid",
+            "type": "string"
+          },
+          "month": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Month",
+            "type": "integer"
+          },
+          "stateAfter": {
+            "$ref": "#/components/schemas/PlayerState"
+          },
+          "teachingConcept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          }
+        },
+        "required": [
+          "month",
+          "eventId",
+          "teachingConcept",
+          "choiceId",
+          "stateAfter"
+        ],
+        "title": "DecisionRequest",
+        "type": "object"
+      },
+      "Effect": {
+        "additionalProperties": false,
+        "description": "A bounded change the finance engine knows how to apply.\n\n``amount`` may be negative only for savings_change and wellbeing_change.\n``months`` is required for new_installment and new_informal_loan.",
+        "properties": {
+          "amount": {
+            "maximum": 100000000.0,
+            "minimum": -100000000.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/EffectKind"
+          },
+          "months": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MoneySource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "amount"
+        ],
+        "title": "Effect",
+        "type": "object"
+      },
+      "EffectKind": {
+        "enum": [
+          "expense",
+          "income",
+          "new_installment",
+          "new_informal_loan",
+          "savings_change",
+          "wellbeing_change",
+          "price_inflation"
+        ],
+        "title": "EffectKind",
+        "type": "string"
+      },
+      "EventType": {
+        "enum": [
+          "income",
+          "expense",
+          "emergency",
+          "offer",
+          "scam",
+          "macro_news",
+          "bonus"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
+      "GameEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "maxItems": 4,
+            "minItems": 2,
+            "title": "Choices",
+            "type": "array"
+          },
+          "eventId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Eventid",
+            "type": "string"
+          },
+          "imageKey": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[a-z0-9_ñ]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Imagekey"
+          },
+          "narrative": {
+            "maxLength": 280,
+            "minLength": 1,
+            "title": "Narrative",
+            "type": "string"
+          },
+          "npc": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Npc"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "teachingConcept": {
+            "$ref": "#/components/schemas/TeachingConcept"
+          },
+          "title": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EventType"
+          }
+        },
+        "required": [
+          "eventId",
+          "type",
+          "title",
+          "narrative",
+          "choices",
+          "teachingConcept"
+        ],
+        "title": "GameEvent",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BudgetInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "database": {
+            "enum": [
+              "ok",
+              "unavailable",
+              "not_configured"
+            ],
+            "title": "Database",
+            "type": "string"
+          },
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "database"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "InformalLoan": {
+        "additionalProperties": false,
+        "properties": {
+          "balance": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Balance",
+            "type": "integer"
+          },
+          "lender": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Lender",
+            "type": "string"
+          },
+          "monthlyRatePct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Monthlyratepct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lender",
+          "balance",
+          "monthlyRatePct"
+        ],
+        "title": "InformalLoan",
+        "type": "object"
+      },
+      "Installment": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Item",
+            "type": "string"
+          },
+          "monthly": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Monthly",
+            "type": "integer"
+          },
+          "monthsLeft": {
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Monthsleft",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "item",
+          "monthly",
+          "monthsLeft"
+        ],
+        "title": "Installment",
+        "type": "object"
+      },
+      "KeyQuestion": {
+        "description": "Questions a financially literate player should ask (impact metric).",
+        "enum": [
+          "total_cost",
+          "hidden_fees",
+          "interest_rate",
+          "term",
+          "cash_price",
+          "insurance"
+        ],
+        "title": "KeyQuestion",
+        "type": "string"
+      },
+      "MoneySource": {
+        "enum": [
+          "cash",
+          "savings",
+          "emergency_fund",
+          "credit_card"
+        ],
+        "title": "MoneySource",
+        "type": "string"
+      },
+      "NegotiationReply": {
+        "additionalProperties": false,
+        "properties": {
+          "dealStatus": {
+            "$ref": "#/components/schemas/DealStatus"
+          },
+          "keyQuestionsAsked": {
+            "items": {
+              "$ref": "#/components/schemas/KeyQuestion"
+            },
+            "maxItems": 6,
+            "title": "Keyquestionsasked",
+            "type": "array"
+          },
+          "npcReply": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Npcreply",
+            "type": "string"
+          },
+          "revealedFacts": {
+            "items": {
+              "$ref": "#/components/schemas/SellerFact"
+            },
+            "maxItems": 7,
+            "title": "Revealedfacts",
+            "type": "array"
+          },
+          "transcript": {
+            "maxLength": 1000,
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript",
+          "npcReply",
+          "dealStatus"
+        ],
+        "title": "NegotiationReply",
+        "type": "object"
+      },
+      "NegotiationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "offerId": {
+            "pattern": "^[a-z0-9_]{1,40}$",
+            "title": "Offerid",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offerId",
+          "text"
+        ],
+        "title": "NegotiationRequest",
+        "type": "object"
+      },
+      "Npc": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_ñ]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ],
+        "title": "Npc",
+        "type": "object"
+      },
+      "PlayerState": {
+        "additionalProperties": false,
+        "properties": {
+          "cash": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Cash",
+            "type": "integer"
+          },
+          "creditCard": {
+            "$ref": "#/components/schemas/CreditCard"
+          },
+          "emergencyFund": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Emergencyfund",
+            "type": "integer"
+          },
+          "history": {
+            "items": {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "History",
+            "type": "array"
+          },
+          "informalLoans": {
+            "items": {
+              "$ref": "#/components/schemas/InformalLoan"
+            },
+            "maxItems": 10,
+            "title": "Informalloans",
+            "type": "array"
+          },
+          "installments": {
+            "items": {
+              "$ref": "#/components/schemas/Installment"
+            },
+            "maxItems": 20,
+            "title": "Installments",
+            "type": "array"
+          },
+          "month": {
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Month",
+            "type": "integer"
+          },
+          "salaryNet": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Salarynet",
+            "type": "integer"
+          },
+          "savings": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Savings",
+            "type": "integer"
+          },
+          "wellbeing": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Wellbeing",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "month",
+          "salaryNet",
+          "cash",
+          "savings",
+          "emergencyFund",
+          "creditCard",
+          "wellbeing"
+        ],
+        "title": "PlayerState",
+        "type": "object"
+      },
+      "SellerFact": {
+        "description": "Facts on the hidden seller sheet that the NPC can reveal.",
+        "enum": [
+          "cash_price",
+          "monthly_payment",
+          "term_months",
+          "interest_rate",
+          "insurance_fee",
+          "commission",
+          "total_cost"
+        ],
+        "title": "SellerFact",
+        "type": "string"
+      },
+      "SessionCreated": {
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {
+            "format": "uuid",
+            "title": "Sessionid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "title": "SessionCreated",
+        "type": "object"
+      },
+      "SessionSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "conceptsTaught": {
+            "items": {
+              "$ref": "#/components/schemas/TeachingConcept"
+            },
+            "title": "Conceptstaught",
+            "type": "array"
+          },
+          "dealsAccepted": {
+            "title": "Dealsaccepted",
+            "type": "integer"
+          },
+          "decisions": {
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "keyQuestionsAsked": {
+            "items": {
+              "$ref": "#/components/schemas/KeyQuestion"
+            },
+            "title": "Keyquestionsasked",
+            "type": "array"
+          },
+          "monthsPlayed": {
+            "title": "Monthsplayed",
+            "type": "integer"
+          },
+          "narrative": {
+            "title": "Narrative",
+            "type": "string"
+          },
+          "negotiations": {
+            "title": "Negotiations",
+            "type": "integer"
+          },
+          "netWorth": {
+            "title": "Networth",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "model",
+              "fallback"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "totalDebt": {
+            "title": "Totaldebt",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "monthsPlayed",
+          "decisions",
+          "conceptsTaught",
+          "negotiations",
+          "dealsAccepted",
+          "keyQuestionsAsked",
+          "totalDebt",
+          "netWorth",
+          "narrative",
+          "source"
+        ],
+        "title": "SessionSummary",
+        "type": "object"
+      },
+      "TeachingConcept": {
+        "enum": [
+          "budget",
+          "emergency_fund",
+          "compound_interest",
+          "minimum_payment",
+          "installments_total_cost",
+          "informal_lending",
+          "pyramid_scheme",
+          "inflation",
+          "exchange_rate",
+          "payroll_deductions"
+        ],
+        "title": "TeachingConcept",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Backend for the Colón Quest financial-literacy game.",
+    "title": "Colón Quest API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/classes": {
+      "post": {
+        "description": "Create a class and return the short code students type when they start a game.",
+        "operationId": "create_class_api_classes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClassRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Class",
+        "tags": [
+          "classes"
+        ]
+      }
+    },
+    "/api/classes/{code}/dashboard": {
+      "get": {
+        "operationId": "class_dashboard_api_classes__code__dashboard_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Z0-9]{4,8}$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassDashboard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Class Dashboard",
+        "tags": [
+          "classes"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Always answers 200 so uptime checks see the process; the body says what is degraded.",
+        "operationId": "get_health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/images/{key}": {
+      "get": {
+        "description": "Return a cached portrait or scene by key, generating it with Muse Image only if missing.",
+        "operationId": "get_image_api_images__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "pattern": "^[a-z0-9_ñ]+$",
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {}
+            },
+            "description": "Cached or newly generated pixel-art PNG image."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Image",
+        "tags": [
+          "images"
+        ]
+      }
+    },
+    "/api/sessions": {
+      "post": {
+        "description": "Start a game. A classCode joins the session to a Class Mode class.",
+        "operationId": "create_session_api_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/decisions": {
+      "post": {
+        "description": "Store the choice the player made and the resulting state (impact telemetry).",
+        "operationId": "record_decision_api_sessions__session_id__decisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionRecorded"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record Decision",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/event": {
+      "post": {
+        "description": "Return this month's event. Never fails because of the model: it falls back instead.\n\nThe ``X-Event-Source`` header says whether the event came from the model, the cache or the\nhand-written fallback catalog.",
+        "operationId": "next_event_api_sessions__session_id__event_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameEvent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Next Event",
+        "tags": [
+          "events"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/negotiation": {
+      "post": {
+        "description": "One negotiation turn with typed text (always available as the fallback to voice).",
+        "operationId": "negotiate_text_api_sessions__session_id__negotiation_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NegotiationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NegotiationReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Negotiate Text",
+        "tags": [
+          "negotiation"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/negotiation/voice": {
+      "post": {
+        "description": "One negotiation turn spoken by the player.\n\nValidation happens before paying for transcription. If voice fails the response is 503 and\nthe client switches to the text endpoint, so the negotiation never blocks.",
+        "operationId": "negotiate_voice_api_sessions__session_id__negotiation_voice_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NegotiationReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Negotiate Voice",
+        "tags": [
+          "negotiation"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/summary": {
+      "post": {
+        "description": "Compute the final figures, write the narrative and close the session (409 afterwards).",
+        "operationId": "finish_session_api_sessions__session_id__summary_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish Session",
+        "tags": [
+          "summary"
+        ]
+      }
+    }
+  }
+}

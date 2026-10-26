@@ -1,0 +1,213 @@
+[
+  {
+    "eventId": "evt_moto_dañada",
+    "type": "emergency",
+    "title": "Se te dañó la moto",
+    "narrative": "Ibas tarde al brete y la moto empezó a sonar feo. Don Rafa la revisa y dice que es el embrague: ₡85 000 y la tiene lista mañana.",
+    "npc": {"id": "mecanico_don_rafa", "name": "Don Rafa", "role": "mechanic"},
+    "imageKey": "scene_taller_mecanico",
+    "choices": [
+      {"id": "pay_cash", "label": "Pagar con efectivo", "effects": [{"kind": "expense", "amount": 85000, "source": "cash"}]},
+      {"id": "pay_card", "label": "Pasarlo a la tarjeta", "effects": [{"kind": "expense", "amount": 85000, "source": "credit_card"}]},
+      {"id": "use_fund", "label": "Usar el fondo de emergencia", "effects": [{"kind": "expense", "amount": 85000, "source": "emergency_fund"}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_dentista",
+    "type": "emergency",
+    "title": "Dolor de muela",
+    "narrative": "Amaneciste con la cara hinchada. La dentista dice que hay que hacer una endodoncia esta semana: ₡120 000. Si esperás, puede salir más caro.",
+    "npc": {"id": "dentista_dra_mora", "name": "Dra. Mora", "role": "dentist"},
+    "imageKey": "scene_consultorio",
+    "choices": [
+      {"id": "pay_cash", "label": "Pagar de contado", "effects": [{"kind": "expense", "amount": 120000, "source": "cash"}]},
+      {"id": "pay_card", "label": "Pagar con tarjeta", "effects": [{"kind": "expense", "amount": 120000, "source": "credit_card"}]},
+      {"id": "wait", "label": "Aguantar y esperar", "effects": [{"kind": "wellbeing_change", "amount": -15}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_pago_minimo",
+    "type": "expense",
+    "title": "Llegó el estado de cuenta",
+    "narrative": "El banco te recuerda que el pago mínimo de la tarjeta es de apenas ₡18 000. Se ve cómodo, pero el resto del saldo sigue generando intereses.",
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pay_minimum", "label": "Pagar solo el mínimo", "effects": [{"kind": "expense", "amount": 18000, "source": "cash"}]},
+      {"id": "pay_more", "label": "Pagar ₡60 000", "effects": [{"kind": "expense", "amount": 60000, "source": "cash"}]}
+    ],
+    "teachingConcept": "minimum_payment"
+  },
+  {
+    "eventId": "evt_celular_cuotas",
+    "type": "offer",
+    "title": "El celular de tus sueños",
+    "narrative": "En la tienda te ofrecen el celular nuevo a solo ₡18 500 al mes. El vendedor no menciona el plazo: son 24 cuotas. De contado cuesta ₡350 000.",
+    "npc": {"id": "vendedor_kevin", "name": "Kevin", "role": "salesperson"},
+    "imageKey": "scene_tienda_celulares",
+    "choices": [
+      {"id": "installments", "label": "Llevarlo en cuotas", "effects": [{"kind": "new_installment", "amount": 18500, "months": 24}]},
+      {"id": "pay_cash", "label": "Pagarlo de contado", "effects": [{"kind": "expense", "amount": 350000, "source": "cash"}]},
+      {"id": "decline", "label": "Seguir con el que tengo", "effects": []}
+    ],
+    "teachingConcept": "installments_total_cost"
+  },
+  {
+    "eventId": "evt_tele_cuotas",
+    "type": "offer",
+    "title": "Pantalla gigante sin prima",
+    "narrative": "Black Friday: una pantalla de 65 pulgadas \"sin prima\" por ₡32 000 al mes durante 36 meses, con seguro incluido. Todo el barrio la está comprando.",
+    "npc": {"id": "vendedor_kevin", "name": "Kevin", "role": "salesperson"},
+    "imageKey": "scene_tienda_electro",
+    "choices": [
+      {"id": "installments", "label": "Firmar las 36 cuotas", "effects": [{"kind": "new_installment", "amount": 32000, "months": 36}]},
+      {"id": "decline", "label": "Mejor no", "effects": []}
+    ],
+    "teachingConcept": "installments_total_cost"
+  },
+  {
+    "eventId": "evt_gota_a_gota",
+    "type": "scam",
+    "title": "Plata rápida sin papeleo",
+    "narrative": "Un señor en moto te ofrece ₡100 000 ya mismo, sin fiador ni papeleo. Solo tenés que pagarle \"poquito\" cada semana. Dice que todos en el barrio le deben.",
+    "npc": {"id": "prestamista_el_flaco", "name": "El Flaco", "role": "lender"},
+    "imageKey": "scene_esquina_barrio",
+    "choices": [
+      {"id": "accept", "label": "Aceptar el préstamo", "effects": [{"kind": "new_informal_loan", "amount": 100000, "months": 2}]},
+      {"id": "decline", "label": "Decirle que no", "effects": [{"kind": "wellbeing_change", "amount": -2}]}
+    ],
+    "teachingConcept": "informal_lending"
+  },
+  {
+    "eventId": "evt_prestamo_primo",
+    "type": "expense",
+    "title": "Tu primo necesita una mano",
+    "narrative": "Tu primo te escribe: \"Mae, prestame ₡50 000 y te los devuelvo en quincena, palabra\". Es la tercera vez este año.",
+    "npc": {"id": "primo_andres", "name": "Andrés", "role": "relative"},
+    "choices": [
+      {"id": "lend", "label": "Prestarle la plata", "effects": [{"kind": "expense", "amount": 50000, "source": "cash"}]},
+      {"id": "decline", "label": "Explicarle que no podés", "effects": [{"kind": "wellbeing_change", "amount": -3}]}
+    ],
+    "teachingConcept": "informal_lending"
+  },
+  {
+    "eventId": "evt_negocio_piramidal",
+    "type": "scam",
+    "title": "El negocio de tu compa",
+    "narrative": "Tu compa del cole te invita a \"un negocio que se multiplica solo\": metés ₡150 000 y traés a dos amigos. Dice que en tres meses tenés el triple.",
+    "npc": {"id": "amigo_brandon", "name": "Brandon", "role": "friend"},
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "invest", "label": "Meter mis ahorros", "effects": [{"kind": "expense", "amount": 150000, "source": "savings"}]},
+      {"id": "decline", "label": "No entrarle", "effects": []}
+    ],
+    "teachingConcept": "pyramid_scheme"
+  },
+  {
+    "eventId": "evt_aguinaldo",
+    "type": "bonus",
+    "title": "¡Cayó el aguinaldo!",
+    "narrative": "Diciembre trae ₡400 000 de aguinaldo. Ya hay ofertas por todo lado y la familia pregunta por los regalos.",
+    "imageKey": "scene_navidad",
+    "choices": [
+      {"id": "save_half", "label": "Ahorrar la mitad", "effects": [{"kind": "income", "amount": 400000}, {"kind": "savings_change", "amount": 200000}]},
+      {"id": "spend", "label": "Gastarlo en regalos y fiesta", "effects": [{"kind": "income", "amount": 400000}, {"kind": "expense", "amount": 350000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 8}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_marchamo",
+    "type": "expense",
+    "title": "Toca pagar el marchamo",
+    "narrative": "Se acerca fin de año y el marchamo de la moto sale en ₡140 000. Sin marchamo no podés circular a partir de enero.",
+    "imageKey": "scene_ins",
+    "choices": [
+      {"id": "pay_cash", "label": "Pagarlo de contado", "effects": [{"kind": "expense", "amount": 140000, "source": "cash"}]},
+      {"id": "pay_card", "label": "Pagarlo con tarjeta", "effects": [{"kind": "expense", "amount": 140000, "source": "credit_card"}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_cumple_mama",
+    "type": "expense",
+    "title": "Cumpleaños de tu mamá",
+    "narrative": "El domingo es el cumple de tu mamá. Viste un regalo bonito de ₡40 000, pero también podés hacerle algo especial con menos plata.",
+    "choices": [
+      {"id": "big_gift", "label": "Comprar el regalo caro", "effects": [{"kind": "expense", "amount": 40000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "small_gift", "label": "Algo sencillo pero especial", "effects": [{"kind": "expense", "amount": 15000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 3}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_gasolina_sube",
+    "type": "macro_news",
+    "title": "Sube la gasolina otra vez",
+    "narrative": "RECOPE anuncia otro aumento en los combustibles y el pasaje del bus también sube. Todo lo que comprás cuesta un poquito más este mes.",
+    "imageKey": "scene_gasolinera",
+    "choices": [
+      {"id": "adjust_budget", "label": "Ajustar el presupuesto", "effects": [{"kind": "price_inflation", "amount": 5}]},
+      {"id": "ignore", "label": "Seguir igual", "effects": [{"kind": "price_inflation", "amount": 5}, {"kind": "wellbeing_change", "amount": -4}]}
+    ],
+    "teachingConcept": "inflation"
+  },
+  {
+    "eventId": "evt_compra_dolares",
+    "type": "macro_news",
+    "title": "Compra en línea en dólares",
+    "narrative": "Querés comprar unos audífonos en una tienda gringa por $80. El tipo de cambio se movió y con comisión de la tarjeta sale en unos ₡45 000.",
+    "choices": [
+      {"id": "buy_now", "label": "Comprar ya", "effects": [{"kind": "expense", "amount": 45000, "source": "credit_card"}]},
+      {"id": "wait", "label": "Esperar y comparar", "effects": []}
+    ],
+    "teachingConcept": "exchange_rate"
+  },
+  {
+    "eventId": "evt_colilla_planilla",
+    "type": "income",
+    "title": "Revisá tu colilla",
+    "narrative": "Tu colilla de pago trae rebajos de CCSS y renta, pero te faltan las horas extra de la semana pasada: ₡35 000 que nadie te mencionó.",
+    "imageKey": "scene_oficina",
+    "choices": [
+      {"id": "claim", "label": "Reclamar las horas extra", "effects": [{"kind": "income", "amount": 35000}]},
+      {"id": "ignore", "label": "Dejarlo así", "effects": []}
+    ],
+    "teachingConcept": "payroll_deductions"
+  },
+  {
+    "eventId": "evt_trabajo_extra",
+    "type": "income",
+    "title": "Un brete extra",
+    "narrative": "Un vecino te paga ₡60 000 por ayudarle a pintar la casa el fin de semana. Es plata que no esperabas.",
+    "npc": {"id": "vecino_don_carlos", "name": "Don Carlos", "role": "neighbor"},
+    "choices": [
+      {"id": "save", "label": "Meterlo al fondo de emergencia", "effects": [{"kind": "income", "amount": 60000}, {"kind": "savings_change", "amount": 60000}]},
+      {"id": "spend", "label": "Darme un gustito", "effects": [{"kind": "income", "amount": 60000}, {"kind": "expense", "amount": 60000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 5}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_tarjeta_nueva",
+    "type": "offer",
+    "title": "Te ofrecen otra tarjeta",
+    "narrative": "Te llaman del banco: \"tarjeta preaprobada con límite de ₡500 000\". Tiene tasa del 3,8 % mensual y una anualidad de ₡15 000 que mencionan muy rápido.",
+    "npc": {"id": "ejecutiva_banco", "name": "Sofía", "role": "bank_agent"},
+    "choices": [
+      {"id": "accept", "label": "Aceptar la tarjeta", "effects": [{"kind": "expense", "amount": 15000, "source": "credit_card"}]},
+      {"id": "decline", "label": "No, gracias", "effects": []}
+    ],
+    "teachingConcept": "compound_interest"
+  },
+  {
+    "eventId": "evt_ahorro_plazo",
+    "type": "bonus",
+    "title": "Tu ahorro puede crecer",
+    "narrative": "La cooperativa ofrece un ahorro a plazo con interés que se capitaliza cada mes. Si metés ₡100 000 ahora, los intereses también generan intereses.",
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "save", "label": "Abrir el ahorro", "effects": [{"kind": "savings_change", "amount": 100000}]},
+      {"id": "skip", "label": "Ahora no", "effects": []}
+    ],
+    "teachingConcept": "compound_interest"
+  }
+]

@@ -44,7 +44,8 @@ Requires [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you).
 cd server
 cp .env.example .env   # fill in your own values, never commit .env
 uv sync
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload   # macOS / Linux
+uv run python -m app.dev               # Windows (async psycopg needs a selector event loop)
 ```
 
 Open <http://localhost:8000/docs> for the OpenAPI docs.
@@ -58,7 +59,7 @@ uv run mypy app
 
 ## Contributing
 
-We track work in Jira (project key `CQ`) and link every branch, commit and pull request to a ticket. `main` holds stable releases; all work branches off `develop` and returns to it through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
+We track work in Jira (project key `SCRUM`) and link every branch, commit and pull request to a ticket. `main` holds stable releases; all work branches off `develop` and returns to it through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
 ## License
 

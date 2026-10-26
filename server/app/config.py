@@ -13,10 +13,22 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     model_api_key: SecretStr = SecretStr("")
+    meta_base_url: str = "https://api.meta.ai/v1"
+    model_timeout_s: float = Field(default=8.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
+    summary_model: str = "muse-spark-1.3-contributor"
+    image_model: str = "muse-image-1.0"
+    transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
+    downgrade_model: str = "muse-spark-1.3"
+    max_calls_per_session: int = Field(default=40, ge=1)
+    max_calls_per_client_per_day: int = Field(default=200, ge=1)
+    response_cache_ttl_s: int = Field(default=3600, ge=0)
+    response_cache_max_entries: int = Field(default=500, ge=1)
+    client_hash_salt: SecretStr = SecretStr("")
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
+    log_level: str = "INFO"
 
     @field_validator("allowed_origins", mode="before")
     @classmethod

@@ -7,10 +7,15 @@ on:
 permissions:
   pull-requests: read
 
+concurrency:
+  group: pr-conventions-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   title:
     name: Title and branch reference a Jira ticket
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Check PR title
         env:
@@ -18,7 +23,7 @@ jobs:
           BRANCH: ${{ github.event.pull_request.head.ref }}
           BASE: ${{ github.event.pull_request.base.ref }}
         run: |
-          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+ \[CQ-[0-9]+\]$'
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+ \[SCRUM-[0-9]+\]$'
           if [[ "$BRANCH" == dependabot/* ]]; then
             echo "Dependabot PR, skipping Jira check."
             exit 0
@@ -36,11 +41,11 @@ jobs:
             exit 1
           fi
           if [[ ! "$TITLE" =~ $pattern ]]; then
-            echo "::error::PR title must look like 'feat(server): add health endpoint [CQ-7]'. Got: '$TITLE'"
+            echo "::error::PR title must look like 'feat(server): add health endpoint [SCRUM-7]'. Got: '$TITLE'"
             exit 1
           fi
-          if [[ ! "$BRANCH" =~ CQ-[0-9]+ ]]; then
-            echo "::error::Branch name must include the Jira key, e.g. 'feat/CQ-7-health-endpoint'. Got: '$BRANCH'"
+          if [[ ! "$BRANCH" =~ SCRUM-[0-9]+ ]]; then
+            echo "::error::Branch name must include the Jira key, e.g. 'feat/SCRUM-7-health-endpoint'. Got: '$BRANCH'"
             exit 1
           fi
           echo "PR title and branch follow the conventions."
