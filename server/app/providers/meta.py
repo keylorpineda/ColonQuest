@@ -6,6 +6,7 @@ multipart call the SDK does not cover, so it uses httpx2 directly.
 
 import base64
 import json
+import logging
 import time
 from typing import Any
 
@@ -27,6 +28,8 @@ from app.providers.base import (
     Usage,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def _elapsed_ms(started: float) -> int:
     return int((time.perf_counter() - started) * 1000)
@@ -35,6 +38,10 @@ def _elapsed_ms(started: float) -> int:
 def _translate_sdk_error(error: openai.OpenAIError) -> ProviderError:
     if isinstance(error, openai.APITimeoutError):
         return ProviderTimeoutError(str(error))
+    if isinstance(error, openai.AuthenticationError | openai.PermissionDeniedError):
+        # A bad or missing key will not fix itself on retry: fail fast to the fallback.
+        logger.error("Meta Model API rejected the credentials (%s)", error.status_code)
+        return ProviderUnavailableError(f"{error.status_code}: credentials rejected")
     if isinstance(error, openai.APIConnectionError | openai.RateLimitError):
         return ProviderUnavailableError(str(error))
     if isinstance(error, openai.APIStatusError) and error.status_code >= 500:
@@ -171,6 +178,9 @@ class MetaProvider:
         except httpx2.TransportError as error:
             raise ProviderUnavailableError(str(error)) from error
 
+        if response.status_code in (401, 403):
+            logger.error("Meta Model API rejected the credentials (%s)", response.status_code)
+            raise ProviderUnavailableError(f"transcribe returned {response.status_code}")
         if response.status_code == 429 or response.status_code >= 500:
             raise ProviderUnavailableError(f"transcribe returned {response.status_code}")
         if response.status_code != 200:
