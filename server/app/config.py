@@ -13,8 +13,13 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     model_api_key: SecretStr = SecretStr("")
+    meta_base_url: str = "https://api.meta.ai/v1"
+    model_timeout_s: float = Field(default=8.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
+    summary_model: str = "muse-spark-1.3-contributor"
+    image_model: str = "muse-image-1.0"
+    transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
 
