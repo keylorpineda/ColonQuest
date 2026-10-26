@@ -98,6 +98,9 @@ jobs:
       - name: Ruff format
         run: uv run ruff format --check .
 
+      - name: Contract schemas up to date
+        run: uv run python -m app.export_schemas --check
+
   server-types:
     name: Server / type-check
     needs: changes
