@@ -1,0 +1,1 @@
+"""Colón Quest backend."""

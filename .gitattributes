@@ -1,0 +1,24 @@
+* text=auto eol=lf
+
+*.cs      text diff=csharp
+*.py      text diff=python
+*.md      text
+*.json    text
+*.yml     text
+
+# Unity YAML assets: merge with UnityYAMLMerge when configured
+*.unity   text merge=unityyamlmerge eol=lf
+*.prefab  text merge=unityyamlmerge eol=lf
+*.asset   text merge=unityyamlmerge eol=lf
+*.meta    text merge=unityyamlmerge eol=lf
+*.mat     text merge=unityyamlmerge eol=lf
+*.anim    text merge=unityyamlmerge eol=lf
+*.controller text merge=unityyamlmerge eol=lf
+
+# Binary assets
+*.png  binary
+*.jpg  binary
+*.wav  binary
+*.mp3  binary
+*.ogg  binary
+*.ttf  binary
