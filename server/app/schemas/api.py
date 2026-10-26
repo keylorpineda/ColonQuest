@@ -22,6 +22,25 @@ class ClassCreated(ContractModel):
     name: str
 
 
+class ConceptStat(ContractModel):
+    concept: TeachingConcept
+    decisions: int
+    risky_choice_pct: int | None
+
+
+class ClassDashboard(ContractModel):
+    code: ClassCode
+    name: str
+    students: int
+    finished_games: int
+    negotiations: int
+    trap_detection_pct: int | None
+    average_final_debt: int | None
+    concepts: list[ConceptStat]
+    explanation: str
+    source: Literal["model", "fallback"]
+
+
 class CreateSessionRequest(ContractModel):
     class_code: ClassCode | None = None
 
