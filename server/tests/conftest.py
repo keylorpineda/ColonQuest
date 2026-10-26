@@ -1,6 +1,9 @@
+import asyncio
 import os
+import sys
 from collections.abc import AsyncIterator
 from pathlib import Path
+from typing import Any
 
 # Tests must never reach real services configured in a developer's server/.env (Neon, Meta).
 # Environment variables take precedence over the .env file in pydantic-settings.
@@ -22,7 +25,10 @@ requires_db = pytest.mark.skipif(not TEST_DATABASE_URL, reason="TEST_DATABASE_UR
 
 
 @pytest.fixture
-def anyio_backend() -> str:
+def anyio_backend() -> str | tuple[str, dict[str, Any]]:
+    # Async psycopg cannot run on Windows' default ProactorEventLoop.
+    if sys.platform == "win32":
+        return "asyncio", {"loop_factory": asyncio.SelectorEventLoop}
     return "asyncio"
 
 
