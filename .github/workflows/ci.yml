@@ -184,6 +184,25 @@ jobs:
           path: server/pytest.xml
           retention-days: 7
 
+  engine-test:
+    name: Engine / NUnit tests
+    needs: changes
+    if: needs.changes.outputs.unity == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Restore NuGet cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('unity/Tests.DotNet/ColonQuest.Finance.Tests.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Run FinanceEngine NUnit tests
+        run: dotnet test unity/Tests.DotNet/ColonQuest.Finance.Tests.csproj --nologo --verbosity normal
+
   unity-test:
     name: Unity / EditMode tests
     needs: changes
@@ -245,7 +264,7 @@ jobs:
   # count as success; any failure or cancellation blocks the merge.
   ci-passed:
     name: CI passed
-    needs: [changes, server-lint, server-types, server-test, unity-test, workflows-lint]
+    needs: [changes, server-lint, server-types, server-test, engine-test, unity-test, workflows-lint]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 2
