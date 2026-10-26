@@ -6,12 +6,12 @@
 | --- | --- |
 | Jira (project `SCRUM`, [board](https://keylorpineda.atlassian.net/jira/software/projects/SCRUM/boards/1)) | Backlog, sprints, ticket status |
 | GitHub | Code, pull requests, CI |
-| GitHub for Jira app | Shows branches, commits, PRs and builds on each Jira ticket |
+| GitHub for Atlassian app | Shows branches, commits, PRs and builds on each Jira ticket |
 | Atlassian MCP (`.mcp.json`) | Lets Claude Code read and create Jira tickets from the repo |
 
 ## Linking GitHub and Jira
 
-1. In Jira: **Apps → Explore more apps → GitHub for Jira** → install.
+1. In Jira: **Apps → Explore more apps → GitHub for Atlassian** → install.
 2. Connect the GitHub account `keylorpineda` and select the `ColonQuest` repository.
 3. Any branch, commit or PR that contains a key like `SCRUM-12` now appears in that ticket's
    **Development** panel.
