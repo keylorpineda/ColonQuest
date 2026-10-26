@@ -12,6 +12,9 @@ dependencies = [
     "pydantic-settings>=2.6",
     "openai>=3.38",
     "httpx2>=2.16",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "psycopg[binary]>=3.2",
+    "alembic>=1.14",
 ]
 
 [dependency-groups]
