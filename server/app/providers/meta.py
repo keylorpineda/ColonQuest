@@ -66,6 +66,11 @@ class MetaProvider:
     async def aclose(self) -> None:
         await self._http.aclose()
 
+    def _require_key(self) -> None:
+        """Without a key every call would fail with 401; skip the network and fall back now."""
+        if not self._settings.model_api_key.get_secret_value():
+            raise ProviderUnavailableError("MODEL_API_KEY is not configured")
+
     async def structured[T: BaseModel](
         self,
         *,
@@ -77,6 +82,7 @@ class MetaProvider:
         max_tokens: int = 2048,
     ) -> StructuredResult[T]:
         """Ask for JSON that matches ``output`` and validate it with Pydantic."""
+        self._require_key()
         extra: dict[str, Any] = {}
         if reasoning_effort is not None:
             extra["reasoning_effort"] = reasoning_effort
@@ -126,6 +132,7 @@ class MetaProvider:
 
     async def generate_image(self, prompt: str, *, size: str = "1024x1024") -> GeneratedImage:
         """Generate one PNG image and return its bytes."""
+        self._require_key()
         started = time.perf_counter()
         try:
             response = await self._client.images.generate(
@@ -154,6 +161,7 @@ class MetaProvider:
         self, wav: bytes, *, language_bias: list[str] | None = None
     ) -> Transcription:
         """Transcribe a mono 16-bit PCM WAV clip (16 or 24 kHz)."""
+        self._require_key()
         request: dict[str, Any] = {
             "model": self._settings.transcribe_model,
             "audioEncoding": "WAV",
