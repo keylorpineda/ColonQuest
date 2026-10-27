@@ -2,10 +2,16 @@
 
 Unity 2D project (WebGL + desktop). Owner: Jefferson.
 
-Create the Unity project **inside this folder** so `unity/Assets`, `unity/Packages` and
-`unity/ProjectSettings` are tracked and `unity/Library` stays ignored.
+## Open the project
 
-Planned layout:
+1. Install Unity Hub and the editor **6000.3.27f1** (the version pinned in
+   `ProjectSettings/ProjectVersion.txt`) with the **WebGL Build Support** module.
+2. In Unity Hub choose **Add project from disk** and select this `unity/` folder.
+3. Commit the `.meta` file that Unity creates next to every new asset.
+
+`unity/Library`, `Temp`, `Logs` and `UserSettings` stay ignored.
+
+## Layout
 
 ```
 Assets/
