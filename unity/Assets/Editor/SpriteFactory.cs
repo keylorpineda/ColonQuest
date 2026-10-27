@@ -16,6 +16,8 @@ namespace ColonQuest.EditorTools
         public const string RoundedRectSmallPath = Folder + "/RoundedRectSmall.png";
         public const string CirclePath = Folder + "/Circle.png";
         public const string RingPath = Folder + "/Ring.png";
+        public const string SoftCirclePath = Folder + "/SoftCircle.png";
+        public const string VignettePath = Folder + "/Vignette.png";
 
         [MenuItem("Colon Quest/Art/Generate Sprites")]
         public static void Generate()
@@ -27,16 +29,38 @@ namespace ColonQuest.EditorTools
             Write(RoundedRectSmallPath, 32, 64, 8, (x, y) => RoundedRectAlpha(x, y, 32, 8));
             Write(CirclePath, 128, 128, 0, (x, y) => CircleAlpha(x, y, 128));
             Write(RingPath, 128, 128, 0, (x, y) => RingAlpha(x, y, 128, 12f));
+
+            // Soft shapes for glows, nebulae and the screen vignette: alpha fades smoothly.
+            Write(SoftCirclePath, 256, 256, 0, (x, y) => SoftCircleAlpha(x, y, 256));
+            Write(VignettePath, 256, 256, 0, (x, y) => VignetteAlpha(x, y, 256));
             AssetDatabase.Refresh();
         }
 
         public static void EnsureGenerated()
         {
             if (!File.Exists(RoundedRectPath) || !File.Exists(RoundedRectSmallPath)
-                || !File.Exists(CirclePath) || !File.Exists(RingPath))
+                || !File.Exists(CirclePath) || !File.Exists(RingPath)
+                || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath))
             {
                 Generate();
             }
+        }
+
+        private static float SoftCircleAlpha(float x, float y, int size)
+        {
+            float half = size * 0.5f;
+            float fade = Mathf.Clamp01(1f - new Vector2(x - half, y - half).magnitude / half);
+            return fade * fade * (3f - 2f * fade);
+        }
+
+        /// <summary>Clear in the middle, darker toward the corners. Tint it dark to use it as a vignette.</summary>
+        private static float VignetteAlpha(float x, float y, int size)
+        {
+            float nx = x / size * 2f - 1f;
+            float ny = y / size * 2f - 1f;
+            float distance = Mathf.Sqrt(nx * nx + ny * ny) / 1.4142f;
+            float t = Mathf.Clamp01((distance - 0.35f) / 0.65f);
+            return t * t * (3f - 2f * t);
         }
 
         private static float RoundedRectAlpha(float x, float y, int size, float radius)
