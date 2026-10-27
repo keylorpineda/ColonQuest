@@ -19,6 +19,12 @@ namespace ColonQuest.World
         /// <summary>Overlay panels turn this off while they are open so the player stands still.</summary>
         public bool InputEnabled { get; set; } = true;
 
+        /// <summary>Sets the child that is mirrored to face the walking direction.</summary>
+        public void SetVisual(Transform target)
+        {
+            visual = target;
+        }
+
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
