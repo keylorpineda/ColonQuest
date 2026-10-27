@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     open_weights_npc_model: str = "muse-spark-open"
     open_weights_timeout_s: float = Field(default=4.0, gt=0)
 
+    # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
+    agentic_game_master: bool = False
+    season_planner: bool = False
+    seller_agent: bool = False
+    agent_max_steps: int = Field(default=5, ge=1, le=10)
+    agent_timeout_s: float = Field(default=10.0, gt=0)
+
     @field_validator("allowed_origins", mode="before")
     @classmethod
     def split_origins(cls, value: str | list[str]) -> list[str]:

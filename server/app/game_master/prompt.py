@@ -9,6 +9,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from app.agents.tools import HistoryItem
 from app.game_master.limits import CASH_FLOW_RANGES, KIND_RANGES, MONTH_RANGES
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
@@ -73,6 +74,7 @@ class PromptContext:
     state: PlayerState
     recent_event_ids: Sequence[str] = ()
     taught_concepts: Sequence[TeachingConcept] = ()
+    history: Sequence[HistoryItem] = ()  # read by the agentic game master's tools
 
 
 def state_signals(state: PlayerState) -> dict[str, object]:
