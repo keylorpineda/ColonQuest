@@ -32,7 +32,19 @@ namespace ColonQuest.World
     public static class MapLayout
     {
         /// <summary>Everything the camera may show in the town.</summary>
-        public static readonly Rect TownBounds = new Rect(-26f, -18f, 52f, 33f);
+        public static readonly Rect TownBounds = new Rect(-46f, -34f, 92f, 66f);
+
+        // The natural edges of the world: rock faces to the north, west and east, the sea to the south.
+        public const float NorthEdgeY = 23f;
+        public const float WestEdgeX = -43.5f;
+        public const float EastEdgeX = 43.5f;
+        public const float ShoreY = -27.2f;
+
+        // The river that runs north to south on the east side, and the pier on the beach.
+        public const float RiverXMin = 28f;
+        public const float RiverXMax = 31f;
+        public const float PierXMin = 4f;
+        public const float PierXMax = 7.2f;
 
         public const float TownCameraSize = 4.6f;
         public const float InteriorCameraSize = 3.9f;

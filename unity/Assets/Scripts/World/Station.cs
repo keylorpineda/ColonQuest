@@ -12,7 +12,9 @@ namespace ColonQuest.World
         Grocery,
         Lender,
         Pyramid,
-        Kiosk
+        Kiosk,
+        Soda,
+        Coop
     }
 
     /// <summary>
