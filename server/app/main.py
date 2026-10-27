@@ -10,6 +10,7 @@ from app.api import classes, dashboard, events, health, images, negotiation, ses
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
 from app.game_master.agentic import AgenticGameMaster
+from app.game_master.planner import SeasonPlanner
 from app.game_master.service import GameMaster
 from app.images.service import ImageService
 from app.logging_config import configure_logging
@@ -40,6 +41,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.negotiator = Negotiator(
         build_npc_provider(settings, provider, open_weights), settings
     )
+    # Only consulted when SEASON_PLANNER is on (see app.api.events.get_season_planner).
+    app.state.season_planner = SeasonPlanner(provider, settings)
     app.state.summary_writer = SummaryWriter(provider, settings)
     app.state.class_explainer = ClassExplainer(provider, settings)
     app.state.image_service = ImageService(provider, settings)
