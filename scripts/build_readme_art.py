@@ -13,6 +13,7 @@ screen readers and stops moving under prefers-reduced-motion. Standard library o
 from collections.abc import Sequence
 from html import escape
 from pathlib import Path
+from typing import Any
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "assets"
 
@@ -304,7 +305,177 @@ def svg(name: str, height: int, title: str, desc: str, body: str, style: str = "
     (OUT / f"{name}.svg").write_text(document, encoding="utf-8", newline="\n")
 
 
-def header(slug: str, number: str, text: str, icon_name: str) -> None:
+# Every visible string, per language. English files keep the plain name; others get a suffix.
+COPY: dict[str, dict[str, Any]] = {
+    "en": {
+        "suffix": "",
+        "tagline": "Every money decision becomes a story.",
+        "steps": [
+            ("Decide", "pay, save, borrow"),
+            ("Narrate", "Muse Wonder"),
+            ("Compute", "exact colones"),
+            ("Negotiate", "by voice"),
+        ],
+        "rule": ("The AI tells the story.", "The finance engine keeps the books."),
+        "hero_desc": "A financial-literacy game for Costa Rican students. Each month the player "
+        "decides what to do with their money, Muse Wonder narrates the consequence, a "
+        "deterministic engine computes the exact colones, and the player negotiates by voice "
+        "with characters who hide fees. The AI tells the story; the finance engine keeps the "
+        "books.",
+        "section": "Section",
+        "headers": [
+            "THE PROBLEM",
+            "JUDGING CRITERIA",
+            "META MODELS",
+            "ARCHITECTURE",
+            "ACCESSIBILITY",
+            "GETTING STARTED",
+            "REPOSITORY",
+            "TEAM",
+        ],
+        "traps_title": "The traps",
+        "traps_desc": "Four traps the game teaches players to spot: installments with insurance "
+        "nobody mentioned; paying only the card minimum while the debt keeps growing; gota a "
+        "gota lenders with fast cash and weekly interest; and pyramid schemes that pay you for "
+        "recruiting friends.",
+        "traps": [
+            ("card", "Installments", "Just one payment a month...", "plus hidden insurance."),
+            (
+                "clock",
+                "Minimum payment",
+                "You pay a little each month",
+                "and the debt keeps growing.",
+            ),
+            ("bag", "Gota a gota", "Fast cash today,", "interest every week."),
+            ("pyramid", "Pyramid", "Bring three friends", "and get rich. Promise."),
+        ],
+        "stamp": "TRAP",
+        "criteria_title": "Judging criteria",
+        "criteria_desc": "Impact 30 percent: telemetry, Class Mode and a student pilot. Use of "
+        "Meta tools 25 percent: four models, each with one job. Demo 25 percent: one link that "
+        "never breaks because of a model. Technical depth 20 percent: validated contracts and "
+        "an exact engine.",
+        "criteria": [
+            ("Impact", 30, "telemetry, Class Mode, student pilot"),
+            ("Meta tools", 25, "four models, each with one job"),
+            ("Demo", 25, "one link, never breaks on a model"),
+            ("Technical depth", 20, "validated contracts, exact engine"),
+        ],
+        "models_title": "Meta models",
+        "models_desc": "Muse Wonder is the game master and the voice of the characters. Muse "
+        "Spark writes the season plan, the year-end summary and Class Mode reports. Muse Voice "
+        "Transcribe turns the voice of the player into text while negotiating. Muse Image draws "
+        "pixel-art portraits, pre-generated and cached.",
+        "models": [
+            ("spark", "Muse Wonder", "Game master and the", "voices of the characters"),
+            ("bolt", "Muse Spark", "Season plan, summary", "and Class Mode reports"),
+            ("mic", "Voice Transcribe", "You negotiate out loud;", "typing always works too"),
+            ("picture", "Muse Image", "Pixel-art portraits", "pre-generated and cached"),
+        ],
+        "arch_title": "Architecture",
+        "arch_desc": "The Unity 2D client, which runs the C# finance engine on WebGL and "
+        "desktop, talks JSON with a FastAPI backend that holds the Pydantic contracts, the cost "
+        "guard, the cache and the agents. The backend calls the Meta Model API (Wonder, Spark, "
+        "Voice and Image), stores sessions, decisions and model calls in Neon Postgres, and can "
+        "optionally run the characters on open-weight models hosted on Baseten or Modal.",
+        "boxes": [
+            ("Unity 2D client", ["WebGL and desktop", "C# finance engine"]),
+            ("FastAPI backend", ["Pydantic v2 contracts", "cost guard, cache, agents"]),
+            ("Meta Model API", ["Wonder, Spark,", "Voice and Image"]),
+            ("Neon Postgres", ["sessions, decisions,", "model calls"]),
+            ("Open weights", ["optional NPCs", "Baseten or Modal"]),
+        ],
+        "footer": "Made in Costa Rica by DoWhile Team",
+    },
+    "es": {
+        "suffix": "-es",
+        "tagline": "Cada decisión de plata se vuelve una historia.",
+        "steps": [
+            ("Decidir", "pagar o ahorrar"),
+            ("Narrar", "Muse Wonder"),
+            ("Calcular", "colones exactos"),
+            ("Negociar", "con la voz"),
+        ],
+        "rule": ("La IA cuenta la historia.", "El motor financiero lleva las cuentas."),
+        "hero_desc": "Un juego de educación financiera para estudiantes de Costa Rica. Cada mes "
+        "el jugador decide qué hacer con su plata, Muse Wonder narra la consecuencia, un motor "
+        "determinista calcula los colones exactos y el jugador negocia por voz con personajes "
+        "que esconden cargos. La IA cuenta la historia; el motor financiero lleva las cuentas.",
+        "section": "Sección",
+        "headers": [
+            "EL PROBLEMA",
+            "CRITERIOS DEL JURADO",
+            "MODELOS DE META",
+            "ARQUITECTURA",
+            "ACCESIBILIDAD",
+            "CÓMO EMPEZAR",
+            "REPOSITORIO",
+            "EQUIPO",
+        ],
+        "traps_title": "Las trampas",
+        "traps_desc": "Cuatro trampas que el juego enseña a detectar: cuotas con un seguro que "
+        "nadie mencionó; pagar solo el mínimo de la tarjeta mientras la deuda crece; "
+        "prestamistas gota a gota con plata rápida e intereses semanales; y esquemas piramidales "
+        "que te pagan por meter amigos.",
+        "traps": [
+            ("card", "Cuotas", "Solo una cuota al mes...", "y un seguro escondido."),
+            ("clock", "Pago mínimo", "Pagás poquito cada mes", "y la deuda sigue creciendo."),
+            ("bag", "Gota a gota", "Plata rápida hoy,", "intereses cada semana."),
+            ("pyramid", "Pirámide", "Traé tres amigos", "y te hacés rico. Seguro."),
+        ],
+        "stamp": "TRAMPA",
+        "criteria_title": "Criterios del jurado",
+        "criteria_desc": "Impacto 30 por ciento: telemetría, Modo Clase y una prueba piloto con "
+        "estudiantes. Herramientas de Meta 25 por ciento: cuatro modelos, cada uno con un rol. "
+        "Demo 25 por ciento: un link que nunca se cae por un modelo. Profundidad técnica 20 por "
+        "ciento: contratos validados y un motor exacto.",
+        "criteria": [
+            ("Impacto", 30, "telemetría, Modo Clase, piloto"),
+            ("Meta", 25, "cuatro modelos, cada uno con un rol"),
+            ("Demo", 25, "un link que no se cae por un modelo"),
+            ("Técnica", 20, "contratos validados, motor exacto"),
+        ],
+        "models_title": "Modelos de Meta",
+        "models_desc": "Muse Wonder es el game master y la voz de los personajes. Muse Spark "
+        "escribe el plan de la temporada, el resumen del año y los reportes del Modo Clase. Muse "
+        "Voice Transcribe convierte la voz del jugador en texto al negociar. Muse Image dibuja "
+        "retratos en pixel art, pre-generados y en caché.",
+        "models": [
+            ("spark", "Muse Wonder", "Game master y la", "voz de los personajes"),
+            ("bolt", "Muse Spark", "Plan de temporada,", "resumen y Modo Clase"),
+            ("mic", "Voice Transcribe", "Negociás en voz alta;", "escribir siempre sirve"),
+            ("picture", "Muse Image", "Retratos en pixel art", "pre-generados y en caché"),
+        ],
+        "arch_title": "Arquitectura",
+        "arch_desc": "El cliente Unity 2D, que corre el motor financiero en C# en WebGL y "
+        "escritorio, se comunica por JSON con un backend FastAPI que tiene los contratos "
+        "Pydantic, el control de costos, la caché y los agentes. El backend llama a la API de "
+        "modelos de Meta (Wonder, Spark, Voice e Image), guarda sesiones, decisiones y llamadas "
+        "en Neon Postgres y puede correr los personajes en modelos abiertos en Baseten o Modal.",
+        "boxes": [
+            ("Cliente Unity 2D", ["WebGL y escritorio", "motor financiero C#"]),
+            ("Backend FastAPI", ["contratos Pydantic v2", "costos, caché, agentes"]),
+            ("API de Meta", ["Wonder, Spark,", "Voice e Image"]),
+            ("Neon Postgres", ["sesiones, decisiones,", "llamadas a modelos"]),
+            ("Modelos abiertos", ["NPCs opcionales", "Baseten o Modal"]),
+        ],
+        "footer": "Hecho en Costa Rica por DoWhile Team",
+    },
+}
+
+HEADER_SLUGS = [
+    ("problem", "warning"),
+    ("criteria", "chart"),
+    ("models", "spark"),
+    ("architecture", "stack"),
+    ("accessibility", "person"),
+    ("start", "terminal"),
+    ("repo", "folder"),
+    ("team", "team"),
+]
+
+
+def header(slug: str, number: str, text: str, icon_name: str, copy: dict[str, Any]) -> None:
     cursor_x = 128 + len(text) * 18 + 10
     body = f"""  <rect x="0" y="0" width="{WIDTH}" height="72" fill="{PAPER}"/>
   <rect x="0" y="66" width="{WIDTH}" height="6" fill="{INK}"/>
@@ -313,25 +484,19 @@ def header(slug: str, number: str, text: str, icon_name: str) -> None:
   <text class="num" x="72" y="44">{number}</text>
   <text class="h" x="128" y="46">{escape(text)}</text>
   <rect class="blink" x="{cursor_x}" y="22" width="14" height="28" fill="{OCHRE}"/>"""
-    svg(f"h-{slug}", 72, text, f"Section {number}: {text}", body)
+    svg(f"h-{slug}{copy['suffix']}", 72, text, f"{copy['section']} {number}: {text}", body)
 
 
-def hero() -> None:
-    steps = [
-        ("Decide", "pay, save, borrow"),
-        ("Narrate", "Muse Wonder"),
-        ("Compute", "exact colones"),
-        ("Negotiate", "by voice"),
-    ]
+def hero(copy: dict[str, Any]) -> None:
     nodes = ""
-    for i, (label, detail) in enumerate(steps):
+    for i, (label, detail) in enumerate(copy["steps"]):
         x = 50 + 180 * i
         cx = x + 75
         nodes += f"""
   {panel(x, 252, 150, 108, cls=f"node n{i + 1}")}
   <text class="step" x="{cx}" y="280" text-anchor="middle">0{i + 1}</text>
-  <text class="label" x="{cx}" y="314" text-anchor="middle">{label}</text>
-  <text class="detail-sm" x="{cx}" y="342" text-anchor="middle">{detail}</text>"""
+  <text class="label" x="{cx}" y="314" text-anchor="middle">{escape(label)}</text>
+  <text class="detail-sm" x="{cx}" y="342" text-anchor="middle">{escape(detail)}</text>"""
     style = f"""
     .node {{ animation: active 8s steps(1) infinite; }}
     .n2 {{ animation-delay: 2s; }}
@@ -340,11 +505,12 @@ def hero() -> None:
     .runner {{ animation: run 8s steps(48) -1s infinite; }}
     @keyframes active {{ 0% {{ fill: {OCHRE}; }} 25% {{ fill: {CARD}; }} }}
     @keyframes run {{ 0% {{ transform: translateX(0); }} 100% {{ transform: translateX(720px); }} }}"""
+    story, books = copy["rule"]
     body = f"""  <rect x="10" y="10" width="788" height="448" fill="{INK}"/>
   <rect x="2" y="2" width="788" height="448" fill="{PAPER}" stroke="{INK}" stroke-width="4"/>
   {flag(46, 34)}
   <text class="title" x="46" y="124">COLÓN QUEST</text>
-  <text class="tagline" x="48" y="164">Every money decision becomes a story.</text>
+  <text class="tagline" x="48" y="164">{escape(copy["tagline"])}</text>
   <rect x="46" y="182" width="430" height="30" fill="{INK}"/>
   <text class="event" x="58" y="203">META GLOBAL AI DEVELOPER HACKATHON 2026</text>
   <g class="bob">{big_coin(630, 64, 7)}</g>
@@ -353,18 +519,8 @@ def hero() -> None:
   <clipPath id="track"><rect x="50" y="368" width="696" height="24"/></clipPath>
   <g clip-path="url(#track)"><g class="runner hide-still">{big_coin(-64, 373, 1.5)}</g></g>
   <line x1="46" y1="400" x2="746" y2="400" stroke="{INK}" stroke-width="2"/>
-  <text class="rule" x="396" y="432" text-anchor="middle">The AI tells the story. <tspan class="strong">The finance engine keeps the books.</tspan></text>"""
-    svg(
-        "colon-quest-card",
-        460,
-        "Colón Quest",
-        "A financial-literacy game for Costa Rican students. Each month the player decides what "
-        "to do with their money, Muse Wonder narrates the consequence, a deterministic engine "
-        "computes the exact colones, and the player negotiates by voice with characters who hide "
-        "fees. The AI tells the story; the finance engine keeps the books.",
-        body,
-        style,
-    )
+  <text class="rule" x="396" y="432" text-anchor="middle">{escape(story)} <tspan class="strong">{escape(books)}</tspan></text>"""
+    svg(f"colon-quest-card{copy['suffix']}", 460, "Colón Quest", copy["hero_desc"], body, style)
 
 
 def tiles(
@@ -401,13 +557,8 @@ def tiles(
     svg(name, 2 * h + gap + 2 * margin + 6, title, desc, body, keyframes)
 
 
-def criteria() -> None:
-    rows = [
-        ("Impact", 30, "telemetry, Class Mode, student pilot"),
-        ("Meta tools", 25, "four models, each with one job"),
-        ("Demo", 25, "one link, never breaks on a model"),
-        ("Technical depth", 20, "validated contracts, exact engine"),
-    ]
+def criteria(copy: dict[str, Any]) -> None:
+    rows = copy["criteria"]
     body = f'  <rect x="0" y="0" width="{WIDTH}" height="352" fill="{PAPER}"/>\n  {panel(24, 20, 746, 306)}'
     style = f"""
     .seg {{ animation: flash 0.25s steps(1) 1; }}
@@ -431,21 +582,15 @@ def criteria() -> None:
         if i < len(rows) - 1:
             body += f'\n  <line x1="48" y1="{y + 66}" x2="746" y2="{y + 66}" stroke="{INK}" stroke-width="1" stroke-dasharray="4 6"/>'
     svg(
-        "criteria",
-        352,
-        "Judging criteria",
-        "Impact 30 percent: telemetry, Class Mode and a student pilot. Use of Meta tools 25 "
-        "percent: four models, each with one job. Demo 25 percent: one link that never breaks "
-        "because of a model. Technical depth 20 percent: validated contracts and an exact engine.",
-        body,
-        style,
+        f"criteria{copy['suffix']}", 352, copy["criteria_title"], copy["criteria_desc"], body, style
     )
 
 
-def architecture() -> None:
+def architecture(copy: dict[str, Any]) -> None:
     def box(
-        x: int, y: int, w: int, h: int, title: str, lines: Sequence[str], dashed: bool = False
+        x: int, y: int, w: int, h: int, content: tuple[str, Sequence[str]], dashed: bool = False
     ) -> str:
+        title, lines = content
         if dashed:
             frame = (
                 f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{PAPER}" stroke="{INK}" '
@@ -461,6 +606,7 @@ def architecture() -> None:
             )
         return frame + text
 
+    client, backend, meta, neon, open_weights = copy["boxes"]
     style = """
     .p1 { animation: p1 3s steps(30) infinite; }
     .p2 { animation: p2 4s steps(40) infinite; }
@@ -471,8 +617,8 @@ def architecture() -> None:
     @keyframes p3 { 0% { transform: translate(0, 0); } 60% { transform: translate(0, 52px); } 100% { transform: translate(-200px, 52px); } }
     @keyframes p4 { 0% { transform: translate(0, 0); } 40% { transform: translate(0, 52px); } 100% { transform: translate(56px, 52px); } }"""
     body = f"""  <rect x="0" y="0" width="{WIDTH}" height="400" fill="{PAPER}"/>
-  {box(24, 24, 330, 128, "Unity 2D client", ["WebGL and desktop", "C# finance engine"])}
-  {box(440, 24, 330, 128, "FastAPI backend", ["Pydantic v2 contracts", "cost guard, cache, agents"])}
+  {box(24, 24, 330, 128, client)}
+  {box(440, 24, 330, 128, backend)}
   <line x1="360" y1="88" x2="434" y2="88" stroke="{INK}" stroke-width="4"/>
   <text class="step" x="397" y="78" text-anchor="middle">JSON</text>
   <line x1="605" y1="158" x2="605" y2="212" stroke="{INK}" stroke-width="4"/>
@@ -480,82 +626,40 @@ def architecture() -> None:
   <line x1="139" y1="212" x2="139" y2="250" stroke="{INK}" stroke-width="4"/>
   <line x1="405" y1="212" x2="405" y2="250" stroke="{INK}" stroke-width="4"/>
   <line x1="661" y1="212" x2="661" y2="250" stroke="{INK}" stroke-width="4" stroke-dasharray="6 5"/>
-  {box(24, 250, 230, 126, "Meta Model API", ["Wonder, Spark,", "Voice and Image"])}
-  {box(290, 250, 230, 126, "Neon Postgres", ["sessions, decisions,", "model calls"])}
-  {box(556, 250, 214, 126, "Open weights", ["optional NPCs", "Baseten or Modal"], dashed=True)}
+  {box(24, 250, 230, 126, meta)}
+  {box(290, 250, 230, 126, neon)}
+  {box(556, 250, 214, 126, open_weights, dashed=True)}
   <rect class="p1 hide-still" x="364" y="83" width="10" height="10" fill="{OCHRE}" stroke="{INK}" stroke-width="2"/>
   <rect class="p2 hide-still" x="600" y="160" width="10" height="10" fill="{OCHRE}" stroke="{INK}" stroke-width="2"/>
   <rect class="p3 hide-still" x="600" y="160" width="10" height="10" fill="{BLUE}" stroke="{INK}" stroke-width="2"/>
   <rect class="p4 hide-still" x="600" y="160" width="10" height="10" fill="{RED}" stroke="{INK}" stroke-width="2"/>"""
-    svg(
-        "architecture",
-        400,
-        "Architecture",
-        "The Unity 2D client, which runs the C# finance engine on WebGL and desktop, talks JSON "
-        "with a FastAPI backend that holds the Pydantic contracts, the cost guard, the cache and "
-        "the agents. The backend calls the Meta Model API (Wonder, Spark, Voice and Image), "
-        "stores sessions, decisions and model calls in Neon Postgres, and can optionally run "
-        "the characters on open-weight models hosted on Baseten or Modal.",
-        body,
-        style,
-    )
+    svg(f"architecture{copy['suffix']}", 400, copy["arch_title"], copy["arch_desc"], body, style)
 
 
-def footer() -> None:
+def footer(copy: dict[str, Any]) -> None:
     body = f"""  <rect x="0" y="0" width="{WIDTH}" height="96" fill="{PAPER}"/>
   <rect x="0" y="0" width="{WIDTH}" height="6" fill="{INK}"/>
   {flag(24, 36)}
-  <text class="label" x="112" y="58">Hecho en Costa Rica por DoWhile Team</text>
+  <text class="label" x="112" y="58">{escape(copy["footer"])}</text>
   <g class="bob">{big_coin(712, 28, 4)}</g>"""
-    svg("footer", 96, "Made in Costa Rica", "Made in Costa Rica by the DoWhile Team.", body)
+    svg(f"footer{copy['suffix']}", 96, copy["footer"], copy["footer"] + ".", body)
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    hero()
-    tiles(
-        "traps",
-        "The traps",
-        "Four traps the game teaches players to spot: installments with insurance nobody "
-        "mentioned; paying only the card minimum while interest keeps growing; gota a gota "
-        "lenders with fast money and brutal interest; and pyramid schemes that pay you for "
-        "recruiting friends.",
-        [
-            ("card", "Cuotas", "Solo una cuota al mes...", "y un seguro escondido."),
-            ("clock", "Pago mínimo", "Pagás poquito cada mes", "y la deuda sigue creciendo."),
-            ("bag", "Gota a gota", "Plata rápida hoy,", "intereses cada semana."),
-            ("pyramid", "Pirámide", "Traé tres amigos", "y te hacés rico. Seguro."),
-        ],
-        stamp="TRAMPA",
-    )
-    criteria()
-    tiles(
-        "models",
-        "Meta models",
-        "Muse Wonder is the game master and the voice of the characters. Muse Spark writes the "
-        "season plan, the year-end summary and Class Mode explanations. Muse Voice Transcribe "
-        "turns the player's voice into text while negotiating. Muse Image draws pixel-art "
-        "portraits and scenes, pre-generated and cached.",
-        [
-            ("spark", "Muse Wonder", "Game master and the", "voices of the characters"),
-            ("bolt", "Muse Spark", "Season plan, summary", "and Class Mode reports"),
-            ("mic", "Voice Transcribe", "You negotiate out loud;", "typing always works too"),
-            ("picture", "Muse Image", "Pixel-art portraits", "pre-generated and cached"),
-        ],
-    )
-    architecture()
-    for slug, number, text, icon_name in [
-        ("problem", "01", "THE PROBLEM", "warning"),
-        ("criteria", "02", "JUDGING CRITERIA", "chart"),
-        ("models", "03", "META MODELS", "spark"),
-        ("architecture", "04", "ARCHITECTURE", "stack"),
-        ("accessibility", "05", "ACCESSIBILITY", "person"),
-        ("start", "06", "GETTING STARTED", "terminal"),
-        ("repo", "07", "REPOSITORY", "folder"),
-        ("team", "08", "TEAM", "team"),
-    ]:
-        header(slug, number, text, icon_name)
-    footer()
+    for copy in COPY.values():
+        suffix = copy["suffix"]
+        hero(copy)
+        tiles(
+            f"traps{suffix}", copy["traps_title"], copy["traps_desc"], copy["traps"], copy["stamp"]
+        )
+        criteria(copy)
+        tiles(f"models{suffix}", copy["models_title"], copy["models_desc"], copy["models"])
+        architecture(copy)
+        headers = zip(HEADER_SLUGS, copy["headers"], strict=True)
+        for number, ((slug, icon_name), text) in enumerate(headers, start=1):
+            header(slug, f"{number:02d}", text, icon_name, copy)
+        footer(copy)
 
 
 if __name__ == "__main__":
