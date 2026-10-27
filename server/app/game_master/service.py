@@ -35,6 +35,7 @@ MAX_ATTEMPTS = 2  # first try plus one retry when the response is invalid
 
 class EventSource(StrEnum):
     MODEL = "model"
+    AGENT = "agent"
     CACHE = "cache"
     FALLBACK = "fallback"
 
@@ -156,6 +157,10 @@ class GameMaster:
             ok=False,
             session_id=session_id,
         )
+
+    def fallback_event(self, context: PromptContext, reason: FallbackReason) -> EventOutcome:
+        """Hand-written event without calling any model."""
+        return self._fallback(context, reason)
 
     def _fallback(self, context: PromptContext, reason: FallbackReason) -> EventOutcome:
         logger.info("serving fallback event: %s", reason)
