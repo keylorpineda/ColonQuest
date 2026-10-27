@@ -17,6 +17,7 @@ from pydantic import BaseModel
 
 from app.config import Settings
 from app.providers.base import (
+    ChatTurn,
     GeneratedImage,
     ProviderResponseError,
     ProviderTimeoutError,
@@ -27,6 +28,7 @@ from app.providers.base import (
     Usage,
 )
 from app.providers.openai_compat import (
+    chat_completion,
     elapsed_ms,
     structured_completion,
     translate_sdk_error,
@@ -77,6 +79,29 @@ class MetaProvider:
             model=model,
             system=system,
             user=user,
+            output=output,
+            reasoning_effort=reasoning_effort,
+            max_tokens=max_tokens,
+        )
+
+    async def chat(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        output: type[BaseModel],
+        reasoning_effort: ReasoningEffort | None = None,
+        max_tokens: int = 2048,
+    ) -> ChatTurn:
+        """One tool-calling step (agentic game master and seller)."""
+        self._require_key()
+        return await chat_completion(
+            self._client,
+            provider=PROVIDER,
+            model=model,
+            messages=messages,
+            tools=tools,
             output=output,
             reasoning_effort=reasoning_effort,
             max_tokens=max_tokens,
