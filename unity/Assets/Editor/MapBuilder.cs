@@ -292,19 +292,25 @@ namespace ColonQuest.EditorTools
             return go;
         }
 
-        private static void Glow(Transform parent, string name, Vector2 center, float size, string hex, float alpha, int order)
+        private static SpriteRenderer Glow(Transform parent, string name, Vector2 center, float size, string hex, float alpha, int order)
         {
             var color = GamePalette.Hex(hex);
             color.a = alpha;
-            Shape(parent, name, softCircle, center, Vector2.one * size, color, order);
+            return Shape(parent, name, softCircle, center, Vector2.one * size, color, order);
+        }
+
+        private static void Flickering(SpriteRenderer target, float amplitude, float speed, float seed)
+        {
+            target.gameObject.AddComponent<Flicker>().Configure(amplitude, speed, seed);
         }
 
         /// <summary>Soft pools of light from the screens and lamps, so the rooms feel lit from inside.</summary>
         private static void BuildLights(Transform parent)
         {
-            Glow(parent, "Light_Atm", new Vector2(0f, -4.8f), 3.2f, "#55E08F", 0.26f, OrderLight);
-            Glow(parent, "Light_Tv", new Vector2(4.8f, 3.8f), 3.2f, "#4DA3FF", 0.22f, OrderLight);
-            Glow(parent, "Light_DeskLamp", new Vector2(-2.5f, -3.4f), 3.4f, "#FFD23F", 0.26f, OrderLight);
+            // The TV flickers fast, the ATM hums, the lamp barely moves.
+            Flickering(Glow(parent, "Light_Atm", new Vector2(0f, -4.8f), 3.2f, "#55E08F", 0.26f, OrderLight), 0.18f, 2.5f, 11f);
+            Flickering(Glow(parent, "Light_Tv", new Vector2(4.8f, 3.8f), 3.2f, "#4DA3FF", 0.22f, OrderLight), 0.4f, 9f, 23f);
+            Flickering(Glow(parent, "Light_DeskLamp", new Vector2(-2.5f, -3.4f), 3.4f, "#FFD23F", 0.26f, OrderLight), 0.08f, 1.2f, 37f);
         }
 
         private static Transform ParallaxGroup(Transform parent, string name, float factor)
@@ -327,8 +333,8 @@ namespace ColonQuest.EditorTools
             Nebula(nebula, new Vector2(-11f, -5f), 11f, "#1D6B7A", 0.26f);
             Nebula(nebula, new Vector2(12f, -3f), 12f, "#3A2A8C", 0.28f);
 
-            StarField(ParallaxGroup(parent, "Stars_Far", 0.88f), random, 90, 0.04f, 0.09f, 0.2f, 0.45f, OrderStarsFar);
-            StarField(ParallaxGroup(parent, "Stars_Mid", 0.72f), random, 45, 0.07f, 0.14f, 0.3f, 0.6f, OrderStarsMid);
+            StarField(ParallaxGroup(parent, "Stars_Far", 0.88f), random, 90, 0.04f, 0.09f, 0.2f, 0.45f, OrderStarsFar, false);
+            StarField(ParallaxGroup(parent, "Stars_Mid", 0.72f), random, 45, 0.07f, 0.14f, 0.3f, 0.6f, OrderStarsMid, true);
             currentLayer = LayerForeground;
             Dust(ParallaxGroup(parent, "Dust", -0.25f), random);
             currentLayer = LayerWorld;
@@ -375,7 +381,7 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Nebula", softCircle, center, Vector2.one * size, color, OrderNebula);
         }
 
-        private static void StarField(Transform parent, System.Random random, int count, float minSize, float maxSize, float minAlpha, float maxAlpha, int order)
+        private static void StarField(Transform parent, System.Random random, int count, float minSize, float maxSize, float minAlpha, float maxAlpha, int order, bool twinkle)
         {
             for (int i = 0; i < count; i++)
             {
@@ -384,7 +390,11 @@ namespace ColonQuest.EditorTools
                 float size = Mathf.Lerp(minSize, maxSize, (float)random.NextDouble());
                 var color = GamePalette.White;
                 color.a = Mathf.Lerp(minAlpha, maxAlpha, (float)random.NextDouble());
-                Shape(parent, "Star", circle, new Vector2(x, y), Vector2.one * size, color, order);
+                var star = Shape(parent, "Star", circle, new Vector2(x, y), Vector2.one * size, color, order);
+                if (twinkle)
+                {
+                    Flickering(star, 0.6f, 1.2f, (float)(random.NextDouble() * 100.0));
+                }
             }
         }
 
@@ -545,7 +555,7 @@ namespace ColonQuest.EditorTools
             var station = go.AddComponent<Station>();
             station.Configure(type, displayName);
 
-            Glow(go.transform, "Glow", Vector2.zero, 3.6f, "#FFD23F", 0.2f, OrderGlow);
+            Flickering(Glow(go.transform, "Glow", Vector2.zero, 3.6f, "#FFD23F", 0.2f, OrderGlow), 0.3f, 1.1f, center.x + center.y);
             var marker = Shape(go.transform, "Marker", ring, Vector2.zero, Vector2.one * 1.3f, GamePalette.Marker, OrderMarker);
             marker.gameObject.AddComponent<StationMarker>().Bind(station);
         }
@@ -614,8 +624,13 @@ namespace ColonQuest.EditorTools
             // A warm pool of light that travels with the player.
             Glow(player.transform, "Glow", Vector2.zero, 4.2f, "#FFE2A8", 0.16f, OrderPlayer - 3);
 
+            // Bob holds the walk cycle (bounce and squash); Visual inside it only flips left and right.
+            var bob = new GameObject("Bob").transform;
+            bob.SetParent(player.transform, false);
+            bob.gameObject.AddComponent<PlayerAnimator>();
+
             var visual = new GameObject("Visual").transform;
-            visual.SetParent(player.transform, false);
+            visual.SetParent(bob, false);
             player.AddComponent<PlayerController>().SetVisual(visual);
 
             var skin = GamePalette.Hex("#FF8A3D");
