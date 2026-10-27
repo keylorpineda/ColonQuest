@@ -26,6 +26,9 @@ namespace ColonQuest.EditorTools
         private const int OrderWall = 8;
         private const int OrderMarker = 10;
         private const int OrderLabel = 12;
+        private const int OrderPlayer = 20;
+
+        private const float WallThickness = 0.3f;
 
         private static Sprite rounded;
         private static Sprite roundedSmall;
@@ -77,10 +80,13 @@ namespace ColonQuest.EditorTools
             BuildStation(stations, "Station_Bank", StationType.Bank, "Cajero", new Vector2(0f, -3.4f));
 
             BuildLabels(Group(map, "Labels"));
+            BuildWallColliders(Group(map, "Colliders"));
 
             var spawn = new GameObject("PlayerSpawn");
             spawn.transform.position = Vector3.zero;
             spawn.transform.SetParent(map, false);
+
+            BuildPlayer(spawn.transform.position);
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -165,11 +171,37 @@ namespace ColonQuest.EditorTools
             return renderer;
         }
 
-        /// <summary>A dark outline shape with the colored body on top, the core look of the style.</summary>
+        /// <summary>
+        /// A dark outline shape with the colored body on top, the core look of the style.
+        /// Props at the default order are furniture and block the player; props drawn above
+        /// it (order greater than OrderProp) are decoration lying on furniture and do not.
+        /// </summary>
         private static void Prop(Transform parent, string name, Sprite sprite, Vector2 center, Vector2 size, Color color, int order = OrderProp)
         {
             Shape(parent, name + "_Outline", sprite, center, size + Vector2.one * (PropOutline * 2f), GamePalette.Outline, order);
-            Shape(parent, name, sprite, center, size, color, order + 1);
+            var body = Shape(parent, name, sprite, center, size, color, order + 1);
+            if (order <= OrderProp)
+            {
+                body.gameObject.AddComponent<BoxCollider2D>().size = size;
+            }
+        }
+
+        private static void Wall(Transform parent, string name, Vector2 center, Vector2 size)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = center;
+            go.AddComponent<BoxCollider2D>().size = size;
+        }
+
+        private static void HorizontalCollider(Transform parent, float xMin, float xMax, float y)
+        {
+            Wall(parent, $"Wall_H_{xMin}_{xMax}_{y}", new Vector2((xMin + xMax) * 0.5f, y), new Vector2(xMax - xMin, WallThickness));
+        }
+
+        private static void VerticalCollider(Transform parent, float x, float yMin, float yMax)
+        {
+            Wall(parent, $"Wall_V_{x}_{yMin}_{yMax}", new Vector2(x, (yMin + yMax) * 0.5f), new Vector2(WallThickness, yMax - yMin));
         }
 
         private static void BuildCamera()
@@ -300,6 +332,87 @@ namespace ColonQuest.EditorTools
 
             var marker = Shape(go.transform, "Marker", ring, Vector2.zero, Vector2.one * 1.3f, GamePalette.Marker, OrderMarker);
             marker.gameObject.AddComponent<StationMarker>().Bind(station);
+        }
+
+        /// <summary>The outer perimeter of the map plus the walls on each side of every doorway.</summary>
+        private static void BuildWallColliders(Transform parent)
+        {
+            // Corridor
+            VerticalCollider(parent, -11f, -1.2f, 1.2f);
+            VerticalCollider(parent, 11f, -1.2f, 1.2f);
+            HorizontalCollider(parent, -11f, -3.5f, -1.2f);
+            HorizontalCollider(parent, 3.5f, 11f, -1.2f);
+            HorizontalCollider(parent, -11f, -10.5f, 1.2f);
+            HorizontalCollider(parent, -3.5f, -2.5f, 1.2f);
+            HorizontalCollider(parent, 2.5f, 3.5f, 1.2f);
+            HorizontalCollider(parent, 10.5f, 11f, 1.2f);
+
+            // Casa
+            VerticalCollider(parent, -10.5f, 1.2f, 6.2f);
+            VerticalCollider(parent, -3.5f, 1.2f, 6.2f);
+            HorizontalCollider(parent, -10.5f, -3.5f, 6.2f);
+            HorizontalCollider(parent, -10.5f, -8.2f, 1.2f);
+            HorizontalCollider(parent, -5.8f, -3.5f, 1.2f);
+
+            // Plaza
+            VerticalCollider(parent, -2.5f, 1.2f, 3.2f);
+            VerticalCollider(parent, 2.5f, 1.2f, 3.2f);
+            HorizontalCollider(parent, -2.5f, 2.5f, 3.2f);
+
+            // Tienda
+            VerticalCollider(parent, 3.5f, 1.2f, 6.2f);
+            VerticalCollider(parent, 10.5f, 1.2f, 6.2f);
+            HorizontalCollider(parent, 3.5f, 10.5f, 6.2f);
+            HorizontalCollider(parent, 3.5f, 5.8f, 1.2f);
+            HorizontalCollider(parent, 8.2f, 10.5f, 1.2f);
+
+            // Banco
+            VerticalCollider(parent, -3.5f, -6.2f, -1.2f);
+            VerticalCollider(parent, 3.5f, -6.2f, -1.2f);
+            HorizontalCollider(parent, -3.5f, 3.5f, -6.2f);
+            HorizontalCollider(parent, -3.5f, -1.2f, -1.2f);
+            HorizontalCollider(parent, 1.2f, 3.5f, -1.2f);
+        }
+
+        private static void BuildPlayer(Vector3 position)
+        {
+            var player = new GameObject("Player") { tag = "Player" };
+            player.transform.position = position;
+
+            var body = player.AddComponent<Rigidbody2D>();
+            body.gravityScale = 0f;
+            body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            body.interpolation = RigidbodyInterpolation2D.Interpolate;
+
+            var collider = player.AddComponent<CircleCollider2D>();
+            collider.radius = 0.3f;
+            collider.offset = new Vector2(0f, -0.1f);
+
+            // Shadow stays put; the visual flips to face the walking direction.
+            var shadowColor = GamePalette.Outline;
+            shadowColor.a = 0.35f;
+            Shape(player.transform, "Shadow", circle, new Vector2(0f, -0.5f), new Vector2(0.8f, 0.3f), shadowColor, OrderPlayer - 1);
+
+            var visual = new GameObject("Visual").transform;
+            visual.SetParent(player.transform, false);
+            player.AddComponent<PlayerController>().SetVisual(visual);
+
+            var skin = GamePalette.Hex("#FF8A3D");
+            Shape(visual, "Body_Outline", rounded, Vector2.zero, new Vector2(0.96f, 1.16f), GamePalette.Outline, OrderPlayer);
+            Shape(visual, "Body", rounded, Vector2.zero, new Vector2(0.8f, 1.0f), skin, OrderPlayer + 1);
+            Shape(visual, "Belly", roundedSmall, new Vector2(0f, -0.28f), new Vector2(0.5f, 0.28f), GamePalette.Shade(skin, 1.15f), OrderPlayer + 2);
+
+            // Two big cartoon eyes looking toward the walking direction (right when unflipped).
+            Eye(visual, new Vector2(0.0f, 0.22f));
+            Eye(visual, new Vector2(0.3f, 0.22f));
+        }
+
+        private static void Eye(Transform parent, Vector2 center)
+        {
+            Shape(parent, "Eye_Outline", circle, center, Vector2.one * 0.3f, GamePalette.Outline, OrderPlayer + 2);
+            Shape(parent, "Eye", circle, center, Vector2.one * 0.24f, GamePalette.White, OrderPlayer + 3);
+            Shape(parent, "Pupil", circle, center + new Vector2(0.04f, 0f), Vector2.one * 0.11f, GamePalette.Outline, OrderPlayer + 4);
         }
 
         private static void BuildLabels(Transform parent)
