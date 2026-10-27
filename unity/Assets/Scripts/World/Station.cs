@@ -7,7 +7,12 @@ namespace ColonQuest.World
     {
         Home,
         Store,
-        Bank
+        Bank,
+        Garage,
+        Grocery,
+        Lender,
+        Pyramid,
+        Kiosk
     }
 
     /// <summary>
