@@ -11,9 +11,10 @@ from dataclasses import dataclass
 
 from app.agents.tools import HistoryItem
 from app.game_master.limits import CASH_FLOW_RANGES, KIND_RANGES, MONTH_RANGES
+from app.game_master.season import PlannedMonth
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-10-26"
+PROMPT_VERSION = "gm-2026-10-26b"
 
 
 def _ranges_table() -> str:
@@ -52,6 +53,7 @@ REACT TO THE PLAYER
 - December: aguinaldo, marchamo or holiday spending.
 - Do not repeat any event id listed under "Avoid".
 - Prefer teaching concepts listed under "Not taught yet".
+- When "plannedFocus" is given, build the event around its teachingConcept, eventType and theme.
 
 RULES THE GAME ENGINE ENFORCES (out-of-range values are clamped, so stay inside them)
 - type is one of: {_values(EventType)}
@@ -75,6 +77,7 @@ class PromptContext:
     recent_event_ids: Sequence[str] = ()
     taught_concepts: Sequence[TeachingConcept] = ()
     history: Sequence[HistoryItem] = ()  # read by the agentic game master's tools
+    planned: PlannedMonth | None = None  # this month's slot in the season plan
 
 
 def state_signals(state: PlayerState) -> dict[str, object]:
@@ -107,6 +110,8 @@ def build_user_prompt(context: PromptContext) -> str:
         "avoid": list(context.recent_event_ids),
         "notTaughtYet": untaught,
     }
+    if context.planned is not None:
+        payload["plannedFocus"] = context.planned.model_dump(mode="json", by_alias=True)
     return "Create the event for this month.\n" + json.dumps(
         payload, ensure_ascii=False, separators=(",", ":")
     )
