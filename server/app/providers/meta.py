@@ -13,12 +13,11 @@ from typing import Any
 import httpx2
 import openai
 from openai import AsyncOpenAI
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from app.config import Settings
 from app.providers.base import (
     GeneratedImage,
-    ProviderError,
     ProviderResponseError,
     ProviderTimeoutError,
     ProviderUnavailableError,
@@ -27,26 +26,15 @@ from app.providers.base import (
     Transcription,
     Usage,
 )
+from app.providers.openai_compat import (
+    elapsed_ms,
+    structured_completion,
+    translate_sdk_error,
+)
 
 logger = logging.getLogger(__name__)
 
-
-def _elapsed_ms(started: float) -> int:
-    return int((time.perf_counter() - started) * 1000)
-
-
-def _translate_sdk_error(error: openai.OpenAIError) -> ProviderError:
-    if isinstance(error, openai.APITimeoutError):
-        return ProviderTimeoutError(str(error))
-    if isinstance(error, openai.AuthenticationError | openai.PermissionDeniedError):
-        # A bad or missing key will not fix itself on retry: fail fast to the fallback.
-        logger.error("Meta Model API rejected the credentials (%s)", error.status_code)
-        return ProviderUnavailableError(f"{error.status_code}: credentials rejected")
-    if isinstance(error, openai.APIConnectionError | openai.RateLimitError):
-        return ProviderUnavailableError(str(error))
-    if isinstance(error, openai.APIStatusError) and error.status_code >= 500:
-        return ProviderUnavailableError(f"{error.status_code}: {error.message}")
-    return ProviderResponseError(str(error))
+PROVIDER = "meta_api"
 
 
 class MetaProvider:
@@ -83,51 +71,15 @@ class MetaProvider:
     ) -> StructuredResult[T]:
         """Ask for JSON that matches ``output`` and validate it with Pydantic."""
         self._require_key()
-        extra: dict[str, Any] = {}
-        if reasoning_effort is not None:
-            extra["reasoning_effort"] = reasoning_effort
-        started = time.perf_counter()
-        try:
-            completion = await self._client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": output.__name__,
-                        "schema": output.model_json_schema(by_alias=True),
-                    },
-                },
-                max_tokens=max_tokens,
-                **extra,
-            )
-        except openai.OpenAIError as error:
-            raise _translate_sdk_error(error) from error
-
-        content = completion.choices[0].message.content if completion.choices else None
-        if not content:
-            raise ProviderResponseError("empty completion")
-        try:
-            value = output.model_validate_json(content)
-        except ValidationError as error:
-            raise ProviderResponseError(f"schema validation failed: {error}") from error
-
-        usage = completion.usage
-        cached = 0
-        if usage and usage.prompt_tokens_details and usage.prompt_tokens_details.cached_tokens:
-            cached = usage.prompt_tokens_details.cached_tokens
-        return StructuredResult(
-            value=value,
-            usage=Usage(
-                model=model,
-                input_tokens=usage.prompt_tokens if usage else 0,
-                output_tokens=usage.completion_tokens if usage else 0,
-                cached_input_tokens=cached,
-            ),
-            latency_ms=_elapsed_ms(started),
+        return await structured_completion(
+            self._client,
+            provider=PROVIDER,
+            model=model,
+            system=system,
+            user=user,
+            output=output,
+            reasoning_effort=reasoning_effort,
+            max_tokens=max_tokens,
         )
 
     async def generate_image(self, prompt: str, *, size: str = "1024x1024") -> GeneratedImage:
@@ -144,7 +96,7 @@ class MetaProvider:
                 output_format="png",
             )
         except openai.OpenAIError as error:
-            raise _translate_sdk_error(error) from error
+            raise translate_sdk_error(error, PROVIDER) from error
 
         if not response.data or not response.data[0].b64_json:
             raise ProviderResponseError("image response has no data")
@@ -154,7 +106,7 @@ class MetaProvider:
             media_type="image/png",
             revised_prompt=image.revised_prompt,
             usage=Usage(model=self._settings.image_model, images=1),
-            latency_ms=_elapsed_ms(started),
+            latency_ms=elapsed_ms(started),
         )
 
     async def transcribe(
@@ -204,5 +156,5 @@ class MetaProvider:
                 model=self._settings.transcribe_model,
                 audio_seconds=float(duration_ms) / 1000 if isinstance(duration_ms, int) else 0.0,
             ),
-            latency_ms=_elapsed_ms(started),
+            latency_ms=elapsed_ms(started),
         )
