@@ -1,3 +1,5 @@
+<p align="center"><b>English</b> | <a href="README.es.md">Español</a></p>
+
 <p align="center">
   <img src="docs/assets/colon-quest-card.svg" width="100%" alt="Colón Quest card. Each month the player decides what to do with their money, Muse Wonder narrates the consequence, a deterministic engine computes the exact colones, and the player negotiates by voice with characters who hide fees. The AI tells the story; the finance engine keeps the books.">
 </p>
