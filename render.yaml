@@ -28,6 +28,12 @@ services:
         sync: false
       - key: CLIENT_HASH_SALT
         generateValue: true
+      - key: AGENTIC_GAME_MASTER
+        value: "false"
+      - key: SEASON_PLANNER
+        value: "false"
+      - key: SELLER_AGENT
+        value: "false"
       - key: NPC_PROVIDER
         value: "meta_api"
       - key: OPEN_WEIGHTS_BASE_URL
