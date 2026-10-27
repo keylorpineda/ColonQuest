@@ -17,7 +17,8 @@ namespace ColonQuest.EditorTools
         private const string ScenePath = "Assets/Scenes/Main.unity";
         private const float OutlineThickness = 0.28f;
         private const float PropOutline = 0.08f;
-        private const float CameraSize = 7.5f;
+        private const float CameraSize = 4.6f;
+        private static readonly Rect MapBounds = new Rect(-11.5f, -6.7f, 23f, 13.4f);
 
         private const int OrderOutline = -8;
         private const int OrderFloor = -5;
@@ -52,7 +53,6 @@ namespace ColonQuest.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             var map = new GameObject("Map").transform;
-            BuildCamera();
             BuildStars(Group(map, "Background"));
 
             // Rooms first, corridor last: the corridor covers the rounded corners of
@@ -86,14 +86,18 @@ namespace ColonQuest.EditorTools
             spawn.transform.position = Vector3.zero;
             spawn.transform.SetParent(map, false);
 
-            BuildPlayer(spawn.transform.position);
+            var player = BuildPlayer(spawn.transform.position);
+            BuildCamera().AddComponent<CameraFollow>().Configure(player, MapBounds);
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
         }
 
-        /// <summary>Renders the main camera of Main.unity to a PNG. Pass -previewPath file.png.</summary>
+        /// <summary>
+        /// Renders the main camera of Main.unity to a PNG. Pass -previewPath file.png, and
+        /// optionally -previewZoom (orthographic size) and -previewAt x,y to frame the shot.
+        /// </summary>
         public static void RenderPreview()
         {
             string path = GetArgument("-previewPath") ?? "MapPreview.png";
@@ -102,6 +106,23 @@ namespace ColonQuest.EditorTools
             const int width = 1920;
             const int height = 1080;
             var camera = Camera.main;
+
+            string zoom = GetArgument("-previewZoom");
+            if (zoom != null)
+            {
+                camera.orthographicSize = float.Parse(zoom, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            string at = GetArgument("-previewAt");
+            if (at != null)
+            {
+                var parts = at.Split(',');
+                camera.transform.position = new Vector3(
+                    float.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture),
+                    float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture),
+                    camera.transform.position.z);
+            }
+
             var target = new RenderTexture(width, height, 24);
             camera.targetTexture = target;
             camera.Render();
@@ -204,7 +225,7 @@ namespace ColonQuest.EditorTools
             Wall(parent, $"Wall_V_{x}_{yMin}_{yMax}", new Vector2(x, (yMin + yMax) * 0.5f), new Vector2(WallThickness, yMax - yMin));
         }
 
-        private static void BuildCamera()
+        private static GameObject BuildCamera()
         {
             var go = new GameObject("Main Camera") { tag = "MainCamera" };
             go.transform.position = new Vector3(0f, 0f, -10f);
@@ -215,6 +236,7 @@ namespace ColonQuest.EditorTools
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = GamePalette.Space;
             go.AddComponent<AudioListener>();
+            return go;
         }
 
         private static void BuildStars(Transform parent)
@@ -374,7 +396,7 @@ namespace ColonQuest.EditorTools
             HorizontalCollider(parent, 1.2f, 3.5f, -1.2f);
         }
 
-        private static void BuildPlayer(Vector3 position)
+        private static Transform BuildPlayer(Vector3 position)
         {
             var player = new GameObject("Player") { tag = "Player" };
             player.transform.position = position;
@@ -406,6 +428,8 @@ namespace ColonQuest.EditorTools
             // Two big cartoon eyes looking toward the walking direction (right when unflipped).
             Eye(visual, new Vector2(0.0f, 0.22f));
             Eye(visual, new Vector2(0.3f, 0.22f));
+
+            return player.transform;
         }
 
         private static void Eye(Transform parent, Vector2 center)
