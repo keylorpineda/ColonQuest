@@ -29,11 +29,18 @@ less reliable.
   Each later event adjusts the plan without a model call: when the last decision left the player
   with more debt than the one before, that concept is reinforced in the next free month (never
   December, never twice). The month's slot reaches the game master as `plannedFocus`.
+- **Seller agent** (`SELLER_AGENT`, `app/negotiation/agent.py`): the salesperson tries to
+  maximize its earnings, which grow with the term. `quote_term(months)` re-prices the offer under
+  negotiation and returns the seller's private earnings. The agent may omit figures until asked
+  but never lie: every amount in its reply must be on the hidden sheet or in a quotable tool
+  result (its earnings never are), otherwise a scripted reply is served. Steps are recorded as
+  `negotiation_agent`; provider errors use the single-call negotiator, timeouts the scripted
+  reply, and `X-Reply-Source: agent` marks agent replies.
 - Budget and per-session/IP limits are checked before the agent starts; at 80 % of the daily
   budget the agent runs on Spark, at 100 % it never runs.
 
 ## How to enable
 
-Apply the migration first (`uv run alembic upgrade head`), then set `SEASON_PLANNER=true` and
-`AGENTIC_GAME_MASTER=true` in Render once the playable month is stable, then watch
+Apply the migration first (`uv run alembic upgrade head`), then set `SEASON_PLANNER=true`,
+`SELLER_AGENT=true` and `AGENTIC_GAME_MASTER=true` in Render once the playable month is stable, then watch
 `SELECT endpoint, count(*), avg(latency_ms) FROM model_calls GROUP BY 1`.
