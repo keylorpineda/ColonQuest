@@ -28,3 +28,9 @@ services:
         sync: false
       - key: CLIENT_HASH_SALT
         generateValue: true
+      - key: NPC_PROVIDER
+        value: "meta_api"
+      - key: OPEN_WEIGHTS_BASE_URL
+        sync: false
+      - key: OPEN_WEIGHTS_API_KEY
+        sync: false
