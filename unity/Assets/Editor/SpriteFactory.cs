@@ -18,6 +18,7 @@ namespace ColonQuest.EditorTools
         public const string RingPath = Folder + "/Ring.png";
         public const string SoftCirclePath = Folder + "/SoftCircle.png";
         public const string VignettePath = Folder + "/Vignette.png";
+        public const string SquarePath = Folder + "/Square.png";
 
         [MenuItem("Colon Quest/Art/Generate Sprites")]
         public static void Generate()
@@ -33,6 +34,9 @@ namespace ColonQuest.EditorTools
             // Soft shapes for glows, nebulae and the screen vignette: alpha fades smoothly.
             Write(SoftCirclePath, 256, 256, 0, (x, y) => SoftCircleAlpha(x, y, 256));
             Write(VignettePath, 256, 256, 0, (x, y) => VignetteAlpha(x, y, 256));
+
+            // A plain 1 by 1 unit square for thin lines such as floor tile joints.
+            Write(SquarePath, 4, 4, 0, (x, y) => 1f);
             AssetDatabase.Refresh();
         }
 
@@ -40,7 +44,7 @@ namespace ColonQuest.EditorTools
         {
             if (!File.Exists(RoundedRectPath) || !File.Exists(RoundedRectSmallPath)
                 || !File.Exists(CirclePath) || !File.Exists(RingPath)
-                || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath))
+                || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath) || !File.Exists(SquarePath))
             {
                 Generate();
             }
