@@ -10,6 +10,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Protocol
 
 from app.config import Settings
 from app.cost_guard import BudgetMode, select_text_model
@@ -56,6 +57,14 @@ class EventOutcome:
     model: str | None = None
     fallback_reason: FallbackReason | None = None
     adjustments: list[str] = field(default_factory=list)
+
+
+class EventGenerator(Protocol):
+    """Anything that produces the month's event: GameMaster or AgenticGameMaster."""
+
+    async def next_event(
+        self, ledger: Ledger, session_id: uuid.UUID, context: PromptContext
+    ) -> EventOutcome: ...
 
 
 class GameMaster:

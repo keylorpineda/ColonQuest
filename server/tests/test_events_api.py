@@ -120,3 +120,50 @@ async def test_unknown_session_and_invalid_state(client: httpx2.AsyncClient) -> 
     session_id = await new_session(client)
     bad = await client.post(f"/api/sessions/{session_id}/event", json=STATE | {"cash": -5})
     assert bad.status_code == 422
+
+
+async def test_agentic_game_master_reads_stored_history(db: AsyncSession) -> None:
+    import json
+
+    from app.game_master.agentic import AgenticGameMaster
+
+    from .fakes import MODEL_EVENT, FakeToolProvider, final_turn, tool_turn
+
+    settings = Settings(  # type: ignore[call-arg]
+        _env_file=None, game_master_model="muse-wonder-1.0", agentic_game_master=True
+    )
+    tool_provider = FakeToolProvider(
+        tool_turn(("get_player_history", {})), final_turn(json.dumps(MODEL_EVENT))
+    )
+    agentic = AgenticGameMaster(
+        GameMaster(FakeProvider(), settings, TTLCache(10, 60)), tool_provider, settings
+    )
+    app = create_app()
+
+    async def override_session() -> AsyncIterator[AsyncSession]:
+        yield db
+
+    app.dependency_overrides[get_session] = override_session
+    app.dependency_overrides[get_game_master] = lambda: agentic
+    async with httpx2.AsyncClient(
+        transport=httpx2.ASGITransport(app=app), base_url="http://test"
+    ) as http:
+        session_id = (await http.post("/api/sessions", json={})).json()["sessionId"]
+        db.add(
+            Decision(
+                session_id=uuid.UUID(session_id),
+                month=2,
+                event_id="evt_moto_dañada",
+                teaching_concept="emergency_fund",
+                choice_id="pay_card",
+                state_after=STATE | {"month": 2},
+            )
+        )
+        await db.flush()
+        response = await http.post(f"/api/sessions/{session_id}/event", json=STATE)
+
+    assert response.status_code == 200
+    assert response.headers["X-Event-Source"] == "agent"
+    history_result = tool_provider.calls[1]["messages"][3]["content"]
+    assert '"choiceId": "pay_card"' in history_result
+    assert '"month": 2' in history_result

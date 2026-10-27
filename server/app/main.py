@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import classes, dashboard, events, health, images, negotiation, sessions, summary
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
+from app.game_master.agentic import AgenticGameMaster
 from app.game_master.service import GameMaster
 from app.images.service import ImageService
 from app.logging_config import configure_logging
@@ -31,7 +32,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         max_entries=settings.response_cache_max_entries, ttl_s=settings.response_cache_ttl_s
     )
     app.state.provider = provider
-    app.state.game_master = GameMaster(provider, settings, cache)
+    # The agentic wrapper delegates to the single-call game master unless AGENTIC_GAME_MASTER.
+    app.state.game_master = AgenticGameMaster(
+        GameMaster(provider, settings, cache), provider, settings
+    )
     # NPC dialogue may run on open weights (Baseten/Modal) with automatic fallback to Meta.
     app.state.negotiator = Negotiator(
         build_npc_provider(settings, provider, open_weights), settings
