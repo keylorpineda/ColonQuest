@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 358" width="800" height="358" role="img" aria-labelledby="t d">
   <title id="t">Meta models</title>
-  <desc id="d">Muse Wonder is the game master and the voice of the characters. Muse Spark writes the season plan, the year-end summary and Class Mode explanations. Muse Voice Transcribe turns the player&#x27;s voice into text while negotiating. Muse Image draws pixel-art portraits and scenes, pre-generated and cached.</desc>
+  <desc id="d">Muse Wonder is the game master and the voice of the characters. Muse Spark writes the season plan, the year-end summary and Class Mode reports. Muse Voice Transcribe turns the voice of the player into text while negotiating. Muse Image draws pixel-art portraits, pre-generated and cached.</desc>
   <style>
     .h { font: 800 30px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; letter-spacing: 1px; }
     .num { font: 700 18px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }

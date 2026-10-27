@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 72" width="800" height="72" role="img" aria-labelledby="t d">
+  <title id="t">ACCESIBILIDAD</title>
+  <desc id="d">Sección 05: ACCESIBILIDAD</desc>
+  <style>
+    .h { font: 800 30px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; letter-spacing: 1px; }
+    .num { font: 700 18px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .title { font: 800 56px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; letter-spacing: 2px; }
+    .tagline { font: italic 500 24px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .event { font: 700 16px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #fbf6ea; letter-spacing: 1px; }
+    .label { font: 800 22px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; }
+    .label-sm { font: 800 20px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; }
+    .detail { font: 500 18px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .detail-sm { font: 500 16px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .step { font: 700 14px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .pct { font: 800 24px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .stamp { font: 800 18px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; letter-spacing: 2px; }
+    .rule { font: 500 18px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #1d1a16; }
+    .strong { font-weight: 700; }
+    .blink { animation: blink 1s steps(1) infinite; }
+    .bob { animation: bob 1.2s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes bob { 50% { transform: translateY(-6px); } }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      .hide-still { opacity: 0; }
+    }
+  </style>
+  <rect x="0" y="0" width="800" height="72" fill="#f3ead7"/>
+  <rect x="0" y="66" width="800" height="6" fill="#1d1a16"/>
+  <rect x="10" y="16" width="48" height="48" fill="#1d1a16"/><rect x="4" y="10" width="48" height="48" fill="#fbf6ea" stroke="#1d1a16" stroke-width="3"/>
+  <rect x="24" y="18" width="4" height="4" fill="#1d1a16"/><rect x="28" y="18" width="4" height="4" fill="#1d1a16"/><rect x="24" y="22" width="4" height="4" fill="#1d1a16"/><rect x="28" y="22" width="4" height="4" fill="#1d1a16"/><rect x="16" y="30" width="4" height="4" fill="#1d1a16"/><rect x="20" y="30" width="4" height="4" fill="#1d1a16"/><rect x="24" y="30" width="4" height="4" fill="#1d1a16"/><rect x="28" y="30" width="4" height="4" fill="#1d1a16"/><rect x="32" y="30" width="4" height="4" fill="#1d1a16"/><rect x="36" y="30" width="4" height="4" fill="#1d1a16"/><rect x="24" y="34" width="4" height="4" fill="#1d1a16"/><rect x="28" y="34" width="4" height="4" fill="#1d1a16"/><rect x="24" y="38" width="4" height="4" fill="#1d1a16"/><rect x="28" y="38" width="4" height="4" fill="#1d1a16"/><rect x="20" y="42" width="4" height="4" fill="#1d1a16"/><rect x="32" y="42" width="4" height="4" fill="#1d1a16"/><rect x="16" y="46" width="4" height="4" fill="#1d1a16"/><rect x="36" y="46" width="4" height="4" fill="#1d1a16"/>
+  <text class="num" x="72" y="44">05</text>
+  <text class="h" x="128" y="46">ACCESIBILIDAD</text>
+  <rect class="blink" x="372" y="22" width="14" height="28" fill="#e2a92b"/>
+</svg>
