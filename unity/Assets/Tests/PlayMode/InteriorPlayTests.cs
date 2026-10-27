@@ -1,0 +1,175 @@
+using System.Collections;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+
+namespace ColonQuest.World.PlayModeTests
+{
+    /// <summary>Plays the Banco interior: walls, furniture, the station, the vendor and the way back out.</summary>
+    public sealed class BancoPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Banco;
+
+        [UnityTest]
+        public IEnumerator Player_AppearsInFrontOfTheDoormat()
+        {
+            yield return null;
+
+            Assert.AreEqual(2.4f, Body.position.x, 0.5f);
+            Assert.AreEqual(-4.3f, Body.position.y, 0.5f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsStoppedByTheRoomWall()
+        {
+            yield return Walk(new Vector2(2.4f, -2f), Vector2.left, 3f);
+
+            Assert.Greater(Body.position.x, -3.5f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsBlockedByTheAtm()
+        {
+            yield return Walk(new Vector2(0f, -3f), Vector2.down, 1.5f);
+
+            // The ATM body starts at y = -4.2, so the player stops above it.
+            Assert.Greater(Body.position.y, -4.2f);
+        }
+
+        [UnityTest]
+        public IEnumerator Station_FiresWhenThePlayerWalksIn()
+        {
+            var station = GameObject.Find("Station_Bank").GetComponent<Station>();
+            Station entered = null;
+            station.PlayerEntered += s => entered = s;
+
+            Teleport(station.transform.position);
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
+            Assert.AreSame(station, entered);
+            Assert.IsTrue(station.IsPlayerInside);
+        }
+
+        [UnityTest]
+        public IEnumerator Station_FiresWhenThePlayerWalksOut()
+        {
+            var station = GameObject.Find("Station_Bank").GetComponent<Station>();
+            Station exited = null;
+            station.PlayerExited += s => exited = s;
+
+            Teleport(station.transform.position);
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
+            Teleport(new Vector2(2.4f, -1.5f));
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
+            Assert.AreSame(station, exited);
+            Assert.IsFalse(station.IsPlayerInside);
+        }
+
+        [UnityTest]
+        public IEnumerator Cashier_BlocksThePlayer()
+        {
+            var cashier = GameObject.Find("Cajera").transform;
+
+            // Walk down into the cashier from above, where the floor is free.
+            yield return Walk((Vector2)cashier.position + new Vector2(0f, 1.4f), Vector2.down, 1.2f);
+
+            Assert.Greater(Body.position.y, cashier.position.y);
+        }
+
+        [UnityTest]
+        public IEnumerator FarStars_MoveLessThanTheCamera()
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            var farStars = GameObject.Find("Stars_Far").transform;
+
+            // Factor 0.88: the layer follows the camera by 88 percent of its position.
+            Assert.AreEqual(Cam.transform.position.x * 0.88f, farStars.position.x, 0.05f);
+            Assert.AreEqual(Cam.transform.position.y * 0.88f, farStars.position.y, 0.05f);
+        }
+
+        [UnityTest]
+        public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheBank()
+        {
+            Teleport(new Vector2(2.4f, -5.6f));
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
+            Assert.AreEqual(-8.5f, Body.position.x, 0.6f);
+            Assert.AreEqual(4.3f, Body.position.y, 0.6f);
+        }
+    }
+
+    /// <summary>The other two interiors have a vendor of their own and a door back to the town.</summary>
+    public sealed class TiendaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Tienda;
+
+        [UnityTest]
+        public IEnumerator Vendor_StandsBehindTheCounter()
+        {
+            var vendor = GameObject.Find("Vendedor");
+            var counter = GameObject.Find("Counter");
+            yield return null;
+
+            Assert.IsNotNull(vendor);
+            Assert.Greater(vendor.transform.position.y, counter.transform.position.y);
+        }
+
+        [UnityTest]
+        public IEnumerator Station_FiresWhenThePlayerWalksIn()
+        {
+            var station = GameObject.Find("Station_Store").GetComponent<Station>();
+            Station entered = null;
+            station.PlayerEntered += s => entered = s;
+
+            Teleport(station.transform.position);
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
+            Assert.AreSame(station, entered);
+        }
+
+        [UnityTest]
+        public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheShop()
+        {
+            Teleport(new Vector2(7f, 1.0f));
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(8.5f, Body.position.x, 0.6f);
+            Assert.AreEqual(4.3f, Body.position.y, 0.6f);
+        }
+    }
+
+    public sealed class CasaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Casa;
+
+        [UnityTest]
+        public IEnumerator Player_IsBlockedByTheBed()
+        {
+            yield return Walk(new Vector2(-9.3f, 3f), Vector2.up, 1.5f);
+
+            Assert.Less(Body.position.y, 4f);
+        }
+
+        [UnityTest]
+        public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheHouse()
+        {
+            Teleport(new Vector2(-7f, 1.0f));
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(-19.5f, Body.position.x, 0.6f);
+            Assert.AreEqual(4.3f, Body.position.y, 0.6f);
+        }
+    }
+}
