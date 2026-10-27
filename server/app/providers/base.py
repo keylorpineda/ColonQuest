@@ -32,6 +32,7 @@ class Usage:
     cached_input_tokens: int = 0
     audio_seconds: float = 0.0
     images: int = 0
+    provider: str = "meta_api"  # recorded in model_calls; "open_weights" for Baseten/Modal
 
 
 @dataclass(frozen=True, slots=True)
