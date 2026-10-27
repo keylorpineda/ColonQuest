@@ -20,19 +20,32 @@ namespace ColonQuest.EditorTools
         private const float CameraSize = 4.6f;
         private static readonly Rect MapBounds = new Rect(-11.5f, -6.7f, 23f, 13.4f);
 
-        private const int OrderNebula = -20;
-        private const int OrderStarsFar = -18;
-        private const int OrderStarsMid = -16;
-        private const int OrderOutline = -8;
-        private const int OrderFloor = -5;
-        private const int OrderRug = 4;
+        // Sorting layers, back to front. Orders below only matter inside one layer.
+        private const string LayerBackground = "Background";
+        private const string LayerFloor = "Floor";
+        private const string LayerWorld = "Default";
+        private const string LayerForeground = "Foreground";
+
+        private const int OrderNebula = 0;
+        private const int OrderStarsFar = 1;
+        private const int OrderStarsMid = 2;
+
+        private const int OrderOutline = 0;
+        private const int OrderFloor = 1;
+        private const int FloorOrdersPerRoom = 4;
+        private const int OrderRug = 40;
+
+        private const int OrderShadow = 0;
         private const int OrderProp = 5;
         private const int OrderWall = 8;
         private const int OrderMarker = 10;
         private const int OrderLabel = 12;
         private const int OrderPlayer = 20;
-        private const int OrderDust = 30;
-        private const int OrderVignette = 40;
+
+        private const int OrderDust = 0;
+        private const int OrderVignette = 10;
+
+        private static string currentLayer = LayerWorld;
 
         private const float WallThickness = 0.3f;
 
@@ -42,6 +55,7 @@ namespace ColonQuest.EditorTools
         private static Sprite ring;
         private static Sprite softCircle;
         private static Sprite vignette;
+        private static Sprite square;
 
         private struct Room
         {
@@ -56,6 +70,7 @@ namespace ColonQuest.EditorTools
         {
             SpriteFactory.EnsureGenerated();
             LoadSprites();
+            EnsureSortingLayers();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -72,7 +87,9 @@ namespace ColonQuest.EditorTools
                 new Room { Name = "Plaza", Center = new Vector2(0f, 2.2f), Size = new Vector2(5f, 2.8f), Color = GamePalette.FloorPlaza },
                 new Room { Name = "Pasillo", Center = Vector2.zero, Size = new Vector2(22f, 2.4f), Color = GamePalette.FloorCorridor }
             };
+            currentLayer = LayerFloor;
             BuildFloors(Group(map, "Floors"), rooms);
+            currentLayer = LayerWorld;
             BuildWalls(Group(map, "Walls"));
 
             var props = Group(map, "Props");
@@ -168,6 +185,7 @@ namespace ColonQuest.EditorTools
             ring = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.RingPath);
             softCircle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SoftCirclePath);
             vignette = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.VignettePath);
+            square = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SquarePath);
         }
 
         private static Transform Group(Transform parent, string name)
@@ -186,6 +204,7 @@ namespace ColonQuest.EditorTools
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
             renderer.color = color;
+            renderer.sortingLayerName = currentLayer;
             renderer.sortingOrder = order;
 
             if (sprite == rounded || sprite == roundedSmall)
@@ -208,9 +227,17 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void Prop(Transform parent, string name, Sprite sprite, Vector2 center, Vector2 size, Color color, int order = OrderProp)
         {
+            bool solid = order <= OrderProp;
+            if (solid)
+            {
+                var shadowColor = GamePalette.Outline;
+                shadowColor.a = 0.3f;
+                Shape(parent, name + "_Shadow", sprite, center + new Vector2(0.07f, -0.16f), size + Vector2.one * 0.12f, shadowColor, OrderShadow);
+            }
+
             Shape(parent, name + "_Outline", sprite, center, size + Vector2.one * (PropOutline * 2f), GamePalette.Outline, order);
             var body = Shape(parent, name, sprite, center, size, color, order + 1);
-            if (order <= OrderProp)
+            if (solid)
             {
                 body.gameObject.AddComponent<BoxCollider2D>().size = size;
             }
@@ -259,6 +286,7 @@ namespace ColonQuest.EditorTools
         private static void BuildBackground(Transform parent)
         {
             var random = new System.Random(7);
+            currentLayer = LayerBackground;
 
             var nebula = ParallaxGroup(parent, "Nebula", 0.92f);
             Nebula(nebula, new Vector2(-9f, 4f), 15f, "#4B2E9A", 0.34f);
@@ -269,7 +297,43 @@ namespace ColonQuest.EditorTools
 
             StarField(ParallaxGroup(parent, "Stars_Far", 0.88f), random, 90, 0.04f, 0.09f, 0.2f, 0.45f, OrderStarsFar);
             StarField(ParallaxGroup(parent, "Stars_Mid", 0.72f), random, 45, 0.07f, 0.14f, 0.3f, 0.6f, OrderStarsMid);
+            currentLayer = LayerForeground;
             Dust(ParallaxGroup(parent, "Dust", -0.25f), random);
+            currentLayer = LayerWorld;
+        }
+
+        /// <summary>
+        /// Registers the sorting layers the scene uses, in back to front order:
+        /// Background, Floor, Default (props, walls, characters), Foreground.
+        /// </summary>
+        private static void EnsureSortingLayers()
+        {
+            var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            var layers = tagManager.FindProperty("m_SortingLayers");
+
+            AddSortingLayer(layers, LayerBackground, 0, 1111001);
+            AddSortingLayer(layers, LayerFloor, 1, 1111002);
+            AddSortingLayer(layers, LayerForeground, layers.arraySize, 1111003);
+
+            tagManager.ApplyModifiedProperties();
+            AssetDatabase.SaveAssets();
+        }
+
+        private static void AddSortingLayer(SerializedProperty layers, string name, int index, int uniqueId)
+        {
+            for (int i = 0; i < layers.arraySize; i++)
+            {
+                if (layers.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue == name)
+                {
+                    return;
+                }
+            }
+
+            layers.InsertArrayElementAtIndex(index);
+            var element = layers.GetArrayElementAtIndex(index);
+            element.FindPropertyRelative("name").stringValue = name;
+            element.FindPropertyRelative("uniqueID").intValue = uniqueId;
+            element.FindPropertyRelative("locked").intValue = 0;
         }
 
         private static void Nebula(Transform parent, Vector2 center, float size, string hex, float alpha)
@@ -320,15 +384,50 @@ namespace ColonQuest.EditorTools
                     room.Size + Vector2.one * (OutlineThickness * 2f), GamePalette.Outline, OrderOutline);
             }
 
-            // Each room takes two sorting orders (floor, then plate) so later rooms cover earlier ones.
+            // Each room takes four sorting orders (floor, plate, tile joints, wall face)
+            // so later rooms cover earlier ones.
             for (int i = 0; i < rooms.Length; i++)
             {
                 var room = rooms[i];
-                int order = OrderFloor + i * 2;
+                int order = OrderFloor + i * FloorOrdersPerRoom;
                 Shape(parent, room.Name + "_Floor", rounded, room.Center, room.Size, room.Color, order);
                 Shape(parent, room.Name + "_Plate", rounded, room.Center,
                     room.Size - Vector2.one, GamePalette.Shade(room.Color, 0.94f), order + 1);
+                TileJoints(parent, room, order + 2);
+
+                if (room.Name != "Banco" && room.Name != "Pasillo")
+                {
+                    WallFace(parent, room, order + 3);
+                }
             }
+        }
+
+        /// <summary>Faint lines every unit across the plate, so the floors read as tiles.</summary>
+        private static void TileJoints(Transform parent, Room room, int order)
+        {
+            var color = GamePalette.Shade(room.Color, 0.84f);
+            color.a = 0.5f;
+
+            Vector2 half = (room.Size - Vector2.one) * 0.5f;
+            for (float x = Mathf.Ceil(room.Center.x - half.x); x <= room.Center.x + half.x; x += 1f)
+            {
+                Shape(parent, room.Name + "_JointV", square, new Vector2(x, room.Center.y), new Vector2(0.04f, half.y * 2f), color, order);
+            }
+
+            for (float y = Mathf.Ceil(room.Center.y - half.y); y <= room.Center.y + half.y; y += 1f)
+            {
+                Shape(parent, room.Name + "_JointH", square, new Vector2(room.Center.x, y), new Vector2(half.x * 2f, 0.04f), color, order);
+            }
+        }
+
+        /// <summary>The visible face of the back wall: a darker band with a baseboard line.</summary>
+        private static void WallFace(Transform parent, Room room, int order)
+        {
+            float top = room.Center.y + room.Size.y * 0.5f;
+            Shape(parent, room.Name + "_WallFace", roundedSmall, new Vector2(room.Center.x, top - 0.4f),
+                new Vector2(room.Size.x, 0.8f), GamePalette.Shade(room.Color, 0.66f), order);
+            Shape(parent, room.Name + "_Baseboard", square, new Vector2(room.Center.x, top - 0.78f),
+                new Vector2(room.Size.x - 0.3f, 0.07f), GamePalette.Shade(room.Color, 0.45f), order);
         }
 
         private static void BuildWalls(Transform parent)
@@ -353,7 +452,11 @@ namespace ColonQuest.EditorTools
         private static void BuildHome(Transform parent)
         {
             var home = Group(parent, "Casa");
+            // The rug lies on the floor, so it belongs to the floor layer, below every shadow.
+            currentLayer = LayerFloor;
             Shape(home, "Rug", rounded, new Vector2(-7.2f, 3.4f), new Vector2(3.4f, 2.2f), GamePalette.Debt, OrderRug);
+            Shape(home, "Rug_Stripe", rounded, new Vector2(-7.2f, 3.4f), new Vector2(2.6f, 1.4f), GamePalette.Shade(GamePalette.Debt, 0.82f), OrderRug + 1);
+            currentLayer = LayerWorld;
             Prop(home, "Bed", rounded, new Vector2(-9.3f, 4.9f), new Vector2(2.0f, 1.8f), GamePalette.Alert);
             Prop(home, "Pillow", roundedSmall, new Vector2(-9.9f, 4.9f), new Vector2(0.6f, 1.0f), GamePalette.White, OrderProp + 2);
             Prop(home, "Wardrobe", rounded, new Vector2(-7.1f, 5.6f), new Vector2(1.8f, 1.0f), GamePalette.Hex("#6A4A8C"));
@@ -472,7 +575,8 @@ namespace ColonQuest.EditorTools
             // Shadow stays put; the visual flips to face the walking direction.
             var shadowColor = GamePalette.Outline;
             shadowColor.a = 0.35f;
-            Shape(player.transform, "Shadow", circle, new Vector2(0f, -0.5f), new Vector2(0.8f, 0.3f), shadowColor, OrderPlayer - 1);
+            shadowColor.a = 0.45f;
+            Shape(player.transform, "Shadow", softCircle, new Vector2(0f, -0.5f), new Vector2(1.1f, 0.4f), shadowColor, OrderPlayer - 1);
 
             var visual = new GameObject("Visual").transform;
             visual.SetParent(player.transform, false);
