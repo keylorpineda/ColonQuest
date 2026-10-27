@@ -24,6 +24,7 @@ namespace ColonQuest.EditorTools
 
             currentLayer = LayerFloor;
             BuildGround(Group(map, "Ground"), random);
+            BuildWorldGround(Group(map, "WorldGround"), random);
             BuildStreets(Group(map, "Streets"));
             BuildAlleyLotAndPark(Group(map, "Lots"));
             currentLayer = LayerWorld;
@@ -34,6 +35,8 @@ namespace ColonQuest.EditorTools
             BuildStreetFurniture(Group(map, "Furniture"), shadows);
             BuildPlazaAndPark(Group(map, "Landmarks"), shadows);
             BuildAlleyAndLot(Group(map, "AlleyAndLot"), shadows);
+            BuildWorldProps(Group(map, "WorldProps"), shadows, random);
+            BuildWorldBorders(Group(map, "Borders"));
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
             BuildClouds(Group(map, "Clouds"), random);
@@ -52,24 +55,29 @@ namespace ColonQuest.EditorTools
 
         private static void BuildGround(Transform parent, System.Random random)
         {
-            Shape(parent, "Grass", rounded, new Vector2(0f, -1.5f), new Vector2(56f, 36f), GrassColor, TownGrass);
+            Shape(parent, "Grass", rounded, MapLayout.TownBounds.center, MapLayout.TownBounds.size, GrassColor, TownGrass);
 
             // Big soft darker patches and small tufts so the grass is not one flat color.
             var patch = GamePalette.Hex("#58A867");
             patch.a = 0.45f;
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 42; i++)
             {
-                float x = (float)(random.NextDouble() * 52.0 - 26.0);
-                float y = (float)(random.NextDouble() * 32.0 - 17.0);
+                float x = (float)(random.NextDouble() * 88.0 - 44.0);
+                float y = (float)(random.NextDouble() * 56.0 - 28.0);
                 float size = 6f + (float)random.NextDouble() * 7f;
                 Shape(parent, "Patch", softCircle, new Vector2(x, y), new Vector2(size, size * 0.7f), patch, TownGrassPatch);
             }
 
             var tuft = GamePalette.Hex("#58A867");
-            for (int i = 0; i < 110; i++)
+            for (int i = 0; i < 300; i++)
             {
-                float x = (float)(random.NextDouble() * 52.0 - 26.0);
-                float y = (float)(random.NextDouble() * 32.0 - 17.0);
+                float x = (float)(random.NextDouble() * 88.0 - 44.0);
+                float y = (float)(random.NextDouble() * 56.0 - 28.0);
+                if (!OnOpenGrass(x, y))
+                {
+                    continue;
+                }
+
                 Shape(parent, "Tuft", circle, new Vector2(x, y), new Vector2(0.34f, 0.2f), tuft, TownGroundDetail);
             }
 
@@ -80,18 +88,18 @@ namespace ColonQuest.EditorTools
         private static void BuildStreets(Transform parent)
         {
             // Sidewalks first, then the roads on top so the road edge reads as a curb.
-            Walk(parent, new Rect(-26f, 4f, 52f, 2f));
-            Walk(parent, new Rect(-26f, -2f, 52f, 2f));
-            Walk(parent, new Rect(-26f, -10f, 52f, 2f));
-            Walk(parent, new Rect(-26f, -16f, 52f, 2f));
+            Walk(parent, new Rect(-42f, 4f, 84f, 2f));
+            Walk(parent, new Rect(-42f, -2f, 84f, 2f));
+            Walk(parent, new Rect(-42f, -10f, 84f, 2f));
+            Walk(parent, new Rect(-42f, -16f, 84f, 2f));
             Walk(parent, new Rect(-4f, 4f, 8f, 9f));
 
-            Road(parent, new Rect(-26f, 0f, 52f, 4f));
-            Road(parent, new Rect(-26f, -14f, 52f, 4f));
+            Road(parent, new Rect(-42f, 0f, 84f, 4f));
+            Road(parent, new Rect(-42f, -14f, 84f, 4f));
             Road(parent, new Rect(-2f, -10f, 4f, 10f));
 
-            DashedLine(parent, 2f, -26f, 26f);
-            DashedLine(parent, -12f, -26f, 26f);
+            DashedLine(parent, 2f, -42f, 42f);
+            DashedLine(parent, -12f, -42f, 42f);
             Crosswalk(parent, 3.6f, 0f, 4f);
             Crosswalk(parent, -3.6f, 0f, 4f);
             Crosswalk(parent, 3.6f, -14f, -10f);
@@ -144,29 +152,31 @@ namespace ColonQuest.EditorTools
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Casa", Sign = "CASA", Roof = "#C0504D", Wall = "#F2D7B6",
-                XMin = -23f, XMax = -16f, YBottom = 6f, YTop = 12f, DoorX = -19.5f, FacadeHeight = 2.6f, Entrance = Entrance.Door
+                XMin = -24f, XMax = -16f, YBottom = 6f, YTop = 12.6f, DoorX = -19.5f, FacadeHeight = 2.8f, Entrance = Entrance.Door
             });
-            Building(parent, shadows, new BuildingSpec
+            var banco = Building(parent, shadows, new BuildingSpec
             {
                 Name = "Banco", Sign = "BANCO", Roof = "#3B6FB6", Wall = "#E8EEF9",
-                XMin = -13f, XMax = -4f, YBottom = 6f, YTop = 12f, DoorX = -8.5f, FacadeHeight = 2.9f, Entrance = Entrance.Door
+                XMin = -13.5f, XMax = -4f, YBottom = 6f, YTop = 13.8f, DoorX = -8.5f, FacadeHeight = 3.4f, Entrance = Entrance.Door
             });
-            Building(parent, shadows, new BuildingSpec
+            Columns(banco, -8.5f - (-13.5f + -4f) * 0.5f, 3.4f);
+            var tienda = Building(parent, shadows, new BuildingSpec
             {
                 Name = "Tienda", Sign = "TIENDA", Roof = "#7B5BA8", Wall = "#FFE6A8",
-                XMin = 4f, XMax = 13f, YBottom = 6f, YTop = 12f, DoorX = 8.5f, FacadeHeight = 2.6f, Entrance = Entrance.Door,
+                XMin = 4f, XMax = 13.5f, YBottom = 6f, YTop = 13.4f, DoorX = 8.5f, FacadeHeight = 3.2f, Entrance = Entrance.Door,
                 AwningA = "#E8505B", AwningB = "#F8F5E8"
             });
+            Banner(tienda, "36 CUOTAS SIN INTERESES", 8.5f - (4f + 13.5f) * 0.5f, 3.2f + 1.7f, "#E8505B");
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Taller", Sign = "TALLER DON RAFA", Roof = "#4B5568", Wall = "#D7DDE8",
-                XMin = 16f, XMax = 23f, YBottom = 6f, YTop = 12f, DoorX = 19.5f, FacadeHeight = 2.6f, Entrance = Entrance.Garage
+                XMin = 16f, XMax = 23.5f, YBottom = 6f, YTop = 12.8f, DoorX = 19.5f, FacadeHeight = 3.0f, Entrance = Entrance.Garage
             });
 
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Pulperia", Sign = "PULPERIA", Roof = "#3FA66A", Wall = "#FBE3C4",
-                XMin = -23f, XMax = -16f, YBottom = -8f, YTop = -3f, DoorX = -19.5f, FacadeHeight = 2.6f, Entrance = Entrance.Window,
+                XMin = -24.5f, XMax = -16f, YBottom = -8f, YTop = -2.6f, DoorX = -19.5f, FacadeHeight = 2.8f, Entrance = Entrance.Window,
                 AwningA = "#3FA66A", AwningB = "#F8F5E8"
             });
             Building(parent, shadows, new BuildingSpec
@@ -177,7 +187,7 @@ namespace ColonQuest.EditorTools
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "KioscoSinpe", Sign = "SINPE", Roof = "#4DA3FF", Wall = "#F1F4FF",
-                XMin = 10.5f, XMax = 13.5f, YBottom = -8f, YTop = -4.5f, DoorX = 12f, FacadeHeight = 2.2f, Entrance = Entrance.Window,
+                XMin = 10f, XMax = 14f, YBottom = -8f, YTop = -4.2f, DoorX = 12f, FacadeHeight = 2.4f, Entrance = Entrance.Window,
                 AwningA = "#4DA3FF", AwningB = "#F8F5E8"
             });
         }
@@ -252,12 +262,6 @@ namespace ColonQuest.EditorTools
             Car(parent, shadows, -6f, -10.95f, "#55E08F");
             Car(parent, shadows, 8f, -13.05f, "#F1F4FF");
             Car(parent, shadows, -18f, -13.05f, "#FF8A3D");
-
-            // Hedges close the town in on all four sides.
-            Hedge(parent, new Vector2(0f, 14.4f), new Vector2(53.2f, 1.4f));
-            Hedge(parent, new Vector2(0f, -17.4f), new Vector2(53.2f, 1.4f));
-            Hedge(parent, new Vector2(-25.4f, -1.5f), new Vector2(1.4f, 34f));
-            Hedge(parent, new Vector2(25.4f, -1.5f), new Vector2(1.4f, 34f));
         }
 
         private static void BuildPlazaAndPark(Transform parent, Transform shadows)
@@ -342,6 +346,8 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f), TownStationGlow, TownStationMarker);
             BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f), TownStationGlow, TownStationMarker);
             BuildStation(parent, "Station_Kiosk", StationType.Kiosk, "Kiosco SINPE", new Vector2(12f, -8.9f), TownStationGlow, TownStationMarker);
+            BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f), TownStationGlow, TownStationMarker);
+            BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f), TownStationGlow, TownStationMarker);
             currentLayer = LayerWorld;
         }
 
@@ -364,6 +370,13 @@ namespace ColonQuest.EditorTools
             BuildNpc(parent, "Prestamista", new Vector2(-14f, -5.3f), new Look { Skin = "#5B4B7A", Extra = Accessory.Hood, ExtraColor = "#2A2140" }, true);
             BuildNpc(parent, "Promotor", new Vector2(9.0f, -5.7f), new Look { Skin = "#2EAA55", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, true);
 
+            BuildNpc(parent, "AsesoraCoop", new Vector2(-29.6f, 4.85f), new Look { Skin = "#2E8B57", Extra = Accessory.Vest, ExtraColor = "#F1F4FF" }, true);
+            BuildNpc(parent, "DonaLucia", new Vector2(14.3f, -25.0f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#00A8A8" }, true);
+
+            BuildPedestrian(parent, "Peaton_F", new Vector2(-25f, -17.8f), new Vector2(40f, -17.8f), new Look { Skin = "#4DA3FF", Extra = Accessory.Cap, ExtraColor = "#FFD23F" }, 1.3f);
+            BuildPedestrian(parent, "Peaton_G", new Vector2(-42f, 5.2f), new Vector2(-28f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);
+            BuildPedestrian(parent, "Peaton_H", new Vector2(33f, 5.2f), new Vector2(42f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#55E08F" }, 1.1f);
+            BuildPedestrian(parent, "Peaton_I", new Vector2(-40f, -9.0f), new Vector2(-26f, -9.0f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#4DA3FF" }, 1.2f);
             BuildPedestrian(parent, "Peaton_A", new Vector2(-24f, 5.2f), new Vector2(-14.5f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#FF7A5C" }, 1.1f);
             BuildPedestrian(parent, "Peaton_B", new Vector2(24f, -9.0f), new Vector2(14.5f, -9.0f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.2f);
             BuildPedestrian(parent, "Peaton_C", new Vector2(-10f, -1.0f), new Vector2(10f, -1.0f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
@@ -379,13 +392,13 @@ namespace ColonQuest.EditorTools
             var color = GamePalette.Hex("#0B1630");
             color.a = 0.12f;
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 20; i++)
             {
-                float x = (float)(random.NextDouble() * 80.0 - 40.0);
-                float y = (float)(random.NextDouble() * 44.0 - 22.0);
+                float x = (float)(random.NextDouble() * 160.0 - 80.0);
+                float y = (float)(random.NextDouble() * 110.0 - 55.0);
                 float size = 8f + (float)random.NextDouble() * 6f;
                 var cloud = Shape(layer, "Cloud", softCircle, new Vector2(x, y), new Vector2(size * 1.4f, size), color, OrderDust);
-                cloud.gameObject.AddComponent<Drift>().Configure(new Vector2(0.35f + (float)random.NextDouble() * 0.25f, 0.04f), new Vector2(45f, 28f));
+                cloud.gameObject.AddComponent<Drift>().Configure(new Vector2(0.35f + (float)random.NextDouble() * 0.25f, 0.04f), new Vector2(90f, 56f));
             }
 
             currentLayer = LayerWorld;
