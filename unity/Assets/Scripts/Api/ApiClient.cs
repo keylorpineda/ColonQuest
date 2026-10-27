@@ -58,9 +58,9 @@ namespace ColonQuest.Api
             return StartCoroutine(Service.SendNegotiationText(offerId, text, done));
         }
 
-        public Coroutine RequestSummary(Action<ApiResult<SessionSummary>> done)
+        public Coroutine RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
         {
-            return StartCoroutine(Service.RequestSummary(done));
+            return StartCoroutine(Service.RequestSummary(finalState, done));
         }
 
         public Coroutine CheckHealth(Action<ApiResult<HealthStatus>> done)

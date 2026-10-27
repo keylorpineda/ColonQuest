@@ -112,7 +112,8 @@ namespace ColonQuest.Api
             done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));
         }
 
-        public IEnumerator RequestSummary(Action<ApiResult<SessionSummary>> done)
+        /// <summary>Closes the session: the backend needs the final state to compute net worth and debt.</summary>
+        public IEnumerator RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
         {
             if (!HasSession)
             {
@@ -121,7 +122,7 @@ namespace ColonQuest.Api
             }
 
             HttpResponseData response = null;
-            yield return transport.Send(Post($"sessions/{SessionId}/summary", "{}", config.Timeout), r => response = r);
+            yield return transport.Send(Post($"sessions/{SessionId}/summary", JsonUtility.ToJson(ApiMapper.ToDto(finalState)), config.Timeout), r => response = r);
             done(Parse<SessionSummaryDto, SessionSummary>(response, ApiMapper.FromDto));
         }
 

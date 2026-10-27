@@ -285,9 +285,10 @@ namespace ColonQuest.Api.Tests
                 "{\"monthsPlayed\":12,\"decisions\":12,\"conceptsTaught\":[\"budget\"],\"negotiations\":1,\"dealsAccepted\":0,\"keyQuestionsAsked\":[\"total_cost\"],\"totalDebt\":50000,\"netWorth\":120000,\"narrative\":\"Buen año.\",\"source\":\"fallback\"}"));
             ApiResult<SessionSummary> result = null;
 
-            Run(service.RequestSummary(r => result = r));
+            Run(service.RequestSummary(State(12), r => result = r));
 
             Assert.IsTrue(result.Ok);
+            StringAssert.Contains("\"salaryNet\":450000", transport.Requests[1].JsonBody);
             Assert.AreEqual(120000L, result.Value.NetWorth);
             Assert.AreEqual("fallback", result.Value.Source);
         }
