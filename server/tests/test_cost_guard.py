@@ -90,3 +90,18 @@ async def test_record_and_sum_daily_spend(db: AsyncSession) -> None:
     status = await budget_status(db, budget_usd=4.5)
     assert status.mode == BudgetMode.DOWNGRADED
     assert status.remaining_usd == Decimal("0.5")
+
+
+def test_open_weights_calls_do_not_spend_meta_budget() -> None:
+    usage = Usage(
+        model="muse-spark-open", input_tokens=50_000, output_tokens=5_000, provider="open_weights"
+    )
+    assert estimate_cost(usage) == Decimal(0)
+
+
+@pytest.mark.anyio
+async def test_record_call_stores_the_answering_provider(db: AsyncSession) -> None:
+    usage = Usage(model="muse-spark-open", input_tokens=10, provider="open_weights")
+    call = await record_call(db, usage=usage, endpoint="negotiation", latency_ms=5, ok=True)
+    assert call.provider == "open_weights"
+    assert call.estimated_cost_usd == Decimal(0)
