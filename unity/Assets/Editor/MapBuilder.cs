@@ -20,6 +20,9 @@ namespace ColonQuest.EditorTools
         private const float CameraSize = 4.6f;
         private static readonly Rect MapBounds = new Rect(-11.5f, -6.7f, 23f, 13.4f);
 
+        private const int OrderNebula = -20;
+        private const int OrderStarsFar = -18;
+        private const int OrderStarsMid = -16;
         private const int OrderOutline = -8;
         private const int OrderFloor = -5;
         private const int OrderRug = 4;
@@ -28,6 +31,8 @@ namespace ColonQuest.EditorTools
         private const int OrderMarker = 10;
         private const int OrderLabel = 12;
         private const int OrderPlayer = 20;
+        private const int OrderDust = 30;
+        private const int OrderVignette = 40;
 
         private const float WallThickness = 0.3f;
 
@@ -35,6 +40,8 @@ namespace ColonQuest.EditorTools
         private static Sprite roundedSmall;
         private static Sprite circle;
         private static Sprite ring;
+        private static Sprite softCircle;
+        private static Sprite vignette;
 
         private struct Room
         {
@@ -53,7 +60,7 @@ namespace ColonQuest.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             var map = new GameObject("Map").transform;
-            BuildStars(Group(map, "Background"));
+            BuildBackground(Group(map, "Background"));
 
             // Rooms first, corridor last: the corridor covers the rounded corners of
             // the rooms where they overlap, so each doorway has a clean seam.
@@ -159,6 +166,8 @@ namespace ColonQuest.EditorTools
             roundedSmall = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.RoundedRectSmallPath);
             circle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.CirclePath);
             ring = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.RingPath);
+            softCircle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SoftCirclePath);
+            vignette = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.VignettePath);
         }
 
         private static Transform Group(Transform parent, string name)
@@ -239,17 +248,66 @@ namespace ColonQuest.EditorTools
             return go;
         }
 
-        private static void BuildStars(Transform parent)
+        private static Transform ParallaxGroup(Transform parent, string name, float factor)
+        {
+            var group = Group(parent, name);
+            group.gameObject.AddComponent<ParallaxLayer>().SetFactor(factor);
+            return group;
+        }
+
+        /// <summary>Distant layers move less than the camera, the dust in front moves more.</summary>
+        private static void BuildBackground(Transform parent)
         {
             var random = new System.Random(7);
-            for (int i = 0; i < 80; i++)
+
+            var nebula = ParallaxGroup(parent, "Nebula", 0.92f);
+            Nebula(nebula, new Vector2(-9f, 4f), 15f, "#4B2E9A", 0.34f);
+            Nebula(nebula, new Vector2(8f, 5f), 12f, "#1D4F8C", 0.34f);
+            Nebula(nebula, new Vector2(1f, -6f), 16f, "#6B2A6B", 0.28f);
+            Nebula(nebula, new Vector2(-11f, -5f), 11f, "#1D6B7A", 0.26f);
+            Nebula(nebula, new Vector2(12f, -3f), 12f, "#3A2A8C", 0.28f);
+
+            StarField(ParallaxGroup(parent, "Stars_Far", 0.88f), random, 90, 0.04f, 0.09f, 0.2f, 0.45f, OrderStarsFar);
+            StarField(ParallaxGroup(parent, "Stars_Mid", 0.72f), random, 45, 0.07f, 0.14f, 0.3f, 0.6f, OrderStarsMid);
+            Dust(ParallaxGroup(parent, "Dust", -0.25f), random);
+        }
+
+        private static void Nebula(Transform parent, Vector2 center, float size, string hex, float alpha)
+        {
+            var color = GamePalette.Hex(hex);
+            color.a = alpha;
+            Shape(parent, "Nebula", softCircle, center, Vector2.one * size, color, OrderNebula);
+        }
+
+        private static void StarField(Transform parent, System.Random random, int count, float minSize, float maxSize, float minAlpha, float maxAlpha, int order)
+        {
+            for (int i = 0; i < count; i++)
             {
-                float x = (float)(random.NextDouble() * 34.0 - 17.0);
-                float y = (float)(random.NextDouble() * 19.0 - 9.5);
-                float size = 0.05f + (float)random.NextDouble() * 0.1f;
+                float x = (float)(random.NextDouble() * 28.0 - 14.0);
+                float y = (float)(random.NextDouble() * 16.0 - 8.0);
+                float size = Mathf.Lerp(minSize, maxSize, (float)random.NextDouble());
                 var color = GamePalette.White;
-                color.a = 0.25f + (float)random.NextDouble() * 0.35f;
-                Shape(parent, "Star", circle, new Vector2(x, y), Vector2.one * size, color, -10);
+                color.a = Mathf.Lerp(minAlpha, maxAlpha, (float)random.NextDouble());
+                Shape(parent, "Star", circle, new Vector2(x, y), Vector2.one * size, color, order);
+            }
+        }
+
+        private static void Dust(Transform parent, System.Random random)
+        {
+            for (int i = 0; i < 36; i++)
+            {
+                float x = (float)(random.NextDouble() * 28.0 - 14.0);
+                float y = (float)(random.NextDouble() * 18.0 - 9.0);
+                float size = 0.05f + (float)random.NextDouble() * 0.08f;
+                var color = GamePalette.Hex("#FFF1C2");
+                color.a = 0.16f + (float)random.NextDouble() * 0.2f;
+
+                var mote = Shape(parent, "Mote", circle, new Vector2(x, y), Vector2.one * size, color, OrderDust);
+                mote.gameObject.AddComponent<Mote>().Configure(
+                    0.15f + (float)random.NextDouble() * 0.3f,
+                    0.1f + (float)random.NextDouble() * 0.2f,
+                    (float)(random.NextDouble() * 6.28),
+                    new Vector2(14f, 9f));
             }
         }
 
