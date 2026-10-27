@@ -14,6 +14,7 @@ from app.game_master.planner import SeasonPlanner
 from app.game_master.service import GameMaster
 from app.images.service import ImageService
 from app.logging_config import configure_logging
+from app.negotiation.agent import SellerAgent
 from app.negotiation.service import Negotiator
 from app.providers.meta import MetaProvider
 from app.providers.open_weights import OpenWeightsProvider
@@ -38,8 +39,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         GameMaster(provider, settings, cache), provider, settings
     )
     # NPC dialogue may run on open weights (Baseten/Modal) with automatic fallback to Meta.
-    app.state.negotiator = Negotiator(
-        build_npc_provider(settings, provider, open_weights), settings
+    # The seller agent (SELLER_AGENT) wraps it and uses Meta's tool calling.
+    app.state.negotiator = SellerAgent(
+        Negotiator(build_npc_provider(settings, provider, open_weights), settings),
+        provider,
+        settings,
     )
     # Only consulted when SEASON_PLANNER is on (see app.api.events.get_season_planner).
     app.state.season_planner = SeasonPlanner(provider, settings)
