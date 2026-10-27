@@ -14,6 +14,8 @@ from app.images.service import ImageService
 from app.logging_config import configure_logging
 from app.negotiation.service import Negotiator
 from app.providers.meta import MetaProvider
+from app.providers.open_weights import OpenWeightsProvider
+from app.providers.routing import build_npc_provider
 from app.response_cache import TTLCache
 from app.schemas import GameEvent
 from app.summary.writer import SummaryWriter
@@ -24,12 +26,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Create one provider and one game master per process and close them on shutdown."""
     settings = get_settings()
     provider = MetaProvider(settings)
+    open_weights = OpenWeightsProvider(settings)
     cache: TTLCache[GameEvent] = TTLCache(
         max_entries=settings.response_cache_max_entries, ttl_s=settings.response_cache_ttl_s
     )
     app.state.provider = provider
     app.state.game_master = GameMaster(provider, settings, cache)
-    app.state.negotiator = Negotiator(provider, settings)
+    # NPC dialogue may run on open weights (Baseten/Modal) with automatic fallback to Meta.
+    app.state.negotiator = Negotiator(
+        build_npc_provider(settings, provider, open_weights), settings
+    )
     app.state.summary_writer = SummaryWriter(provider, settings)
     app.state.class_explainer = ClassExplainer(provider, settings)
     app.state.image_service = ImageService(provider, settings)
@@ -37,6 +43,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         await provider.aclose()
+        await open_weights.aclose()
 
 
 def create_app() -> FastAPI:
