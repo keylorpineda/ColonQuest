@@ -716,9 +716,12 @@ def run_locally(card: Card, copy: dict[str, Any]) -> None:
         body += f'<text class="prompt" x="{LEFT + 24}" y="{y}">$</text>'
         body += f'<text class="code" x="{LEFT + 52}" y="{y}">{escape(command)}</text>'
     body += f'<rect class="blink" x="{LEFT + 52}" y="{40 + 36 * len(COMMANDS)}" width="12" height="22" fill="{OCHRE}"/>'
-    note_y = height + 60
-    body += lines(LEFT, note_y, wrap(copy["run_note"], 56), "detail", 30)
-    card.add(body, note_y + 30)
+    # The note ends with a command; keep the command whole on its own line.
+    note, windows_command = copy["run_note"].split(": ", 1)
+    note_y = height + 62
+    body += f'<text class="detail" x="{LEFT}" y="{note_y}">{escape(note)}:</text>'
+    body += f'<text class="label-sm" x="{LEFT}" y="{note_y + 36}">{escape(windows_command)}</text>'
+    card.add(body, note_y + 60)
 
 
 def team(card: Card, copy: dict[str, Any]) -> None:
