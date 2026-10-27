@@ -40,6 +40,21 @@ class ToolContext:
 
     history: list[HistoryItem] = field(default_factory=list)
     taught: list[TeachingConcept] = field(default_factory=list)
+    offer: Offer | None = None  # the seller agent's hidden sheet
+
+
+# Result keys a seller may quote to the player; anything else (its own earnings) stays private.
+QUOTABLE_KEYS = (
+    "monthlyPayment",
+    "monthlyWithInsurance",
+    "totalCost",
+    "totalInterest",
+    "totalInsurance",
+    "overCashPrice",
+)
+SELLER_EARNINGS_INTEREST_SHARE = (
+    20  # the seller keeps 1/20 of the interest on top of the commission
+)
 
 
 class SimulatePurchaseArgs(ToolArgs):
@@ -55,6 +70,10 @@ class ProjectDebtArgs(ToolArgs):
     monthly_rate_pct: RatePct = Field(description="Monthly interest rate, percent")
     monthly_payment: Money = Field(description="Payment made every month")
     months: Months = Field(description="Months to project")
+
+
+class QuoteTermArgs(ToolArgs):
+    months: Annotated[int, Field(ge=6, le=60)] = Field(description="Installment term to quote")
 
 
 class NoArgs(ToolArgs):
@@ -104,6 +123,34 @@ def project_debt(args: ProjectDebtArgs) -> dict[str, Any]:
         "totalInterest": total_interest,
         "neverPaysOff": paid_off_in is None and balance >= args.balance,
     }
+
+
+def quote_term(args: QuoteTermArgs, context: ToolContext) -> dict[str, Any]:
+    """The current offer re-priced at another term, with what the seller would earn."""
+    if context.offer is None:
+        return {"error": "no offer in this conversation"}
+    offer = context.offer
+    figures = simulate_purchase(
+        SimulatePurchaseArgs(
+            price=offer.cash_price,
+            months=args.months,
+            monthly_rate_pct=float(offer.monthly_rate_pct),
+            insurance_monthly=offer.insurance_monthly,
+            commission=offer.commission,
+        )
+    )
+    earnings = offer.commission + figures["totalInterest"] // SELLER_EARNINGS_INTEREST_SHARE
+    return {"months": args.months, **figures, "sellerEarningsPrivate": earnings}
+
+
+def quotable_amounts(results: Iterable[dict[str, Any]]) -> frozenset[int]:
+    """Amounts computed by tools that a seller may repeat to the player."""
+    return frozenset(
+        result[key]
+        for result in results
+        for key in QUOTABLE_KEYS
+        if isinstance(result.get(key), int)
+    )
 
 
 def get_player_history(_: NoArgs, context: ToolContext) -> dict[str, Any]:
@@ -159,6 +206,13 @@ TOOLS: dict[str, Tool] = {
             "How a debt evolves month by month with a fixed payment, and when it is paid off.",
             ProjectDebtArgs,
             lambda args, _: project_debt(args),
+        ),
+        Tool(
+            "quote_term",
+            "Exact figures of the offer under negotiation at another term, plus your private "
+            "earnings for that term (never tell the player your earnings).",
+            QuoteTermArgs,
+            quote_term,
         ),
         Tool(
             "get_player_history",

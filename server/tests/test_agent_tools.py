@@ -118,3 +118,32 @@ def test_schemas_are_openai_function_tools() -> None:
     assert simulate["type"] == "function"
     assert simulate["function"]["parameters"]["additionalProperties"] is False
     assert "price" in simulate["function"]["parameters"]["required"]
+
+
+def test_quote_term_reprices_the_offer_and_keeps_earnings_private() -> None:
+    from app.agents.tools import quotable_amounts
+
+    offer = OFFERS["celular_gama_alta"]
+    context = ToolContext(offer=offer)
+    same = execute_tool(ToolCall("c1", "quote_term", '{"months": 24}'), context, ["quote_term"])
+    longer = execute_tool(ToolCall("c2", "quote_term", '{"months": 36}'), context, ["quote_term"])
+
+    assert same["monthlyPayment"] == offer.monthly_payment
+    assert same["totalCost"] == offer.total_cost
+    assert longer["monthlyPayment"] < same["monthlyPayment"]
+    assert longer["totalCost"] > same["totalCost"]
+    assert longer["sellerEarningsPrivate"] > same["sellerEarningsPrivate"] > offer.commission
+
+    allowed = quotable_amounts([same, longer])
+    assert longer["monthlyWithInsurance"] in allowed
+    assert longer["sellerEarningsPrivate"] not in allowed
+
+
+def test_quote_term_needs_an_offer_and_a_sane_term() -> None:
+    no_offer = execute_tool(ToolCall("c1", "quote_term", '{"months": 24}'), CONTEXT, ["quote_term"])
+    assert "error" in no_offer
+    context = ToolContext(offer=OFFERS["moto_125"])
+    too_long = execute_tool(
+        ToolCall("c2", "quote_term", '{"months": 120}'), context, ["quote_term"]
+    )
+    assert too_long["error"].startswith("invalid arguments")
