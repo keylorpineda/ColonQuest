@@ -52,6 +52,7 @@ class GameSession(Base):
     )
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     final_state: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    season_plan: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
 
 class Decision(Base):
