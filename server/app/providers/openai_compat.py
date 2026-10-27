@@ -6,7 +6,7 @@ usage accounting live here once.
 
 import logging
 import time
-from typing import Any
+from typing import Any, cast
 
 import openai
 from openai import AsyncOpenAI
@@ -15,12 +15,14 @@ from openai.types.shared_params import ResponseFormatJSONSchema
 from pydantic import BaseModel, ValidationError
 
 from app.providers.base import (
+    ChatTurn,
     ProviderError,
     ProviderResponseError,
     ProviderTimeoutError,
     ProviderUnavailableError,
     ReasoningEffort,
     StructuredResult,
+    ToolCall,
     Usage,
 )
 
@@ -111,4 +113,49 @@ async def structured_completion[T: BaseModel](
         value=value,
         usage=usage_from(completion, model, provider),
         latency_ms=elapsed_ms(started),
+    )
+
+
+async def chat_completion(
+    client: AsyncOpenAI,
+    *,
+    provider: str,
+    model: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]],
+    output: type[BaseModel],
+    reasoning_effort: ReasoningEffort | None = None,
+    max_tokens: int = 2048,
+) -> ChatTurn:
+    """One step of a tool-calling conversation; the final answer must match ``output``."""
+    extra: dict[str, Any] = {}
+    if reasoning_effort is not None:
+        extra["reasoning_effort"] = reasoning_effort
+    started = time.perf_counter()
+    try:
+        completion = await client.chat.completions.create(
+            model=model,
+            messages=cast(list[ChatCompletionMessageParam], messages),
+            tools=cast(Any, tools),
+            response_format=json_schema_format(output),
+            max_tokens=max_tokens,
+            **extra,
+        )
+    except openai.OpenAIError as error:
+        raise translate_sdk_error(error, provider) from error
+    if not completion.choices:
+        raise ProviderResponseError("empty completion")
+
+    message = completion.choices[0].message
+    calls = [
+        ToolCall(id=call.id, name=call.function.name, arguments=call.function.arguments or "{}")
+        for call in (message.tool_calls or [])
+        if call.type == "function"
+    ]
+    return ChatTurn(
+        content=message.content,
+        tool_calls=calls,
+        usage=usage_from(completion, model, provider),
+        latency_ms=elapsed_ms(started),
+        message=message.model_dump(exclude_none=True, exclude={"annotations", "audio", "refusal"}),
     )
