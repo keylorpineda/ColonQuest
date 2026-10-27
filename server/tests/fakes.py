@@ -78,3 +78,55 @@ class FakeLedger:
 
     async def record(self, **kwargs: Any) -> None:
         self.records.append(kwargs)
+
+
+class FakeToolProvider:
+    """Scripted chat() turns for agent tests; each step returns a ChatTurn or raises."""
+
+    def __init__(self, *turns: Callable[[], Any], delay_s: float = 0) -> None:
+        self.turns = list(turns)
+        self.calls: list[dict[str, Any]] = []
+        self.delay_s = delay_s
+
+    async def chat(self, **kwargs: Any) -> Any:
+        self.calls.append({**kwargs, "messages": list(kwargs["messages"])})
+        if self.delay_s:
+            await asyncio.sleep(self.delay_s)
+        return self.turns.pop(0)()
+
+
+def tool_turn(*calls: tuple[str, dict[str, Any]]) -> Callable[[], Any]:
+    import json as _json
+
+    from app.providers.base import ChatTurn, ToolCall
+
+    def step() -> Any:
+        tool_calls = [
+            ToolCall(id=f"call_{i}", name=name, arguments=_json.dumps(args))
+            for i, (name, args) in enumerate(calls)
+        ]
+        message = {
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": c.id,
+                    "type": "function",
+                    "function": {"name": c.name, "arguments": c.arguments},
+                }
+                for c in tool_calls
+            ],
+        }
+        return ChatTurn(
+            None, tool_calls, Usage(model="muse-wonder-1.0", output_tokens=20), 300, message
+        )
+
+    return step
+
+
+def final_turn(content: str) -> Callable[[], Any]:
+    from app.providers.base import ChatTurn
+
+    def step() -> Any:
+        return ChatTurn(content, [], Usage(model="muse-wonder-1.0", output_tokens=200), 500, {})
+
+    return step
