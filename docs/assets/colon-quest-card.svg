@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="800" height="460" role="img" aria-labelledby="card-title card-desc">
+  <title id="card-title">Colón Quest</title>
+  <desc id="card-desc">A financial-literacy game for Costa Rican students. Each month the player decides what to do with their money, Muse Wonder narrates the consequence, a deterministic engine computes the exact colones, and the player negotiates by voice with characters who hide fees. The AI tells the story; the finance engine keeps the books.</desc>
+  <style>
+    .title { font: 800 60px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #f8fafc; letter-spacing: -1px; }
+    .tagline { font: 500 26px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #cbd5e1; }
+    .event { font: 600 18px ui-monospace, "Cascadia Code", Consolas, Menlo, monospace; fill: #93c5fd; }
+    .label { font: 700 24px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #f8fafc; }
+    .detail { font: 500 16px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #cbd5e1; }
+    .step { font: 700 15px ui-monospace, "Cascadia Code", Consolas, Menlo, monospace; fill: #94a3b8; }
+    .rule { font: 500 18px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #cbd5e1; }
+    .rule-strong { font-weight: 700; fill: #fde68a; }
+    .coin-symbol { font: 800 64px ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #78350f; }
+
+    .coin { transform-box: fill-box; transform-origin: center; animation: flip 4s ease-in-out infinite; }
+    .coin-float { animation: float 4s ease-in-out infinite; }
+    .node { fill: #111a2e; stroke: #334155; stroke-width: 2; animation: pulse 8s linear infinite; }
+    .n2 { animation-delay: 2s; }
+    .n3 { animation-delay: 4s; }
+    .n4 { animation-delay: 6s; }
+    .runner { animation: run 8s linear -2s infinite; }
+    .spark { animation: blink 2s ease-in-out infinite; }
+
+    @keyframes flip { 0%, 40%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.08); } 60% { transform: scaleX(1); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes pulse {
+      0% { stroke: #60a5fa; fill: #13284a; }
+      22% { stroke: #60a5fa; fill: #13284a; }
+      30%, 100% { stroke: #334155; fill: #111a2e; }
+    }
+    @keyframes run {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(180px); }
+      50% { transform: translateX(360px); }
+      75% { transform: translateX(540px); }
+      100% { transform: translateX(720px); }
+    }
+    @keyframes blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .coin, .coin-float, .node, .runner, .spark { animation: none; }
+      .runner { opacity: 0; }
+    }
+  </style>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#172036"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <clipPath id="track">
+      <rect x="50" y="250" width="690" height="140"/>
+    </clipPath>
+  </defs>
+
+  <rect x="2" y="2" width="796" height="456" rx="28" fill="url(#bg)" stroke="#334155" stroke-width="2"/>
+
+  <!-- Costa Rican flag stripe -->
+  <rect x="48" y="40" width="22" height="6" rx="3" fill="#60a5fa"/>
+  <rect x="74" y="40" width="22" height="6" rx="3" fill="#f8fafc"/>
+  <rect x="100" y="40" width="22" height="6" rx="3" fill="#f87171"/>
+  <rect x="126" y="40" width="22" height="6" rx="3" fill="#f8fafc"/>
+  <rect x="152" y="40" width="22" height="6" rx="3" fill="#60a5fa"/>
+
+  <text class="title" x="48" y="112">Colón Quest</text>
+  <text class="tagline" x="48" y="156">Every money decision becomes a story.</text>
+  <text class="event" x="48" y="196">Meta Global AI Developer Hackathon 2026</text>
+
+  <!-- Spinning colón coin -->
+  <g class="coin-float">
+    <g class="coin">
+      <circle cx="680" cy="118" r="62" fill="url(#gold)" stroke="#b45309" stroke-width="4"/>
+      <circle cx="680" cy="118" r="48" fill="none" stroke="#b45309" stroke-width="3" stroke-dasharray="6 6"/>
+      <text class="coin-symbol" x="680" y="140" text-anchor="middle">₡</text>
+    </g>
+  </g>
+  <circle class="spark" cx="604" cy="64" r="4" fill="#fde68a"/>
+  <circle class="spark" cx="752" cy="182" r="3" fill="#fde68a" style="animation-delay: 1s"/>
+
+  <!-- Monthly loop -->
+  <line x1="125" y1="306" x2="665" y2="306" stroke="#334155" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
+
+  <g>
+    <rect class="node n1" x="50" y="252" width="150" height="108" rx="18"/>
+    <text class="step" x="125" y="280" text-anchor="middle">01</text>
+    <text class="label" x="125" y="314" text-anchor="middle">Decide</text>
+    <text class="detail" x="125" y="342" text-anchor="middle">pay, save, borrow</text>
+  </g>
+  <g>
+    <rect class="node n2" x="230" y="252" width="150" height="108" rx="18"/>
+    <text class="step" x="305" y="280" text-anchor="middle">02</text>
+    <text class="label" x="305" y="314" text-anchor="middle">Narrate</text>
+    <text class="detail" x="305" y="342" text-anchor="middle">Muse Wonder</text>
+  </g>
+  <g>
+    <rect class="node n3" x="410" y="252" width="150" height="108" rx="18"/>
+    <text class="step" x="485" y="280" text-anchor="middle">03</text>
+    <text class="label" x="485" y="314" text-anchor="middle">Compute</text>
+    <text class="detail" x="485" y="342" text-anchor="middle">exact colones</text>
+  </g>
+  <g>
+    <rect class="node n4" x="590" y="252" width="150" height="108" rx="18"/>
+    <text class="step" x="665" y="280" text-anchor="middle">04</text>
+    <text class="label" x="665" y="314" text-anchor="middle">Negotiate</text>
+    <text class="detail" x="665" y="342" text-anchor="middle">by voice</text>
+  </g>
+
+  <g clip-path="url(#track)">
+    <g class="runner">
+      <circle cx="-55" cy="380" r="7" fill="#fbbf24"/>
+      <rect x="-125" y="378" width="62" height="4" rx="2" fill="#fbbf24" opacity="0.35"/>
+    </g>
+  </g>
+
+  <text class="rule" x="400" y="428" text-anchor="middle">The AI tells the story. <tspan class="rule-strong">The finance engine keeps the books.</tspan></text>
+</svg>
