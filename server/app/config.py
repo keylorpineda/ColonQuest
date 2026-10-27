@@ -1,7 +1,7 @@
 """Application settings loaded from environment variables."""
 
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -29,6 +29,13 @@ class Settings(BaseSettings):
     client_hash_salt: SecretStr = SecretStr("")
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
     log_level: str = "INFO"
+
+    # Open-weights NPCs (SCRUM-68): conditional on Baseten or Modal credits.
+    npc_provider: Literal["meta_api", "open_weights"] = "meta_api"
+    open_weights_base_url: str = ""
+    open_weights_api_key: SecretStr = SecretStr("")
+    open_weights_npc_model: str = "muse-spark-open"
+    open_weights_timeout_s: float = Field(default=4.0, gt=0)
 
     @field_validator("allowed_origins", mode="before")
     @classmethod
