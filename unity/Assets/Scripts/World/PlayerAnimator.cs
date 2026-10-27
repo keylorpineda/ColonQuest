@@ -17,6 +17,13 @@ namespace ColonQuest.World
         private Vector3 restPosition;
         private float phase;
         private float moving;
+        private float externalSpeed;
+
+        /// <summary>Walking amount from 0 to 1 for characters that have no Rigidbody2D, such as pedestrians.</summary>
+        public void SetSpeed01(float amount)
+        {
+            externalSpeed = Mathf.Clamp01(amount);
+        }
 
         private void Awake()
         {
@@ -26,7 +33,7 @@ namespace ColonQuest.World
 
         private void Update()
         {
-            float target = body != null ? Mathf.Clamp01(body.linearVelocity.magnitude / referenceSpeed) : 0f;
+            float target = body != null ? Mathf.Clamp01(body.linearVelocity.magnitude / referenceSpeed) : externalSpeed;
             moving = Mathf.MoveTowards(moving, target, Time.deltaTime * 8f);
             phase += Time.deltaTime * stepRate * moving;
 
