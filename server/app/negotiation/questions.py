@@ -8,6 +8,7 @@
 
 import re
 import unicodedata
+from collections.abc import Collection
 
 from app.negotiation.seller_sheet import Offer
 from app.schemas import KeyQuestion, SellerFact
@@ -90,9 +91,13 @@ def quoted_amounts(text: str) -> list[int]:
     return amounts
 
 
-def invalid_amounts(reply: str, offer: Offer) -> list[int]:
-    """Amounts in the reply that are not on the seller's sheet."""
-    return [amount for amount in quoted_amounts(reply) if amount not in offer.allowed_amounts]
+def invalid_amounts(reply: str, offer: Offer, extra: Collection[int] = ()) -> list[int]:
+    """Amounts in the reply that are neither on the seller's sheet nor computed by its tools."""
+    return [
+        amount
+        for amount in quoted_amounts(reply)
+        if amount not in offer.allowed_amounts and amount not in extra
+    ]
 
 
 def facts_answering(questions: set[KeyQuestion]) -> list[SellerFact]:
