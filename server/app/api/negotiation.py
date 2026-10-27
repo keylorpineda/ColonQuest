@@ -24,7 +24,7 @@ from app.db import Negotiation
 from app.game_master.ledger import DbLedger
 from app.negotiation.audio import MAX_BYTES, AudioError, normalize_wav
 from app.negotiation.seller_sheet import get_offer
-from app.negotiation.service import Negotiator, PreviousTurn
+from app.negotiation.service import NegotiationResponder, PreviousTurn
 from app.providers.base import ProviderError, Transcriber, Usage
 from app.schemas import NegotiationReply
 from app.schemas.api import NegotiationRequest
@@ -34,8 +34,8 @@ router = APIRouter(prefix="/sessions", tags=["negotiation"])
 VOICE_UNAVAILABLE = "voice is unavailable right now, use text input"
 
 
-def get_negotiator(request: Request) -> Negotiator:
-    negotiator: Negotiator = request.app.state.negotiator
+def get_negotiator(request: Request) -> NegotiationResponder:
+    negotiator: NegotiationResponder = request.app.state.negotiator
     return negotiator
 
 
@@ -44,14 +44,14 @@ def get_transcriber(request: Request) -> Transcriber:
     return transcriber
 
 
-NegotiatorDep = Annotated[Negotiator, Depends(get_negotiator)]
+NegotiatorDep = Annotated[NegotiationResponder, Depends(get_negotiator)]
 TranscriberDep = Annotated[Transcriber, Depends(get_transcriber)]
 
 
 async def run_turn(
     db: DbSession,
     settings: AppSettings,
-    negotiator: Negotiator,
+    negotiator: NegotiationResponder,
     response: Response,
     session_id: uuid.UUID,
     offer_id: str,
