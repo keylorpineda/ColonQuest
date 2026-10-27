@@ -31,22 +31,33 @@ Assets/
 
 ## The world
 
-The game is a small Costa Rican town you walk around, in the spirit of a Pokémon town. Two
-streets are joined by an avenue, with a plaza and fountain to the north and a park with a pond
-to the south. Each place is a kind of money decision the game master can throw at the player.
+The game is an open world you walk around, in the spirit of a Pokémon town. The town sits in
+the middle: two streets joined by an avenue, a plaza and fountain, and a park with a pond. Around
+it the world is about three and a half times larger (92 by 66 units), and every edge is a natural
+barrier instead of a hedge:
+
+- North: a forest with a trail up to a lookout, then a rock face with a waterfall, with mountains and a volcano behind it.
+- East: a river with two bridges (one per street). Past it, a farm with a barn, a silo, a coffee plantation and a pasture with wandering cows, closed by a cliff.
+- West: a neighborhood with the cooperative and houses, and a football field, closed by a cliff.
+- South: a boardwalk, a beach with palms and umbrellas, a lifeguard tower, Soda El Muelle and a pier into the sea.
+- Both streets end at a "CAMINO CERRADO" barrier. Invisible colliders follow the rocks, the river and the shoreline.
+
+Each place is a kind of money decision the game master can throw at the player.
 
 ![The whole town](../docs/art/town.png)
 
 | Place | How you use it | Event type it feeds |
 | --- | --- | --- |
-| Casa | Door, then the interior with the bed and the bills table | budget, emergency fund |
-| Banco | Door, then the interior with the ATM and the cashier | `income` |
-| Tienda | Door, then the interior with the vendor behind the counter | `offer` (the installment trap) |
+| Casa | Door, then the interior with kitchen, living room, dining table and bedroom | budget, emergency fund |
+| Banco | Door, then the interior with the teller counter, three ATMs and the vault | `income` |
+| Tienda | Door, then the interior with TVs, appliances, shelves and the vendor | `offer` (the installment trap) |
 | Taller de Don Rafa | Station on the sidewalk in front of the garage | `emergency` |
 | Pulpería | Station in front of the service window | `expense` |
 | Prestamos Rápidos | Station in the dark alley, with the lender | `scam` (gota a gota) |
 | Inversiones Seguras | Station at the stand with the "300%" banner | `scam` (pyramid scheme) |
 | Kiosco SINPE | Station in front of the booth | `macro_news` |
+| Cooperativa de ahorro | Station in front of the counter window, in the west | savings, `offer` |
+| Soda El Muelle | Station in front of the beach counter, in the south | `expense` |
 
 Today the stations only fire `PlayerEntered` and `PlayerExited`; the overlay panels that react to
 them come with the playable month.
@@ -108,13 +119,14 @@ file run **Colon Quest > Build All Scenes** and commit the changed `.unity` file
 | `MapBuilder.Characters.cs` | The player, NPCs with their looks, and pedestrians |
 | `MapBuilder.Interiors.cs` | Casa, Tienda and Banco |
 | `MapBuilder.Town.cs` | The town layout: streets, lots, buildings, nature, people |
-| `MapBuilder.Town.Props.cs` | Buildings, trees, lamps, benches, cars, hedges and the fountain |
+| `MapBuilder.Town.Props.cs` | Buildings, trees, lamps, benches, cars and the fountain |
+| `MapBuilder.World.cs` | The open world around the town: sea, river, cliffs, mountains, forest, farm, neighborhood, beach and the invisible borders |
 
 `MapBuilder.RenderPreview` saves a camera view to a PNG for reviews, for example
-`-previewScene Town -previewZoom 17.5 -previewAt 0,-1.5`.
+`-previewScene Town -previewZoom 17.5 -previewAt 0,-1.5`. Use `-previewZoom 33 -previewAt 0,-1` for the whole world.
 
 ## Tests
 
 Run them from Window > General > Test Runner. EditMode covers the finance engine and the pure
 rules (movement, camera clamping, Y sorting). PlayMode loads each real scene and checks the
-walls, furniture, doors, transitions, stations, camera and parallax.
+walls, furniture, doors, transitions, stations, the world edges (cliffs, sea, river, bridges and pier), camera and parallax.
