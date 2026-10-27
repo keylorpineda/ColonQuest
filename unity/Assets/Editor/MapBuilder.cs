@@ -36,6 +36,8 @@ namespace ColonQuest.EditorTools
         private const int OrderRug = 40;
 
         private const int OrderShadow = 0;
+        private const int OrderGlow = 3;
+        private const int OrderLight = 4;
         private const int OrderProp = 5;
         private const int OrderWall = 8;
         private const int OrderMarker = 10;
@@ -103,6 +105,7 @@ namespace ColonQuest.EditorTools
             BuildStation(stations, "Station_Store", StationType.Store, "Tienda", new Vector2(8.9f, 2.9f));
             BuildStation(stations, "Station_Bank", StationType.Bank, "Cajero", new Vector2(0f, -3.4f));
 
+            BuildLights(Group(map, "Lights"));
             BuildLabels(Group(map, "Labels"));
             BuildWallColliders(Group(map, "Colliders"));
 
@@ -149,6 +152,11 @@ namespace ColonQuest.EditorTools
 
             var target = new RenderTexture(width, height, 24);
             camera.targetTexture = target;
+            foreach (var fitter in UnityEngine.Object.FindObjectsByType<ViewFitter>(FindObjectsSortMode.None))
+            {
+                fitter.Fit();
+            }
+
             camera.Render();
 
             RenderTexture.active = target;
@@ -272,7 +280,31 @@ namespace ColonQuest.EditorTools
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = GamePalette.Space;
             go.AddComponent<AudioListener>();
+
+            // Dark corners keep the eye on the middle of the screen.
+            var tint = GamePalette.Hex("#05070F");
+            tint.a = 0.55f;
+            currentLayer = LayerForeground;
+            var shade = Shape(go.transform, "Vignette", vignette, new Vector2(0f, 0f), Vector2.one, tint, OrderVignette);
+            currentLayer = LayerWorld;
+            shade.transform.localPosition = new Vector3(0f, 0f, 5f);
+            shade.gameObject.AddComponent<ViewFitter>().Fit();
             return go;
+        }
+
+        private static void Glow(Transform parent, string name, Vector2 center, float size, string hex, float alpha, int order)
+        {
+            var color = GamePalette.Hex(hex);
+            color.a = alpha;
+            Shape(parent, name, softCircle, center, Vector2.one * size, color, order);
+        }
+
+        /// <summary>Soft pools of light from the screens and lamps, so the rooms feel lit from inside.</summary>
+        private static void BuildLights(Transform parent)
+        {
+            Glow(parent, "Light_Atm", new Vector2(0f, -4.8f), 3.2f, "#55E08F", 0.26f, OrderLight);
+            Glow(parent, "Light_Tv", new Vector2(4.8f, 3.8f), 3.2f, "#4DA3FF", 0.22f, OrderLight);
+            Glow(parent, "Light_DeskLamp", new Vector2(-2.5f, -3.4f), 3.4f, "#FFD23F", 0.26f, OrderLight);
         }
 
         private static Transform ParallaxGroup(Transform parent, string name, float factor)
@@ -513,6 +545,7 @@ namespace ColonQuest.EditorTools
             var station = go.AddComponent<Station>();
             station.Configure(type, displayName);
 
+            Glow(go.transform, "Glow", Vector2.zero, 3.6f, "#FFD23F", 0.2f, OrderGlow);
             var marker = Shape(go.transform, "Marker", ring, Vector2.zero, Vector2.one * 1.3f, GamePalette.Marker, OrderMarker);
             marker.gameObject.AddComponent<StationMarker>().Bind(station);
         }
@@ -577,6 +610,9 @@ namespace ColonQuest.EditorTools
             shadowColor.a = 0.35f;
             shadowColor.a = 0.45f;
             Shape(player.transform, "Shadow", softCircle, new Vector2(0f, -0.5f), new Vector2(1.1f, 0.4f), shadowColor, OrderPlayer - 1);
+
+            // A warm pool of light that travels with the player.
+            Glow(player.transform, "Glow", Vector2.zero, 4.2f, "#FFE2A8", 0.16f, OrderPlayer - 3);
 
             var visual = new GameObject("Visual").transform;
             visual.SetParent(player.transform, false);
