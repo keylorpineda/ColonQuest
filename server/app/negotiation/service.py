@@ -13,7 +13,7 @@ import time
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Protocol
 
 from pydantic import Field
 
@@ -100,6 +100,17 @@ def build_user_prompt(offer: Offer, history: Sequence[PreviousTurn], player_text
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
+class NegotiationResponder(Protocol):
+    async def reply(
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        offer: Offer,
+        player_text: str,
+        history: Sequence[PreviousTurn] = (),
+    ) -> NegotiationOutcome: ...
+
+
 class Negotiator:
     def __init__(self, provider: ModelProvider, settings: Settings) -> None:
         self._provider = provider
@@ -117,7 +128,7 @@ class Negotiator:
         mode = await ledger.budget_mode()
         model = select_text_model(self._settings.game_master_model, mode, self._settings)
         if model is None or await ledger.limit_exceeded(session_id) is not None:
-            return self._fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions)
 
         prompt = build_user_prompt(offer, history, player_text)
         try:
@@ -131,9 +142,9 @@ class Negotiator:
                 ok=False,
                 session_id=session_id,
             )
-            return self._fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions)
         except ProviderError:
-            return self._fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions)
 
         reply = NegotiationReply(
             transcript=player_text,
@@ -188,9 +199,12 @@ class Negotiator:
                 raise ProviderResponseError(f"seller quoted invented amounts: {bad_amounts}")
         raise AssertionError("unreachable")  # pragma: no cover
 
-    def _fallback(
-        self, offer: Offer, player_text: str, questions: set[KeyQuestion]
+    def fallback(
+        self, offer: Offer, player_text: str, questions: set[KeyQuestion] | None = None
     ) -> NegotiationOutcome:
+        """Scripted reply that never calls a model."""
+        if questions is None:
+            questions = classify_questions(player_text)
         text, facts = fallback_reply(offer, questions)
         reply = NegotiationReply(
             transcript=player_text,
