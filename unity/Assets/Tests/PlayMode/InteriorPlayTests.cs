@@ -16,25 +16,25 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return null;
 
-            Assert.AreEqual(2.4f, Body.position.x, 0.5f);
-            Assert.AreEqual(-4.3f, Body.position.y, 0.5f);
+            Assert.AreEqual(0f, Body.position.x, 0.5f);
+            Assert.AreEqual(-1.9f, Body.position.y, 0.5f);
         }
 
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheRoomWall()
         {
-            yield return Walk(new Vector2(2.4f, -2f), Vector2.left, 3f);
+            yield return Walk(new Vector2(2.4f, -1.5f), Vector2.left, 3f);
 
-            Assert.Greater(Body.position.x, -3.5f);
+            Assert.Greater(Body.position.x, -6f);
         }
 
         [UnityTest]
         public IEnumerator Player_IsBlockedByTheAtm()
         {
-            yield return Walk(new Vector2(0f, -3f), Vector2.down, 1.5f);
+            yield return Walk(new Vector2(3f, -0.4f), Vector2.right, 1.5f);
 
-            // The ATM body starts at y = -4.2, so the player stops above it.
-            Assert.Greater(Body.position.y, -4.2f);
+            // The ATM body starts at x = 4.6, so the player stops before it.
+            Assert.Less(Body.position.x, 4.7f);
         }
 
         [UnityTest]
@@ -63,7 +63,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return new WaitForFixedUpdate();
             yield return new WaitForFixedUpdate();
 
-            Teleport(new Vector2(2.4f, -1.5f));
+            Teleport(new Vector2(0f, -1.5f));
             yield return new WaitForFixedUpdate();
             yield return new WaitForFixedUpdate();
 
@@ -77,7 +77,7 @@ namespace ColonQuest.World.PlayModeTests
             var cashier = GameObject.Find("Cajera").transform;
 
             // Walk down into the cashier from above, where the floor is free.
-            yield return Walk((Vector2)cashier.position + new Vector2(0f, 1.4f), Vector2.down, 1.2f);
+            yield return Walk((Vector2)cashier.position + new Vector2(0f, 1.0f), Vector2.down, 1.2f);
 
             Assert.Greater(Body.position.y, cashier.position.y);
         }
@@ -97,7 +97,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheBank()
         {
-            Teleport(new Vector2(2.4f, -5.6f));
+            Teleport(new Vector2(0f, -3.2f));
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 
@@ -140,7 +140,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheShop()
         {
-            Teleport(new Vector2(7f, 1.0f));
+            Teleport(new Vector2(0f, -3.2f));
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 
@@ -156,15 +156,16 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsBlockedByTheBed()
         {
-            yield return Walk(new Vector2(-9.3f, 3f), Vector2.up, 1.5f);
+            yield return Walk(new Vector2(-4.9f, -1.0f), Vector2.down, 1.5f);
 
-            Assert.Less(Body.position.y, 4f);
+            // The bed ends at y = -1.8, so the player stops above it.
+            Assert.Greater(Body.position.y, -2.0f);
         }
 
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheHouse()
         {
-            Teleport(new Vector2(-7f, 1.0f));
+            Teleport(new Vector2(0f, -3.2f));
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 

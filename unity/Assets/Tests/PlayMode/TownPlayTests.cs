@@ -22,11 +22,61 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Player_IsStoppedByTheHedgeAtTheTownEdge()
+        public IEnumerator Player_IsStoppedByTheCliffInTheWest()
         {
-            yield return Walk(new Vector2(-23f, 2f), Vector2.left, 1.5f);
+            yield return Walk(new Vector2(-40f, -22f), Vector2.left, 2f);
 
-            Assert.Greater(Body.position.x, -25.3f);
+            Assert.Greater(Body.position.x, MapLayout.WestEdgeX - 0.1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsStoppedByTheCliffInTheEast()
+        {
+            yield return Walk(new Vector2(41f, -21f), Vector2.right, 2f);
+
+            Assert.Less(Body.position.x, MapLayout.EastEdgeX + 0.1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsStoppedByTheCliffInTheNorth()
+        {
+            // Up the trail to the lookout, which ends at the rock face.
+            yield return Walk(new Vector2(0.2f, 16f), Vector2.up, 3f);
+
+            Assert.Less(Body.position.y, MapLayout.NorthEdgeY + 0.1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsStoppedByTheSeaAtTheShore()
+        {
+            yield return Walk(new Vector2(-12f, -22f), Vector2.down, 2f);
+
+            Assert.Greater(Body.position.y, MapLayout.ShoreY - 0.1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_CanWalkOutOnThePier()
+        {
+            float pierX = (MapLayout.PierXMin + MapLayout.PierXMax) * 0.5f;
+            yield return Walk(new Vector2(pierX, -25f), Vector2.down, 1.2f);
+
+            Assert.Less(Body.position.y, MapLayout.ShoreY - 1f, "the pier leads over the water");
+        }
+
+        [UnityTest]
+        public IEnumerator Player_IsStoppedByTheRiverAwayFromTheBridges()
+        {
+            yield return Walk(new Vector2(25.5f, 10f), Vector2.right, 2f);
+
+            Assert.Less(Body.position.x, MapLayout.RiverXMin);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_CrossesTheRiverOnTheBridge()
+        {
+            yield return Walk(new Vector2(25f, 2f), Vector2.right, 3f);
+
+            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 1f);
         }
 
         [UnityTest]
@@ -83,12 +133,14 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Town_HasAllEightInteractionPlaces()
+        public IEnumerator Town_HasAllTenInteractionPlaces()
         {
             yield return null;
 
-            Assert.AreEqual(5, Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Length, "five street stations");
+            Assert.AreEqual(7, Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Length, "seven street stations");
             Assert.AreEqual(3, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "three enterable buildings");
+            Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
+            Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
         }
 
         [UnityTest]
@@ -118,8 +170,8 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
 
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name);
-            Assert.AreEqual(-7f, Body.position.x, 0.6f);
-            Assert.AreEqual(2.3f, Body.position.y, 0.6f);
+            Assert.AreEqual(0f, Body.position.x, 0.6f);
+            Assert.AreEqual(-1.9f, Body.position.y, 0.6f);
         }
 
         [UnityTest]
@@ -140,7 +192,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Camera_NeverShowsPastTheTownEdge()
         {
-            Teleport(new Vector2(24f, 2f));
+            Teleport(new Vector2(43f, -21f));
             yield return new WaitForSeconds(1.5f);
 
             float halfWidth = Cam.orthographicSize * Cam.aspect;
