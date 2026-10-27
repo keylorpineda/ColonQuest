@@ -19,6 +19,7 @@ from app.db import GameSession, ModelCall
 from app.providers.base import Usage
 
 MILLION = Decimal(1_000_000)
+META_PROVIDER = "meta_api"
 USD_PER_AUDIO_HOUR = Decimal("0.18")
 USD_PER_IMAGE = Decimal("0.01")
 
@@ -60,7 +61,13 @@ class BudgetStatus:
 
 
 def estimate_cost(usage: Usage) -> Decimal:
-    """Estimated USD cost of one call, rounded to 6 decimals like the model_calls column."""
+    """Estimated USD cost of one call, rounded to 6 decimals like the model_calls column.
+
+    Only Meta Model API calls count against DAILY_BUDGET_USD; open-weights calls run on partner
+    credits (Baseten or Modal) and are recorded at zero Meta cost.
+    """
+    if usage.provider != META_PROVIDER:
+        return Decimal("0.000000")
     if usage.images:
         cost = USD_PER_IMAGE * usage.images
     elif usage.audio_seconds:
@@ -96,12 +103,12 @@ async def record_call(
     latency_ms: int,
     ok: bool,
     session_id: uuid.UUID | None = None,
-    provider: str = "meta_api",
+    provider: str | None = None,
 ) -> ModelCall:
     """Persist one model call with its estimated cost. Failed calls are recorded at zero cost."""
     call = ModelCall(
         session_id=session_id,
-        provider=provider,
+        provider=provider or usage.provider,
         model=usage.model,
         endpoint=endpoint,
         input_tokens=usage.input_tokens,
