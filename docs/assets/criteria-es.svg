@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 352" width="800" height="352" role="img" aria-labelledby="t d">
+  <title id="t">Criterios del jurado</title>
+  <desc id="d">Impacto 30 por ciento: telemetría, Modo Clase y una prueba piloto con estudiantes. Herramientas de Meta 25 por ciento: cuatro modelos, cada uno con un rol. Demo 25 por ciento: un link que nunca se cae por un modelo. Profundidad técnica 20 por ciento: contratos validados y un motor exacto.</desc>
+  <style>
+    .h { font: 800 30px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; letter-spacing: 1px; }
+    .num { font: 700 18px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .title { font: 800 56px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; letter-spacing: 2px; }
+    .tagline { font: italic 500 24px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .event { font: 700 16px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #fbf6ea; letter-spacing: 1px; }
+    .label { font: 800 22px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; }
+    .label-sm { font: 800 20px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #1d1a16; }
+    .detail { font: 500 18px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .detail-sm { font: 500 16px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #4f4536; }
+    .step { font: 700 14px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .pct { font: 800 24px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; }
+    .stamp { font: 800 18px ui-monospace, "Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace; fill: #b3261e; letter-spacing: 2px; }
+    .rule { font: 500 18px Georgia, "Iowan Old Style", "Times New Roman", serif; fill: #1d1a16; }
+    .strong { font-weight: 700; }
+    .blink { animation: blink 1s steps(1) infinite; }
+    .bob { animation: bob 1.2s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes bob { 50% { transform: translateY(-6px); } }
+    .seg { animation: flash 0.25s steps(1) 1; }
+    @keyframes flash { 0% { fill: #f6d47a; } 100% { fill: #e2a92b; } }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      .hide-still { opacity: 0; }
+    }
+  </style>
+  <rect x="0" y="0" width="800" height="352" fill="#f3ead7"/>
+  <rect x="30" y="26" width="746" height="306" fill="#1d1a16"/><rect x="24" y="20" width="746" height="306" fill="#fbf6ea" stroke="#1d1a16" stroke-width="3"/>
+  <text class="label" x="48" y="70">Impacto</text>
+  <text class="detail-sm" x="48" y="96">telemetría, Modo Clase, piloto</text>
+  <rect class="seg" style="animation-delay: 0.30s" x="418" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.38s" x="442" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.46s" x="466" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.54s" x="490" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.62s" x="514" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.70s" x="538" y="52" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="562" y="52" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="586" y="52" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="610" y="52" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="634" y="52" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <text class="pct" x="746" y="76" text-anchor="end">30%</text>
+  <line x1="48" y1="110" x2="746" y2="110" stroke="#1d1a16" stroke-width="1" stroke-dasharray="4 6"/>
+  <text class="label" x="48" y="142">Meta</text>
+  <text class="detail-sm" x="48" y="168">cuatro modelos, cada uno con un rol</text>
+  <rect class="seg" style="animation-delay: 0.78s" x="418" y="124" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.86s" x="442" y="124" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 0.94s" x="466" y="124" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.02s" x="490" y="124" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.10s" x="514" y="124" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="538" y="124" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="562" y="124" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="586" y="124" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="610" y="124" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="634" y="124" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <text class="pct" x="746" y="148" text-anchor="end">25%</text>
+  <line x1="48" y1="182" x2="746" y2="182" stroke="#1d1a16" stroke-width="1" stroke-dasharray="4 6"/>
+  <text class="label" x="48" y="214">Demo</text>
+  <text class="detail-sm" x="48" y="240">un link que no se cae por un modelo</text>
+  <rect class="seg" style="animation-delay: 1.26s" x="418" y="196" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.34s" x="442" y="196" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.42s" x="466" y="196" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.50s" x="490" y="196" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.58s" x="514" y="196" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="538" y="196" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="562" y="196" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="586" y="196" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="610" y="196" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="634" y="196" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <text class="pct" x="746" y="220" text-anchor="end">25%</text>
+  <line x1="48" y1="254" x2="746" y2="254" stroke="#1d1a16" stroke-width="1" stroke-dasharray="4 6"/>
+  <text class="label" x="48" y="286">Técnica</text>
+  <text class="detail-sm" x="48" y="312">contratos validados, motor exacto</text>
+  <rect class="seg" style="animation-delay: 1.74s" x="418" y="268" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.82s" x="442" y="268" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.90s" x="466" y="268" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect class="seg" style="animation-delay: 1.98s" x="490" y="268" width="18" height="28" fill="#e2a92b" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="514" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="538" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="562" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="586" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="610" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <rect x="634" y="268" width="18" height="28" fill="#fbf6ea" stroke="#1d1a16" stroke-width="2"/>
+  <text class="pct" x="746" y="292" text-anchor="end">20%</text>
+</svg>
