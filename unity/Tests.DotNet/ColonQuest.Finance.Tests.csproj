@@ -13,6 +13,7 @@
   <ItemGroup>
     <Compile Include="..\Assets\Scripts\Finance\**\*.cs" LinkBase="Finance" />
     <Compile Include="..\Assets\Tests\EditMode\**\*.cs" LinkBase="Tests" />
+    <Compile Remove="..\Assets\Tests\EditMode\World\**" />
   </ItemGroup>
 
   <ItemGroup>
