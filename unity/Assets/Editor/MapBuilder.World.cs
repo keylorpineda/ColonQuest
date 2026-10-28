@@ -45,7 +45,6 @@ namespace ColonQuest.EditorTools
             BuildSouthGround(parent, random);
             BuildRiver(parent);
             BuildNorthGround(parent, random);
-            BuildSideCliffs(parent, random);
             BuildFootballField(parent);
         }
 
@@ -191,10 +190,39 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Mountain_Snow", circle, new Vector2(x - 0.2f, 27.5f + height * 0.78f), new Vector2(width * 0.2f, height * 0.5f), GamePalette.White, WorldSand + 4);
         }
 
-        private static void BuildSideCliffs(Transform parent, System.Random random)
+        /// <summary>
+        /// Fog over the west and east ends of the map. The roads keep going into it and the invisible
+        /// walls stand inside it, so the world seems to go on instead of stopping at a drawn edge.
+        /// </summary>
+        private static void BuildFog(Transform parent)
         {
-            CliffBlock(parent, new Rect(-46f, -34f, 2.5f, 57f), 2, random);
-            CliffBlock(parent, new Rect(MapLayout.EastEdgeX, -34f, 2.5f, 57f), 1, random);
+            var previous = currentLayer;
+            currentLayer = LayerForeground;
+
+            var fog = GamePalette.Hex("#DDE8F1");
+            for (int side = -1; side <= 1; side += 2)
+            {
+                // Solid past the edge of the camera, then soft puffs thinning out toward the town.
+                var wall = fog;
+                wall.a = 1f;
+                Shape(parent, "Fog_Solid", square, new Vector2(side * 49.5f, -1f), new Vector2(10f, 70f), wall, 5);
+
+                int seed = 0;
+                for (float x = 38f; x <= 47f; x += 1.8f)
+                {
+                    float depth = Mathf.InverseLerp(38f, 46f, x);
+                    for (float y = -36f; y <= 34f; y += 4.2f, seed++)
+                    {
+                        var puff = fog;
+                        puff.a = Mathf.Lerp(0.16f, 0.5f, depth);
+                        float wobble = (seed % 3) * 0.7f;
+                        var cloud = Shape(parent, "Fog", softCircle, new Vector2(side * (x + wobble * 0.4f), y + wobble), Vector2.one * (7f + wobble), puff, 6);
+                        Flickering(cloud, 0.05f, 0.3f + (seed % 5) * 0.05f, seed);
+                    }
+                }
+            }
+
+            currentLayer = previous;
         }
 
         /// <summary>A rock face: dark outline, strata lines and round boulders along the edge the player sees.</summary>
@@ -302,7 +330,7 @@ namespace ColonQuest.EditorTools
 
         // ---------------------------------------------------------------- props
 
-        /// <summary>The standing things of the world: forests, fields, beach, neighborhood and the barriers at the road ends.</summary>
+        /// <summary>The standing things of the world: forests, fields, beach and neighborhood.</summary>
         private static void BuildWorldProps(Transform parent, Transform shadows, System.Random random)
         {
             BuildNorthForest(parent, shadows, random);
@@ -310,13 +338,7 @@ namespace ColonQuest.EditorTools
             BuildEastFarm(parent, shadows, random);
             BuildBeach(parent, shadows, random);
 
-            foreach (float x in new[] { -42.2f, 42.2f })
-            {
-                Barrier(parent, x, -2f, 6f);
-                Barrier(parent, x, -16f, -8f);
-            }
-
-            foreach (float x in new[] { -36f, -27f, -18f, -9f, 0f, 9f, 18f, 36f, 41f })
+            foreach (float x in new[] { -36f, -27f, -18f, -9f, 0f, 9f, 18f, 36f, 39.5f })
             {
                 Lamp(parent, x, -17.2f);
             }
@@ -510,7 +532,7 @@ namespace ColonQuest.EditorTools
                 Name = "Establo", Sign = "FINCA", Roof = "#8B3A3A", Wall = "#C0504D",
                 XMin = 33f, XMax = 41f, YBottom = 7.5f, YTop = 13.5f, DoorX = 37f, FacadeHeight = 2.9f, Entrance = Entrance.Garage
             });
-            Silo(parent, shadows, 42f, 9f);
+            Silo(parent, shadows, 38f, 9f);
 
             // Coffee rows.
             for (float y = 15f; y < 22f; y += 2.3f)
@@ -719,26 +741,6 @@ namespace ColonQuest.EditorTools
             Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 5);
             Shape(root, "Flag", roundedSmall, new Vector2(1.1f, 3.8f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 5);
             root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.0f, 0.5f);
-        }
-
-        // ---------------------------------------------------------------- barriers
-
-        /// <summary>A striped barrier across the end of a road, with a "closed road" sign.</summary>
-        private static void Barrier(Transform parent, float x, float yMin, float yMax)
-        {
-            float length = yMax - yMin;
-            var root = Root(parent, "Barrier", new Vector2(x, (yMin + yMax) * 0.5f), yMin);
-            Shape(root, "Outline", roundedSmall, Vector2.zero, new Vector2(0.7f, length + 0.14f), GamePalette.Outline, 0);
-            for (float y = -length * 0.5f + 0.5f; y < length * 0.5f; y += 1f)
-            {
-                Shape(root, "Stripe", roundedSmall, new Vector2(0f, y), new Vector2(0.54f, 0.9f), GamePalette.Hex(((int)(y * 2f)) % 2 == 0 ? "#E8505B" : "#F8F5E8"), 1);
-            }
-
-            float side = x < 0f ? 1.9f : -1.9f;
-            Shape(root, "Sign_Outline", roundedSmall, new Vector2(side, 0f), new Vector2(3.4f, 0.8f), GamePalette.Outline, 2);
-            Shape(root, "Sign", roundedSmall, new Vector2(side, 0f), new Vector2(3.26f, 0.66f), GamePalette.Hex("#FFD23F"), 3);
-            Label(root, "CAMINO CERRADO", new Vector2(side, 0f), GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
-            root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(0.7f, length);
         }
 
         // ---------------------------------------------------------------- public building details

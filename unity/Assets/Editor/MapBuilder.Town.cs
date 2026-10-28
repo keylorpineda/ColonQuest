@@ -40,6 +40,7 @@ namespace ColonQuest.EditorTools
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
             BuildClouds(Group(map, "Clouds"), random);
+            BuildFog(Group(map, "Fog"));
 
             BuildSpawnPoint(map, SpawnIds.Start, new Vector2(0f, 2f));
             BuildSpawnPoint(map, SpawnIds.TownFromCasa, new Vector2(-19.5f, 4.3f));
@@ -90,18 +91,19 @@ namespace ColonQuest.EditorTools
         private static void BuildStreets(Transform parent)
         {
             // Sidewalks first, then the roads on top so the road edge reads as a curb.
-            Walk(parent, new Rect(-42f, 4f, 84f, 2f));
-            Walk(parent, new Rect(-42f, -2f, 84f, 2f));
-            Walk(parent, new Rect(-42f, -10f, 84f, 2f));
-            Walk(parent, new Rect(-42f, -16f, 84f, 2f));
+            // The roads run past the edge of the map, into the fog, so they never seem to end.
+            Walk(parent, new Rect(-50f, 4f, 100f, 2f));
+            Walk(parent, new Rect(-50f, -2f, 100f, 2f));
+            Walk(parent, new Rect(-50f, -10f, 100f, 2f));
+            Walk(parent, new Rect(-50f, -16f, 100f, 2f));
             Walk(parent, new Rect(-4f, 4f, 8f, 9f));
 
-            Road(parent, new Rect(-42f, 0f, 84f, 4f));
-            Road(parent, new Rect(-42f, -14f, 84f, 4f));
+            Road(parent, new Rect(-50f, 0f, 100f, 4f));
+            Road(parent, new Rect(-50f, -14f, 100f, 4f));
             Road(parent, new Rect(-2f, -10f, 4f, 10f));
 
-            DashedLine(parent, 2f, -42f, 42f);
-            DashedLine(parent, -12f, -42f, 42f);
+            DashedLine(parent, 2f, -49f, 49f);
+            DashedLine(parent, -12f, -49f, 49f);
             Crosswalk(parent, 3.6f, 0f, 4f);
             Crosswalk(parent, -3.6f, 0f, 4f);
             Crosswalk(parent, 3.6f, -14f, -10f);

@@ -36,8 +36,8 @@ namespace ColonQuest.World
 
         // The natural edges of the world: rock faces to the north, west and east, the sea to the south.
         public const float NorthEdgeY = 23f;
-        public const float WestEdgeX = -43.5f;
-        public const float EastEdgeX = 43.5f;
+        public const float WestEdgeX = -41.5f;
+        public const float EastEdgeX = 41.5f;
         public const float ShoreY = -27.2f;
 
         // The river that runs north to south on the east side, and the pier on the beach.
