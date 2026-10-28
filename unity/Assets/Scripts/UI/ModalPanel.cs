@@ -186,18 +186,7 @@ namespace ColonQuest.UI
         /// <summary>A face in the speaker's color: two eyes and a mouth that opens while the text appears.</summary>
         private void BuildFace(RectTransform card, string speaker, Vector2 position)
         {
-            int hash = 0;
-            foreach (char c in speaker)
-            {
-                hash = hash * 31 + c;
-            }
-
-            float hue = (hash & 0x7fffffff) % 360 / 360f;
-            var face = UiKit.Card(card, "Face", Color.HSVToRGB(hue, 0.35f, 0.98f), new Vector2(112f, 112f), new Vector2(0.5f, 1f), position);
-            UiKit.Fill(face, "EyeL", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(-20f, 14f));
-            UiKit.Fill(face, "EyeR", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(20f, 14f));
-            var lips = UiKit.Fill(face, "Mouth", UiKit.Ink, new Vector2(34f, 6f), new Vector2(0.5f, 0.5f), new Vector2(0f, -22f));
-            mouth = lips.rectTransform;
+            mouth = UiKit.Portrait(card, speaker, 112f, new Vector2(0.5f, 1f), position);
         }
 
         /// <summary>Presses the option with this index, as if it was clicked. Used for the number keys.</summary>

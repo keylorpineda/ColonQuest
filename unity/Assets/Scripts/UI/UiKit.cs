@@ -145,6 +145,58 @@ namespace ColonQuest.UI
             return button;
         }
 
+        /// <summary>
+        /// The name of the portrait file of a character: lowercase, letters and digits, the rest as underscores
+        /// ("Don Rafa" is "don_rafa"). The pregenerated portraits go in Resources/Portraits with these names.
+        /// </summary>
+        public static string PortraitKey(string name)
+        {
+            var key = new System.Text.StringBuilder();
+            foreach (char c in (name ?? string.Empty).ToLowerInvariant().Normalize(System.Text.NormalizationForm.FormD))
+            {
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    continue;
+                }
+
+                key.Append(char.IsLetterOrDigit(c) && c < 128 ? c : '_');
+            }
+
+            return key.ToString().Trim('_');
+        }
+
+        /// <summary>
+        /// A character's portrait: the pregenerated picture when Resources/Portraits has one, and otherwise a
+        /// face in a color taken from the name, with eyes and a mouth. Returns the mouth, or null for a picture.
+        /// </summary>
+        public static RectTransform Portrait(RectTransform parent, string name, float size, Vector2 anchor, Vector2 position)
+        {
+            var face = Card(parent, "Portrait", Color.white, new Vector2(size, size), anchor, position);
+            var picture = Resources.Load<Sprite>("Portraits/" + PortraitKey(name));
+            if (picture != null)
+            {
+                var image = Fill(face, "Picture", Color.white, new Vector2(size - Outline * 2f, size - Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
+                image.sprite = picture;
+                image.type = Image.Type.Simple;
+                image.preserveAspect = true;
+                return null;
+            }
+
+            int hash = 0;
+            foreach (char c in name ?? string.Empty)
+            {
+                hash = hash * 31 + c;
+            }
+
+            float hue = (hash & 0x7fffffff) % 360 / 360f;
+            face.GetComponent<Image>().color = Color.HSVToRGB(hue, 0.35f, 0.98f);
+            float k = size / 112f;
+            Fill(face, "EyeL", Ink, new Vector2(12f, 18f) * k, new Vector2(0.5f, 0.5f), new Vector2(-20f, 14f) * k);
+            Fill(face, "EyeR", Ink, new Vector2(12f, 18f) * k, new Vector2(0.5f, 0.5f), new Vector2(20f, 14f) * k);
+            var lips = Fill(face, "Mouth", Ink, new Vector2(34f, 6f) * k, new Vector2(0.5f, 0.5f), new Vector2(0f, -22f) * k);
+            return lips.rectTransform;
+        }
+
         /// <summary>The height a text needs when wrapped to <paramref name="width"/>.</summary>
         public static float MeasureHeight(Text label, float width)
         {

@@ -182,6 +182,19 @@ namespace ColonQuest.World.PlayModeTests
             }
         }
 
+        [UnityTest]
+        public IEnumerator Portrait_TheSellerWindowShowsTheCharacterFace()
+        {
+            yield return StartOfflineRun();
+
+            Session.BeginNegotiation();
+            yield return null;
+
+            Assert.IsTrue(Ui.Find("Negotiation").GetComponentsInChildren<Transform>(true).Any(t => t.name == "Portrait"));
+            Assert.AreEqual("don_rafa", ColonQuest.UI.UiKit.PortraitKey("Don Rafa"));
+            Assert.AreEqual("dona_marta", ColonQuest.UI.UiKit.PortraitKey("Doña Marta"));
+        }
+
         // ---------------------------------------------------------------- buying
 
         [UnityTest]

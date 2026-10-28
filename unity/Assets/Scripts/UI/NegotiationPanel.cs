@@ -204,9 +204,10 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             float y = -Pad + UiKit.Outline;
 
-            UiKit.Label(card, negotiation.Venue + "  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth, 60f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Portrait(card, negotiation.Offer.SellerName, 92f, top, new Vector2(textWidth * 0.5f - 46f, y - 4f));
+            UiKit.Label(card, negotiation.Venue + "  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 60f;
-            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth, 38f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth - 110f, 38f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 50f;
 
             var log = UiKit.Label(card, ConversationText(negotiation), 30, UiKit.Ink, new Vector2(textWidth, LogHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
