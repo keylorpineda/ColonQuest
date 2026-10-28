@@ -162,6 +162,26 @@ namespace ColonQuest.World.PlayModeTests
             Assert.Greater(Body.position.y, MapLayout.PlayNorthY - 1.5f, "it reached the wall");
         }
 
+        [UnityTest]
+        public IEnumerator Player_CrossesTheRiverOnTheBoardwalkOfTheBeach()
+        {
+            yield return Walk(new Vector2(25f, -18.3f), Vector2.right, 3.2f);
+
+            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 1f);
+        }
+
+        [UnityTest]
+        public IEnumerator DrivingCars_HaveACollisionBodyAndAreHeardByTheAudio()
+        {
+            yield return null;
+
+            Assert.Greater(TrafficCar.All.Count, 0);
+            foreach (var car in TrafficCar.All)
+            {
+                Assert.IsNotNull(car.GetComponent<Collider2D>(), "a car on the street blocks the player");
+            }
+        }
+
         // ---------------------------------------------------------------- buying
 
         [UnityTest]

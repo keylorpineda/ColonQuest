@@ -65,7 +65,7 @@ namespace ColonQuest.EditorTools
             }
 
             // The streets, their sidewalks and the lots between them.
-            if (y > -17.8f && y < 6.8f)
+            if (y > -19.4f && y < 6.8f)
             {
                 return false;
             }

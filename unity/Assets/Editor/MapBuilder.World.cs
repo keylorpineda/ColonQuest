@@ -181,6 +181,7 @@ namespace ColonQuest.EditorTools
             Bridge(parent, x, 6f, -2f);
             Bridge(parent, x, -8f, -16f);
             Bridge(parent, x, NorthSidewalkY, 24f);
+            Bridge(parent, x, -17.45f, -19.15f);
 
             // Plunge pool under the waterfall, at the foot of the cliff.
             Shape(parent, "Pool_Outline", rounded, new Vector2(20.3f, PoolY), new Vector2(5.8f, 2.6f), GamePalette.Outline, 5);
@@ -349,7 +350,7 @@ namespace ColonQuest.EditorTools
             RiverWall(parent, riverX, riverWidth, 6f, 24f);
             RiverWall(parent, riverX, riverWidth, NorthSidewalkY, MapLayout.WorldNorthEdgeY);
             RiverWall(parent, riverX, riverWidth, -8f, -2f);
-            RiverWall(parent, riverX, riverWidth, shore, -16f);
+            RiverWall(parent, riverX, riverWidth, shore, -19.8f);
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
         }
@@ -607,7 +608,6 @@ namespace ColonQuest.EditorTools
             Tree(parent, shadows, 42.6f, -1.4f, 1.2f, "#4CB36F", true);
             Tree(parent, shadows, 33f, 14.2f, 1.1f, "#3B9660", false);
             Tree(parent, shadows, 42.8f, -9.2f, 1.2f, "#3FA66A", false);
-            Tree(parent, shadows, 32.6f, -17.2f, 1.1f, "#4CB36F", false);
             Tree(parent, shadows, 41.5f, 6.4f, 1.0f, "#3B9660", false);
         }
 
