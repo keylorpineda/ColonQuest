@@ -18,6 +18,8 @@ namespace ColonQuest.World
 
         private static AudioDirector instance;
 
+        private float Level => Master * volume;
+
         private readonly Dictionary<MusicTrack, AudioSource> music = new Dictionary<MusicTrack, AudioSource>();
         private readonly AudioClip[] cars = new AudioClip[2];
         private readonly AudioClip[] birds = new AudioClip[3];
@@ -34,6 +36,7 @@ namespace ColonQuest.World
         private float nextCar = 6f;
         private float nextBirds = 4f;
         private bool muted;
+        private float volume = GameSettings.DefaultVolume;
         private Coroutine talking;
 
         /// <summary>True while all sound is off.</summary>
@@ -47,6 +50,26 @@ namespace ColonQuest.World
                     instance.muted = value;
                 }
             }
+        }
+
+        /// <summary>The master volume, from 0 to 1.</summary>
+        public static float Volume
+        {
+            get => instance != null ? instance.volume : GameSettings.DefaultVolume;
+            set
+            {
+                if (instance != null)
+                {
+                    instance.volume = GameSettings.ClampVolume(value);
+                }
+            }
+        }
+
+        /// <summary>Takes the sound switch and the volume from the settings.</summary>
+        public static void Apply(GameSettings settings)
+        {
+            Muted = !settings.SoundOn;
+            Volume = settings.Volume;
         }
 
         public static void EnsureCreated()
@@ -79,6 +102,7 @@ namespace ColonQuest.World
             }
 
             instance = this;
+            Apply(GameSettings.Current);
             foreach (MusicTrack track in new[] { MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
             {
                 music[track] = Source("Music_" + track, true);
@@ -158,7 +182,7 @@ namespace ColonQuest.World
         private void Update()
         {
             var levels = SoundMix.Compute(SceneManager.GetActiveScene().name, PlayerPosition());
-            float scale = muted ? 0f : Master;
+            float scale = muted ? 0f : Level;
             float step = FadePerSecond * Time.unscaledDeltaTime;
 
             foreach (var pair in music)
@@ -220,7 +244,7 @@ namespace ColonQuest.World
                 float side = Mathf.Clamp((car.transform.position.x - listener.x) / CarHearingRange, -0.9f, 0.9f);
                 float closeness = 1f - distance / CarHearingRange;
                 carSource.panStereo = side;
-                carSource.PlayOneShot(cars[Random.Range(0, cars.Length)], Mathf.Clamp01(level * (0.3f + 0.7f * closeness)) * Master);
+                carSource.PlayOneShot(cars[Random.Range(0, cars.Length)], Mathf.Clamp01(level * (0.3f + 0.7f * closeness)) * Level);
                 nextCar = 0.6f;
             }
         }
@@ -234,7 +258,7 @@ namespace ColonQuest.World
             }
 
             birdSource.panStereo = Random.Range(-0.8f, 0.8f);
-            birdSource.PlayOneShot(birds[Random.Range(0, birds.Length)], 0.35f * level * Master);
+            birdSource.PlayOneShot(birds[Random.Range(0, birds.Length)], 0.35f * level * Level);
             nextBirds = Random.Range(6f, 15f);
         }
 
@@ -277,7 +301,7 @@ namespace ColonQuest.World
             // About one syllable for every three letters, so the babble lasts as long as the text takes to appear.
             int count = Mathf.Clamp(text.Length / 3, 3, 70);
             var random = new System.Random(hash + text.Length);
-            voiceSource.volume = 0.6f * Master;
+            voiceSource.volume = 0.6f * Level;
 
             for (int i = 0; i < count; i++)
             {
