@@ -145,6 +145,28 @@ namespace ColonQuest.UI
             return button;
         }
 
+        /// <summary>Changes the text of a button made by <see cref="MakeButton"/>.</summary>
+        public static void SetLabel(Button button, string text)
+        {
+            button.transform.Find("Body/Text").GetComponent<Text>().text = text;
+        }
+
+        /// <summary>
+        /// A full-screen layer that dims what is behind it and catches every click. The window goes inside it.
+        /// </summary>
+        public static GameObject Overlay(Transform parent, string name)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            go.AddComponent<Image>().color = Dim;
+            return go;
+        }
+
         /// <summary>
         /// The name of the portrait file of a character: lowercase, letters and digits, the rest as underscores
         /// ("Don Rafa" is "don_rafa"). The pregenerated portraits go in Resources/Portraits with these names.

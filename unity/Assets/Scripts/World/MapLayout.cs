@@ -5,6 +5,7 @@ namespace ColonQuest.World
     /// <summary>Names of the scenes the player moves between.</summary>
     public static class SceneNames
     {
+        public const string Menu = "Menu";
         public const string Town = "Town";
         public const string Casa = "Casa";
         public const string Tienda = "Tienda";
