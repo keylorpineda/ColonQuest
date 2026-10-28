@@ -3,6 +3,26 @@
 Last updated 28 October 2026. This is what the Unity side does today, how it was checked and what is
 still open. Everything under "Verified" was run; everything under "Not verified" was not.
 
+## The main menu
+
+The game opens on the `Menu` scene, the first one in Build Settings. It is built from code like the rest of the
+interface (`MainMenu`, `UiKit`): a cartoon sky with drifting clouds and bobbing coins, the title and the buttons.
+
+| Button | What it does |
+| --- | --- |
+| Modo historia | Starts a new life (`GameSession.StartNewGame`, or the first run when no session exists yet) and loads `Town` |
+| Jugar online | Only shows "Disponible en la versión completa"; nothing else happens |
+| Ajustes | Sound on or off and the volume in steps of 10 %. Applied to `AudioDirector` at once and kept in PlayerPrefs (`GameSettings`) |
+| Créditos | DoWhile Team (Keylor and Jefferson, the same credit) and the Meta tools the client uses: Muse Wonder, Muse Spark, Muse Voice Transcribe |
+| Salir | `Application.Quit`. Not shown in the browser build |
+
+In the town, Esc opens the pause window (not while the game master is answering, a window is open or the phone
+is up): Reanudar, Ajustes and Volver al menú. Time stops while it is up. Going back to the menu takes two
+presses, because the run is lost. The town overlay hides itself in the menu scene.
+
+Pure logic lives in `GameSettings` (World), `MenuEntries` and `MenuMotion` (Game) and has EditMode tests; the
+flow has PlayMode tests in `MenuPlayTests.cs` (`MenuPlayTests` and `PausePlayTests`).
+
 ## What plays
 
 One run is three months. Each month has three tasks, then the bank closes the month.
