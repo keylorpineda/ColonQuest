@@ -29,6 +29,11 @@ namespace ColonQuest.EditorTools
             BuildInterior(SceneNames.Casa);
             BuildInterior(SceneNames.Tienda);
             BuildInterior(SceneNames.Banco);
+            BuildInterior(SceneNames.Agencia);
+            BuildInterior(SceneNames.Carcel);
+            BuildInterior(SceneNames.Hospital);
+            BuildInterior(SceneNames.HospitalArriba);
+            BuildInterior(SceneNames.Vecino);
         }
 
         private static Room RoomFor(string sceneName)
@@ -39,6 +44,16 @@ namespace ColonQuest.EditorTools
                     return new Room { Name = "Casa", Center = Vector2.zero, Size = MapLayout.CasaSize, Color = GamePalette.FloorHome };
                 case SceneNames.Tienda:
                     return new Room { Name = "Tienda", Center = Vector2.zero, Size = MapLayout.TiendaSize, Color = GamePalette.FloorStore };
+                case SceneNames.Agencia:
+                    return new Room { Name = "Agencia", Center = Vector2.zero, Size = MapLayout.AgenciaSize, Color = GamePalette.Hex("#CFD6E6") };
+                case SceneNames.Carcel:
+                    return new Room { Name = "Carcel", Center = Vector2.zero, Size = MapLayout.CarcelSize, Color = GamePalette.Hex("#A7ADB8") };
+                case SceneNames.Hospital:
+                    return new Room { Name = "Hospital", Center = Vector2.zero, Size = MapLayout.HospitalSize, Color = GamePalette.Hex("#E3F1F2") };
+                case SceneNames.HospitalArriba:
+                    return new Room { Name = "HospitalArriba", Center = Vector2.zero, Size = MapLayout.HospitalArribaSize, Color = GamePalette.Hex("#DCEBF5") };
+                case SceneNames.Vecino:
+                    return new Room { Name = "Vecino", Center = Vector2.zero, Size = MapLayout.VecinoSize, Color = GamePalette.Hex("#CFA97A") };
                 default:
                     return new Room { Name = "Banco", Center = Vector2.zero, Size = MapLayout.BancoSize, Color = GamePalette.FloorBank };
             }
@@ -53,6 +68,16 @@ namespace ColonQuest.EditorTools
                     return MapLayout.CasaMat;
                 case SceneNames.Tienda:
                     return MapLayout.TiendaMat;
+                case SceneNames.Agencia:
+                    return MapLayout.AgenciaMat;
+                case SceneNames.Carcel:
+                    return MapLayout.CarcelMat;
+                case SceneNames.Hospital:
+                    return MapLayout.HospitalMat;
+                case SceneNames.HospitalArriba:
+                    return MapLayout.HospitalArribaMat;
+                case SceneNames.Vecino:
+                    return MapLayout.VecinoMat;
                 default:
                     return MapLayout.BancoMat;
             }
@@ -66,6 +91,16 @@ namespace ColonQuest.EditorTools
                     return SpawnIds.TownFromCasa;
                 case SceneNames.Tienda:
                     return SpawnIds.TownFromTienda;
+                case SceneNames.Agencia:
+                    return SpawnIds.TownFromAgencia;
+                case SceneNames.Carcel:
+                    return SpawnIds.TownFromComisaria;
+                case SceneNames.Hospital:
+                    return SpawnIds.TownFromHospital;
+                case SceneNames.HospitalArriba:
+                    return SpawnIds.HospitalFromAbove;
+                case SceneNames.Vecino:
+                    return SpawnIds.TownFromVecino;
                 default:
                     return SpawnIds.TownFromBanco;
             }
@@ -80,7 +115,7 @@ namespace ColonQuest.EditorTools
             var room = RoomFor(sceneName);
             currentLayer = LayerFloor;
             BuildFloors(Group(map, "Floors"), new[] { room });
-            BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName));
+            BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName), sceneName == SceneNames.HospitalArriba ? SceneNames.Hospital : SceneNames.Town);
             currentLayer = LayerWorld;
 
             var layout = new InteriorParts
@@ -105,6 +140,21 @@ namespace ColonQuest.EditorTools
                     BuildStoreLayout(layout, room);
                     BuildStoreThings(layout);
                     break;
+                case SceneNames.Agencia:
+                    BuildAgencyLayout(layout, room);
+                    break;
+                case SceneNames.Carcel:
+                    BuildJailLayout(layout, room);
+                    break;
+                case SceneNames.Hospital:
+                    BuildHospitalLayout(layout, room);
+                    break;
+                case SceneNames.HospitalArriba:
+                    BuildHospitalUpperLayout(layout, room);
+                    break;
+                case SceneNames.Vecino:
+                    BuildNeighborLayout(layout, room);
+                    break;
                 default:
                     BuildBankLayout(layout, room);
                     BuildBankThings(layout);
@@ -120,6 +170,7 @@ namespace ColonQuest.EditorTools
 
             Vector2 spawnAt = MatFor(sceneName) + new Vector2(0f, 1.3f);
             BuildSpawnPoint(map, SpawnIds.FromTown, spawnAt);
+            BuildExtraSpawns(map, sceneName);
 
             var player = BuildPlayer(spawnAt, false);
             var half = room.Size * 0.5f + Vector2.one * 0.3f;
@@ -158,7 +209,7 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>A red doormat on the floor and the trigger that leads back to the town.</summary>
-        private static void BuildDoorMat(Transform parent, Vector2 position, string townSpawn)
+        private static void BuildDoorMat(Transform parent, Vector2 position, string townSpawn, string exitScene)
         {
             Shape(parent, "Mat_Outline", roundedSmall, position, new Vector2(1.7f, 0.7f), GamePalette.Outline, OrderRug + 4);
             Shape(parent, "Mat", roundedSmall, position, new Vector2(1.56f, 0.56f), GamePalette.Hex("#8B3A3A"), OrderRug + 5);
@@ -168,7 +219,7 @@ namespace ColonQuest.EditorTools
             trigger.transform.SetParent(parent, false);
             trigger.transform.localPosition = position;
             trigger.AddComponent<BoxCollider2D>().size = new Vector2(1.6f, 0.8f);
-            trigger.AddComponent<Door>().Configure(SceneNames.Town, townSpawn);
+            trigger.AddComponent<Door>().Configure(exitScene, townSpawn);
             trigger.GetComponent<BoxCollider2D>().isTrigger = true;
         }
 

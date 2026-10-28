@@ -28,6 +28,11 @@ namespace ColonQuest.EditorTools
         private static readonly Vector2 CarDealerSpot = new Vector2(9f, 31f);
         private static readonly Vector2 FarmSpot = new Vector2(54.5f, 4.9f);
 
+        // The new public buildings: where their doors are. The police station is on the avenue, the hospital by the east streets.
+        private const float PoliceX = 56f;
+        private const float HospitalX = 54f;
+        private const float HospitalY = 8f;
+
         // ---------------------------------------------------------------- north district
 
         private static void BuildNorthDistrictProps(Transform parent, Transform shadows, System.Random random)
@@ -54,6 +59,22 @@ namespace ColonQuest.EditorTools
                 XMin = 2f, XMax = 16f, YBottom = row, YTop = row + 7f, DoorX = CarDealerSpot.x, FacadeHeight = 3.4f, Entrance = Entrance.Garage
             });
             Banner(agency, "TODO A CUOTAS", 0f, 3.4f + 1.7f, "#E8505B");
+
+            // The police station at the east end of the avenue and the hospital, two floors high, by the east streets.
+            Building(parent, shadows, new BuildingSpec
+            {
+                Name = "Comisaria", Sign = "POLICIA", Roof = "#2F4B8C", Wall = "#DCE3F2",
+                XMin = PoliceX - 5f, XMax = PoliceX + 5f, YBottom = row, YTop = row + 6.6f, DoorX = PoliceX, FacadeHeight = 3.2f, Entrance = Entrance.Door,
+                AwningA = "#2F4B8C", AwningB = "#F8F5E8"
+            });
+            var hospital = Building(parent, shadows, new BuildingSpec
+            {
+                Name = "Hospital", Sign = "HOSPITAL", Roof = "#9FB4CC", Wall = "#F5F8FB",
+                XMin = HospitalX - 7f, XMax = HospitalX + 7f, YBottom = HospitalY, YTop = HospitalY + 8.4f, DoorX = HospitalX, FacadeHeight = 5.6f, Entrance = Entrance.Door
+            });
+            Banner(hospital, "URGENCIAS", 0f, 5.6f + 1.4f, "#E8505B");
+            Shape(hospital, "CrossBar", square, new Vector2(4.2f, 3.9f), new Vector2(1.1f, 0.34f), GamePalette.Hex("#E8505B"), 6);
+            Shape(hospital, "CrossBar", square, new Vector2(4.2f, 3.9f), new Vector2(0.34f, 1.1f), GamePalette.Hex("#E8505B"), 6);
 
             // Two cars on show in front of the agency, on either side of the place where the player talks.
             Car(parent, shadows, 4f, 32f, "#E8505B");
@@ -210,7 +231,15 @@ namespace ColonQuest.EditorTools
         private static void BuildMarketStations(Transform parent)
         {
             BuildStation(parent, "Station_RealEstate", StationType.RealEstate, "Ver las casas de la inmobiliaria", RealEstateSpot);
-            BuildStation(parent, "Station_CarDealer", StationType.CarDealer, "Ver los carros de la agencia", CarDealerSpot);
+            // The car agency, the police station and the hospital are entered by their doors; the neighbor's house too.
+            Doorway(parent, new Vector2(CarDealerSpot.x, 33.2f), SceneNames.Agencia);
+            Doorway(parent, new Vector2(PoliceX, 33.2f), SceneNames.Carcel);
+            Doorway(parent, new Vector2(HospitalX, HospitalY + 0.2f), SceneNames.Hospital);
+            Doorway(parent, new Vector2(-8.5f, -7.8f), SceneNames.Vecino);
+            BuildSpawnPoint(parent, SpawnIds.TownFromAgencia, new Vector2(CarDealerSpot.x, 31.6f));
+            BuildSpawnPoint(parent, SpawnIds.TownFromComisaria, new Vector2(PoliceX, 31.6f));
+            BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 6.8f));
+            BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-8.5f, -9.2f));
             BuildStation(parent, "Station_Farm", StationType.Farm, "Hablar de invertir en la finca", FarmSpot);
 
             // A house with a sign opens just that house. The first two signs are in the original town.
@@ -237,7 +266,6 @@ namespace ColonQuest.EditorTools
         private static void BuildMarketPeople(Transform parent)
         {
             BuildNpc(parent, "AgenteInmobiliaria", new Vector2(-10.3f, 31.3f), new Look { Skin = "#4DA3FF", Extra = Accessory.Tie, ExtraColor = "#2A7F8C" }, true);
-            BuildNpc(parent, "DonChepe", new Vector2(10.9f, 30.9f), new Look { Skin = "#F2994A", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, true);
             BuildNpc(parent, "DonBeto", new Vector2(56.5f, 4.85f), new Look { Skin = "#7FB069", Extra = Accessory.Cap, ExtraColor = "#8B5A3C" }, true);
 
             BuildPedestrian(parent, "Peaton_J", new Vector2(-44f, 31.6f), new Vector2(-21f, 31.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);

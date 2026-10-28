@@ -31,6 +31,7 @@ namespace ColonQuest.EditorTools
             BuildDistrictEdges(Group(map, "DistrictEdges"), shadows, random);
             BuildMarketStations(Group(map, "MarketStations"));
             BuildMarketPeople(Group(map, "MarketPeople"));
+            CollectorCarBuild(Group(map, "CollectorCar"), Group(map, "CollectorShadow"));
         }
 
         // ---------------------------------------------------------------- ground
