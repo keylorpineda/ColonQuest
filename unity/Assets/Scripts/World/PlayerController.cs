@@ -19,6 +19,9 @@ namespace ColonQuest.World
         /// <summary>Overlay panels turn this off while they are open so the player stands still.</summary>
         public bool InputEnabled { get; set; } = true;
 
+        /// <summary>Set while a modal panel is open. It outlives scene changes, unlike <see cref="InputEnabled"/>.</summary>
+        public static bool Blocked { get; set; }
+
         /// <summary>Sets the child that is mirrored to face the walking direction.</summary>
         public void SetVisual(Transform target)
         {
@@ -32,7 +35,7 @@ namespace ColonQuest.World
 
         private void Update()
         {
-            input = InputEnabled
+            input = InputEnabled && !Blocked
                 ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
                 : Vector2.zero;
 
