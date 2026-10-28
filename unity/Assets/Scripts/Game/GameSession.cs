@@ -27,8 +27,14 @@ namespace ColonQuest.Game
 
         private const int MaxNegotiationText = 300;
 
+        /// <summary>Shown in the text box when a spoken turn could not be understood.</summary>
+        public const string VoiceFailedNotice = "No te entendí, escribilo.";
+
         /// <summary>The conversation at the store, or null when there is none.</summary>
         public Negotiation CurrentNegotiation { get; private set; }
+
+        /// <summary>Set when the last spoken turn failed; cleared by the next turn.</summary>
+        public string VoiceNotice { get; private set; }
 
         /// <summary>What the last deal cost and how well the player asked; shown with the result.</summary>
         public DealReport LastDeal { get; private set; }
@@ -81,6 +87,7 @@ namespace ColonQuest.Game
             Busy = false;
             CurrentEvent = null;
             CurrentNegotiation = null;
+            VoiceNotice = null;
             LastDeal = null;
             Summary = null;
 
@@ -167,6 +174,7 @@ namespace ColonQuest.Game
 
             CurrentStation = StationType.Store;
             LastDeal = null;
+            VoiceNotice = null;
             CurrentNegotiation = new Negotiation(SellerOffer.ForMonth(Loop.MonthsPlayed));
             NegotiationStarted?.Invoke(CurrentNegotiation);
         }
@@ -190,6 +198,7 @@ namespace ColonQuest.Game
             }
 
             Busy = true;
+            VoiceNotice = null;
             Changed?.Invoke();
             ApiClient.Instance.SendNegotiationText(negotiation.Offer.OfferId, text, result =>
             {
@@ -199,6 +208,51 @@ namespace ColonQuest.Game
                     bool local = !result.Ok;
                     var reply = local ? LocalSeller.Reply(negotiation.Offer, text) : result.Value;
                     negotiation.Record(text, reply, local);
+                    NegotiationUpdated?.Invoke(negotiation);
+                }
+
+                Changed?.Invoke();
+            });
+        }
+
+        /// <summary>
+        /// One turn spoken by the player. Only the backend can transcribe, so when it is missing or the
+        /// voice fails nothing is recorded: <see cref="VoiceNotice"/> asks the player to type instead.
+        /// </summary>
+        public void SendNegotiationVoice(byte[] wav)
+        {
+            var negotiation = CurrentNegotiation;
+            if (negotiation == null || negotiation.IsClosed || Busy || wav == null || wav.Length == 0)
+            {
+                return;
+            }
+
+            if (!ApiClient.Instance.Service.HasSession)
+            {
+                VoiceNotice = VoiceFailedNotice;
+                NegotiationUpdated?.Invoke(negotiation);
+                Changed?.Invoke();
+                return;
+            }
+
+            Busy = true;
+            VoiceNotice = null;
+            Changed?.Invoke();
+            ApiClient.Instance.SendNegotiationVoice(negotiation.Offer.OfferId, wav, result =>
+            {
+                Busy = false;
+                if (CurrentNegotiation == negotiation)
+                {
+                    if (result.Ok)
+                    {
+                        negotiation.Record(result.Value.Transcript, result.Value, false);
+                    }
+                    else
+                    {
+                        Debug.Log("Voice turn failed: " + result.Error);
+                        VoiceNotice = VoiceFailedNotice;
+                    }
+
                     NegotiationUpdated?.Invoke(negotiation);
                 }
 
