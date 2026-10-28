@@ -25,10 +25,9 @@ namespace ColonQuest.UI
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
-        private bool phoneOpen;
+        private PhoneUi phone;
         private Negotiation spokenNegotiation;
         private int spokenTurns;
-        private int phoneOpenings;
 
         private Text monthText;
         private Text tasksText;
@@ -63,6 +62,7 @@ namespace ColonQuest.UI
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
+            phone = new PhoneUi(canvas.transform, session);
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
@@ -211,11 +211,25 @@ namespace ColonQuest.UI
                 return;
             }
 
-            bool open = modal.IsOpen;
-            if (!open)
+            if (phone.IsOpen)
             {
-                phoneOpen = false;
+                PlayerController.Blocked = true;
+                promptCard.SetActive(false);
+                loadingCard.SetActive(false);
+                phone.Tick(Time.unscaledDeltaTime);
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    phone.Back();
+                }
+                else if (Input.GetKeyDown(KeyCode.P) && !phone.IsTyping)
+                {
+                    phone.Close();
+                }
+
+                return;
             }
+
+            bool open = modal.IsOpen;
 
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
@@ -224,11 +238,6 @@ namespace ColonQuest.UI
             if (open)
             {
                 promptCard.SetActive(false);
-                if (phoneOpen && Input.GetKeyDown(KeyCode.P))
-                {
-                    modal.Hide();
-                    return;
-                }
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -248,7 +257,7 @@ namespace ColonQuest.UI
 
             if (!session.Busy && Input.GetKeyDown(KeyCode.P))
             {
-                ShowPhone();
+                phone.Open();
                 return;
             }
 
@@ -320,6 +329,7 @@ namespace ColonQuest.UI
         private void CloseWindows()
         {
             modal.Hide();
+            phone.Close();
             negotiationPanel.Hide();
         }
 
@@ -373,6 +383,7 @@ namespace ColonQuest.UI
 
         private void ShowEvent(GameEvent gameEvent, ResultSource source)
         {
+            phone.Close();
             var options = new List<ModalOption>();
             for (int i = 0; i < gameEvent.Choices.Count; i++)
             {
@@ -393,6 +404,7 @@ namespace ColonQuest.UI
 
         private void ShowOutcome(ChoiceOutcome outcome)
         {
+            phone.Close();
             var text = new StringBuilder();
             Line(text, "Efectivo", outcome.CashDelta, true);
             Line(text, "Ahorros", outcome.SavingsDelta, true);
@@ -461,6 +473,7 @@ namespace ColonQuest.UI
 
         private void ShowMonthReport(MonthlyTickReport report)
         {
+            phone.Close();
             var text = new StringBuilder();
             text.AppendLine($"Salario  <color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.SalaryCredited)}</color>");
             if (report.AguinaldoCredited > 0L)
@@ -515,26 +528,6 @@ namespace ColonQuest.UI
             modal.Show(station.DisplayName, null, line, new[] { Continue(null) }, station.DisplayName);
         }
 
-        /// <summary>The phone opens with P anywhere: the SINPE notice, what is left to do this month and the account.</summary>
-        private void ShowPhone()
-        {
-            var loop = session.Loop;
-            var state = session.State;
-            var text = new StringBuilder();
-            text.AppendLine(PhoneMessages.SinpeNotice(phoneOpenings));
-            text.AppendLine();
-            text.AppendLine(loop.AllTasksDone
-                ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar."
-                : $"Tareas del mes: {loop.TasksDone} de {GameRules.TasksPerMonth}.");
-            text.AppendLine($"Efectivo  {Money.Format(state.Cash)}");
-            text.AppendLine($"Tarjeta  {Money.Format(state.CreditCard.Balance)} de {Money.Format(state.CreditCard.Limit)}");
-            text.Append($"Cuotas al mes  {Money.Format(GameRules.MonthlyInstallments(state))}");
-
-            phoneOpenings++;
-            phoneOpen = true;
-            modal.Show("Tu celular", "Mensajes y cuentas  ·  P para cerrar", text.ToString(), new[] { Continue(null) });
-        }
-
         private void ShowStatement()
         {
             var state = session.State;
@@ -563,6 +556,7 @@ namespace ColonQuest.UI
 
         private void ShowEnd(SessionSummary summary)
         {
+            phone.Close();
             var text = new StringBuilder();
             text.AppendLine(summary.Narrative);
             text.AppendLine();
