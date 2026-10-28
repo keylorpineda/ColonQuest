@@ -54,7 +54,7 @@ namespace ColonQuest.EditorTools
             // A warm pool of light that travels with the player.
             Glow(player.transform, "Glow", Vector2.zero, 4.2f, "#FFE2A8", 0.16f, OrderPlayer - 3);
 
-            var visual = BuildCharacterVisual(player.transform, PlayerLook);
+            var visual = BuildCharacterVisual(player.transform, PlayerLook, false, 0f, true);
             player.AddComponent<PlayerController>().SetVisual(visual);
             return player.transform;
         }
@@ -78,7 +78,7 @@ namespace ColonQuest.EditorTools
                 MakeYSorted(npc, -0.45f, false);
             }
 
-            BuildCharacterVisual(npc.transform, look);
+            BuildCharacterVisual(npc.transform, look, true, 2.6f);
             return npc.transform;
         }
 
@@ -90,7 +90,7 @@ namespace ColonQuest.EditorTools
             walker.transform.position = from;
 
             MakeYSorted(walker, -0.45f);
-            BuildCharacterVisual(walker.transform, look);
+            BuildCharacterVisual(walker.transform, look, true);
             walker.AddComponent<Patrol>().Configure(from, to, speed, 1.6f);
             return walker.transform;
         }
@@ -109,70 +109,12 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// Shadow, then Bob (the walk cycle) holding Visual (the left and right flip) with the
-        /// body, accessory and eyes. Returns Visual.
+        /// Shadow, then Bob (the walk cycle) holding Visual (the left and right flip) with the person:
+        /// head, torso, arms and legs. Returns Visual. See MapBuilder.People.cs.
         /// </summary>
-        private static Transform BuildCharacterVisual(Transform root, Look look)
+        private static Transform BuildCharacterVisual(Transform root, Look look, bool social = false, float talkRadius = 0f, bool isPlayer = false)
         {
-            var shadowColor = GamePalette.Outline;
-            shadowColor.a = 0.45f;
-            Shape(root, "Shadow", softCircle, new Vector2(0f, -0.5f), new Vector2(1.1f, 0.4f), shadowColor, OrderPlayer - 1);
-
-            var bob = new GameObject("Bob").transform;
-            bob.SetParent(root, false);
-            bob.gameObject.AddComponent<PlayerAnimator>();
-
-            var visual = new GameObject("Visual").transform;
-            visual.SetParent(bob, false);
-
-            var skin = GamePalette.Hex(look.Skin);
-            Shape(visual, "Body_Outline", rounded, Vector2.zero, new Vector2(0.96f, 1.16f), GamePalette.Outline, OrderPlayer);
-            Shape(visual, "Body", rounded, Vector2.zero, new Vector2(0.8f, 1.0f), skin, OrderPlayer + 1);
-            Shape(visual, "Belly", roundedSmall, new Vector2(0f, -0.28f), new Vector2(0.5f, 0.28f), GamePalette.Shade(skin, 1.15f), OrderPlayer + 2);
-
-            DrawAccessory(visual, look);
-
-            // Two big cartoon eyes looking toward the walking direction (right when unflipped).
-            Eye(visual, new Vector2(0.0f, 0.22f));
-            Eye(visual, new Vector2(0.3f, 0.22f));
-            return visual;
-        }
-
-        private static void DrawAccessory(Transform visual, Look look)
-        {
-            var color = look.Extra == Accessory.None ? Color.white : GamePalette.Hex(look.ExtraColor);
-            var dark = GamePalette.Shade(color, 0.6f);
-
-            switch (look.Extra)
-            {
-                case Accessory.Cap:
-                    Shape(visual, "Cap_Outline", roundedSmall, new Vector2(0.02f, 0.52f), new Vector2(0.9f, 0.34f), GamePalette.Outline, OrderPlayer + 3);
-                    Shape(visual, "Cap", roundedSmall, new Vector2(0.02f, 0.52f), new Vector2(0.78f, 0.24f), color, OrderPlayer + 4);
-                    Shape(visual, "Cap_Brim", roundedSmall, new Vector2(0.38f, 0.45f), new Vector2(0.34f, 0.12f), dark, OrderPlayer + 4);
-                    break;
-                case Accessory.Hood:
-                    Shape(visual, "Hood_Outline", rounded, new Vector2(0f, 0.28f), new Vector2(1.0f, 0.62f), GamePalette.Outline, OrderPlayer + 3);
-                    Shape(visual, "Hood", rounded, new Vector2(0f, 0.28f), new Vector2(0.88f, 0.5f), color, OrderPlayer + 4);
-                    break;
-                case Accessory.Helmet:
-                    Shape(visual, "Helmet_Outline", roundedSmall, new Vector2(0f, 0.5f), new Vector2(0.9f, 0.4f), GamePalette.Outline, OrderPlayer + 3);
-                    Shape(visual, "Helmet", roundedSmall, new Vector2(0f, 0.5f), new Vector2(0.78f, 0.28f), color, OrderPlayer + 4);
-                    break;
-                case Accessory.Tie:
-                    Shape(visual, "Tie_Outline", roundedSmall, new Vector2(-0.22f, -0.22f), new Vector2(0.22f, 0.34f), GamePalette.Outline, OrderPlayer + 3);
-                    Shape(visual, "Tie", roundedSmall, new Vector2(-0.22f, -0.22f), new Vector2(0.14f, 0.26f), color, OrderPlayer + 4);
-                    break;
-                case Accessory.Vest:
-                    Shape(visual, "Vest", roundedSmall, new Vector2(0f, -0.2f), new Vector2(0.8f, 0.5f), color, OrderPlayer + 3);
-                    break;
-            }
-        }
-
-        private static void Eye(Transform parent, Vector2 center)
-        {
-            Shape(parent, "Eye_Outline", circle, center, Vector2.one * 0.3f, GamePalette.Outline, OrderPlayer + 5);
-            Shape(parent, "Eye", circle, center, Vector2.one * 0.24f, GamePalette.White, OrderPlayer + 6);
-            Shape(parent, "Pupil", circle, center + new Vector2(0.04f, 0f), Vector2.one * 0.11f, GamePalette.Outline, OrderPlayer + 7);
+            return BuildPersonVisual(root, look, social, talkRadius, isPlayer);
         }
     }
 }
