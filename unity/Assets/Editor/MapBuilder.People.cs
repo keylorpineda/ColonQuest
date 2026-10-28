@@ -64,7 +64,6 @@ namespace ColonQuest.EditorTools
             torso.localPosition = new Vector3(0f, -0.02f, 0f);
             Part2(torso, "Torso", rounded, Vector2.zero, new Vector2(0.52f, 0.52f), shirt, OrderPlayer + 6);
             Shape(torso, "Collar", roundedSmall, new Vector2(0f, 0.22f), new Vector2(0.2f, 0.07f), GamePalette.Shade(shirt, 0.8f), OrderPlayer + 9);
-            Shape(torso, "Belt", square, new Vector2(0f, -0.2f), new Vector2(0.5f, 0.05f), GamePalette.Shade(pants, 0.7f), OrderPlayer + 9);
             DrawTorsoAccessory(torso, look);
             rig.Torso = torso;
 
