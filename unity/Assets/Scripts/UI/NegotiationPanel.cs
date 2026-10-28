@@ -19,9 +19,15 @@ namespace ColonQuest.UI
         private const float Pad = 40f;
         private const float LogHeight = 330f;
 
+        private const string MicNotice = "No pude usar el micrófono, escribilo.";
+        private const string TypeHint = "Escribe lo que le dices al vendedor...";
+
         private readonly GameSession session;
         private readonly GameObject root;
+        private readonly IVoiceRecorder recorder;
         private InputField input;
+        private Text talkLabel;
+        private string micNotice;
         private string lastKey = string.Empty;
 
         private static readonly string[] QuestionLabels =
@@ -29,9 +35,10 @@ namespace ColonQuest.UI
             "Costo total", "Cargos escondidos", "Tasa de interés", "Plazo", "Precio de contado", "Seguro"
         };
 
-        public NegotiationPanel(Transform canvas, GameSession gameSession)
+        public NegotiationPanel(Transform canvas, GameSession gameSession, IVoiceRecorder voiceRecorder = null)
         {
             session = gameSession;
+            recorder = voiceRecorder ?? VoiceRecorders.Create();
             root = new GameObject("Negotiation", typeof(RectTransform));
             root.transform.SetParent(canvas, false);
             var rect = (RectTransform)root.transform;
@@ -47,6 +54,8 @@ namespace ColonQuest.UI
 
         public void Hide()
         {
+            recorder.Cancel();
+            micNotice = null;
             Clear();
             lastKey = string.Empty;
             root.SetActive(false);
@@ -66,7 +75,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status;
+            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice;
             if (IsOpen && key == lastKey)
             {
                 return;
@@ -76,13 +85,101 @@ namespace ColonQuest.UI
             Build(negotiation);
         }
 
-        /// <summary>Enter sends the typed line, like the send button.</summary>
+        /// <summary>Enter sends the typed line, like the send button. It also follows the recording.</summary>
         public void Tick()
         {
             if (input != null && input.isFocused && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
             {
                 Submit();
             }
+
+            TickVoice();
+        }
+
+        /// <summary>What the text box says when voice did not work, or null.</summary>
+        private string Notice => session.VoiceNotice ?? micNotice;
+
+        private void TickVoice()
+        {
+            var state = recorder.State;
+            if (state == VoiceRecorderState.Idle)
+            {
+                return;
+            }
+
+            recorder.Tick();
+            state = recorder.State;
+            if (state == VoiceRecorderState.Ready)
+            {
+                byte[] wav = recorder.TakeWav();
+                if (wav != null && wav.Length > 0)
+                {
+                    session.SendNegotiationVoice(wav);
+                }
+                else
+                {
+                    ShowMicProblem();
+                }
+            }
+            else if (state == VoiceRecorderState.Failed)
+            {
+                recorder.TakeWav();
+                ShowMicProblem();
+            }
+
+            UpdateTalkLabel();
+        }
+
+        /// <summary>Tap to start talking, tap again to send; the recorder also stops by itself at the limit.</summary>
+        private void ToggleTalk()
+        {
+            if (session.Busy)
+            {
+                return;
+            }
+
+            switch (recorder.State)
+            {
+                case VoiceRecorderState.Recording:
+                    recorder.Stop();
+                    break;
+                case VoiceRecorderState.Starting:
+                    recorder.Cancel();
+                    break;
+                default:
+                    micNotice = null;
+                    recorder.Start();
+                    break;
+            }
+
+            UpdateTalkLabel();
+        }
+
+        private void UpdateTalkLabel()
+        {
+            if (talkLabel == null)
+            {
+                return;
+            }
+
+            switch (recorder.State)
+            {
+                case VoiceRecorderState.Starting:
+                    talkLabel.text = "Abriendo micro...";
+                    break;
+                case VoiceRecorderState.Recording:
+                    talkLabel.text = $"Enviar voz  {Mathf.FloorToInt(recorder.Seconds)}/{WavEncoder.MaxSeconds} s";
+                    break;
+                default:
+                    talkLabel.text = "Hablar";
+                    break;
+            }
+        }
+
+        private void ShowMicProblem()
+        {
+            micNotice = MicNotice;
+            Refresh();
         }
 
         private void Submit()
@@ -170,10 +267,14 @@ namespace ColonQuest.UI
         private void BuildInput(RectTransform card, float textWidth, float y)
         {
             var top = new Vector2(0.5f, 1f);
-            float sendWidth = 260f;
-            float boxWidth = textWidth - sendWidth - 16f;
+            bool voice = recorder.IsSupported;
+            float sendWidth = 220f;
+            float talkWidth = voice ? 300f : 0f;
+            float gap = 16f;
+            float boxWidth = textWidth - sendWidth - gap - (voice ? talkWidth + gap : 0f);
             float boxX = -(textWidth - boxWidth) / 2f;
             float sendX = (textWidth - sendWidth) / 2f;
+            float talkX = sendX - sendWidth / 2f - gap - talkWidth / 2f;
 
             var outline = UiKit.Fill(card, "InputBox", UiKit.Ink, new Vector2(boxWidth, 84f), top, new Vector2(boxX, y - 10f));
             outline.raycastTarget = true;
@@ -182,7 +283,8 @@ namespace ColonQuest.UI
             var text = UiKit.Label(body.transform, string.Empty, 32, UiKit.Ink, new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.fontStyle = FontStyle.Normal;
-            var hint = UiKit.Label(body.transform, "Escribe lo que le dices al vendedor...", 30, new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
+            string notice = Notice;
+            var hint = UiKit.Label(body.transform, notice ?? TypeHint, 30, notice != null ? GameUiColors.Loss : new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
             hint.fontStyle = FontStyle.Italic;
 
             input = outline.gameObject.AddComponent<InputField>();
@@ -191,6 +293,13 @@ namespace ColonQuest.UI
             input.placeholder = hint;
             input.characterLimit = 300;
             input.lineType = InputField.LineType.SingleLine;
+
+            if (voice)
+            {
+                var talk = UiKit.MakeButton(card, "Hablar", GameUiColors.Yellow, new Vector2(talkWidth, 84f), top, new Vector2(talkX, y - 10f), ToggleTalk);
+                talkLabel = talk.GetComponentInChildren<Text>();
+                UpdateTalkLabel();
+            }
 
             UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y - 10f), Submit);
         }
@@ -248,6 +357,7 @@ namespace ColonQuest.UI
         private void Clear()
         {
             input = null;
+            talkLabel = null;
             for (int i = root.transform.childCount - 1; i >= 0; i--)
             {
                 Object.Destroy(root.transform.GetChild(i).gameObject);
