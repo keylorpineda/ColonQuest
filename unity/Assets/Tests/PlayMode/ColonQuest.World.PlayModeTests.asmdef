@@ -3,6 +3,10 @@
   "rootNamespace": "ColonQuest.World.PlayModeTests",
   "references": [
     "ColonQuest.World",
+    "ColonQuest.Api",
+    "ColonQuest.Game",
+    "ColonQuest.UI",
+    "ColonQuest.Finance",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],
