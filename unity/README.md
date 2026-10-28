@@ -37,10 +37,11 @@ it the world is about three and a half times larger (92 by 66 units), and every 
 barrier instead of a hedge:
 
 - North: a forest with a trail up to a lookout, then a rock face with a waterfall, with mountains and a volcano behind it.
-- East: a river with two bridges (one per street). Past it, a farm with a barn, a silo, a coffee plantation and a pasture with wandering cows, fading into fog.
-- West: a neighborhood with the cooperative and houses, and a football field, fading into fog.
+- East: a river with two bridges (one per street). Past it, a farm with a barn, a silo, a coffee plantation and a pasture with wandering cows, the road and the land go on, but an invisible wall stops the player.
+- West: a neighborhood with the cooperative and houses, and a football field, seen but out of reach.
 - South: a boardwalk, a beach with palms and umbrellas, a lifeguard tower, Soda El Muelle and a pier into the sea.
-- Both streets keep going into the fog at the east and west ends, and an invisible wall inside the fog stops the player. More invisible colliders follow the rocks, the river and the shoreline.
+- The walkable area ends at invisible walls inside the world (x from -33 to 35.5, north at y 17); everything past them is scenery the camera still shows, so no edge looks like an edge. More invisible colliders follow the rocks, the river and the shoreline.
+- Depth: haze toward the far north, grass, flowers, bushes and rocks sorted by their feet, floating pollen and slanted light beams that slide at their own speed (`MapBuilder.Depth.cs`).
 
 Each place is a kind of money decision the game master can throw at the player.
 
