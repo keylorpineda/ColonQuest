@@ -27,18 +27,43 @@ namespace ColonQuest.EditorTools
             switch (sceneName)
             {
                 case SceneNames.Casa:
-                    return new Room { Name = "Casa", Center = Vector2.zero, Size = new Vector2(11f, 8f), Color = GamePalette.FloorHome };
+                    return new Room { Name = "Casa", Center = Vector2.zero, Size = MapLayout.CasaSize, Color = GamePalette.FloorHome };
                 case SceneNames.Tienda:
-                    return new Room { Name = "Tienda", Center = Vector2.zero, Size = new Vector2(12f, 8.4f), Color = GamePalette.FloorStore };
+                    return new Room { Name = "Tienda", Center = Vector2.zero, Size = MapLayout.TiendaSize, Color = GamePalette.FloorStore };
                 default:
-                    return new Room { Name = "Banco", Center = Vector2.zero, Size = new Vector2(12f, 8.4f), Color = GamePalette.FloorBank };
+                    return new Room { Name = "Banco", Center = Vector2.zero, Size = MapLayout.BancoSize, Color = GamePalette.FloorBank };
+            }
+        }
+
+        /// <summary>
+        /// The furniture was built for the original small rooms. It is moved up so it still leans on the
+        /// back wall of the bigger room; the new details fill the space that opens up in front of it.
+        /// </summary>
+        private static Vector2 ShiftFor(string sceneName)
+        {
+            switch (sceneName)
+            {
+                case SceneNames.Casa:
+                    return new Vector2(0f, MapLayout.CasaSize.y * 0.5f - 4f);
+                case SceneNames.Tienda:
+                    return new Vector2(0f, MapLayout.TiendaSize.y * 0.5f - 4.2f);
+                default:
+                    return new Vector2(0f, MapLayout.BancoSize.y * 0.5f - 4.2f);
             }
         }
 
         /// <summary>Where the doormat lies: walking onto it leaves the building.</summary>
         private static Vector2 MatFor(string sceneName)
         {
-            return new Vector2(0f, -3.2f);
+            switch (sceneName)
+            {
+                case SceneNames.Casa:
+                    return MapLayout.CasaMat;
+                case SceneNames.Tienda:
+                    return MapLayout.TiendaMat;
+                default:
+                    return MapLayout.BancoMat;
+            }
         }
 
         private static string TownSpawnFor(string sceneName)
@@ -72,6 +97,17 @@ namespace ColonQuest.EditorTools
             var people = Group(map, "People");
             var labels = Group(map, "Labels");
 
+            var shift = ShiftFor(sceneName);
+            props.localPosition = shift;
+            stations.localPosition = shift;
+            lights.localPosition = shift;
+            var extras = Group(map, "Extras");
+            var extraLights = Group(map, "ExtraLights");
+            var extraPeople = Group(map, "ExtraPeople");
+            var matLabel = MatFor(sceneName) + new Vector2(1.3f, 0f);
+            var random = new System.Random(5);
+            interiorLayers = 0;
+
             switch (sceneName)
             {
                 case SceneNames.Casa:
@@ -79,23 +115,26 @@ namespace ColonQuest.EditorTools
                     BuildStation(stations, "Station_Home", StationType.Home, "Casa", new Vector2(-3f, -0.8f));
                     Flickering(Glow(lights, "Light_Nightstand", new Vector2(-2.7f, -3.0f), 3.0f, "#FFD23F", 0.24f, OrderLight), 0.1f, 1.1f, 5f);
                     Flickering(Glow(lights, "Light_Tv", new Vector2(3.3f, 3.0f), 3.4f, "#4DA3FF", 0.2f, OrderLight), 0.3f, 7f, 17f);
-                    Label(labels, "CASA", new Vector2(1.3f, -3.2f), GamePalette.Shade(room.Color, 0.62f));
+                    Label(labels, "CASA", matLabel, GamePalette.Shade(room.Color, 0.62f));
+                    BuildHomeExtras(extras, extraLights, room, random);
                     break;
                 case SceneNames.Tienda:
                     BuildStore(props);
                     BuildStation(stations, "Station_Store", StationType.Store, "Tienda", new Vector2(4.2f, -1.8f));
                     Flickering(Glow(lights, "Light_Tv", new Vector2(-3.0f, 3.2f), 4.2f, "#4DA3FF", 0.22f, OrderLight), 0.4f, 9f, 23f);
                     Flickering(Glow(lights, "Light_Offer", new Vector2(0f, 3.6f), 4.6f, "#E8505B", 0.2f, OrderLight), 0.2f, 3f, 31f);
-                    Label(labels, "TIENDA", new Vector2(1.3f, -3.3f), GamePalette.Shade(room.Color, 0.62f));
-                    BuildNpc(people, "Vendedor", new Vector2(4.2f, 0.95f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, false);
+                    Label(labels, "TIENDA", matLabel, GamePalette.Shade(room.Color, 0.62f));
+                    BuildStoreExtras(extras, extraLights, room, random);
+                    BuildNpc(people, "Vendedor", new Vector2(4.2f, 0.95f) + shift, new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, false);
                     break;
                 default:
                     BuildBank(props);
                     BuildStation(stations, "Station_Bank", StationType.Bank, "Cajero", new Vector2(3.8f, -0.4f));
                     Flickering(Glow(lights, "Light_Atm", new Vector2(5.1f, -0.4f), 3.4f, "#55E08F", 0.26f, OrderLight), 0.18f, 2.5f, 11f);
                     Flickering(Glow(lights, "Light_DeskLamp", new Vector2(-3.0f, 1.6f), 3.6f, "#FFD23F", 0.24f, OrderLight), 0.08f, 1.2f, 37f);
-                    Label(labels, "BANCO", new Vector2(1.3f, -3.3f), GamePalette.Shade(room.Color, 0.62f));
-                    BuildNpc(people, "Cajera", new Vector2(-1.9f, 2.4f), new Look { Skin = "#9AD0A8", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, false);
+                    Label(labels, "BANCO", matLabel, GamePalette.Shade(room.Color, 0.62f));
+                    BuildBankExtras(extras, extraLights, extraPeople, room, random);
+                    BuildNpc(people, "Cajera", new Vector2(-1.9f, 2.4f) + shift, new Look { Skin = "#9AD0A8", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, false);
                     break;
             }
 
@@ -110,6 +149,7 @@ namespace ColonQuest.EditorTools
             BuildCamera(MapLayout.InteriorCameraSize, GamePalette.Space, room.Center)
                 .AddComponent<CameraFollow>().Configure(player, bounds);
 
+            Debug.Log(sceneName + " detail layers: " + interiorLayers);
             SaveScene(scene, sceneName);
         }
 

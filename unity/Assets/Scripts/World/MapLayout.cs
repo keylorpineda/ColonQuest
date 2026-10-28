@@ -55,5 +55,14 @@ namespace ColonQuest.World
 
         public const float TownCameraSize = 4.6f;
         public const float InteriorCameraSize = 3.9f;
+
+        // The interiors: the Casa and the Tienda are 1.5 times the original size, the Banco twice as wide
+        // and twice as deep (four times the area). The doormat lies one unit above the bottom wall.
+        public static readonly Vector2 CasaSize = new Vector2(16.5f, 12f);
+        public static readonly Vector2 TiendaSize = new Vector2(18f, 12.6f);
+        public static readonly Vector2 BancoSize = new Vector2(24f, 16.8f);
+        public static readonly Vector2 CasaMat = new Vector2(0f, -5f);
+        public static readonly Vector2 TiendaMat = new Vector2(0f, -5.3f);
+        public static readonly Vector2 BancoMat = new Vector2(0f, -7.4f);
     }
 }
