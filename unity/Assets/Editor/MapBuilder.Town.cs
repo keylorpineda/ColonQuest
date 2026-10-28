@@ -50,6 +50,8 @@ namespace ColonQuest.EditorTools
             BuildCamera(MapLayout.TownCameraSize, GrassColor, new Vector2(0f, 2f))
                 .AddComponent<CameraFollow>().Configure(player, MapLayout.TownBounds);
 
+            new GameObject("GameBootstrap").AddComponent<ColonQuest.UI.GameBootstrap>();
+
             SaveScene(scene, SceneNames.Town);
         }
 
