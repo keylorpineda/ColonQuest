@@ -322,6 +322,11 @@ namespace ColonQuest.EditorTools
                 var shadowColor = GamePalette.Outline;
                 shadowColor.a = 0.16f;
                 OnGround(root, "Shadow", softCircle, new Vector2(0.12f, -0.2f), new Vector2(2.6f, 1.3f), shadowColor, TownShadow);
+                root.gameObject.AddComponent<TrafficCar>();
+                var body2d = root.gameObject.AddComponent<Rigidbody2D>();
+                body2d.bodyType = RigidbodyType2D.Kinematic;
+                body2d.useFullKinematicContacts = true;
+                root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.5f, 1.1f);
                 root.gameObject.AddComponent<Drift>().Configure(new Vector2(speed, 0f), new Vector2(MapLayout.PlayEastX - 4f, 100f));
                 if (speed < 0f)
                 {

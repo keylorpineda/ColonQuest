@@ -193,20 +193,36 @@ namespace ColonQuest.World
             return player != null ? (Vector2)player.position : Vector2.zero;
         }
 
+        private const float CarHearingRange = 9f;
+
+        private readonly HashSet<TrafficCar> carsHeard = new HashSet<TrafficCar>();
+
+        /// <summary>A car sounds once, as it comes within hearing range of the player. No car near, no sound.</summary>
         private void Traffic(float level, float dt)
         {
             nextCar -= dt;
-            if (nextCar > 0f || level < 0.05f || cars[0] == null)
+            if (level < 0.05f || cars[0] == null)
             {
                 return;
             }
 
-            var clip = cars[Random.Range(0, cars.Length)];
-            bool toRight = Random.value < 0.5f;
-            carSource.panStereo = toRight ? -0.9f : 0.9f;
-            carSource.PlayOneShot(clip, Mathf.Clamp01(level * 0.7f) * Master);
-            StartCoroutine(Pan(carSource, toRight ? -0.9f : 0.9f, toRight ? 0.9f : -0.9f, CarSeconds));
-            nextCar = CarSeconds + Random.Range(2f, 9f) / (0.4f + level);
+            Vector2 listener = PlayerPosition();
+            carsHeard.RemoveWhere(c => c == null || Vector2.Distance(c.transform.position, listener) > CarHearingRange * 1.4f);
+            foreach (var car in TrafficCar.All)
+            {
+                float distance = Vector2.Distance(car.transform.position, listener);
+                if (nextCar > 0f || distance > CarHearingRange || carsHeard.Contains(car))
+                {
+                    continue;
+                }
+
+                carsHeard.Add(car);
+                float side = Mathf.Clamp((car.transform.position.x - listener.x) / CarHearingRange, -0.9f, 0.9f);
+                float closeness = 1f - distance / CarHearingRange;
+                carSource.panStereo = side;
+                carSource.PlayOneShot(cars[Random.Range(0, cars.Length)], Mathf.Clamp01(level * (0.3f + 0.7f * closeness)) * Master);
+                nextCar = 0.6f;
+            }
         }
 
         private void Birds(float level, float dt)
