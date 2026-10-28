@@ -24,7 +24,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheWest()
         {
-            yield return Walk(new Vector2(-30f, 2f), Vector2.left, 2f);
+            yield return Walk(new Vector2(-36f, 2f), Vector2.left, 2f);
 
             Assert.Greater(Body.position.x, MapLayout.PlayWestX - 0.1f);
         }
@@ -32,7 +32,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheEast()
         {
-            yield return Walk(new Vector2(33f, 2f), Vector2.right, 2f);
+            yield return Walk(new Vector2(38f, 2f), Vector2.right, 2f);
 
             Assert.Less(Body.position.x, MapLayout.PlayEastX + 0.1f);
         }

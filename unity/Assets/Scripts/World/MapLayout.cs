@@ -41,8 +41,8 @@ namespace ColonQuest.World
         /// Where the invisible walls stand. The world goes on past them (roads, trees, river, sea), so the
         /// player sees there is more but cannot get to it.
         /// </summary>
-        public const float PlayWestX = -33f;
-        public const float PlayEastX = 35.5f;
+        public const float PlayWestX = -38f;
+        public const float PlayEastX = 40f;
         public const float PlayNorthY = 17f;
 
         public const float ShoreY = -27.2f;
