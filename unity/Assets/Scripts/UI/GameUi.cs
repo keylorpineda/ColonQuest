@@ -25,6 +25,8 @@ namespace ColonQuest.UI
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
+        private bool phoneOpen;
+        private int phoneOpenings;
 
         private Text monthText;
         private Text tasksText;
@@ -117,7 +119,7 @@ namespace ColonQuest.UI
         private void BuildHud()
         {
             var topLeft = new Vector2(0f, 1f);
-            var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 290f), topLeft, new Vector2(24f, -24f));
+            var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
             monthText = UiKit.Label(card, string.Empty, 36, UiKit.Ink, new Vector2(260f, 44f), topLeft, new Vector2(22f, -14f));
             tasksText = UiKit.Label(card, string.Empty, 26, GameUiColors.Muted, new Vector2(170f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -14f), TextAnchor.MiddleRight);
@@ -130,6 +132,7 @@ namespace ColonQuest.UI
             UiKit.Label(card, "Ánimo", 26, GameUiColors.Muted, new Vector2(200f, 36f), topLeft, new Vector2(22f, -226f));
             UiKit.Fill(card, "WellbeingBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
             wellbeingFill = UiKit.Fill(card, "WellbeingFill", GameUiColors.Gain, new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
+            UiKit.Label(card, "[P]  Celular", 24, GameUiColors.Muted, new Vector2(300f, 36f), topLeft, new Vector2(22f, -276f));
         }
 
         private Text Row(RectTransform card, string label, int index)
@@ -207,12 +210,23 @@ namespace ColonQuest.UI
             }
 
             bool open = modal.IsOpen;
+            if (!open)
+            {
+                phoneOpen = false;
+            }
+
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
 
             if (open)
             {
                 promptCard.SetActive(false);
+                if (phoneOpen && Input.GetKeyDown(KeyCode.P))
+                {
+                    modal.Hide();
+                    return;
+                }
+
                 for (int i = 0; i < 4; i++)
                 {
                     if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
@@ -226,6 +240,12 @@ namespace ColonQuest.UI
                     modal.Press(0);
                 }
 
+                return;
+            }
+
+            if (!session.Busy && Input.GetKeyDown(KeyCode.P))
+            {
+                ShowPhone();
                 return;
             }
 
@@ -457,6 +477,26 @@ namespace ColonQuest.UI
             thingUses[key] = uses + 1;
             string line = ThingLines.Pick(station.Lines, uses, session.State);
             modal.Show(station.DisplayName, null, line, new[] { Continue(null) });
+        }
+
+        /// <summary>The phone opens with P anywhere: the SINPE notice, what is left to do this month and the account.</summary>
+        private void ShowPhone()
+        {
+            var loop = session.Loop;
+            var state = session.State;
+            var text = new StringBuilder();
+            text.AppendLine(PhoneMessages.SinpeNotice(phoneOpenings));
+            text.AppendLine();
+            text.AppendLine(loop.AllTasksDone
+                ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar."
+                : $"Tareas del mes: {loop.TasksDone} de {GameRules.TasksPerMonth}.");
+            text.AppendLine($"Efectivo  {Money.Format(state.Cash)}");
+            text.AppendLine($"Tarjeta  {Money.Format(state.CreditCard.Balance)} de {Money.Format(state.CreditCard.Limit)}");
+            text.Append($"Cuotas al mes  {Money.Format(GameRules.MonthlyInstallments(state))}");
+
+            phoneOpenings++;
+            phoneOpen = true;
+            modal.Show("Tu celular", "Mensajes y cuentas  ·  P para cerrar", text.ToString(), new[] { Continue(null) });
         }
 
         private void ShowStatement()
