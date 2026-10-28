@@ -35,6 +35,7 @@ namespace ColonQuest.World.PlayModeTests
             var settings = GameSettings.Current;
             settings.SoundOn = true;
             settings.Volume = 1f;
+            settings.Language = GameLanguage.Spanish;
             settings.Save();
             AudioDirector.EnsureCreated();
             AudioDirector.Apply(settings);
@@ -135,6 +136,39 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt("Settings/Card/Body/Button_Sonido").onClick.Invoke();
             yield return null;
             Assert.IsFalse(AudioDirector.Muted);
+        }
+
+        [UnityTest]
+        public IEnumerator Settings_LanguageButtonSwitchesTheMenuToEnglishAndBack()
+        {
+            yield return null;
+            ButtonAt("Button_Ajustes").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual("Idioma: Español", LabelOf("Settings/Card/Body/Button_Idioma"));
+            Assert.AreEqual("Modo historia", LabelOf("Button_Modo historia"));
+
+            ButtonAt("Settings/Card/Body/Button_Idioma").onClick.Invoke();
+            yield return null;
+
+            Assert.AreEqual(GameLanguage.English, Loc.Current);
+            Assert.AreEqual("Language: English", LabelOf("Settings/Card/Body/Button_Idioma"), "the button names the language in its own language");
+            Assert.AreEqual("Story mode", LabelOf("Button_Modo historia"));
+            Assert.AreEqual("Play online", LabelOf("Button_Jugar online"));
+            Assert.AreEqual("Sound: on", LabelOf("Settings/Card/Body/Button_Sonido"));
+            StringAssert.EndsWith(";en", PlayerPrefs.GetString(GameSettings.StoreKey));
+
+            ButtonAt("Settings/Card/Body/Button_Volver").onClick.Invoke();
+            ButtonAt("Button_Créditos").onClick.Invoke();
+            yield return null;
+            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Label_Hecho por DoWhile Team"));
+            Assert.AreEqual("Made by DoWhile Team", Menu.Find("Credits/Card/Body/Label_Hecho por DoWhile Team").GetComponent<Text>().text);
+
+            ButtonAt("Credits/Card/Body/Button_Volver").onClick.Invoke();
+            ButtonAt("Button_Ajustes").onClick.Invoke();
+            ButtonAt("Settings/Card/Body/Button_Idioma").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(GameLanguage.Spanish, Loc.Current);
+            Assert.AreEqual("Modo historia", LabelOf("Button_Modo historia"));
         }
 
         [UnityTest]

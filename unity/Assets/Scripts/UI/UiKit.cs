@@ -114,7 +114,13 @@ namespace ColonQuest.UI
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
             label.verticalOverflow = VerticalWrapMode.Overflow;
             label.raycastTarget = false;
-            label.text = text;
+            label.text = Loc.T(text);
+            if (!string.IsNullOrEmpty(text))
+            {
+                // Texts that code fills in later start empty and are left alone.
+                rect.gameObject.AddComponent<LocalizedText>().Bind(text);
+            }
+
             return label;
         }
 

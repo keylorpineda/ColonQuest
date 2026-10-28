@@ -88,29 +88,29 @@ namespace ColonQuest.UI
 
             if (session.Holdings.HasHealthInsurance)
             {
-                text.AppendLine($"Ya tienes seguro de salud. Pagas {Money.Format(session.Holdings.HealthPremium)} al mes y, si te internan, tu parte de la cuenta es de {MarketAssumptions.InsuredPatientSharePct} %.");
-                options.Add(Back("1.  Salir"));
+                text.AppendLine(Loc.F("Ya tienes seguro de salud. Pagas {0} al mes y, si te internan, tu parte de la cuenta es de {1} %.", Money.Format(session.Holdings.HealthPremium), MarketAssumptions.InsuredPatientSharePct));
+                options.Add(Back(Loc.T("1.  Salir")));
             }
             else
             {
-                text.AppendLine("Un accidente no avisa. Una noche en el hospital, sin seguro, se paga completa.");
+                text.AppendLine(Loc.T("Un accidente no avisa. Una noche en el hospital, sin seguro, se paga completa."));
                 text.AppendLine();
-                text.AppendLine($"Sin seguro, una internada como la de un atropello cuesta {Money.Format(bill)}.");
-                text.AppendLine($"Con seguro, tú pones {Money.Format(insured)} y pagas {Money.Format(premium)} cada mes, tengas o no tengas un accidente.");
+                text.AppendLine(Loc.F("Sin seguro, una internada como la de un atropello cuesta {0}.", Money.Format(bill)));
+                text.AppendLine(Loc.F("Con seguro, tú pones {0} y pagas {1} cada mes, tengas o no tengas un accidente.", Money.Format(insured), Money.Format(premium)));
                 text.AppendLine();
-                text.AppendLine("El fondo de emergencia también sirve para esto: es la plata que ya está lista cuando llega el golpe.");
+                text.AppendLine(Loc.T("El fondo de emergencia también sirve para esto: es la plata que ya está lista cuando llega el golpe."));
                 text.AppendLine();
-                text.Append(MarketAssumptions.ShortDisclaimer + " Es un seguro de salud genérico; no es el de ninguna institución.");
+                text.Append(Loc.T("Cifras de ejemplo del juego. Es un seguro de salud genérico; no es el de ninguna institución."));
                 options.Add(new ModalOption
                 {
-                    Label = $"1.  Contratar el seguro  ·  {Money.Format(premium)} al mes",
+                    Label = Loc.F("1.  Contratar el seguro  ·  {0} al mes", Money.Format(premium)),
                     Color = GameUiColors.Green,
                     OnPress = () => { if (session.BuyHealthInsurance()) { ShowHealthDesk(); } }
                 });
-                options.Add(Back("2.  Por ahora no"));
+                options.Add(Back(Loc.T("2.  Por ahora no")));
             }
 
-            modal.Show("Seguro de salud", "Recepción del hospital", text.ToString(), options);
+            modal.Show(Loc.T("Seguro de salud"), Loc.T("Recepción del hospital"), text.ToString(), options);
         }
 
         // ---------------------------------------------------------------- the collectors
@@ -124,22 +124,22 @@ namespace ColonQuest.UI
 
             long demand = session.CollectionDemand;
             var text = new StringBuilder();
-            text.AppendLine("Un carro negro, con los vidrios polarizados y la música a todo volumen, frena frente a ti. Se bajan dos hombres.");
+            text.AppendLine(Loc.T("Un carro negro, con los vidrios polarizados y la música a todo volumen, frena frente a ti. Se bajan dos hombres."));
             text.AppendLine();
-            text.AppendLine($"«Mae, usted debe plata. Hoy venimos por {Money.Format(demand)}.»");
+            text.AppendLine(Loc.F("«Mae, usted debe plata. Hoy venimos por {0}.»", Money.Format(demand)));
             text.AppendLine();
-            text.AppendLine("Pagar baja la deuda. Negociar paga la mitad hoy y deja el resto como un préstamo nuevo con recargo. Ignorarlos cuesta una multa por atraso y mucha tensión.");
+            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar paga la mitad hoy y deja el resto como un préstamo nuevo con recargo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
             text.AppendLine();
-            text.Append(MarketAssumptions.ShortDisclaimer);
+            text.Append(Loc.T("Cifras de ejemplo del juego."));
 
             var options = new List<ModalOption>
             {
-                new ModalOption { Label = $"1.  Pagar  ·  {Money.Format(demand)}", Color = GameUiColors.Green, OnPress = () => session.PayCollectors() },
-                new ModalOption { Label = $"2.  Negociar  ·  pagar {Money.Format(demand / 2L)} hoy", Color = GameUiColors.Yellow, OnPress = () => session.NegotiateCollectors() },
-                new ModalOption { Label = "3.  Ignorarlos", Color = GameUiColors.Pink, OnPress = () => session.IgnoreCollectors() }
+                new ModalOption { Label = Loc.F("1.  Pagar  ·  {0}", Money.Format(demand)), Color = GameUiColors.Green, OnPress = () => session.PayCollectors() },
+                new ModalOption { Label = Loc.F("2.  Negociar  ·  pagar {0} hoy", Money.Format(demand / 2L)), Color = GameUiColors.Yellow, OnPress = () => session.NegotiateCollectors() },
+                new ModalOption { Label = Loc.T("3.  Ignorarlos"), Color = GameUiColors.Pink, OnPress = () => session.IgnoreCollectors() }
             };
 
-            modal.Show("Los cobradores", "Cobro por atraso", text.ToString(), options);
+            modal.Show(Loc.T("Los cobradores"), Loc.T("Cobro por atraso"), text.ToString(), options);
         }
     }
 }

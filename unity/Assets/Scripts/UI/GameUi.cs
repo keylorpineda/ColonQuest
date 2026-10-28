@@ -79,6 +79,7 @@ namespace ColonQuest.UI
             session.NegotiationStarted += OnNegotiationChanged;
             session.NegotiationUpdated += OnNegotiationChanged;
             session.NewGameStarted += CloseWindows;
+            Loc.Changed += Refresh;
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
@@ -100,6 +101,7 @@ namespace ColonQuest.UI
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            Loc.Changed -= Refresh;
             if (session != null)
             {
                 session.Changed -= Refresh;
@@ -312,12 +314,19 @@ namespace ColonQuest.UI
             promptCard.SetActive(text != null);
             if (text != null)
             {
-                promptText.text = text;
+                promptText.text = PromptText(text);
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     Interact(station);
                 }
             }
+        }
+
+        /// <summary>The prompt in the player's language: the key "[E]  " stays, the rest is translated.</summary>
+        private static string PromptText(string text)
+        {
+            const string key = "[E]  ";
+            return text.StartsWith(key) ? key + Loc.T(text.Substring(key.Length)) : Loc.T(text);
         }
 
         private string PromptFor(Station station)
@@ -344,7 +353,7 @@ namespace ColonQuest.UI
                         return "[E]  " + station.DisplayName;
                     }
 
-                    return loop.AllTasksDone ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar." : "Ya pasaste por " + station.DisplayName + " este mes.";
+                    return loop.AllTasksDone ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar." : Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
             }
         }
 
@@ -430,8 +439,8 @@ namespace ColonQuest.UI
         {
             var state = session.State;
             var loop = session.Loop;
-            monthText.text = $"Mes {Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay)} de {GameRules.MonthsToPlay}";
-            tasksText.text = $"Tareas {loop.TasksDone}/{GameRules.TasksPerMonth}";
+            monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay);
+            tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
             cashText.text = Money.Format(state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
             cardText.text = Money.Format(state.CreditCard.Balance);
@@ -479,20 +488,20 @@ namespace ColonQuest.UI
             Line(text, "Deuda con prestamista", outcome.InformalDebtDelta, false);
             if (outcome.WellbeingDelta != 0)
             {
-                text.AppendLine($"Ánimo  <color={GameUiColors.Hex(outcome.WellbeingDelta > 0 ? GameUiColors.Gain : GameUiColors.Loss)}>{(outcome.WellbeingDelta > 0 ? "+" : string.Empty)}{outcome.WellbeingDelta}</color>");
+                text.AppendLine($"{Loc.T("Ánimo")}  <color={GameUiColors.Hex(outcome.WellbeingDelta > 0 ? GameUiColors.Gain : GameUiColors.Loss)}>{(outcome.WellbeingDelta > 0 ? "+" : string.Empty)}{outcome.WellbeingDelta}</color>");
             }
 
             if (outcome.ChangedNothing)
             {
-                text.AppendLine("Tus cuentas quedaron igual.");
+                text.AppendLine(Loc.T("Tus cuentas quedaron igual."));
             }
 
             AppendDeal(text, session.LastDeal);
 
             text.AppendLine();
             text.Append(session.Loop.AllTasksDone
-                ? "Hiciste todas tus tareas. Ve al banco a cobrar el salario."
-                : $"Tareas del mes: {session.Loop.TasksDone} de {GameRules.TasksPerMonth}.");
+                ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
+                : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
 
             modal.Show("Lo que pasó", outcome.ChoiceLabel, text.ToString(), new[] { Continue(null) });
         }
@@ -524,7 +533,7 @@ namespace ColonQuest.UI
             }
 
             bool good = (delta > 0L) == moreIsGood;
-            text.AppendLine($"{label}  <color={GameUiColors.Hex(good ? GameUiColors.Gain : GameUiColors.Loss)}>{Money.FormatSigned(delta)}</color>");
+            text.AppendLine($"{Loc.T(label)}  <color={GameUiColors.Hex(good ? GameUiColors.Gain : GameUiColors.Loss)}>{Money.FormatSigned(delta)}</color>");
         }
 
         private void AskCloseMonth()
