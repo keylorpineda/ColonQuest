@@ -88,7 +88,8 @@ namespace ColonQuest.Api
 
             if (facts.Count == 0)
             {
-                reply.NpcReply = $"Mae, este {offer.Item} sale a solo {offer.Describe(SellerFact.MonthlyPayment)} al mes. ¡Se lo lleva hoy mismo!";
+                string down = offer.DownPayment > 0L ? $", más la prima de {SellerOffer.FormatColones(offer.DownPayment)}" : string.Empty;
+                reply.NpcReply = $"Mae, este {offer.Item} sale a solo {offer.Describe(SellerFact.MonthlyPayment)} al mes{down}. ¡Se lo lleva hoy mismo!";
                 reply.RevealedFacts = new List<SellerFact> { SellerFact.MonthlyPayment };
                 return reply;
             }
@@ -100,13 +101,28 @@ namespace ColonQuest.Api
             }
 
             reply.NpcReply = "Bueno, diay... " + string.Join("; ", parts) + ".";
+            if (offer.DownPayment > 0L && AsksAboutDownPayment(playerText))
+            {
+                reply.NpcReply += $" La prima es de {SellerOffer.FormatColones(offer.DownPayment)}.";
+            }
+
             reply.RevealedFacts = facts;
             return reply;
         }
 
         public static string Greeting(SellerOffer offer)
         {
-            return $"¡Pura vida! Soy {offer.SellerName}. Mire este {offer.Item}: se lo dejo en cuotas bien cómodas. ¿Qué le interesa saber?";
+            string terms = offer.DownPayment > 0L
+                ? $"con una prima de {SellerOffer.FormatColones(offer.DownPayment)} se lo dejo en cuotas bien cómodas"
+                : "se lo dejo en cuotas bien cómodas";
+            return $"¡Pura vida! Soy {offer.SellerName}. Mire este {offer.Item}: {terms}. ¿Qué le interesa saber?";
+        }
+
+        /// <summary>The down payment is not one of the key questions of the backend, so it is answered on the side.</summary>
+        private static bool AsksAboutDownPayment(string text)
+        {
+            string normalized = Normalize(text ?? string.Empty);
+            return normalized.Contains("prima") || normalized.Contains("entrada");
         }
 
         private static List<SellerFact> FactsAnswering(List<KeyQuestion> questions)

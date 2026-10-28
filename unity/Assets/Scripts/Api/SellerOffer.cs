@@ -21,7 +21,18 @@ namespace ColonQuest.Api
         public long InsuranceMonthly { get; }
         public long Commission { get; }
 
+        /// <summary>
+        /// What the buyer pays up front out of the cash price (a car's <c>prima</c>). Only client-side offers have
+        /// one: the four offers of the backend catalog always finance the whole price, so this stays zero there.
+        /// </summary>
+        public long DownPayment { get; }
+
         public SellerOffer(string offerId, string item, string sellerName, long cashPrice, int termMonths, decimal monthlyRatePct, long insuranceMonthly, long commission)
+            : this(offerId, item, sellerName, cashPrice, termMonths, monthlyRatePct, insuranceMonthly, commission, 0L)
+        {
+        }
+
+        public SellerOffer(string offerId, string item, string sellerName, long cashPrice, int termMonths, decimal monthlyRatePct, long insuranceMonthly, long commission, long downPayment)
         {
             OfferId = offerId;
             Item = item;
@@ -31,9 +42,13 @@ namespace ColonQuest.Api
             MonthlyRatePct = monthlyRatePct;
             InsuranceMonthly = insuranceMonthly;
             Commission = commission;
+            DownPayment = downPayment;
         }
 
-        /// <summary>French amortization of the cash price, rounded up to the next 100 colones.</summary>
+        /// <summary>The part of the price that the installments pay for.</summary>
+        public long Financed => CashPrice - DownPayment;
+
+        /// <summary>French amortization of the financed price, rounded up to the next 100 colones.</summary>
         public long MonthlyPayment
         {
             get
@@ -42,7 +57,7 @@ namespace ColonQuest.Api
                 decimal raw;
                 if (rate == 0m)
                 {
-                    raw = (decimal)CashPrice / TermMonths;
+                    raw = (decimal)Financed / TermMonths;
                 }
                 else
                 {
@@ -52,7 +67,7 @@ namespace ColonQuest.Api
                         growth *= 1m + rate;
                     }
 
-                    raw = CashPrice * rate / (1m - 1m / growth);
+                    raw = Financed * rate / (1m - 1m / growth);
                 }
 
                 return (long)(Math.Ceiling(raw / RoundTo) * RoundTo);
@@ -62,7 +77,7 @@ namespace ColonQuest.Api
         /// <summary>What leaves the player's pocket every month: the payment plus the insurance.</summary>
         public long MonthlyCharge => MonthlyPayment + InsuranceMonthly;
 
-        public long TotalCost => MonthlyCharge * TermMonths + Commission;
+        public long TotalCost => MonthlyCharge * TermMonths + Commission + DownPayment;
 
         /// <summary>What the player pays on top of the cash price by buying in installments.</summary>
         public long ExtraOverCash => TotalCost - CashPrice;

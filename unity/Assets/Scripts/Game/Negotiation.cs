@@ -40,7 +40,19 @@ namespace ColonQuest.Game
         private readonly List<KeyQuestion> asked = new List<KeyQuestion>();
         private readonly List<SellerFact> revealed = new List<SellerFact>();
 
+        public const string StoreVenue = "Tienda";
+
         public SellerOffer Offer { get; }
+
+        /// <summary>Where the conversation happens, for the title of the window.</summary>
+        public string Venue { get; set; } = StoreVenue;
+
+        /// <summary>
+        /// True for an offer the backend does not know (the car agency): its turns never go to the server, the
+        /// local seller answers them all.
+        /// </summary>
+        public bool IsLocalOnly => SellerOffer.Find(Offer.OfferId) == null;
+
         public DealStatus Status { get; private set; } = DealStatus.Open;
         public IReadOnlyList<NegotiationTurn> Turns => turns;
         public IReadOnlyList<KeyQuestion> KeyQuestionsAsked => asked;
