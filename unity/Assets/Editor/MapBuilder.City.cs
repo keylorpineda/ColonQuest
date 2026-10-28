@@ -468,82 +468,126 @@ namespace ColonQuest.EditorTools
 
         // ---------------------------------------------------------------- facades
 
-        private static void ForEachFacade(Transform group, System.Random random, int perBuilding, Action<Transform, BuildingSpec, float> draw)
+        private static bool IsHouse(BuildingSpec b)
         {
-            foreach (var spec in buildingSpecs)
-            {
-                for (int i = 0; i < perBuilding; i++)
-                {
-                    float x = spec.XMin + 0.9f + (float)random.NextDouble() * (spec.XMax - spec.XMin - 1.8f);
-                    if (Mathf.Abs(x - spec.DoorX) < 1.6f)
-                    {
-                        x = spec.DoorX + (i % 2 == 0 ? 1.9f : -1.9f);
-                        x = Mathf.Clamp(x, spec.XMin + 0.5f, spec.XMax - 0.5f);
-                    }
+            return b.Name == "Casa" || b.Name.StartsWith("Casa_", StringComparison.Ordinal);
+        }
 
-                    draw(group, spec, x);
-                }
-            }
+        /// <summary>Shops and offices: everything that is not a home, the workshop or the farm.</summary>
+        private static bool IsBusiness(BuildingSpec b)
+        {
+            return !IsHouse(b) && b.Name != "Establo" && b.Name != "Taller";
+        }
+
+        /// <summary>Only the places that handle money watch their door.</summary>
+        private static bool HandlesMoney(BuildingSpec b)
+        {
+            return b.Name == "Banco" || b.Name == "Tienda" || b.Name == "Cooperativa" || b.Name == "KioscoSinpe";
+        }
+
+        /// <summary>The places that put a menu or offers out on the sidewalk.</summary>
+        private static bool PutsOutABoard(BuildingSpec b)
+        {
+            return b.Name == "Pulperia" || b.Name == "SodaElMuelle" || b.Name == "Tienda";
         }
 
         private static void BuildFacadeDetails(Transform parent, System.Random random)
         {
+            // One poster on the shops that advertise, next to the door and below the sign.
             string[] posters = { "#FFD23F", "#4DA3FF", "#FF7A8A", "#55E08F" };
-            ForEachFacade(CityGroup(parent, "WallPosters"), random, 2, (g, b, x) =>
-            {
-                var root = Root(g, "Poster", new Vector2(x, b.YBottom + 0.95f), b.YBottom - 0.05f);
-                Part(root, square, Vector2.zero, new Vector2(0.42f, 0.56f), posters[random.Next(posters.Length)], 0);
-                Shape(root, "Line", square, new Vector2(0f, 0.08f), new Vector2(0.28f, 0.05f), Hex("#F8F5E8"), 3);
-                Shape(root, "Line", square, new Vector2(0f, -0.06f), new Vector2(0.28f, 0.05f), Hex("#F8F5E8"), 3);
-            });
-
-            ForEachFacade(CityGroup(parent, "WindowAirConditioners"), random, 1, (g, b, x) =>
-            {
-                var root = Root(g, "AC", new Vector2(x, b.YBottom + 1.9f), b.YBottom - 0.05f);
-                Part(root, rounded, Vector2.zero, new Vector2(0.7f, 0.4f), "#E3E7F1", 0);
-                Shape(root, "Grille", square, new Vector2(0f, -0.02f), new Vector2(0.5f, 0.07f), Hex("#8E93A8"), 3);
-                Shape(root, "Grille", square, new Vector2(0f, 0.1f), new Vector2(0.5f, 0.07f), Hex("#8E93A8"), 3);
-            });
-
-            string[] blooms = { "#FF7A8A", "#FFD23F", "#B28DFF", "#F8F5E8" };
-            ForEachFacade(CityGroup(parent, "FlowerBoxes"), random, 2, (g, b, x) =>
-            {
-                var root = Root(g, "FlowerBox", new Vector2(x, b.YBottom + 0.55f), b.YBottom - 0.06f);
-                Part(root, roundedSmall, Vector2.zero, new Vector2(0.9f, 0.22f), "#7A4F2A", 0);
-                for (int i = -2; i <= 2; i++)
-                {
-                    Shape(root, "Leaf", circle, new Vector2(i * 0.18f, 0.14f), Vector2.one * 0.2f, Hex("#3E9457"), 3);
-                    Shape(root, "Bloom", circle, new Vector2(i * 0.18f, 0.2f), Vector2.one * 0.12f, Hex(blooms[random.Next(blooms.Length)]), 4);
-                }
-            });
-
-            var lamps = CityGroup(parent, "WallLamps");
+            var posterGroup = CityGroup(parent, "WallPosters");
+            int posterIndex = 0;
             foreach (var b in buildingSpecs)
             {
-                foreach (float side in new[] { -1.3f, 1.3f })
+                if (!PutsOutABoard(b))
                 {
-                    float x = Mathf.Clamp(b.DoorX + side, b.XMin + 0.4f, b.XMax - 0.4f);
-                    var root = Root(lamps, "WallLamp", new Vector2(x, b.YBottom + 1.7f), b.YBottom - 0.05f);
-                    Part(root, roundedSmall, Vector2.zero, new Vector2(0.14f, 0.26f), "#4A5166", 0);
-                    Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.05f), Vector2.one * 1.2f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, x);
+                    continue;
+                }
+
+                float x = Mathf.Clamp(b.DoorX - 1.75f, b.XMin + 0.4f, b.XMax - 0.4f);
+                var root = Root(posterGroup, "Poster", new Vector2(x, b.YBottom + 1.15f), b.YBottom - 0.05f);
+                Part(root, square, Vector2.zero, new Vector2(0.42f, 0.56f), posters[posterIndex++ % posters.Length], 0);
+                Shape(root, "Line", square, new Vector2(0f, 0.08f), new Vector2(0.28f, 0.05f), Hex("#F8F5E8"), 3);
+                Shape(root, "Line", square, new Vector2(0f, -0.06f), new Vector2(0.28f, 0.05f), Hex("#F8F5E8"), 3);
+            }
+
+            // Air conditioners hang beside a window of the offices and shops, never on homes.
+            var conditioners = CityGroup(parent, "WindowAirConditioners");
+            foreach (var b in buildingSpecs)
+            {
+                float side = FacadeWindowOffset(b);
+                if (!IsBusiness(b) || side <= 0f || b.AwningA != null)
+                {
+                    continue;
+                }
+
+                var root = Root(conditioners, "AC", new Vector2(b.DoorX + side, b.YBottom + 2.35f), b.YBottom - 0.05f);
+                Part(root, rounded, Vector2.zero, new Vector2(0.7f, 0.36f), "#E3E7F1", 0);
+                Shape(root, "Grille", square, new Vector2(0f, -0.02f), new Vector2(0.5f, 0.06f), Hex("#8E93A8"), 3);
+                Shape(root, "Grille", square, new Vector2(0f, 0.09f), new Vector2(0.5f, 0.06f), Hex("#8E93A8"), 3);
+            }
+
+            // Flower boxes under the windows of the homes.
+            string[] blooms = { "#FF7A8A", "#FFD23F", "#B28DFF", "#F8F5E8" };
+            var boxes = CityGroup(parent, "FlowerBoxes");
+            foreach (var b in buildingSpecs)
+            {
+                float side = FacadeWindowOffset(b);
+                if (!IsHouse(b) || side <= 0f)
+                {
+                    continue;
+                }
+
+                foreach (float s in new[] { -side, side })
+                {
+                    var root = Root(boxes, "FlowerBox", new Vector2(b.DoorX + s, b.YBottom + 0.9f), b.YBottom - 0.06f);
+                    Part(root, roundedSmall, Vector2.zero, new Vector2(1.1f, 0.22f), "#7A4F2A", 0);
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        Shape(root, "Leaf", circle, new Vector2(i * 0.2f, 0.14f), Vector2.one * 0.2f, Hex("#3E9457"), 3);
+                        Shape(root, "Bloom", circle, new Vector2(i * 0.2f, 0.2f), Vector2.one * 0.12f, Hex(blooms[random.Next(blooms.Length)]), 4);
+                    }
                 }
             }
 
-            var numbers = CityGroup(parent, "HouseNumbers");
-            int number = 10;
+            // A porch light over every door.
+            var lamps = CityGroup(parent, "WallLamps");
             foreach (var b in buildingSpecs)
             {
-                var root = Root(numbers, "Number", new Vector2(Mathf.Clamp(b.DoorX + 1.9f, b.XMin + 0.4f, b.XMax - 0.4f), b.YBottom + 1.05f), b.YBottom - 0.05f);
+                if (b.Entrance != Entrance.Door)
+                {
+                    continue;
+                }
+
+                var root = Root(lamps, "PorchLight", new Vector2(b.DoorX, b.YBottom + 2.2f), b.YBottom - 0.05f);
+                Part(root, roundedSmall, Vector2.zero, new Vector2(0.3f, 0.2f), "#4A5166", 0);
+                Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.1f), Vector2.one * 1.3f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, b.DoorX);
+            }
+
+            // A number plate on the door of every home.
+            var numbers = CityGroup(parent, "HouseNumbers");
+            foreach (var b in buildingSpecs)
+            {
+                if (!IsHouse(b))
+                {
+                    continue;
+                }
+
+                var root = Root(numbers, "Number", new Vector2(b.DoorX, b.YBottom + 1.72f), b.YBottom - 0.05f);
                 Part(root, rounded, Vector2.zero, new Vector2(0.36f, 0.26f), "#F8F5E8", 0);
                 Shape(root, "Digit", square, new Vector2(-0.06f, 0f), new Vector2(0.06f, 0.14f), Hex("#2A3345"), 3);
                 Shape(root, "Digit", square, new Vector2(0.06f, 0f), new Vector2(0.06f, 0.14f), Hex("#2A3345"), 3);
-                number += 2;
             }
 
             var cameras = CityGroup(parent, "SecurityCameras");
             foreach (var b in buildingSpecs)
             {
-                var root = Root(cameras, "Camera", new Vector2(b.XMin + 0.3f, b.YBottom + b.FacadeHeight - 0.35f), b.YBottom - 0.05f);
+                if (!HandlesMoney(b))
+                {
+                    continue;
+                }
+
+                var root = Root(cameras, "Camera", new Vector2(b.DoorX - 1.6f, b.YBottom + b.FacadeHeight - 0.35f), b.YBottom - 0.05f);
                 Part(root, rounded, Vector2.zero, new Vector2(0.3f, 0.16f), "#4A5166", 0);
                 Flickering(Shape(root, "Light", circle, new Vector2(0.1f, 0f), Vector2.one * 0.06f, Hex("#E8505B"), 3), 0.8f, 1.2f, b.XMin);
             }
@@ -551,6 +595,11 @@ namespace ColonQuest.EditorTools
             var mats = CityGroup(parent, "DoorMats");
             foreach (var b in buildingSpecs)
             {
+                if (b.Entrance != Entrance.Door)
+                {
+                    continue;
+                }
+
                 Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.5f), new Vector2(1.1f, 0.5f), GamePalette.Outline, 16);
                 Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.5f), new Vector2(0.98f, 0.38f), Hex("#B2475A"), 17);
             }
@@ -560,7 +609,7 @@ namespace ColonQuest.EditorTools
             {
                 float x = Mathf.Clamp(b.DoorX + 2.1f, b.XMin, b.XMax);
                 float y = b.YBottom - 0.9f;
-                if (!Clear(x, y, 0.8f))
+                if (!PutsOutABoard(b) || !Clear(x, y, 0.8f))
                 {
                     continue;
                 }
@@ -573,12 +622,18 @@ namespace ColonQuest.EditorTools
                 occupied.Add(new Vector2(x, y));
             }
 
+            // Potted plants by the doors of the homes and the bank.
             var pots = CityGroup(parent, "DoorPlants");
             foreach (var b in buildingSpecs)
             {
-                foreach (float side in new[] { -1.7f, 1.7f })
+                if (!IsHouse(b) && b.Name != "Banco")
                 {
-                    float x = Mathf.Clamp(b.DoorX + side, b.XMin + 0.2f, b.XMax - 0.2f);
+                    continue;
+                }
+
+                foreach (float side in new[] { -1.4f, 1.4f })
+                {
+                    float x = b.DoorX + side;
                     float y = b.YBottom - 0.55f;
                     if (!Clear(x, y, 0.7f))
                     {
@@ -596,71 +651,70 @@ namespace ColonQuest.EditorTools
 
         // ---------------------------------------------------------------- roofs
 
-        private static void ForEachRoof(Transform group, System.Random random, int perBuilding, Action<Transform, BuildingSpec, Vector2> draw)
-        {
-            foreach (var spec in buildingSpecs)
-            {
-                for (int i = 0; i < perBuilding; i++)
-                {
-                    float x = spec.XMin + 1f + (float)random.NextDouble() * (spec.XMax - spec.XMin - 2f);
-                    float y = Mathf.Lerp(spec.YBottom + spec.FacadeHeight + 0.5f, spec.YTop - 0.2f, 0.15f + (float)random.NextDouble() * 0.7f);
-                    draw(group, spec, new Vector2(x, y));
-                }
-            }
-        }
-
+        /// <summary>
+        /// What sits on each roof follows what the building is. Homes have the water tank every Costa Rican
+        /// house has, some an antenna; shops and offices have their air conditioning units in a row at the
+        /// back; the workshop has an exhaust pipe. Nothing is placed at random.
+        /// </summary>
         private static void BuildRoofDetails(Transform parent, System.Random random)
         {
-            ForEachRoof(CityGroup(parent, "RoofAntennas"), random, 1, (g, b, at) =>
-            {
-                var root = Root(g, "Antenna", at, b.YBottom - 0.05f);
-                Part(root, roundedSmall, new Vector2(0f, 0.6f), new Vector2(0.06f, 1.2f), "#6B7186", 0);
-                Part(root, roundedSmall, new Vector2(0f, 1.0f), new Vector2(0.6f, 0.06f), "#6B7186", 0);
-                Part(root, roundedSmall, new Vector2(0f, 0.8f), new Vector2(0.44f, 0.06f), "#6B7186", 0);
-            });
+            var tanks = CityGroup(parent, "RoofWaterTanks");
+            var antennas = CityGroup(parent, "RoofAntennas");
+            var solar = CityGroup(parent, "SolarPanels");
+            var units = CityGroup(parent, "RoofAcUnits");
+            var pipes = CityGroup(parent, "RoofPipes");
 
-            ForEachRoof(CityGroup(parent, "RoofWaterTanks"), random, 1, (g, b, at) =>
+            int house = 0;
+            foreach (var b in buildingSpecs)
             {
-                var root = Root(g, "Tank", at, b.YBottom - 0.05f);
-                Part(root, roundedSmall, new Vector2(0f, 0.38f), new Vector2(0.7f, 0.76f), "#3C7FD9", 0);
-                Part(root, circle, new Vector2(0f, 0.78f), new Vector2(0.7f, 0.3f), "#5B9BEA", 1);
-                Shape(root, "Band", square, new Vector2(0f, 0.38f), new Vector2(0.7f, 0.06f), Hex("#2A5FA8"), 6);
-            });
-
-            ForEachRoof(CityGroup(parent, "RoofVents"), random, 2, (g, b, at) =>
-            {
-                var root = Root(g, "Vent", at, b.YBottom - 0.05f);
-                Part(root, roundedSmall, new Vector2(0f, 0.2f), new Vector2(0.3f, 0.4f), "#8A90A5", 0);
-                Part(root, rounded, new Vector2(0f, 0.44f), new Vector2(0.4f, 0.12f), "#6B7186", 1);
-            });
-
-            ForEachRoof(CityGroup(parent, "SolarPanels"), random, 1, (g, b, at) =>
-            {
-                var root = Root(g, "Solar", at, b.YBottom - 0.05f);
-                Part(root, rounded, Vector2.zero, new Vector2(1.2f, 0.7f), "#2E4A7A", 0);
-                for (int i = -1; i <= 1; i++)
+                float roofY = b.YTop - 1.1f;
+                float cx = (b.XMin + b.XMax) * 0.5f;
+                if (IsHouse(b))
                 {
-                    Shape(root, "Cell", square, new Vector2(i * 0.36f, 0f), new Vector2(0.02f, 0.62f), Hex("#7FA8E8"), 3);
+                    var tank = Root(tanks, "Tank", new Vector2(b.XMax - 1.0f, roofY), b.YBottom - 0.05f);
+                    Part(tank, roundedSmall, new Vector2(0f, 0.3f), new Vector2(0.7f, 0.6f), "#3C7FD9", 0);
+                    Part(tank, circle, new Vector2(0f, 0.62f), new Vector2(0.7f, 0.28f), "#5B9BEA", 1);
+                    Shape(tank, "Band", square, new Vector2(0f, 0.3f), new Vector2(0.7f, 0.05f), Hex("#2A5FA8"), 6);
+
+                    if (house % 2 == 0)
+                    {
+                        var antenna = Root(antennas, "Antenna", new Vector2(b.XMin + 1.1f, roofY), b.YBottom - 0.05f);
+                        Part(antenna, roundedSmall, new Vector2(0f, 0.5f), new Vector2(0.06f, 1.0f), "#6B7186", 0);
+                        Part(antenna, roundedSmall, new Vector2(0f, 0.85f), new Vector2(0.6f, 0.06f), "#6B7186", 0);
+                        Part(antenna, roundedSmall, new Vector2(0f, 0.65f), new Vector2(0.44f, 0.06f), "#6B7186", 0);
+                    }
+
+                    if (house == 1)
+                    {
+                        var panel = Root(solar, "Solar", new Vector2(cx, roofY - 0.2f), b.YBottom - 0.05f);
+                        Part(panel, rounded, Vector2.zero, new Vector2(1.6f, 0.7f), "#2E4A7A", 0);
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            Shape(panel, "Cell", square, new Vector2(i * 0.5f, 0f), new Vector2(0.02f, 0.62f), Hex("#7FA8E8"), 3);
+                        }
+                    }
+
+                    house++;
                 }
-
-                Shape(root, "Cell", square, Vector2.zero, new Vector2(1.1f, 0.02f), Hex("#7FA8E8"), 3);
-            });
-
-            ForEachRoof(CityGroup(parent, "SatelliteDishes"), random, 1, (g, b, at) =>
-            {
-                var root = Root(g, "Dish", at, b.YBottom - 0.05f);
-                Part(root, circle, new Vector2(0f, 0.3f), new Vector2(0.62f, 0.5f), "#E3E7F1", 0);
-                Part(root, roundedSmall, new Vector2(0.1f, 0.5f), new Vector2(0.06f, 0.3f), "#6B7186", 1);
-            });
-
-            ForEachRoof(CityGroup(parent, "RoofChimneys"), random, 1, (g, b, at) =>
-            {
-                var root = Root(g, "Chimney", at, b.YBottom - 0.05f);
-                Part(root, roundedSmall, new Vector2(0f, 0.35f), new Vector2(0.42f, 0.7f), "#A0523D", 0);
-                Part(root, roundedSmall, new Vector2(0f, 0.72f), new Vector2(0.54f, 0.12f), "#6B7186", 1);
-                var smoke = Shape(root, "Smoke", softCircle, new Vector2(0.05f, 1.2f), new Vector2(0.7f, 0.9f), Hex("#FFFFFF", 0.35f), 6);
-                Flickering(smoke, 0.3f, 0.4f, at.x);
-            });
+                else if (IsBusiness(b))
+                {
+                    float w = b.XMax - b.XMin;
+                    float[] spots = w > 7f ? new[] { cx - 1.4f, cx + 1.4f } : new[] { cx };
+                    foreach (float x in spots)
+                    {
+                        var unit = Root(units, "AcUnit", new Vector2(x, roofY), b.YBottom - 0.05f);
+                        Part(unit, rounded, new Vector2(0f, 0.3f), new Vector2(0.9f, 0.6f), "#D7DDE8", 0);
+                        Shape(unit, "Fan", ring, new Vector2(0f, 0.32f), new Vector2(0.44f, 0.44f), Hex("#6B7186"), 3);
+                        Shape(unit, "Hub", circle, new Vector2(0f, 0.32f), Vector2.one * 0.1f, Hex("#6B7186"), 4);
+                    }
+                }
+                else if (b.Name == "Taller")
+                {
+                    var pipe = Root(pipes, "Exhaust", new Vector2(b.XMin + 1.3f, roofY), b.YBottom - 0.05f);
+                    Part(pipe, roundedSmall, new Vector2(0f, 0.4f), new Vector2(0.26f, 0.8f), "#8A90A5", 0);
+                    Part(pipe, rounded, new Vector2(0f, 0.82f), new Vector2(0.4f, 0.12f), "#6B7186", 1);
+                }
+            }
         }
 
         // ---------------------------------------------------------------- nature

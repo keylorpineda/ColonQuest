@@ -437,6 +437,7 @@ namespace ColonQuest.EditorTools
             // South row.
             House(parent, shadows, "Casa_Vecina_B", -43f, -37.5f, -8f, -3f, "#4D9DE0", "#F7E8D0");
             House(parent, shadows, "Casa_Vecina_C", -35.5f, -29.5f, -8f, -3f, "#E1BC29", "#FBE3C4");
+            YardSign(parent, shadows, -38.2f, -8.7f, "SE VENDE", "#E8505B");
 
             foreach (var spot in new[] { new Vector2(-26f, 8.8f), new Vector2(-44.4f, 14f), new Vector2(-39f, 14.5f), new Vector2(-33f, 15f), new Vector2(-27f, 14.5f), new Vector2(-28f, -3.2f), new Vector2(-44.4f, -3f) })
             {
@@ -463,12 +464,27 @@ namespace ColonQuest.EditorTools
             FootballGoals(parent, shadows);
         }
 
-        /// <summary>A plain neighborhood house: a door, windows and a colored roof.</summary>
+        /// <summary>A stake in the front yard: the house is for sale or for rent.</summary>
+        private static void YardSign(Transform parent, Transform shadows, float x, float y, string text, string hex)
+        {
+            var root = Root(parent, "YardSign", new Vector2(x, y), y);
+            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.0f, 0.3f), 0.2f);
+            Shape(root, "Post_Outline", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.18f, 0.9f), GamePalette.Outline, 0);
+            Shape(root, "Post", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.08f, 0.85f), GamePalette.Hex("#8B5A3C"), 1);
+            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 0.95f), new Vector2(1.5f, 0.6f), GamePalette.Outline, 2);
+            Shape(root, "Board", roundedSmall, new Vector2(0f, 0.95f), new Vector2(1.38f, 0.48f), GamePalette.Hex("#F8F5E8"), 3);
+            Label(root, text, new Vector2(0f, 0.95f), GamePalette.Hex(hex), 0.026f, TextAnchor.MiddleCenter);
+            var collider = root.gameObject.AddComponent<CircleCollider2D>();
+            collider.radius = 0.12f;
+            collider.offset = new Vector2(0f, 0.1f);
+        }
+
+        /// <summary>A plain neighborhood house: a door, windows and a colored roof, and no shop sign.</summary>
         private static void House(Transform parent, Transform shadows, string name, float xMin, float xMax, float yBottom, float yTop, string roof, string wall)
         {
             Building(parent, shadows, new BuildingSpec
             {
-                Name = name, Sign = "HOGAR", Roof = roof, Wall = wall,
+                Name = name, Sign = null, Roof = roof, Wall = wall,
                 XMin = xMin, XMax = xMax, YBottom = yBottom, YTop = yTop, DoorX = (xMin + xMax) * 0.5f, FacadeHeight = 2.5f, Entrance = Entrance.Door
             });
         }

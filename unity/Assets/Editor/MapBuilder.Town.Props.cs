@@ -130,7 +130,11 @@ namespace ColonQuest.EditorTools
                 DrawAwning(root, w, fh, b.AwningA, b.AwningB);
             }
 
-            DrawSign(root, b.Sign, dx, fh + 0.62f, wall);
+            // Homes carry no shop sign; only the player's house is marked so it can be found.
+            if (!string.IsNullOrEmpty(b.Sign))
+            {
+                DrawSign(root, b.Sign, dx, fh + 0.62f, wall);
+            }
 
             var collider = root.gameObject.AddComponent<BoxCollider2D>();
             collider.offset = new Vector2(0f, h * 0.5f);
@@ -169,15 +173,16 @@ namespace ColonQuest.EditorTools
 
         private static void DrawFacadeWindows(Transform root, BuildingSpec b, float w, float dx, Color wall)
         {
-            if (b.Entrance == Entrance.Window || b.Entrance == Entrance.None)
+            float offset = FacadeWindowOffset(b);
+            if (offset <= 0f)
             {
                 return;
             }
 
-            foreach (float side in new[] { -2.7f, 2.7f })
+            foreach (float side in new[] { -offset, offset })
             {
                 float wx = dx + side;
-                if (Mathf.Abs(wx) > w * 0.5f - 0.9f)
+                if (Mathf.Abs(wx) > w * 0.5f - 0.6f)
                 {
                     continue;
                 }
@@ -190,6 +195,23 @@ namespace ColonQuest.EditorTools
                 shine.a = 0.55f;
                 Shape(root, "Window_Shine", roundedSmall, new Vector2(wx - 0.27f, 1.78f), new Vector2(0.22f, 0.3f), shine, 7);
             }
+        }
+
+        /// <summary>
+        /// How far from the door the two front windows sit, or 0 when the front has none. Narrow houses
+        /// bring their windows closer to the door instead of losing them.
+        /// </summary>
+        private static float FacadeWindowOffset(BuildingSpec b)
+        {
+            if (b.Entrance != Entrance.Door && b.Entrance != Entrance.Garage)
+            {
+                return 0f;
+            }
+
+            float w = b.XMax - b.XMin;
+            float offset = Mathf.Min(2.7f, w * 0.5f - 1.25f);
+            float doorHalf = b.Entrance == Entrance.Garage ? 1.55f : 0.7f;
+            return offset >= doorHalf + 0.75f ? offset : 0f;
         }
 
         private static void DrawAwning(Transform root, float w, float fh, string a, string b)

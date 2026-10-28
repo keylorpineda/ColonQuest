@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -24,9 +25,28 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheWest()
         {
-            yield return Walk(new Vector2(-36f, 2f), Vector2.left, 2f);
+            yield return Walk(new Vector2(-42f, 2f), Vector2.left, 2f);
 
             Assert.Greater(Body.position.x, MapLayout.PlayWestX - 0.1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Neighborhood_HasHomesTheyCanWalkTo()
+        {
+            yield return null;
+
+            int homes = 0;
+            foreach (var root in Object.FindObjectsByType<Transform>(FindObjectsSortMode.None))
+            {
+                if (root.name.StartsWith("Casa_Vecina_"))
+                {
+                    homes++;
+                    Assert.Greater(root.position.x, MapLayout.PlayWestX, root.name + " stands inside the walls");
+                }
+            }
+
+            Assert.GreaterOrEqual(homes, 4, "the neighborhood has homes to rent or buy later");
+            Assert.AreEqual(2, GameObject.FindObjectsByType<Transform>(FindObjectsSortMode.None).Count(t => t.name == "YardSign"));
         }
 
         [UnityTest]

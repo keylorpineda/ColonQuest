@@ -159,7 +159,7 @@ namespace ColonQuest.EditorTools
         {
             Building(parent, shadows, new BuildingSpec
             {
-                Name = "Casa", Sign = "CASA", Roof = "#C0504D", Wall = "#F2D7B6",
+                Name = "Casa", Sign = "TU CASA", Roof = "#C0504D", Wall = "#F2D7B6",
                 XMin = -24f, XMax = -16f, YBottom = 6f, YTop = 12.6f, DoorX = -19.5f, FacadeHeight = 2.8f, Entrance = Entrance.Door
             });
             var banco = Building(parent, shadows, new BuildingSpec
@@ -174,7 +174,7 @@ namespace ColonQuest.EditorTools
                 XMin = 4f, XMax = 13.5f, YBottom = 6f, YTop = 13.4f, DoorX = 8.5f, FacadeHeight = 3.2f, Entrance = Entrance.Door,
                 AwningA = "#E8505B", AwningB = "#F8F5E8"
             });
-            Banner(tienda, "36 CUOTAS SIN INTERESES", 8.5f - (4f + 13.5f) * 0.5f, 3.2f + 1.7f, "#E8505B");
+            Banner(tienda, "CRÉDITO FÁCIL", 8.5f - (4f + 13.5f) * 0.5f, 3.2f + 1.7f, "#E8505B");
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Taller", Sign = "TALLER DON RAFA", Roof = "#4B5568", Wall = "#D7DDE8",
@@ -187,11 +187,8 @@ namespace ColonQuest.EditorTools
                 XMin = -24.5f, XMax = -16f, YBottom = -8f, YTop = -2.6f, DoorX = -19.5f, FacadeHeight = 2.8f, Entrance = Entrance.Window,
                 AwningA = "#3FA66A", AwningB = "#F8F5E8"
             });
-            Building(parent, shadows, new BuildingSpec
-            {
-                Name = "Bodega", Sign = "BODEGA", Roof = "#7A7F94", Wall = "#D7C7A8",
-                XMin = -12f, XMax = -5f, YBottom = -8f, YTop = -3f, DoorX = -8.5f, FacadeHeight = 2.6f, Entrance = Entrance.Door
-            });
+            House(parent, shadows, "Casa_Vecina_D", -12f, -5f, -8f, -3f, "#8E6BB8", "#F4EBD0");
+            YardSign(parent, shadows, -5.7f, -8.7f, "SE ALQUILA", "#1D4F8C");
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "KioscoSinpe", Sign = "SINPE", Roof = "#4DA3FF", Wall = "#F1F4FF",
