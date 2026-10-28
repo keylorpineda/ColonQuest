@@ -15,9 +15,13 @@ namespace ColonQuest.Api
 
         public const float DefaultTimeoutSeconds = 10f;
 
+        /// <summary>A spoken turn uploads the clip and waits for transcription plus the seller's answer.</summary>
+        public const float VoiceTimeoutSeconds = 20f;
+
         public string BaseUrl = LocalUrl;
         public float EventTimeout = EventTimeoutSeconds;
         public float Timeout = DefaultTimeoutSeconds;
+        public float VoiceTimeout = VoiceTimeoutSeconds;
 
         public static ApiConfig Current { get; private set; } = new ApiConfig();
 

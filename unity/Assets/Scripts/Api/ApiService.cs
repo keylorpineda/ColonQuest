@@ -112,6 +112,48 @@ namespace ColonQuest.Api
             done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));
         }
 
+        /// <summary>
+        /// One negotiation turn spoken by the player: a WAV clip goes to the backend, which transcribes
+        /// it and answers like a typed turn. Meta is never called from here. 503 (voice down), 422 (no
+        /// speech or a bad clip) and network errors come back as failures so the UI can ask for text.
+        /// </summary>
+        public IEnumerator SendNegotiationVoice(string offerId, byte[] wav, Action<ApiResult<NegotiationReply>> done)
+        {
+            if (!HasSession)
+            {
+                done(ApiResult<NegotiationReply>.Failure("no session"));
+                yield break;
+            }
+
+            if (wav == null || wav.Length == 0)
+            {
+                done(ApiResult<NegotiationReply>.Failure("empty audio"));
+                yield break;
+            }
+
+            var form = new MultipartForm()
+                .AddField("offerId", offerId)
+                .AddFile("audio", "voice.wav", "audio/wav", wav);
+            var request = new HttpRequestData
+            {
+                Method = "POST",
+                Url = config.Url($"sessions/{SessionId}/negotiation/voice"),
+                RawBody = form.ToBytes(),
+                ContentType = form.ContentType,
+                TimeoutSeconds = config.VoiceTimeout
+            };
+
+            HttpResponseData response = null;
+            yield return transport.Send(request, r => response = r);
+            var result = Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto);
+            if (result.Ok && string.IsNullOrWhiteSpace(result.Value.Transcript))
+            {
+                result = ApiResult<NegotiationReply>.Failure("empty transcript", response.StatusCode);
+            }
+
+            done(result);
+        }
+
         /// <summary>Closes the session: the backend needs the final state to compute net worth and debt.</summary>
         public IEnumerator RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
         {
