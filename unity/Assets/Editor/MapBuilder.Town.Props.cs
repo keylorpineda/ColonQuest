@@ -89,6 +89,7 @@ namespace ColonQuest.EditorTools
 
         private static Transform Building(Transform parent, Transform shadows, BuildingSpec b)
         {
+            buildingSpecs.Add(b);
             footprints.Add(new Rect(b.XMin - 1f, b.YBottom - 1.5f, b.XMax - b.XMin + 2f, b.YTop - b.YBottom + b.FacadeHeight + 3f));
             float cx = (b.XMin + b.XMax) * 0.5f;
             float w = b.XMax - b.XMin;

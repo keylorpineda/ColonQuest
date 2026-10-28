@@ -22,6 +22,7 @@ namespace ColonQuest.EditorTools
             var map = new GameObject("Map").transform;
             var random = new System.Random(11);
             footprints.Clear();
+            buildingSpecs.Clear();
 
             currentLayer = LayerFloor;
             BuildGround(Group(map, "Ground"), random);
@@ -41,7 +42,9 @@ namespace ColonQuest.EditorTools
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
             BuildClouds(Group(map, "Clouds"), random);
-            BuildDepth(Group(map, "Depth"), Group(map, "DepthShadows"), random);
+            var depthShadows = Group(map, "DepthShadows");
+            BuildDepth(Group(map, "Depth"), depthShadows, random);
+            BuildCity(Group(map, "City"), depthShadows, random);
 
             BuildSpawnPoint(map, SpawnIds.Start, new Vector2(0f, 2f));
             BuildSpawnPoint(map, SpawnIds.TownFromCasa, new Vector2(-19.5f, 4.3f));
