@@ -41,6 +41,7 @@ barrier instead of a hedge:
 - West: a neighborhood with the cooperative and houses, and a football field, seen but out of reach.
 - South: a boardwalk, a beach with palms and umbrellas, a lifeguard tower, Soda El Muelle and a pier into the sea.
 - The walkable area ends at invisible walls inside the world (x from -38 to 40, north at y 17); everything past them is scenery the camera still shows, so no edge looks like an edge. More invisible colliders follow the rocks, the river and the shoreline.
+- City details: 77 named groups under `Map/City` (road markings and stains, street furniture, facade and roof details, nature, river and beach life, sky), built by `MapBuilder.City.cs`.
 - Depth: haze toward the far north, grass, flowers, bushes and rocks sorted by their feet, floating pollen, slanted light beams, leaf shadows, falling leaves, birds and high clouds that each slide at their own speed, plus sun patches, contact shadows, mist, water glints and reeds on the ground (`MapBuilder.Depth.cs`, `MapBuilder.Atmosphere.cs`).
 
 Each place is a kind of money decision the game master can throw at the player.
