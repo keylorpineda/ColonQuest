@@ -23,6 +23,22 @@ presses, because the run is lost. The town overlay hides itself in the menu scen
 Pure logic lives in `GameSettings` (World), `MenuEntries` and `MenuMotion` (Game) and has EditMode tests; the
 flow has PlayMode tests in `MenuPlayTests.cs` (`MenuPlayTests` and `PausePlayTests`).
 
+## Places and things that happen to the player
+
+| Place or event | What it does and what it teaches |
+| --- | --- |
+| Car agency (`Agencia`, north avenue) | A showroom with three cars and a price tag each, two salesmen's desks, a glass financing office, a waiting room with free coffee and a workshop at the back. Don Chepe welcomes the player inside and the car negotiation opens at his desk. Teaches reading the conditions before signing |
+| Neighbor's house (`Vecino`, the house next to the rental sign) | Not the player's house. The owner counts down (9 s) and, if the player is still inside, calls the police. Teaches that a fine costs money and time |
+| Police station (`Carcel`, east end of the avenue) | Counter, judge and four cells. After an arrest: a fine (cash, then card), two days of the month lost and a lower mood |
+| Hospital (`Hospital` and `HospitalArriba`, east streets) | Two floors: reception and emergency ward below, consulting rooms and lab above. A car that runs the player over (once a month at most) sends them here: a bill, one day lost and a lower mood. The emergency fund pays first, then cash, then the card |
+| Health insurance | Taken out at the hospital reception, generic (no institution is named). A monthly premium; with it the patient pays a share of the bill instead of all of it |
+| Collectors' car | A black car with tinted windows and loud music patrols the main street now and then. When the player is in arrears (an informal loan, or a card at 90 % of its limit) and ends up in front of it, it stops and offers three choices: pay, negotiate (half now, the rest as a new informal loan with a surcharge) or ignore (late fee and a lower mood) |
+| Car glass | Every other car has see-through glass: a driver shows in a moving car and the seat is empty in a parked one |
+
+All money here moves in `FinanceEngine` (`FinanceEngine.Incidents.cs`) and `GameLoop`, in whole colones. Every amount and
+percentage is in `MarketAssumptions.cs`, marked as illustrative: check them against a real source (courts, the health
+insurer, the financial regulator) before stating any of them as fact.
+
 ## What plays
 
 One run is three months. Each month has three tasks, then the bank closes the month.
