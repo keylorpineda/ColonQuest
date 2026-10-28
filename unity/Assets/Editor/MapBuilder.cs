@@ -410,6 +410,39 @@ namespace ColonQuest.EditorTools
             station.Configure(type, displayName);
         }
 
+        /// <summary>
+        /// An everyday object the player can use: walking next to it shows "[E] <paramref name="prompt"/>"
+        /// and pressing E shows one of its lines. The zone is a little larger than the object so the
+        /// player can reach it even when the object itself is solid.
+        /// </summary>
+        private static Transform BuildThing(Transform parent, string name, string prompt, Vector2 center, Vector2 size, params string[] lines)
+        {
+            var go = new GameObject("Thing_" + name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = center;
+
+            var collider = go.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;
+            collider.size = size + new Vector2(1.2f, 1.2f);
+
+            go.AddComponent<Station>().Configure(StationType.Thing, prompt, lines);
+            return go.transform;
+        }
+
+        /// <summary>A cash machine zone: it shows the account statement.</summary>
+        private static void BuildAtm(Transform parent, string name, Vector2 center)
+        {
+            var go = new GameObject("Atm_" + name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = center;
+
+            var collider = go.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;
+            collider.size = new Vector2(1.8f, 1.8f);
+
+            go.AddComponent<Station>().Configure(StationType.Atm, "Cajero automático");
+        }
+
         private static void BuildSpawnPoint(Transform parent, string id, Vector2 position)
         {
             var go = new GameObject("Spawn_" + id);

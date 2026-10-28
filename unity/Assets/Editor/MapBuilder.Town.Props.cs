@@ -276,6 +276,8 @@ namespace ColonQuest.EditorTools
         private static void Bench(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Bench", new Vector2(x, y), y);
+            BuildThing(root, "Bench", "Sentarte en la banca", Vector2.zero, new Vector2(2.0f, 0.7f),
+                "Te sentás un rato a ver pasar la gente. Pasear por el parque no cuesta nada.");
             GroundShadowRect(shadows, new Vector2(x + 0.08f, y - 0.02f), new Vector2(2.0f, 0.7f), 0.22f);
             Shape(root, "Back_Outline", roundedSmall, new Vector2(0f, 0.62f), new Vector2(2.0f, 0.34f), GamePalette.Outline, 0);
             Shape(root, "Back", roundedSmall, new Vector2(0f, 0.62f), new Vector2(1.86f, 0.2f), GamePalette.Hex("#8B5A3C"), 1);
@@ -301,6 +303,8 @@ namespace ColonQuest.EditorTools
         private static void Car(Transform parent, Transform shadows, float x, float y, string hex)
         {
             var root = Root(parent, "Car", new Vector2(x, y), y - 0.55f);
+            BuildThing(root, "Car", "Ver el carro", Vector2.zero, new Vector2(2.4f, 1.1f),
+                "Un carro no es solo la cuota: marchamo, RTV, seguro, gasolina y mantenimiento, todos los años.");
             GroundShadowRect(shadows, new Vector2(x + 0.12f, y - 0.2f), new Vector2(2.6f, 1.3f), 0.3f);
 
             var body = GamePalette.Hex(hex);
@@ -347,6 +351,8 @@ namespace ColonQuest.EditorTools
         {
             GroundShadow(shadows, center + new Vector2(0.2f, -0.2f), new Vector2(4.2f, 3.2f), 0.25f);
             var root = Root(parent, "Fountain", center, center.y - 1.5f);
+            BuildThing(root, "Fountain", "Ver la fuente", Vector2.zero, new Vector2(3.7f, 3.7f),
+                "Hay monedas en el fondo. Pedir un deseo es gratis; cumplirlo casi siempre empieza por ahorrar.");
 
             Shape(root, "Basin_Outline", circle, Vector2.zero, Vector2.one * 3.7f, GamePalette.Outline, 0);
             Shape(root, "Basin", circle, Vector2.zero, Vector2.one * 3.5f, GamePalette.Hex("#C7CEE0"), 1);

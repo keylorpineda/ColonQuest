@@ -99,12 +99,15 @@ namespace ColonQuest.EditorTools
             {
                 case SceneNames.Casa:
                     BuildHouseLayout(layout, room);
+                    BuildHouseThings(layout);
                     break;
                 case SceneNames.Tienda:
                     BuildStoreLayout(layout, room);
+                    BuildStoreThings(layout);
                     break;
                 default:
                     BuildBankLayout(layout, room);
+                    BuildBankThings(layout);
                     break;
             }
 

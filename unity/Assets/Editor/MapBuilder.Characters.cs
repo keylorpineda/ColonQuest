@@ -92,6 +92,7 @@ namespace ColonQuest.EditorTools
             MakeYSorted(walker, -0.45f);
             BuildCharacterVisual(walker.transform, look, true);
             walker.AddComponent<Patrol>().Configure(from, to, speed, 1.6f);
+            BuildThing(walker.transform, "Talk", "Saludar", Vector2.zero, new Vector2(0.6f, 0.6f), PasserbyLines(name));
             return walker.transform;
         }
 

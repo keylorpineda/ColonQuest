@@ -180,7 +180,8 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return null;
 
-            Assert.AreEqual(7, Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Length, "seven street stations");
+            var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => s.Type != StationType.Thing && s.Type != StationType.Atm);
+            Assert.AreEqual(7, tasks.Count(), "seven street stations; everyday objects are not tasks");
             Assert.AreEqual(3, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "three enterable buildings");
             Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
             Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
