@@ -25,12 +25,18 @@ rules and the same figures (`SellerOffer` mirrors `server/app/negotiation/seller
 
 - Characters are vector people with animated parts, not pixel art.
 - The town has about 100 visual layers, three interiors with their own layers, parallax and ambient motion.
-- New in this stage: cast shadows to the lower right of every building, a fine tiling grain over the
+- Interiors follow real floor plans: the house has a bedroom, bathroom, kitchen and living room behind
+  walls with doorways; the bank has four numbered windows, a closed staff side with the vault, a queue,
+  waiting chairs, offices and ATMs; the store sells exactly the four offers of the seller.
+- Town buildings get details by use (homes: water tank, flower boxes, door number, no shop sign; shops
+  and offices: roof AC units, cameras where money changes hands). Five homes can be reached; two carry
+  "SE VENDE" and "SE ALQUILA" signs, ready for renting, buying and mortgages later.
+- Also: cast shadows to the lower right of every building, a fine tiling grain over the
   colors and a wash of light that goes from warm morning to blue dusk as the run advances (`DayCycle`).
 
 ## Verified
 
-- EditMode 124 of 124 and PlayMode 41 of 41 pass (28 October).
+- EditMode 124 of 124 and PlayMode 45 of 45 pass (28 October).
 - WebGL build succeeds with 0 errors in about 6 minutes. Output is 9.9 MB (wasm 7.7 MB, data 2.1 MB), gzip
   with the fallback loader, so any static host works.
 - Scenes rebuild from code with `Colon Quest > Build All Scenes`.
