@@ -80,6 +80,16 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void PurchaseMessages_SayWhyEachRefusalHappened()
+        {
+            StringAssert.Contains("efectivo", PurchaseMessages.For(PurchaseFailure.NotEnoughCash));
+            StringAssert.Contains("casa", PurchaseMessages.For(PurchaseFailure.AlreadyHasHome));
+            StringAssert.Contains("carro", PurchaseMessages.For(PurchaseFailure.AlreadyHasCar));
+            StringAssert.Contains("cuotas", PurchaseMessages.For(PurchaseFailure.TooManyInstallments));
+            Assert.IsEmpty(PurchaseMessages.For(PurchaseFailure.None));
+        }
+
+        [Test]
         public void Build_AlwaysEndsWithTheWarningAboutTheFigures()
         {
             var holdings = new Holdings();

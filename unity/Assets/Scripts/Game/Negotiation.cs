@@ -24,6 +24,9 @@ namespace ColonQuest.Game
         public int QuestionsTotal;
         public bool AskedAboutTotalCost;
         public bool AskedAboutHiddenFees;
+
+        /// <summary>Why the deal did not go through, when it was refused after the player said yes.</summary>
+        public string Note = string.Empty;
     }
 
     /// <summary>
