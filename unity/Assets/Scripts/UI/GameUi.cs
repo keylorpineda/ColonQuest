@@ -26,6 +26,7 @@ namespace ColonQuest.UI
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
         private PhoneUi phone;
+        private PauseMenu pause;
         private Negotiation spokenNegotiation;
         private int spokenTurns;
 
@@ -63,6 +64,7 @@ namespace ColonQuest.UI
             modal = new ModalPanel(canvas.transform);
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
+            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
@@ -80,6 +82,7 @@ namespace ColonQuest.UI
 
         private void OnDestroy()
         {
+            Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
             if (session != null)
@@ -164,6 +167,8 @@ namespace ColonQuest.UI
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // The overlay lives across scenes, but the main menu has its own screen.
+            canvas.enabled = scene.name != SceneNames.Menu;
             BindStations();
         }
 
@@ -201,6 +206,24 @@ namespace ColonQuest.UI
 
         private void Update()
         {
+            if (!canvas.enabled)
+            {
+                return;
+            }
+
+            if (pause.IsOpen)
+            {
+                PlayerController.Blocked = true;
+                promptCard.SetActive(false);
+                loadingCard.SetActive(false);
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    pause.Back();
+                }
+
+                return;
+            }
+
             if (negotiationPanel.IsOpen)
             {
                 // The seller's window takes the keyboard: the text box needs every key.
@@ -258,6 +281,12 @@ namespace ColonQuest.UI
             if (!session.Busy && Input.GetKeyDown(KeyCode.P))
             {
                 phone.Open();
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                OpenPause();
                 return;
             }
 
@@ -344,6 +373,8 @@ namespace ColonQuest.UI
             modal.Hide();
             phone.Close();
             negotiationPanel.Hide();
+            pause.Hide();
+            Time.timeScale = 1f;
         }
 
         private void OnNegotiationChanged(Negotiation negotiation)
@@ -599,6 +630,36 @@ namespace ColonQuest.UI
                 new ModalOption { Label = "Ver lo que compraste", Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
                 new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
             });
+        }
+
+        /// <summary>True while the pause window or its settings are up.</summary>
+        public bool PauseOpen => pause.IsOpen;
+
+        /// <summary>
+        /// Opens the pause window. Time stops while it is up; the audio and the window run on unscaled time.
+        /// Nothing happens while the game master is answering.
+        /// </summary>
+        public void OpenPause()
+        {
+            if (session.Busy || pause.IsOpen)
+            {
+                return;
+            }
+
+            Time.timeScale = 0f;
+            pause.Open();
+        }
+
+        private void ResumeFromPause()
+        {
+            Time.timeScale = 1f;
+        }
+
+        private void GoToMenu()
+        {
+            Time.timeScale = 1f;
+            PlayerController.Blocked = false;
+            SceneManager.LoadScene(SceneNames.Menu);
         }
 
         private void Restart()
