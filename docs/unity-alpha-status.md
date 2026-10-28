@@ -13,6 +13,9 @@ One run is three months. Each month has three tasks, then the bank closes the mo
 | Store | Negotiation with the seller (text). Buying adds the installment with insurance and charges the opening commission |
 | Bank | Closes the month: salary, installments, card cycle, interest, living expenses |
 | Home | Account statement |
+| Real estate agency (north district) and the house signs | Four houses to rent or buy. Rent is a 12 month installment with a deposit; buying needs a down payment, closing costs and a mortgage at the longest term the installment contract allows (120 months). The window shows the real total and the share of the salary. Not a task of the month |
+| Car agency (north district) | Negotiation with the seller about a car with a down payment (`prima`). The seller is the local one: the offers are client only and never reach the backend. Buying charges the first marchamo; fuel and upkeep are charged every month. Not a task |
+| Farm (east district) | Coffee or cattle. The stake leaves the cash now and does not come back during the run. The end of the run shows a projection at real time with a bad, a normal and a good scenario. Not a task |
 
 The store rotates four offers (phone, TV, fridge, motorbike). The seller keeps a hidden sheet with the true
 figures; the player only learns them by asking. Asking about total cost, hidden fees, interest, term, cash
@@ -20,6 +23,17 @@ price and insurance feeds the `keyQuestionsAsked` impact metric, and the backend
 
 If the backend answers, its seller replies. If it does not, `LocalSeller` answers with the same scripted
 rules and the same figures (`SellerOffer` mirrors `server/app/negotiation/seller_sheet.py`).
+
+## The districts
+
+The playable area is about twice the original town. The streets of the town run on to the east, a dirt path
+leads from the first street to a new avenue in the north, and both districts end in rock faces like the rest of
+the map. Scene sizes and positions are in `MapLayout`; the districts are built by `MapBuilder.Districts*.cs`.
+
+All prices, rates and percentages of homes, cars and the farm are in one file, `MarketAssumptions.cs`. They are
+illustrative and must be checked against a real source before any of them is stated as a fact; the game shows
+them with a warning. Money for these purchases moves only in `FinanceEngine` (`Holdings`, `FinanceEngine.Housing`,
+`FinanceEngine.Vehicle`, `FinanceEngine.Farm`).
 
 ## The look
 
@@ -43,6 +57,9 @@ rules and the same figures (`SellerOffer` mirrors `server/app/negotiation/seller
 
 ## Not verified
 
+- The north and east districts: the code was written without compiling or running anything, and the scenes
+  have not been regenerated yet. Nobody has looked at the new windows (agencies, farm, end report) or at the
+  districts on screen.
 - Nobody has looked at the new lighting, shadows or the negotiation window on screen. Batch captures hang,
   so a person has to open `Assets/Scenes/Town.unity` and judge them. The amounts are constants in
   `MapBuilder.Realism.cs` and `DayCycle.cs`.
