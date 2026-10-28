@@ -31,6 +31,7 @@ namespace ColonQuest.World
         private AudioSource carSource;
         private AudioSource birdSource;
         private AudioSource voiceSource;
+        private AudioSource collectorSource;
 
         private Transform player;
         private float nextCar = 6f;
@@ -114,6 +115,8 @@ namespace ColonQuest.World
             carSource = Source("Cars", false);
             birdSource = Source("Birds", false);
             voiceSource = Source("Voice", false);
+            collectorSource = Source("CollectorMusic", true);
+            collectorSource.pitch = 0.82f;
             StartCoroutine(Prepare());
         }
 
@@ -171,6 +174,8 @@ namespace ColonQuest.World
             Play(music[MusicTrack.Bank], ProceduralSound.Music(MusicTrack.Bank));
             yield return null;
             Play(music[MusicTrack.House], ProceduralSound.Music(MusicTrack.House));
+            yield return null;
+            Play(collectorSource, ProceduralSound.Music(MusicTrack.Store));
         }
 
         private static void Play(AudioSource source, AudioClip clip)
@@ -193,12 +198,26 @@ namespace ColonQuest.World
             Fade(crowd, levels.Crowd * scale, step);
             Fade(sea, levels.Sea * scale, step);
             Fade(river, levels.River * scale, step);
+            Fade(collectorSource, CollectorLevel() * scale, step);
 
             if (!muted)
             {
                 Traffic(levels.Traffic, Time.unscaledDeltaTime);
                 Birds(levels.Birds, Time.unscaledDeltaTime);
             }
+        }
+
+        /// <summary>The music of the collectors' car, louder as it comes close to the player. Silent when it is out of sight.</summary>
+        private float CollectorLevel()
+        {
+            var car = CollectorCar.Instance;
+            if (car == null || !car.IsVisible)
+            {
+                return 0f;
+            }
+
+            float distance = Vector2.Distance(car.transform.position, PlayerPosition());
+            return 0.5f * Mathf.Clamp01(1f - distance / 16f);
         }
 
         private static void Fade(AudioSource source, float target, float step)

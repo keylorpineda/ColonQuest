@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,17 @@ namespace ColonQuest.World
         private static readonly List<TrafficCar> all = new List<TrafficCar>();
 
         public static IReadOnlyList<TrafficCar> All => all;
+
+        /// <summary>Raised when a moving car runs into the player. The overlay decides what that costs.</summary>
+        public static event Action PlayerHit;
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.collider.CompareTag(Station.PlayerTag))
+            {
+                PlayerHit?.Invoke();
+            }
+        }
 
         private void OnEnable()
         {
