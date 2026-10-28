@@ -157,7 +157,8 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheNewInvisibleWallInTheNorth()
         {
-            yield return Walk(new Vector2(22f, 36f), Vector2.up, 3f);
+            // Between the real estate agency and the car agency: the hospital now stands where this walk used to start.
+            yield return Walk(new Vector2(-4f, 36f), Vector2.up, 3f);
 
             Assert.Less(Body.position.y, MapLayout.PlayNorthY + 0.1f);
             Assert.Greater(Body.position.y, MapLayout.PlayNorthY - 1.5f, "it reached the wall");
