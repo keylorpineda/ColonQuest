@@ -1,4 +1,5 @@
 using ColonQuest.Game;
+using ColonQuest.World;
 using UnityEngine;
 
 namespace ColonQuest.UI
@@ -13,6 +14,7 @@ namespace ColonQuest.UI
 
         private void Awake()
         {
+            AudioDirector.EnsureCreated();
             var session = GameSession.Create();
             if (ui == null)
             {

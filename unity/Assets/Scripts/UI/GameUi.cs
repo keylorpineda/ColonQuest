@@ -26,6 +26,8 @@ namespace ColonQuest.UI
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
         private bool phoneOpen;
+        private Negotiation spokenNegotiation;
+        private int spokenTurns;
         private int phoneOpenings;
 
         private Text monthText;
@@ -323,6 +325,29 @@ namespace ColonQuest.UI
         private void OnNegotiationChanged(Negotiation negotiation)
         {
             negotiationPanel.Refresh();
+            SpeakSeller(negotiation);
+        }
+
+        /// <summary>The seller babbles once for each new line: the greeting first, then every answer.</summary>
+        private void SpeakSeller(Negotiation negotiation)
+        {
+            if (negotiation == null)
+            {
+                return;
+            }
+
+            if (negotiation != spokenNegotiation)
+            {
+                spokenNegotiation = negotiation;
+                spokenTurns = 0;
+                AudioDirector.Talk(negotiation.Opening, "vendedor");
+            }
+
+            if (negotiation.Turns.Count > spokenTurns)
+            {
+                spokenTurns = negotiation.Turns.Count;
+                AudioDirector.Talk(negotiation.Turns[spokenTurns - 1].Seller, "vendedor");
+            }
         }
 
         private void Refresh()
@@ -361,6 +386,7 @@ namespace ColonQuest.UI
                 who = (who.Length > 0 ? who + "  ·  " : string.Empty) + "evento local";
             }
 
+            AudioDirector.Talk(gameEvent.Narrative, gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
             modal.Show(gameEvent.Title, who, gameEvent.Narrative, options);
         }
 
@@ -476,6 +502,7 @@ namespace ColonQuest.UI
             thingUses.TryGetValue(key, out int uses);
             thingUses[key] = uses + 1;
             string line = ThingLines.Pick(station.Lines, uses, session.State);
+            AudioDirector.Talk(line, station.DisplayName);
             modal.Show(station.DisplayName, null, line, new[] { Continue(null) });
         }
 
