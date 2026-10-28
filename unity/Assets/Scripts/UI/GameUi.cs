@@ -45,12 +45,20 @@ namespace ColonQuest.UI
 
         private readonly List<Station> inside = new List<Station>();
 
+        private static GameUi current;
+
         public static GameUi Create(GameSession gameSession)
         {
+            if (current != null)
+            {
+                return current;
+            }
+
             var go = new GameObject("GameUi");
             DontDestroyOnLoad(go);
             var ui = go.AddComponent<GameUi>();
             ui.Bind(gameSession);
+            current = ui;
             return ui;
         }
 
@@ -65,6 +73,7 @@ namespace ColonQuest.UI
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
+            BuildIncidents();
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
@@ -82,6 +91,12 @@ namespace ColonQuest.UI
 
         private void OnDestroy()
         {
+            if (current == this)
+            {
+                current = null;
+            }
+
+            ReleaseIncidents();
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -211,6 +226,8 @@ namespace ColonQuest.UI
                 return;
             }
 
+            TickIncidents();
+
             if (pause.IsOpen)
             {
                 PlayerController.Blocked = true;
@@ -319,6 +336,7 @@ namespace ColonQuest.UI
                 case StationType.RealEstate:
                 case StationType.CarDealer:
                 case StationType.Farm:
+                case StationType.HealthDesk:
                     return "[E]  " + station.DisplayName;
                 default:
                     if (loop.CanDoTask(station.Type))
@@ -355,6 +373,9 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Farm:
                     ShowFarm();
+                    break;
+                case StationType.HealthDesk:
+                    ShowHealthDesk();
                     break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
