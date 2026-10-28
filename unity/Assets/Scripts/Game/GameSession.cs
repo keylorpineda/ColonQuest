@@ -25,6 +25,16 @@ namespace ColonQuest.Game
         public StationType CurrentStation { get; private set; }
         public SessionSummary Summary { get; private set; }
 
+        private const int MaxNegotiationText = 300;
+
+        /// <summary>The conversation at the store, or null when there is none.</summary>
+        public Negotiation CurrentNegotiation { get; private set; }
+
+        /// <summary>What the last deal cost and how well the player asked; shown with the result.</summary>
+        public DealReport LastDeal { get; private set; }
+
+        public event Action<Negotiation> NegotiationStarted;
+        public event Action<Negotiation> NegotiationUpdated;
         public event Action Changed;
         public event Action NewGameStarted;
         public event Action<GameEvent, ResultSource> EventReady;
@@ -65,6 +75,8 @@ namespace ColonQuest.Game
             Loop.NewGame();
             Busy = false;
             CurrentEvent = null;
+            CurrentNegotiation = null;
+            LastDeal = null;
             Summary = null;
 
             // The session id arrives in a moment; until then every event would come from the local catalog.
@@ -90,6 +102,7 @@ namespace ColonQuest.Game
 
             Busy = true;
             CurrentStation = station;
+            LastDeal = null;
             Changed?.Invoke();
             ApiClient.Instance.RequestEvent(State.Clone(), result =>
             {
@@ -135,6 +148,93 @@ namespace ColonQuest.Game
 
             ChoiceApplied?.Invoke(outcome);
             Changed?.Invoke();
+        }
+
+        // ---------------------------------------------------------------- negotiation
+
+        /// <summary>Opens the seller's counter at the store. The panel listens to <see cref="NegotiationStarted"/>.</summary>
+        public void BeginNegotiation()
+        {
+            if (Busy || CurrentNegotiation != null || !Loop.CanDoTask(StationType.Store))
+            {
+                return;
+            }
+
+            CurrentStation = StationType.Store;
+            LastDeal = null;
+            CurrentNegotiation = new Negotiation(SellerOffer.ForMonth(Loop.MonthsPlayed));
+            NegotiationStarted?.Invoke(CurrentNegotiation);
+        }
+
+        /// <summary>
+        /// One turn typed by the player. The backend seller answers; when it cannot, the local seller
+        /// does, so the conversation never stops.
+        /// </summary>
+        public void SendNegotiation(string text)
+        {
+            var negotiation = CurrentNegotiation;
+            text = text == null ? string.Empty : text.Trim();
+            if (negotiation == null || negotiation.IsClosed || Busy || text.Length == 0)
+            {
+                return;
+            }
+
+            if (text.Length > MaxNegotiationText)
+            {
+                text = text.Substring(0, MaxNegotiationText);
+            }
+
+            Busy = true;
+            Changed?.Invoke();
+            ApiClient.Instance.SendNegotiationText(negotiation.Offer.OfferId, text, result =>
+            {
+                Busy = false;
+                if (CurrentNegotiation == negotiation)
+                {
+                    bool local = !result.Ok;
+                    var reply = local ? LocalSeller.Reply(negotiation.Offer, text) : result.Value;
+                    negotiation.Record(text, reply, local);
+                    NegotiationUpdated?.Invoke(negotiation);
+                }
+
+                Changed?.Invoke();
+            });
+        }
+
+        /// <summary>The player buys, from the button or because the seller closed the deal on the typed words.</summary>
+        public void AcceptDeal()
+        {
+            ConcludeNegotiation(true);
+        }
+
+        /// <summary>The player leaves without buying.</summary>
+        public void WalkAway()
+        {
+            ConcludeNegotiation(false);
+        }
+
+        /// <summary>Ends the conversation following how it closed (accepted means bought).</summary>
+        public void FinishNegotiation()
+        {
+            if (CurrentNegotiation != null)
+            {
+                ConcludeNegotiation(CurrentNegotiation.Status == DealStatus.Accepted);
+            }
+        }
+
+        private void ConcludeNegotiation(bool buy)
+        {
+            var negotiation = CurrentNegotiation;
+            if (negotiation == null || Busy)
+            {
+                return;
+            }
+
+            negotiation.Close(buy ? DealStatus.Accepted : DealStatus.WalkedAway);
+            CurrentNegotiation = null;
+            CurrentEvent = negotiation.ToEvent();
+            LastDeal = negotiation.Report(buy);
+            Choose(buy ? Negotiation.BuyChoice : Negotiation.SkipChoice);
         }
 
         public void CloseMonth()
