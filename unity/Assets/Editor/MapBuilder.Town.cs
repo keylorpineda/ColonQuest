@@ -38,6 +38,7 @@ namespace ColonQuest.EditorTools
             BuildPlazaAndPark(Group(map, "Landmarks"), shadows);
             BuildAlleyAndLot(Group(map, "AlleyAndLot"), shadows);
             BuildWorldProps(Group(map, "WorldProps"), shadows, random);
+            BuildDistricts(map, shadows);
             BuildWorldBorders(Group(map, "Borders"));
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));

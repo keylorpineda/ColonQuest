@@ -43,15 +43,15 @@ namespace ColonQuest.EditorTools
 
             var haze = GamePalette.Hex("#BFD9EE");
             const float bottom = -4f;
-            const float top = 34f;
-            const int bands = 38;
+            const float top = 34f + MapLayout.NorthShift;
+            const int bands = 63;
             float step = (top - bottom) / bands;
             for (int i = 0; i < bands; i++)
             {
                 float t = (i + 1f) / bands;
                 var color = haze;
                 color.a = 0.24f * t * t;
-                Shape(parent, "Haze", square, new Vector2(0f, bottom + step * (i + 0.5f)), new Vector2(100f, step + 0.02f), color, 3);
+                Shape(parent, "Haze", square, new Vector2(MapLayout.TownBounds.center.x, bottom + step * (i + 0.5f)), new Vector2(MapLayout.TownBounds.width + 20f, step + 0.02f), color, 3);
             }
 
             currentLayer = previous;

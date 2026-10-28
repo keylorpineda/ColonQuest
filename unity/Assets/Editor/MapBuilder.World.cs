@@ -17,6 +17,10 @@ namespace ColonQuest.EditorTools
         private const int WorldRiverFoam = 8;
         private const int WorldCliff = 20;
 
+        // Where the north avenue's north sidewalk ends (the buildings stand on it) and the waterfall's pool.
+        private const float NorthSidewalkY = 33f;
+        private const float PoolY = 21.2f + MapLayout.NorthShift;
+
         private static readonly Color SeaColor = GamePalette.Hex("#4FB6E0");
         private static readonly Color SandColor = GamePalette.Hex("#F2DFA9");
         private static readonly Color CliffFace = GamePalette.Hex("#8C7B6E");
@@ -45,6 +49,15 @@ namespace ColonQuest.EditorTools
         {
             var p = new Vector2(x, y);
             foreach (var area in PavedAreas)
+            {
+                var grown = new Rect(area.xMin - margin, area.yMin - margin, area.width + margin * 2f, area.height + margin * 2f);
+                if (grown.Contains(p))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var area in DistrictPavedAreas)
             {
                 var grown = new Rect(area.xMin - margin, area.yMin - margin, area.width + margin * 2f, area.height + margin * 2f);
                 if (grown.Contains(p))
@@ -96,14 +109,14 @@ namespace ColonQuest.EditorTools
         private static void BuildSouthGround(Transform parent, System.Random random)
         {
             // Sand, a darker wet strip along the water, then the sea on top of both.
-            Shape(parent, "Sand", rounded, new Vector2(9.5f, -23.1f), new Vector2(73f, 8.2f), SandColor, WorldSand);
+            Shape(parent, "Sand", rounded, new Vector2(20.5f, -23.1f), new Vector2(95f, 8.2f), SandColor, WorldSand);
             var wet = GamePalette.Shade(SandColor, 0.9f);
-            Shape(parent, "WetSand", rounded, new Vector2(9.5f, -26.6f), new Vector2(73f, 1.2f), wet, WorldSand + 1);
-            Shape(parent, "Sea", rounded, new Vector2(0f, -31f), new Vector2(98f, 7.2f), SeaColor, WorldSea);
+            Shape(parent, "WetSand", rounded, new Vector2(20.5f, -26.6f), new Vector2(95f, 1.2f), wet, WorldSand + 1);
+            Shape(parent, "Sea", rounded, new Vector2(15.5f, -31f), new Vector2(129f, 7.2f), SeaColor, WorldSea);
 
             var foam = GamePalette.White;
             foam.a = 0.7f;
-            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(0f, -27.45f), new Vector2(92f, 0.4f), foam, WorldFoam);
+            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(13f, -27.45f), new Vector2(118f, 0.4f), foam, WorldFoam);
             for (int i = 0; i < 16; i++)
             {
                 float x = -42f + i * 5.6f + (float)random.NextDouble() * 2f;
@@ -129,9 +142,9 @@ namespace ColonQuest.EditorTools
             }
 
             // Boardwalk between the street and the sand.
-            Shape(parent, "Boardwalk_Outline", rounded, new Vector2(8.25f, -18.3f), new Vector2(70.5f, 1.5f), GamePalette.Outline, 8);
-            Shape(parent, "Boardwalk", rounded, new Vector2(8.25f, -18.3f), new Vector2(70.3f, 1.3f), WoodColor, 9);
-            for (float x = -25f; x < 43f; x += 1.9f)
+            Shape(parent, "Boardwalk_Outline", rounded, new Vector2(20.5f, -18.3f), new Vector2(95f, 1.5f), GamePalette.Outline, 8);
+            Shape(parent, "Boardwalk", rounded, new Vector2(20.5f, -18.3f), new Vector2(94.8f, 1.3f), WoodColor, 9);
+            for (float x = -25f; x < 67f; x += 1.9f)
             {
                 Shape(parent, "Plank", square, new Vector2(x, -18.3f), new Vector2(0.05f, 1.2f), WoodDark, 10);
             }
@@ -150,7 +163,7 @@ namespace ColonQuest.EditorTools
         {
             float x = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float width = MapLayout.RiverXMax - MapLayout.RiverXMin;
-            float top = MapLayout.NorthEdgeY + 0.2f;
+            float top = MapLayout.WorldNorthEdgeY + 0.2f;
             float bottom = -28.6f;
             var center = new Vector2(x, (top + bottom) * 0.5f);
 
@@ -159,7 +172,7 @@ namespace ColonQuest.EditorTools
 
             var ripple = GamePalette.White;
             ripple.a = 0.5f;
-            foreach (float y in new[] { 10f, 14.5f, 18f, 21f, -5f, -20f, -24f })
+            foreach (float y in new[] { 10f, 14.5f, 18f, 21f, 27f, 35f, 38f, 44f, -5f, -20f, -24f })
             {
                 Flickering(Shape(parent, "River_Ripple", ring, new Vector2(x + (y % 2f - 1f) * 0.5f, y), new Vector2(1.2f, 0.45f), ripple, WorldRiverFoam), 0.5f, 1.1f, y);
             }
@@ -167,12 +180,13 @@ namespace ColonQuest.EditorTools
             // Two bridges, on the streets: railings and posts on the street edges.
             Bridge(parent, x, 6f, -2f);
             Bridge(parent, x, -8f, -16f);
+            Bridge(parent, x, NorthSidewalkY, 24f);
 
-            // Plunge pool under the waterfall.
-            Shape(parent, "Pool_Outline", rounded, new Vector2(20.3f, 21.2f), new Vector2(5.8f, 2.6f), GamePalette.Outline, 5);
-            Shape(parent, "Pool", rounded, new Vector2(20.3f, 21.2f), new Vector2(5.5f, 2.3f), SeaColor, 6);
-            Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(19.4f, 21.2f), new Vector2(1.5f, 0.7f), ripple, 7), 0.5f, 1.3f, 3f);
-            Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(21.6f, 21.0f), new Vector2(1.1f, 0.55f), ripple, 7), 0.5f, 1.7f, 8f);
+            // Plunge pool under the waterfall, at the foot of the cliff.
+            Shape(parent, "Pool_Outline", rounded, new Vector2(20.3f, PoolY), new Vector2(5.8f, 2.6f), GamePalette.Outline, 5);
+            Shape(parent, "Pool", rounded, new Vector2(20.3f, PoolY), new Vector2(5.5f, 2.3f), SeaColor, 6);
+            Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(19.4f, PoolY), new Vector2(1.5f, 0.7f), ripple, 7), 0.5f, 1.3f, 3f);
+            Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(21.6f, PoolY - 0.2f), new Vector2(1.1f, 0.55f), ripple, 7), 0.5f, 1.7f, 8f);
         }
 
         private static void Bridge(Transform parent, float x, float yNorth, float ySouth)
@@ -190,40 +204,46 @@ namespace ColonQuest.EditorTools
 
         private static void BuildNorthGround(Transform parent, System.Random random)
         {
+            // Everything here was drawn for the original town; the group moves it north of the new district.
+            var north = Group(parent, "NorthMass");
+            north.localPosition = new Vector3(0f, MapLayout.NorthShift, 0f);
+
             // Far mountains, then the volcano, behind the cliff face.
             var farBlue = GamePalette.Hex("#7C8FB0");
             var nearBlue = GamePalette.Hex("#8DA0C0");
-            Mountain(parent, -36f, 22f, 4.4f, farBlue);
-            Mountain(parent, -12f, 18f, 3.8f, nearBlue);
-            Mountain(parent, 38f, 20f, 4.3f, farBlue);
-            Mountain(parent, 20f, 14f, 3.2f, nearBlue);
+            Mountain(north, -36f, 22f, 4.4f, farBlue);
+            Mountain(north, -12f, 18f, 3.8f, nearBlue);
+            Mountain(north, 38f, 20f, 4.3f, farBlue);
+            Mountain(north, 20f, 14f, 3.2f, nearBlue);
+            Mountain(north, 54f, 18f, 3.7f, nearBlue);
+            Mountain(north, 68f, 14f, 3.1f, farBlue);
 
             var volcano = GamePalette.Hex("#6E5A66");
-            var cone = Shape(parent, "Volcano_Outline", square, new Vector2(-2f, 27.5f), Vector2.one * 6.5f, GamePalette.Outline, WorldSand + 1);
+            var cone = Shape(north, "Volcano_Outline", square, new Vector2(-2f, 27.5f), Vector2.one * 6.5f, GamePalette.Outline, WorldSand + 1);
             Tilt(cone, 45f);
-            var body = Shape(parent, "Volcano", square, new Vector2(-2f, 27.5f), Vector2.one * 6.2f, volcano, WorldSand + 2);
+            var body = Shape(north, "Volcano", square, new Vector2(-2f, 27.5f), Vector2.one * 6.2f, volcano, WorldSand + 2);
             Tilt(body, 45f);
 
             var lava = GamePalette.Hex("#FF7A3D");
-            Shape(parent, "Crater", circle, new Vector2(-2f, 31.55f), new Vector2(1.5f, 0.5f), lava, WorldSand + 3);
-            Flickering(Glow(parent, "Lava_Glow", new Vector2(-2f, 31.3f), 4.2f, "#FF7A3D", 0.4f, WorldSand + 3), 0.3f, 1.2f, 2f);
+            Shape(north, "Crater", circle, new Vector2(-2f, 31.55f), new Vector2(1.5f, 0.5f), lava, WorldSand + 3);
+            Flickering(Glow(north, "Lava_Glow", new Vector2(-2f, 31.3f), 4.2f, "#FF7A3D", 0.4f, WorldSand + 3), 0.3f, 1.2f, 2f);
             foreach (var streak in new[] { new Vector2(-2.4f, 30.1f), new Vector2(-1.5f, 29.2f), new Vector2(-2.1f, 28.3f) })
             {
-                Tilt(Shape(parent, "Lava_Streak", roundedSmall, streak, new Vector2(0.18f, 1.2f), lava, WorldSand + 3), streak.x < -2f ? 42f : -42f);
+                Tilt(Shape(north, "Lava_Streak", roundedSmall, streak, new Vector2(0.18f, 1.2f), lava, WorldSand + 3), streak.x < -2f ? 42f : -42f);
             }
 
             // The cliff the world stops at, with a waterfall down its face.
-            CliffBlock(parent, new Rect(-46f, MapLayout.NorthEdgeY, 92f, 5.5f), 0, random);
+            CliffBlock(north, new Rect(-46f, MapLayout.NorthEdgeY, MapLayout.TownBounds.width, 5.5f), 0, random);
 
             var water = GamePalette.Hex("#BFE6F7");
             for (int i = 0; i < 3; i++)
             {
-                Flickering(Shape(parent, "Waterfall", roundedSmall, new Vector2(19.3f + i * 1.0f, 25.4f), new Vector2(0.62f, 5.2f), water, WorldCliff + 6), 0.25f, 1.6f + i * 0.4f, i * 3f);
+                Flickering(Shape(north, "Waterfall", roundedSmall, new Vector2(19.3f + i * 1.0f, 25.4f), new Vector2(0.62f, 5.2f), water, WorldCliff + 6), 0.25f, 1.6f + i * 0.4f, i * 3f);
             }
 
             var mist = GamePalette.White;
             mist.a = 0.55f;
-            Flickering(Shape(parent, "Waterfall_Mist", softCircle, new Vector2(20.3f, 22.9f), new Vector2(4.6f, 1.8f), mist, WorldCliff + 7), 0.3f, 1.1f, 6f);
+            Flickering(Shape(north, "Waterfall_Mist", softCircle, new Vector2(20.3f, 22.9f), new Vector2(4.6f, 1.8f), mist, WorldCliff + 7), 0.3f, 1.1f, 6f);
         }
 
         /// <summary>A rounded hill-like mountain with a snowy top. Half is hidden behind the cliff.</summary>
@@ -310,15 +330,15 @@ namespace ColonQuest.EditorTools
         /// <summary>Invisible colliders lined up with the water, the river and the rock faces.</summary>
         private static void BuildWorldBorders(Transform parent)
         {
-            float width = MapLayout.TownBounds.width;
-            Wall(parent, "North_Wall", new Vector2(0f, MapLayout.PlayNorthY + 0.5f), new Vector2(width, 1f));
-            Wall(parent, "West_Wall", new Vector2(MapLayout.PlayWestX - 0.5f, -1f), new Vector2(1f, 66f));
-            Wall(parent, "East_Wall", new Vector2(MapLayout.PlayEastX + 0.5f, -1f), new Vector2(1f, 66f));
+            var bounds = MapLayout.TownBounds;
+            Wall(parent, "North_Wall", new Vector2(bounds.center.x, MapLayout.PlayNorthY + 0.5f), new Vector2(bounds.width, 1f));
+            Wall(parent, "West_Wall", new Vector2(MapLayout.PlayWestX - 0.5f, bounds.center.y), new Vector2(1f, bounds.height));
+            Wall(parent, "East_Wall", new Vector2(MapLayout.PlayEastX + 0.5f, bounds.center.y), new Vector2(1f, bounds.height));
 
             // The sea stops the player at the shore, except along the pier.
             float shore = MapLayout.ShoreY;
             Wall(parent, "Sea_West", new Vector2((-46f + MapLayout.PierXMin - 0.5f) * 0.5f, shore - 0.5f), new Vector2(46f + MapLayout.PierXMin - 0.5f, 1f));
-            Wall(parent, "Sea_East", new Vector2((MapLayout.PierXMax + 0.5f + 46f) * 0.5f, shore - 0.5f), new Vector2(46f - MapLayout.PierXMax - 0.5f, 1f));
+            Wall(parent, "Sea_East", new Vector2((MapLayout.PierXMax + 0.5f + bounds.xMax) * 0.5f, shore - 0.5f), new Vector2(bounds.xMax - MapLayout.PierXMax - 0.5f, 1f));
             Wall(parent, "Pier_West", new Vector2(MapLayout.PierXMin - 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
@@ -326,11 +346,12 @@ namespace ColonQuest.EditorTools
             // The river, with a gap for each bridge.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
-            RiverWall(parent, riverX, riverWidth, 6f, MapLayout.NorthEdgeY);
+            RiverWall(parent, riverX, riverWidth, 6f, 24f);
+            RiverWall(parent, riverX, riverWidth, NorthSidewalkY, MapLayout.WorldNorthEdgeY);
             RiverWall(parent, riverX, riverWidth, -8f, -2f);
             RiverWall(parent, riverX, riverWidth, shore, -16f);
 
-            Wall(parent, "Pool", new Vector2(20.3f, 21.2f), new Vector2(5.2f, 2.0f));
+            Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
         }
 
         private static void RiverWall(Transform parent, float x, float width, float yMin, float yMax)
@@ -408,7 +429,8 @@ namespace ColonQuest.EditorTools
             bool pool = x > 16.5f && x < 24.5f && y > 18f;
             bool river = x > MapLayout.RiverXMin - 1f && x < MapLayout.RiverXMax + 1f;
             bool coffee = x > 31.5f;
-            return trail || lookout || pool || river || coffee;
+            bool northPath = Mathf.Abs(x - MapLayout.NorthPathX) < 2.2f;
+            return trail || lookout || pool || river || coffee || northPath;
         }
 
         private static void Lookout(Transform parent, Transform shadows)

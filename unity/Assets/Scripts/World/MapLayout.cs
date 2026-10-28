@@ -31,19 +31,31 @@ namespace ColonQuest.World
     /// <summary>Sizes shared by the map builder and the tests.</summary>
     public static class MapLayout
     {
-        /// <summary>Everything the camera may show in the town.</summary>
-        public static readonly Rect TownBounds = new Rect(-46f, -34f, 92f, 66f);
+        /// <summary>
+        /// Everything the camera may show in the town: the original town plus the north and east districts, which
+        /// bring the playable area to about twice its first size.
+        /// </summary>
+        public static readonly Rect TownBounds = new Rect(-46f, -34f, 118f, 91f);
 
-        // Where the rock face and the sea are drawn; the player is stopped well before them.
+        // Where the rock face was first drawn, north of the original town. The cliff, the mountains and the
+        // waterfall are built from this line and moved up by NorthShift, so the north district fits below them.
         public const float NorthEdgeY = 23f;
+
+        public const float NorthShift = 25f;
+
+        /// <summary>Where the rock face and the sea are drawn now; the player is stopped well before them.</summary>
+        public const float WorldNorthEdgeY = NorthEdgeY + NorthShift;
+
+        /// <summary>The east side ends in a rock face between this line and <see cref="TownBounds"/>.</summary>
+        public const float EastCliffX = 67.5f;
 
         /// <summary>
         /// Where the invisible walls stand. The world goes on past them (roads, trees, river, sea), so the
         /// player sees there is more but cannot get to it.
         /// </summary>
         public const float PlayWestX = -44.5f;
-        public const float PlayEastX = 40f;
-        public const float PlayNorthY = 17f;
+        public const float PlayEastX = 64f;
+        public const float PlayNorthY = 42f;
 
         public const float ShoreY = -27.2f;
 
@@ -52,6 +64,10 @@ namespace ColonQuest.World
         public const float RiverXMax = 31f;
         public const float PierXMin = 4f;
         public const float PierXMax = 7.2f;
+
+        // The north district: an avenue runs east to west and a dirt path joins it to the first street.
+        public const float AvenueY = 28f;
+        public const float NorthPathX = 26.3f;
 
         public const float TownCameraSize = 4.6f;
         public const float InteriorCameraSize = 3.9f;
