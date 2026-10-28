@@ -124,6 +124,32 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Vendor_TalksOnlyWhenThePlayerIsClose()
+        {
+            var vendor = GameObject.Find("Vendedor").GetComponentInChildren<PlayerAnimator>();
+            Assert.IsTrue(vendor.HasRig, "the vendor is a person with moving parts");
+
+            Teleport(new Vector2(-6f, -3f));
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsFalse(vendor.Talking);
+
+            Teleport((Vector2)vendor.transform.position + new Vector2(0f, -1.5f));
+            yield return new WaitForSeconds(0.4f);
+            Assert.IsTrue(vendor.Talking);
+        }
+
+        [UnityTest]
+        public IEnumerator Vendor_GreetsThePlayerWhoComesClose()
+        {
+            var vendor = GameObject.Find("Vendedor").GetComponentInChildren<PlayerAnimator>();
+
+            Teleport((Vector2)vendor.transform.position + new Vector2(0f, -1.5f));
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsTrue(vendor.IsWaving);
+        }
+
+        [UnityTest]
         public IEnumerator Station_FiresWhenThePlayerWalksIn()
         {
             var station = GameObject.Find("Station_Store").GetComponent<Station>();

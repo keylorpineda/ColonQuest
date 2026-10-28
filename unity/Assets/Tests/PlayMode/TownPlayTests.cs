@@ -80,6 +80,29 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Player_LegsSwingWhileWalking()
+        {
+            var animator = Body.GetComponentInChildren<PlayerAnimator>();
+            Assert.IsTrue(animator.HasRig, "the player is a person with moving parts");
+            var leg = animator.transform.Find("Visual/LegL");
+
+            // Open ground on the avenue, so nothing stops the walk.
+            Teleport(new Vector2(0f, -6f));
+            yield return new WaitForFixedUpdate();
+            Body.linearVelocity = MovementMath.Velocity(Vector2.right, 4.5f);
+
+            float widest = 0f;
+            for (float t = 0f; t < 0.8f; t += Time.deltaTime)
+            {
+                widest = Mathf.Max(widest, Quaternion.Angle(leg.localRotation, Quaternion.identity));
+                yield return null;
+            }
+
+            Body.linearVelocity = Vector2.zero;
+            Assert.Greater(widest, 10f);
+        }
+
+        [UnityTest]
         public IEnumerator Player_IsBlockedByABuildingFacade()
         {
             // x = -17.5 is on the Casa facade, away from its door at -19.5.
