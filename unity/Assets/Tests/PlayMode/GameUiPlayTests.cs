@@ -86,6 +86,62 @@ namespace ColonQuest.World.PlayModeTests
                 "the decision changed the numbers");
         }
 
+        private static bool NegotiationOpen => Ui.Find("Negotiation").gameObject.activeSelf;
+
+        [UnityTest]
+        public IEnumerator Negotiation_OffRunTheLocalSellerAnswersAndRevealsOnlyWhatIsAsked()
+        {
+            yield return StartOfflineRun();
+
+            Session.BeginNegotiation();
+            yield return null;
+            Assert.IsTrue(NegotiationOpen, "the seller's window opens");
+            Assert.IsTrue(PlayerController.Blocked || Session.CurrentNegotiation != null);
+
+            Session.SendNegotiation("Cuanto pago en total?");
+            yield return new WaitForSeconds(0.4f);
+
+            var negotiation = Session.CurrentNegotiation;
+            Assert.AreEqual(1, negotiation.Turns.Count);
+            Assert.IsTrue(negotiation.Turns[0].FromLocalSeller, "offline, so the local seller answers");
+            StringAssert.Contains(negotiation.Offer.Describe(SellerFact.TotalCost), negotiation.Turns[0].Seller);
+            Assert.AreEqual(1, negotiation.KeyQuestionsAsked.Count);
+            Assert.AreEqual(0, Session.Loop.TasksDone, "talking is not buying");
+        }
+
+        [UnityTest]
+        public IEnumerator Negotiation_BuyingAddsTheInstallmentAndCountsTheTask()
+        {
+            yield return StartOfflineRun();
+            long installmentsBefore = GameRules.MonthlyInstallments(Session.State);
+
+            Session.BeginNegotiation();
+            var offer = Session.CurrentNegotiation.Offer;
+            Session.AcceptDeal();
+            yield return null;
+
+            Assert.AreEqual(installmentsBefore + offer.MonthlyCharge, GameRules.MonthlyInstallments(Session.State));
+            Assert.AreEqual(1, Session.Loop.TasksDone);
+            Assert.IsFalse(NegotiationOpen, "the window closes");
+            Assert.IsTrue(ModalOpen, "the result window shows what the deal cost");
+            Assert.IsNotNull(Session.LastDeal);
+        }
+
+        [UnityTest]
+        public IEnumerator Negotiation_WalkingAwayKeepsTheNumbersAndStillCountsTheTask()
+        {
+            yield return StartOfflineRun();
+            long cash = Session.State.Cash;
+
+            Session.BeginNegotiation();
+            Session.WalkAway();
+            yield return null;
+
+            Assert.AreEqual(cash, Session.State.Cash);
+            Assert.AreEqual(1, Session.Loop.TasksDone);
+            Assert.IsFalse(NegotiationOpen);
+        }
+
         [UnityTest]
         public IEnumerator Hud_ShowsTheStateOfTheRun()
         {

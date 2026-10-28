@@ -21,6 +21,7 @@ namespace ColonQuest.UI
         private GameSession session;
         private Canvas canvas;
         private ModalPanel modal;
+        private NegotiationPanel negotiationPanel;
 
         private Text monthText;
         private Text tasksText;
@@ -54,8 +55,11 @@ namespace ColonQuest.UI
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
+            negotiationPanel = new NegotiationPanel(canvas.transform, session);
 
             session.Changed += Refresh;
+            session.NegotiationStarted += OnNegotiationChanged;
+            session.NegotiationUpdated += OnNegotiationChanged;
             session.NewGameStarted += CloseWindows;
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
@@ -74,6 +78,8 @@ namespace ColonQuest.UI
             if (session != null)
             {
                 session.Changed -= Refresh;
+                session.NegotiationStarted -= OnNegotiationChanged;
+                session.NegotiationUpdated -= OnNegotiationChanged;
                 session.NewGameStarted -= CloseWindows;
                 session.EventReady -= ShowEvent;
                 session.ChoiceApplied -= ShowOutcome;
@@ -187,6 +193,16 @@ namespace ColonQuest.UI
 
         private void Update()
         {
+            if (negotiationPanel.IsOpen)
+            {
+                // The seller's window takes the keyboard: the text box needs every key.
+                PlayerController.Blocked = true;
+                loadingCard.SetActive(false);
+                promptCard.SetActive(false);
+                negotiationPanel.Tick();
+                return;
+            }
+
             bool open = modal.IsOpen;
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
@@ -252,6 +268,9 @@ namespace ColonQuest.UI
                 case StationType.Home:
                     ShowStatement();
                     break;
+                case StationType.Store:
+                    session.BeginNegotiation();
+                    break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
                     {
@@ -267,6 +286,12 @@ namespace ColonQuest.UI
         private void CloseWindows()
         {
             modal.Hide();
+            negotiationPanel.Hide();
+        }
+
+        private void OnNegotiationChanged(Negotiation negotiation)
+        {
+            negotiationPanel.Refresh();
         }
 
         private void Refresh()
@@ -283,6 +308,8 @@ namespace ColonQuest.UI
             float wellbeing = Mathf.Clamp01(state.Wellbeing / 100f);
             wellbeingFill.rectTransform.sizeDelta = new Vector2(BarWidth * wellbeing, 26f);
             wellbeingFill.color = wellbeing > 0.5f ? GameUiColors.Gain : (wellbeing > 0.25f ? new Color(0.95f, 0.65f, 0.15f, 1f) : GameUiColors.Loss);
+
+            negotiationPanel.Refresh();
         }
 
         // ---------------------------------------------------------------- windows
@@ -325,12 +352,29 @@ namespace ColonQuest.UI
                 text.AppendLine("Tus cuentas quedaron igual.");
             }
 
+            AppendDeal(text, session.LastDeal);
+
             text.AppendLine();
             text.Append(session.Loop.AllTasksDone
                 ? "Hiciste todas tus tareas. Ve al banco a cobrar el salario."
                 : $"Tareas del mes: {session.Loop.TasksDone} de {GameRules.TasksPerMonth}.");
 
             modal.Show("Lo que pasó", outcome.ChoiceLabel, text.ToString(), new[] { Continue(null) });
+        }
+
+        /// <summary>After a deal: the real cost of the installments next to the cash price, and the questions asked.</summary>
+        private static void AppendDeal(StringBuilder text, DealReport deal)
+        {
+            if (deal == null)
+            {
+                return;
+            }
+
+            text.AppendLine();
+            text.AppendLine($"Precio de contado  {SellerOffer.FormatColones(deal.CashPrice)}");
+            string verb = deal.Bought ? "Terminas pagando" : "A cuotas ibas a pagar";
+            text.AppendLine($"{verb}  <color={GameUiColors.Hex(GameUiColors.Loss)}>{SellerOffer.FormatColones(deal.TotalCost)}</color>  ({SellerOffer.FormatColones(deal.ExtraOverCash)} más)");
+            text.AppendLine($"Preguntas clave que hiciste  {deal.QuestionsAsked} de {deal.QuestionsTotal}");
         }
 
         private static void Line(StringBuilder text, string label, long delta, bool moreIsGood)
