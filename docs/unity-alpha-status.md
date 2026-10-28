@@ -9,10 +9,12 @@ One run is three months. Each month has three tasks, then the bank closes the mo
 
 | Place | What happens |
 | --- | --- |
-| Garage, grocery, lender, pyramid, kiosk, coop, soda | One event from the game master, or a local one when the backend fails or takes more than 8 s |
+| Garage, grocery, lender, pyramid, coop, soda | One event from the game master, or a local one when the backend fails or takes more than 8 s |
 | Store | Negotiation with the seller (text). Buying adds the installment with insurance and charges the opening commission |
 | Bank | Closes the month: salary, installments, card cycle, interest, living expenses |
 | Home | Account statement |
+| ATMs | Account balance |
+| Everyday objects and townspeople | A line of dialogue, rotating; they never move money |
 
 The store rotates four offers (phone, TV, fridge, motorbike). The seller keeps a hidden sheet with the true
 figures; the player only learns them by asking. Asking about total cost, hidden fees, interest, term, cash
@@ -29,19 +31,23 @@ rules and the same figures (`SellerOffer` mirrors `server/app/negotiation/seller
   walls with doorways; the bank has four numbered windows, a closed staff side with the vault, a queue,
   waiting chairs, offices and ATMs; the store sells exactly the four offers of the seller.
 - Town buildings get details by use (homes: water tank, flower boxes, door number, no shop sign; shops
-  and offices: roof AC units, cameras where money changes hands). Five homes can be reached; two carry
+  and offices: cameras where money changes hands). Five homes can be reached; two carry
   "SE VENDE" and "SE ALQUILA" signs, ready for renting, buying and mortgages later.
-- Also: cast shadows to the lower right of every building, a fine tiling grain over the
-  colors and a wash of light that goes from warm morning to blue dusk as the run advances (`DayCycle`).
+- Stations are invisible zones with an "[E]" prompt: no rings or glow. SINPE is not a place; it will be a
+  phone alert.
+- Also: soft ground shadows under the buildings, a fine tiling grain over the colors and a wash of light
+  that goes from warm morning to blue dusk as the run advances (`DayCycle`).
 
 ## Verified
 
-- EditMode 124 of 124 and PlayMode 45 of 45 pass (28 October).
-- WebGL build succeeds with 0 errors in about 6 minutes. Output is 9.9 MB (wasm 7.7 MB, data 2.1 MB), gzip
-  with the fallback loader, so any static host works.
+- EditMode 146 of 146 and PlayMode 51 of 51 pass (28 October, branch `feat/SCRUM-48-voice-on-tip`).
+- Windows build succeeds with 0 errors, 91 MB, and starts without exceptions; with the backend off it
+  plays offline on the local events and seller.
 - Scenes rebuild from code with `Colon Quest > Build All Scenes`.
 
 ## Not verified
+
+- A full month played by a person on the Windows build.
 
 - Nobody has looked at the new lighting, shadows or the negotiation window on screen. Batch captures hang,
   so a person has to open `Assets/Scenes/Town.unity` and judge them. The amounts are constants in
@@ -50,7 +56,9 @@ rules and the same figures (`SellerOffer` mirrors `server/app/negotiation/seller
 - Frame rate in a browser. The town has thousands of sprite renderers; the download is small but the draw
   cost is unmeasured.
 - The deployed backend URL. `ApiConfig` still points to `http://localhost:8000/api`.
-- Voice. The `.jslib` recorder and the multipart upload to `/negotiation/voice` are not written yet.
+- Voice with a real microphone and the real backend. The recorder, `.jslib` and upload are written and
+  covered by tests, nothing more.
+- The phone (key P) and the hip-line fix live in `feat/SCRUM-58-phone-and-people`, not merged yet.
 - Portraits, sound and the loading indicator.
 
 ## Commands
