@@ -82,7 +82,8 @@ namespace ColonQuest.EditorTools
         {
             var color = GamePalette.Outline;
             color.a = alpha;
-            OnGround(shadows, "Shadow", rounded, center, size, color, TownShadow);
+            color.a = alpha * 0.55f;
+            OnGround(shadows, "Shadow", softCircle, center, size, color, TownShadow);
         }
 
         private static Transform Building(Transform parent, Transform shadows, BuildingSpec b)
@@ -100,7 +101,7 @@ namespace ColonQuest.EditorTools
             var wall = GamePalette.Hex(b.Wall);
             var roof = GamePalette.Hex(b.Roof);
 
-            GroundShadowRect(shadows, new Vector2(cx + 0.45f, b.YBottom + h * 0.5f - 0.55f), new Vector2(w + 0.5f, h));
+            GroundShadowRect(shadows, new Vector2(cx + 0.3f, b.YBottom - 0.1f), new Vector2(w + 1.2f, 1.8f));
 
             Shape(root, "Outline", rounded, new Vector2(0f, h * 0.5f), new Vector2(w + 0.16f, h + 0.16f), GamePalette.Outline, 0);
             Shape(root, "Facade", rounded, new Vector2(0f, (fh + 0.4f) * 0.5f), new Vector2(w, fh + 0.4f), wall, 1);

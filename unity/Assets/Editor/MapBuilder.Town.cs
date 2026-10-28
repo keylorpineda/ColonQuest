@@ -189,12 +189,6 @@ namespace ColonQuest.EditorTools
             });
             House(parent, shadows, "Casa_Vecina_D", -12f, -5f, -8f, -3f, "#8E6BB8", "#F4EBD0");
             YardSign(parent, shadows, -5.7f, -8.7f, "SE ALQUILA", "#1D4F8C");
-            Building(parent, shadows, new BuildingSpec
-            {
-                Name = "KioscoSinpe", Sign = "SINPE", Roof = "#4DA3FF", Wall = "#F1F4FF",
-                XMin = 10f, XMax = 14f, YBottom = -8f, YTop = -4.2f, DoorX = 12f, FacadeHeight = 2.4f, Entrance = Entrance.Window,
-                AwningA = "#4DA3FF", AwningB = "#F8F5E8"
-            });
         }
 
         private static void BuildNature(Transform parent, Transform shadows, System.Random random)
@@ -350,7 +344,6 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Grocery", StationType.Grocery, "Pulperia", new Vector2(-19.5f, -9.0f));
             BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f));
             BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
-            BuildStation(parent, "Station_Kiosk", StationType.Kiosk, "Kiosco SINPE", new Vector2(12f, -8.9f));
             BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
             BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f));
             currentLayer = LayerWorld;
