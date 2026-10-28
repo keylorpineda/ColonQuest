@@ -70,6 +70,9 @@ namespace ColonQuest.World
 
         public bool SoundOn { get; set; } = true;
 
+        /// <summary>The language of the text. Spanish unless the player chose English.</summary>
+        public GameLanguage Language { get; set; } = GameLanguage.Spanish;
+
         /// <summary>From 0 to 1. Any value outside that range is brought back into it.</summary>
         public float Volume
         {
@@ -99,7 +102,8 @@ namespace ColonQuest.World
 
         public string Serialize()
         {
-            return (SoundOn ? "1" : "0") + ";" + volume.ToString("0.00", CultureInfo.InvariantCulture);
+            string text = (SoundOn ? "1" : "0") + ";" + volume.ToString("0.00", CultureInfo.InvariantCulture);
+            return Language == GameLanguage.English ? text + ";en" : text;
         }
 
         /// <summary>Reads the text form. Anything that does not parse gives the default for that part.</summary>
@@ -120,6 +124,11 @@ namespace ColonQuest.World
             if (parts.Length > 1 && float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed))
             {
                 settings.Volume = parsed;
+            }
+
+            if (parts.Length > 2 && parts[2] == "en")
+            {
+                settings.Language = GameLanguage.English;
             }
 
             return settings;

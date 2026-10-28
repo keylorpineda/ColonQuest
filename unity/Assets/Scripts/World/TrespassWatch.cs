@@ -60,7 +60,7 @@ namespace ColonQuest.World
 
         public float Remaining => clock != null ? clock.Remaining : 0f;
 
-        public string Warning => ownerName + ": ¡Salga de mi casa o llamo a la policía!";
+        public string Warning => Loc.F("{0}: ¡Salga de mi casa o llamo a la policía!", ownerName);
 
         public void Configure(string owner, float seconds)
         {
