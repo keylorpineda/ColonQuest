@@ -20,6 +20,9 @@ namespace ColonQuest.UI
     {
         private GameSession session;
         private Canvas canvas;
+
+        /// <summary>How many times each everyday object was used, so its lines rotate.</summary>
+        private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
 
@@ -248,6 +251,10 @@ namespace ColonQuest.UI
                     return "[E]  Cobrar el salario y cerrar el mes";
                 case StationType.Home:
                     return "[E]  Revisar tu estado de cuenta";
+                case StationType.Thing:
+                    return "[E]  " + station.DisplayName;
+                case StationType.Atm:
+                    return "[E]  Consultar tu saldo en el cajero";
                 default:
                     if (loop.CanDoTask(station.Type))
                     {
@@ -266,7 +273,11 @@ namespace ColonQuest.UI
                     AskCloseMonth();
                     break;
                 case StationType.Home:
+                case StationType.Atm:
                     ShowStatement();
+                    break;
+                case StationType.Thing:
+                    ShowThing(station);
                     break;
                 case StationType.Store:
                     session.BeginNegotiation();
@@ -436,6 +447,16 @@ namespace ColonQuest.UI
             {
                 new ModalOption { Label = last ? "Ver mi resumen" : "Seguir", Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
             });
+        }
+
+        /// <summary>Everyday objects only talk: they never move money, that is the finance engine's job.</summary>
+        private void ShowThing(Station station)
+        {
+            string key = SceneManager.GetActiveScene().name + "/" + station.name;
+            thingUses.TryGetValue(key, out int uses);
+            thingUses[key] = uses + 1;
+            string line = ThingLines.Pick(station.Lines, uses, session.State);
+            modal.Show(station.DisplayName, null, line, new[] { Continue(null) });
         }
 
         private void ShowStatement()

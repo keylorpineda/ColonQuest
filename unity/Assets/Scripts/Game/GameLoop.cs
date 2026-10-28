@@ -54,7 +54,7 @@ namespace ColonQuest.Game
         /// <summary>The bank and the house are not tasks; every other place offers one event per month.</summary>
         public static bool IsTaskStation(StationType type)
         {
-            return type != StationType.Bank && type != StationType.Home;
+            return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm;
         }
 
         public bool CanDoTask(StationType type)
