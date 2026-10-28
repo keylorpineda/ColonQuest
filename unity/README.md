@@ -131,6 +131,11 @@ The project uses Unity's classic Input Manager (`Horizontal` and `Vertical` axes
 the same in desktop and WebGL builds. Overlay panels set `PlayerController.InputEnabled = false`
 while they are open.
 
+The interiors are big: the Casa is 16.5 by 12 and the Tienda 18 by 12.6 (1.5 times the original), the
+Banco 24 by 16.8 (four times the area). The original furniture leans on the back wall and
+`MapBuilder.Interiors.Extra.cs` fills the rest with named detail groups: 26 in the Casa, 27 in the
+Tienda and 56 in the Banco.
+
 Walking up into a building door fades to its interior; stepping on the red doormat inside fades
 back to the street in front of that door (`Door`, `SceneTransition`, `SpawnPoint`). Walls,
 buildings, trees, cars and furniture have colliders; decoration lying on furniture does not.
