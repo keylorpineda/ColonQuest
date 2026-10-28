@@ -31,10 +31,19 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsBlockedByTheAtm()
         {
-            yield return Walk(new Vector2(3f, 3.8f), Vector2.right, 1.5f);
+            yield return Walk(new Vector2(9f, -2.6f), Vector2.right, 1.5f);
 
-            // The ATM body starts at x = 4.6, so the player stops before it.
-            Assert.Less(Body.position.x, 4.7f);
+            // The ATMs stand against the right wall; their body starts at x = 10.9.
+            Assert.Less(Body.position.x, 10.9f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_CannotGetBehindTheTellerCounter()
+        {
+            yield return Walk(new Vector2(0f, 3.0f), Vector2.up, 1.5f);
+
+            // The counter runs from wall to wall of the staff area, so the lobby ends at its front.
+            Assert.Less(Body.position.y, 3.7f);
         }
 
         [UnityTest]
@@ -72,14 +81,16 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Cashier_BlocksThePlayer()
+        public IEnumerator Cashier_WorksBehindTheCounterAtTheOpenWindow()
         {
             var cashier = GameObject.Find("Cajera").transform;
+            var counter = GameObject.Find("TellerCounter").transform;
+            var station = GameObject.Find("Station_Bank").transform;
+            yield return null;
 
-            // Walk down into the cashier from above, where the floor is free.
-            yield return Walk((Vector2)cashier.position + new Vector2(0f, 1.0f), Vector2.down, 1.2f);
-
-            Assert.Greater(Body.position.y, cashier.position.y);
+            Assert.Greater(cashier.position.y, counter.position.y, "the cashier stands on the staff side");
+            Assert.AreEqual(cashier.position.x, station.position.x, 0.01f, "the month is closed at the cashier's window");
+            Assert.Less(station.position.y, counter.position.y, "the customer side is in front of the counter");
         }
 
         [UnityTest]
@@ -180,12 +191,31 @@ namespace ColonQuest.World.PlayModeTests
         protected override string SceneToLoad => SceneNames.Casa;
 
         [UnityTest]
-        public IEnumerator Player_IsBlockedByTheBed()
+        public IEnumerator Player_IsBlockedByTheBedroomWall()
         {
-            yield return Walk(new Vector2(-4.9f, 1.0f), Vector2.down, 1.5f);
+            yield return Walk(new Vector2(-6.5f, -0.3f), Vector2.up, 1.5f);
 
-            // The bed top is at y = 0.2 once the furniture leans on the bigger room's back wall.
-            Assert.Greater(Body.position.y, 0.0f);
+            // The wall between the living room and the bedroom stands at y = 0.8.
+            Assert.Less(Body.position.y, 0.8f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_EntersTheBedroomThroughItsDoor()
+        {
+            yield return Walk(new Vector2(-2.9f, -0.3f), Vector2.up, 1.5f);
+
+            Assert.Greater(Body.position.y, 1.3f, "the doorway lets the player through");
+        }
+
+        [UnityTest]
+        public IEnumerator House_HasEveryRoom()
+        {
+            yield return null;
+
+            foreach (var name in new[] { "Bed", "Toilet", "Shower", "Fridge", "Sofa", "DiningTable", "BillsDesk" })
+            {
+                Assert.IsNotNull(GameObject.Find(name), name);
+            }
         }
 
         [UnityTest]

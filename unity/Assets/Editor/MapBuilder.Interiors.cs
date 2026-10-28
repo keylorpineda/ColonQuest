@@ -4,8 +4,17 @@ using ColonQuest.World;
 
 namespace ColonQuest.EditorTools
 {
+    /// <summary>
+    /// The three buildings the player can enter. Each one is laid out like the real thing: the Casa has a
+    /// bedroom, a bathroom, a kitchen and a living room; the Banco has a teller line, a queue, a waiting
+    /// area and offices; the Tienda sells phones, screens, white goods and motorbikes. The furniture of
+    /// each one lives in its own file. Coordinates are in room space, with the origin in the middle.
+    /// </summary>
     public static partial class MapBuilder
     {
+        private const float InnerWallThickness = 0.32f;
+        private const float DoorGap = 1.3f;
+
         private struct Room
         {
             public string Name;
@@ -32,23 +41,6 @@ namespace ColonQuest.EditorTools
                     return new Room { Name = "Tienda", Center = Vector2.zero, Size = MapLayout.TiendaSize, Color = GamePalette.FloorStore };
                 default:
                     return new Room { Name = "Banco", Center = Vector2.zero, Size = MapLayout.BancoSize, Color = GamePalette.FloorBank };
-            }
-        }
-
-        /// <summary>
-        /// The furniture was built for the original small rooms. It is moved up so it still leans on the
-        /// back wall of the bigger room; the new details fill the space that opens up in front of it.
-        /// </summary>
-        private static Vector2 ShiftFor(string sceneName)
-        {
-            switch (sceneName)
-            {
-                case SceneNames.Casa:
-                    return new Vector2(0f, MapLayout.CasaSize.y * 0.5f - 4f);
-                case SceneNames.Tienda:
-                    return new Vector2(0f, MapLayout.TiendaSize.y * 0.5f - 4.2f);
-                default:
-                    return new Vector2(0f, MapLayout.BancoSize.y * 0.5f - 4.2f);
             }
         }
 
@@ -91,52 +83,35 @@ namespace ColonQuest.EditorTools
             BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName));
             currentLayer = LayerWorld;
 
-            var props = Group(map, "Props");
-            var stations = Group(map, "Stations");
-            var lights = Group(map, "Lights");
-            var people = Group(map, "People");
-            var labels = Group(map, "Labels");
+            var layout = new InteriorParts
+            {
+                Floor = Group(map, "FloorZones"),
+                Walls = Group(map, "Walls"),
+                Props = Group(map, "Props"),
+                Stations = Group(map, "Stations"),
+                Lights = Group(map, "Lights"),
+                People = Group(map, "People"),
+                Labels = Group(map, "Labels")
+            };
 
-            var shift = ShiftFor(sceneName);
-            props.localPosition = shift;
-            stations.localPosition = shift;
-            lights.localPosition = shift;
-            var extras = Group(map, "Extras");
-            var extraLights = Group(map, "ExtraLights");
-            var extraPeople = Group(map, "ExtraPeople");
-            var matLabel = MatFor(sceneName) + new Vector2(1.3f, 0f);
-            var random = new System.Random(5);
             interiorLayers = 0;
-
             switch (sceneName)
             {
                 case SceneNames.Casa:
-                    BuildHome(props);
-                    BuildStation(stations, "Station_Home", StationType.Home, "Casa", new Vector2(-3f, -0.8f));
-                    Flickering(Glow(lights, "Light_Nightstand", new Vector2(-2.7f, -3.0f), 3.0f, "#FFD23F", 0.24f, OrderLight), 0.1f, 1.1f, 5f);
-                    Flickering(Glow(lights, "Light_Tv", new Vector2(3.3f, 3.0f), 3.4f, "#4DA3FF", 0.2f, OrderLight), 0.3f, 7f, 17f);
-                    Label(labels, "CASA", matLabel, GamePalette.Shade(room.Color, 0.62f));
-                    BuildHomeExtras(extras, extraLights, room, random);
+                    BuildHouseLayout(layout, room);
                     break;
                 case SceneNames.Tienda:
-                    BuildStore(props);
-                    BuildStation(stations, "Station_Store", StationType.Store, "Tienda", new Vector2(4.2f, -1.8f));
-                    Flickering(Glow(lights, "Light_Tv", new Vector2(-3.0f, 3.2f), 4.2f, "#4DA3FF", 0.22f, OrderLight), 0.4f, 9f, 23f);
-                    Flickering(Glow(lights, "Light_Offer", new Vector2(0f, 3.6f), 4.6f, "#E8505B", 0.2f, OrderLight), 0.2f, 3f, 31f);
-                    Label(labels, "TIENDA", matLabel, GamePalette.Shade(room.Color, 0.62f));
-                    BuildStoreExtras(extras, extraLights, room, random);
-                    BuildNpc(people, "Vendedor", new Vector2(4.2f, 0.95f) + shift, new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, false);
+                    BuildStoreLayout(layout, room);
                     break;
                 default:
-                    BuildBank(props);
-                    BuildStation(stations, "Station_Bank", StationType.Bank, "Cajero", new Vector2(3.8f, -0.4f));
-                    Flickering(Glow(lights, "Light_Atm", new Vector2(5.1f, -0.4f), 3.4f, "#55E08F", 0.26f, OrderLight), 0.18f, 2.5f, 11f);
-                    Flickering(Glow(lights, "Light_DeskLamp", new Vector2(-3.0f, 1.6f), 3.6f, "#FFD23F", 0.24f, OrderLight), 0.08f, 1.2f, 37f);
-                    Label(labels, "BANCO", matLabel, GamePalette.Shade(room.Color, 0.62f));
-                    BuildBankExtras(extras, extraLights, extraPeople, room, random);
-                    BuildNpc(people, "Cajera", new Vector2(-1.9f, 2.4f) + shift, new Look { Skin = "#9AD0A8", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, false);
+                    BuildBankLayout(layout, room);
                     break;
             }
+
+            var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
+            Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 1.0f, 0.3f, "#55E08F");
+            Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
+            DustMotes(IL(layout.Props, "DustMotes"), new System.Random(5), room, 18);
 
             BuildRoomColliders(Group(map, "Colliders"), room);
 
@@ -151,6 +126,18 @@ namespace ColonQuest.EditorTools
 
             Debug.Log(sceneName + " detail layers: " + interiorLayers);
             SaveScene(scene, sceneName);
+        }
+
+        /// <summary>The groups every interior fills.</summary>
+        private sealed class InteriorParts
+        {
+            public Transform Floor;
+            public Transform Walls;
+            public Transform Props;
+            public Transform Stations;
+            public Transform Lights;
+            public Transform People;
+            public Transform Labels;
         }
 
         /// <summary>The four walls of the room, drawn by the outline and blocked by colliders.</summary>
@@ -234,170 +221,112 @@ namespace ColonQuest.EditorTools
                 new Vector2(room.Size.x - 0.3f, 0.07f), GamePalette.Shade(room.Color, 0.45f), order);
         }
 
-        /// <summary>A chair, drawn as a small solid seat.</summary>
-        private static void Chair(Transform parent, Vector2 at, Color color)
-        {
-            Prop(parent, "Chair", roundedSmall, at, new Vector2(0.55f, 0.55f), color);
-        }
+        // ---------------------------------------------------------------- room structure
 
-        private static void BuildHome(Transform parent)
+        /// <summary>
+        /// A floor for one part of the building (wood for a bedroom, tiles for a kitchen) laid over the base
+        /// floor, with joints that show planks or tiles.
+        /// </summary>
+        private static void ZoneFloor(Transform parent, string name, Rect area, string hex, float jointStep, bool planks)
         {
-            var home = Group(parent, "Casa");
-
-            // Rugs lie on the floor, so they belong to the floor layer, below every shadow.
+            string previous = currentLayer;
             currentLayer = LayerFloor;
-            Shape(home, "Rug_Living", rounded, new Vector2(3.5f, 1.1f), new Vector2(4.0f, 2.8f), GamePalette.Debt, OrderRug);
-            Shape(home, "Rug_Living_Stripe", rounded, new Vector2(3.5f, 1.1f), new Vector2(3.2f, 2.0f), GamePalette.Shade(GamePalette.Debt, 0.82f), OrderRug + 1);
-            Shape(home, "Rug_Dining", rounded, new Vector2(-3.2f, 0.3f), new Vector2(3.4f, 2.4f), GamePalette.Hex("#C8A878"), OrderRug);
-            Shape(home, "Rug_Bed", rounded, new Vector2(-4.0f, -2.6f), new Vector2(3.0f, 2.4f), GamePalette.Hex("#8E6BB8"), OrderRug);
-            currentLayer = LayerWorld;
+            var zone = IL(parent, name);
+            var color = GamePalette.Hex(hex);
+            Shape(zone, "Floor", square, area.center, area.size, color, OrderRug - 6);
 
-            // Kitchen along the back wall.
-            Prop(home, "Counter", rounded, new Vector2(-4.4f, 3.0f), new Vector2(2.2f, 1.0f), GamePalette.Hex("#D6B656"));
-            Prop(home, "Sink", roundedSmall, new Vector2(-4.7f, 3.05f), new Vector2(0.8f, 0.5f), GamePalette.Hex("#C9CFDB"), OrderProp + 2);
-            Prop(home, "Stove", rounded, new Vector2(-2.6f, 3.0f), new Vector2(1.2f, 1.0f), GamePalette.Hex("#8E96AA"));
-            Prop(home, "Burner", circle, new Vector2(-2.9f, 3.05f), Vector2.one * 0.34f, GamePalette.Hex("#2A3040"), OrderProp + 2);
-            Prop(home, "Burner", circle, new Vector2(-2.3f, 3.05f), Vector2.one * 0.34f, GamePalette.Hex("#2A3040"), OrderProp + 2);
-            Prop(home, "Fridge", rounded, new Vector2(-1.3f, 3.1f), new Vector2(1.0f, 1.4f), GamePalette.Hex("#DFE8F5"));
-            Prop(home, "Bookshelf", rounded, new Vector2(0.6f, 3.1f), new Vector2(1.6f, 1.0f), GamePalette.Hex("#8B5A3C"));
-            for (int i = 0; i < 4; i++)
+            var joint = GamePalette.Shade(color, 0.82f);
+            joint.a = 0.6f;
+            for (float y = area.yMin + jointStep; y < area.yMax - 0.01f; y += jointStep)
             {
-                Prop(home, "Book", roundedSmall, new Vector2(0.05f + i * 0.35f, 3.15f), new Vector2(0.24f, 0.6f), GamePalette.Hex(i % 2 == 0 ? "#E8505B" : "#4DA3FF"), OrderProp + 2);
+                Shape(zone, "JointH", square, new Vector2(area.center.x, y), new Vector2(area.width, 0.04f), joint, OrderRug - 5);
             }
 
-            // Living room on the right.
-            Prop(home, "TvStand", rounded, new Vector2(3.3f, 3.1f), new Vector2(2.4f, 0.9f), GamePalette.Hex("#6A4A8C"));
-            Prop(home, "Tv", roundedSmall, new Vector2(3.3f, 3.35f), new Vector2(1.5f, 0.6f), GamePalette.Wall, OrderProp + 2);
-            Prop(home, "Tv_Screen", roundedSmall, new Vector2(3.3f, 3.35f), new Vector2(1.3f, 0.45f), GamePalette.Alert, OrderProp + 4);
-            Prop(home, "Sofa", rounded, new Vector2(5.0f, 0.9f), new Vector2(1.0f, 2.6f), GamePalette.Hex("#3B6FB6"));
-            Prop(home, "Sofa_Cushion", roundedSmall, new Vector2(4.85f, 0.9f), new Vector2(0.5f, 2.0f), GamePalette.Hex("#6FA0E0"), OrderProp + 2);
-            Prop(home, "CoffeeTable", rounded, new Vector2(3.2f, 0.9f), new Vector2(1.3f, 1.0f), GamePalette.Hex("#8B5A3C"));
-            Prop(home, "Bill_A", roundedSmall, new Vector2(3.0f, 0.95f), new Vector2(0.5f, 0.36f), GamePalette.White, OrderProp + 2);
-            Prop(home, "Bill_B", roundedSmall, new Vector2(3.45f, 0.85f), new Vector2(0.5f, 0.36f), GamePalette.White, OrderProp + 2);
-
-            // Dining table with four chairs.
-            Prop(home, "Table", rounded, new Vector2(-3.2f, 0.3f), new Vector2(2.0f, 1.1f), GamePalette.Hex("#8B5A3C"));
-            Prop(home, "Plate", circle, new Vector2(-3.7f, 0.35f), Vector2.one * 0.4f, GamePalette.White, OrderProp + 2);
-            Prop(home, "Plate", circle, new Vector2(-2.7f, 0.35f), Vector2.one * 0.4f, GamePalette.White, OrderProp + 2);
-            Chair(home, new Vector2(-3.7f, 1.15f), GamePalette.Hex("#B07A45"));
-            Chair(home, new Vector2(-2.7f, 1.15f), GamePalette.Hex("#B07A45"));
-            Chair(home, new Vector2(-3.7f, -0.55f), GamePalette.Hex("#B07A45"));
-            Chair(home, new Vector2(-2.7f, -0.55f), GamePalette.Hex("#B07A45"));
-
-            // Bedroom corner.
-            Prop(home, "Bed", rounded, new Vector2(-4.3f, -2.7f), new Vector2(2.2f, 1.8f), GamePalette.Alert);
-            Prop(home, "Pillow", roundedSmall, new Vector2(-5.0f, -2.7f), new Vector2(0.6f, 1.0f), GamePalette.White, OrderProp + 2);
-            Prop(home, "Nightstand", rounded, new Vector2(-2.7f, -3.2f), new Vector2(0.7f, 0.7f), GamePalette.Hex("#8B5A3C"));
-            Prop(home, "NightLamp", circle, new Vector2(-2.7f, -3.1f), Vector2.one * 0.34f, GamePalette.Marker, OrderProp + 2);
-            Prop(home, "Wardrobe", rounded, new Vector2(4.4f, -3.2f), new Vector2(1.8f, 1.0f), GamePalette.Hex("#6A4A8C"));
-            Prop(home, "WardrobeDoor", square, new Vector2(4.4f, -3.2f), new Vector2(0.05f, 0.9f), GamePalette.Outline, OrderProp + 2);
-
-            Prop(home, "PlantPot", roundedSmall, new Vector2(5.0f, -1.2f), new Vector2(0.6f, 0.5f), GamePalette.Hex("#C26A3A"));
-            Prop(home, "Plant", circle, new Vector2(5.0f, -0.85f), Vector2.one * 0.9f, GamePalette.Hex("#3FA66A"), OrderProp + 2);
-            Prop(home, "PlantPot", roundedSmall, new Vector2(-5.1f, 0.0f), new Vector2(0.6f, 0.5f), GamePalette.Hex("#C26A3A"));
-            Prop(home, "Plant", circle, new Vector2(-5.1f, 0.35f), Vector2.one * 0.9f, GamePalette.Hex("#3FA66A"), OrderProp + 2);
-        }
-
-        private static void BuildStore(Transform parent)
-        {
-            var store = Group(parent, "Tienda");
-
-            // Back wall: a row of TVs and the white goods, under the big offer.
-            var screens = new[] { "#4DA3FF", "#E8505B", "#55E08F" };
-            for (int i = 0; i < 3; i++)
+            if (planks)
             {
-                float x = -4.8f + i * 1.8f;
-                Prop(store, "TV", rounded, new Vector2(x, 3.0f), new Vector2(1.5f, 1.0f), GamePalette.Wall);
-                Shape(store, "TV_Screen", roundedSmall, new Vector2(x, 3.05f), new Vector2(1.2f, 0.7f), GamePalette.Hex(screens[i]), OrderProp + 2);
-                Shape(store, "TV_Shine", roundedSmall, new Vector2(x - 0.3f, 3.2f), new Vector2(0.3f, 0.2f), GamePalette.White, OrderProp + 3);
-            }
-
-            Prop(store, "Fridge", rounded, new Vector2(3.0f, 3.3f), new Vector2(1.0f, 1.5f), GamePalette.Hex("#DFE8F5"));
-            Prop(store, "Washer", rounded, new Vector2(4.3f, 3.3f), new Vector2(1.0f, 1.2f), GamePalette.Hex("#C9CFDB"));
-            Prop(store, "Washer_Door", circle, new Vector2(4.3f, 3.25f), Vector2.one * 0.6f, GamePalette.Hex("#6FA0E0"), OrderProp + 2);
-            Prop(store, "Fridge", rounded, new Vector2(5.4f, 3.3f), new Vector2(0.9f, 1.5f), GamePalette.Hex("#DFE8F5"));
-
-            var banner = new Vector2(0f, 3.85f);
-            Prop(store, "Offer_Frame", roundedSmall, banner, new Vector2(5.2f, 0.5f), GamePalette.Outline, OrderProp + 2);
-            Shape(store, "Offer", roundedSmall, banner, new Vector2(5.06f, 0.36f), GamePalette.Debt, OrderProp + 4);
-            Label(store, "36 CUOTAS SIN INTERESES", banner, GamePalette.White, 0.03f, TextAnchor.MiddleCenter);
-
-            // Four shelving islands with phones and laptops.
-            foreach (float y in new[] { 0.8f, -0.9f })
-            {
-                foreach (float x in new[] { -4.2f, -1.2f })
+                // Plank ends are staggered from one row to the next.
+                int row = 0;
+                for (float y = area.yMin; y < area.yMax - 0.01f; y += jointStep, row++)
                 {
-                    Prop(store, "Shelf", rounded, new Vector2(x, y), new Vector2(2.4f, 0.8f), GamePalette.Hex("#C9753A"));
-                    for (int i = 0; i < 4; i++)
+                    for (float x = area.xMin + (row % 2 == 0 ? 1.2f : 2.4f); x < area.xMax - 0.1f; x += 2.4f)
                     {
-                        var color = y > 0f ? new[] { "#FFD23F", "#E8505B", "#FFFFFF", "#4DA3FF" }[i] : "#2A3040";
-                        Prop(store, y > 0f ? "Phone" : "Laptop", roundedSmall, new Vector2(x - 0.85f + i * 0.57f, y + 0.05f), new Vector2(0.4f, 0.5f), GamePalette.Hex(color), OrderProp + 2);
+                        Shape(zone, "PlankEnd", square, new Vector2(x, y + jointStep * 0.5f), new Vector2(0.04f, jointStep), joint, OrderRug - 5);
                     }
                 }
             }
+            else
+            {
+                for (float x = area.xMin + jointStep; x < area.xMax - 0.01f; x += jointStep)
+                {
+                    Shape(zone, "JointV", square, new Vector2(x, area.center.y), new Vector2(0.04f, area.height), joint, OrderRug - 5);
+                }
+            }
 
-            // Glass display case and the boxes of stock.
-            Prop(store, "Display", rounded, new Vector2(-5.2f, -2.7f), new Vector2(1.4f, 0.9f), GamePalette.Hex("#BFE3F5"));
-            Prop(store, "Display_Item", roundedSmall, new Vector2(-5.2f, -2.7f), new Vector2(0.6f, 0.4f), GamePalette.Marker, OrderProp + 2);
-            Prop(store, "Boxes", rounded, new Vector2(5.2f, -3.2f), new Vector2(1.2f, 1.0f), GamePalette.Hex("#A9743F"));
-            Prop(store, "Boxes_Top", rounded, new Vector2(5.2f, -2.85f), new Vector2(0.9f, 0.5f), GamePalette.Hex("#C9945A"), OrderProp + 2);
-
-            // The counter where the seller works.
-            Prop(store, "Counter", rounded, new Vector2(4.2f, -0.4f), new Vector2(2.8f, 1.0f), GamePalette.Hex("#D6B656"));
-            Prop(store, "Register", roundedSmall, new Vector2(4.9f, -0.3f), new Vector2(0.7f, 0.5f), GamePalette.Wall, OrderProp + 2);
-            Prop(store, "Contract", roundedSmall, new Vector2(3.6f, -0.35f), new Vector2(0.6f, 0.4f), GamePalette.White, OrderProp + 2);
-
-            Prop(store, "PlantPot", roundedSmall, new Vector2(-5.5f, 1.8f), new Vector2(0.6f, 0.5f), GamePalette.Hex("#C26A3A"));
-            Prop(store, "Plant", circle, new Vector2(-5.5f, 2.15f), Vector2.one * 0.9f, GamePalette.Hex("#3FA66A"), OrderProp + 2);
+            currentLayer = previous;
         }
 
-        private static void BuildBank(Transform parent)
+        /// <summary>A wall inside the building: a dark top, a light face below it when it runs across, and a collider.</summary>
+        private static void InnerWall(Transform parent, Vector2 from, Vector2 to, string faceHex)
         {
-            var bank = Group(parent, "Banco");
+            bool horizontal = Mathf.Abs(to.y - from.y) < 0.01f;
+            var center = (from + to) * 0.5f;
+            var size = horizontal
+                ? new Vector2(Mathf.Abs(to.x - from.x), InnerWallThickness)
+                : new Vector2(InnerWallThickness, Mathf.Abs(to.y - from.y));
 
-            // Back wall: a clock and the vault door.
-            Prop(bank, "Clock_Frame", circle, new Vector2(0.2f, 3.65f), Vector2.one * 0.75f, GamePalette.Outline, OrderProp + 2);
-            Shape(bank, "Clock", circle, new Vector2(0.2f, 3.65f), Vector2.one * 0.62f, GamePalette.White, OrderProp + 4);
-            Shape(bank, "Clock_HandA", square, new Vector2(0.2f, 3.75f), new Vector2(0.05f, 0.24f), GamePalette.Outline, OrderProp + 5);
-            Shape(bank, "Clock_HandB", square, new Vector2(0.3f, 3.65f), new Vector2(0.18f, 0.05f), GamePalette.Outline, OrderProp + 5);
-            Prop(bank, "Vault", circle, new Vector2(4.4f, 2.9f), Vector2.one * 2.0f, GamePalette.Hex("#8E96AA"));
-            Prop(bank, "Vault_Ring", ring, new Vector2(4.4f, 2.9f), Vector2.one * 1.5f, GamePalette.Hex("#C9CFDB"), OrderProp + 2);
-            Prop(bank, "Vault_Wheel", circle, new Vector2(4.4f, 2.9f), Vector2.one * 0.5f, GamePalette.Marker, OrderProp + 4);
-
-            // Teller counter with glass partitions; the cashier works behind it.
-            Prop(bank, "Counter", rounded, new Vector2(-3.0f, 1.2f), new Vector2(5.0f, 0.9f), GamePalette.Hex("#7A6A52"));
-            foreach (float x in new[] { -4.7f, -3.0f, -1.3f })
+            Shape(parent, "Wall", square, center, size, GamePalette.Outline, OrderWall);
+            if (horizontal)
             {
-                var glass = GamePalette.Hex("#BFE3F5");
-                glass.a = 0.7f;
-                Prop(bank, "Glass", roundedSmall, new Vector2(x, 1.75f), new Vector2(0.16f, 1.0f), glass, OrderProp + 2);
+                Shape(parent, "WallFace", square, center + new Vector2(0f, -InnerWallThickness * 0.5f - 0.14f), new Vector2(size.x, 0.28f), GamePalette.Hex(faceHex), OrderWall);
             }
 
-            Prop(bank, "DeskLamp", circle, new Vector2(-3.0f, 1.3f), Vector2.one * 0.4f, GamePalette.Marker, OrderProp + 2);
-            Prop(bank, "Ledger", roundedSmall, new Vector2(-4.2f, 1.25f), new Vector2(0.6f, 0.4f), GamePalette.White, OrderProp + 2);
+            Wall(parent, "WallCollider", center, size);
+        }
 
-            // Three ATMs against the right wall; the middle one is the interactive one.
-            foreach (float y in new[] { 1.5f, -0.4f, -2.3f })
+        /// <summary>A wall that runs across from <paramref name="xMin"/> to <paramref name="xMax"/>, with a doorway at each given x.</summary>
+        private static void WallWithDoors(Transform parent, float y, float xMin, float xMax, string faceHex, params float[] doors)
+        {
+            float start = xMin;
+            foreach (float door in doors)
             {
-                Prop(bank, "AtmBody", rounded, new Vector2(5.2f, y), new Vector2(1.2f, 1.5f), GamePalette.Hex("#4B5568"));
-                Prop(bank, "AtmScreen", roundedSmall, new Vector2(5.2f, y + 0.25f), new Vector2(0.9f, 0.6f), GamePalette.MoneyIn, OrderProp + 2);
-                Prop(bank, "AtmKeypad", roundedSmall, new Vector2(5.2f, y - 0.4f), new Vector2(0.7f, 0.3f), GamePalette.Hex("#2A3040"), OrderProp + 2);
+                float gapStart = door - DoorGap * 0.5f;
+                if (gapStart > start)
+                {
+                    InnerWall(parent, new Vector2(start, y), new Vector2(gapStart, y), faceHex);
+                }
+
+                // A wooden threshold marks the doorway on the floor.
+                OnGroundThreshold(parent, new Vector2(door, y), DoorGap);
+                start = door + DoorGap * 0.5f;
             }
 
-            // Queue posts with a rope in front of the counter.
-            Shape(bank, "Rope", square, new Vector2(-2.0f, -0.3f), new Vector2(6.0f, 0.06f), GamePalette.Debt, OrderProp + 2);
-            foreach (float x in new[] { -5.0f, -3.0f, -1.0f, 1.0f })
+            if (xMax > start)
             {
-                Prop(bank, "Post", circle, new Vector2(x, -0.3f), Vector2.one * 0.32f, GamePalette.Marker);
+                InnerWall(parent, new Vector2(start, y), new Vector2(xMax, y), faceHex);
             }
+        }
 
-            // Waiting area.
-            Prop(bank, "Bench", rounded, new Vector2(-4.4f, -2.7f), new Vector2(2.4f, 0.7f), GamePalette.Hex("#3B6FB6"));
-            Prop(bank, "Bench", rounded, new Vector2(-1.6f, -2.7f), new Vector2(2.4f, 0.7f), GamePalette.Hex("#3B6FB6"));
-            Prop(bank, "PlantPot", roundedSmall, new Vector2(5.2f, -3.5f), new Vector2(0.7f, 0.6f), GamePalette.Hex("#C26A3A"));
-            Prop(bank, "Plant", circle, new Vector2(5.2f, -3.1f), Vector2.one * 0.9f, GamePalette.Hex("#3FA66A"), OrderProp + 2);
-            Prop(bank, "PlantPot", roundedSmall, new Vector2(-5.5f, 3.0f), new Vector2(0.7f, 0.6f), GamePalette.Hex("#C26A3A"));
-            Prop(bank, "Plant", circle, new Vector2(-5.5f, 3.35f), Vector2.one * 0.9f, GamePalette.Hex("#3FA66A"), OrderProp + 2);
+        private static void OnGroundThreshold(Transform parent, Vector2 at, float width)
+        {
+            string previous = currentLayer;
+            currentLayer = LayerFloor;
+            Shape(parent, "Threshold", square, at, new Vector2(width, InnerWallThickness), GamePalette.Hex("#9C6B43"), OrderRug + 3);
+            currentLayer = previous;
+        }
+
+        /// <summary>A small plate with text on a wall, such as a room name or a teller number.</summary>
+        private static void WallPlate(Transform parent, string text, Vector2 at, float width, string plateHex, Color textColor, float textSize = 0.032f)
+        {
+            Deco(parent, "Plate_Outline", roundedSmall, at.x, at.y, width + 0.08f, 0.42f, "#2A3345", 1f, OrderLabel - 2);
+            Deco(parent, "Plate", roundedSmall, at.x, at.y, width, 0.34f, plateHex, 1f, OrderLabel - 1);
+            Label(parent, text, at, textColor, textSize, TextAnchor.MiddleCenter);
+        }
+
+        private static void Window(Transform parent, float x, float y, float width)
+        {
+            Deco(parent, "Window_Frame", rounded, x, y, width, 0.5f, "#2A3345");
+            Deco(parent, "Window_Glass", rounded, x, y, width - 0.14f, 0.36f, "#BFE3F5", 1f, 8);
+            Deco(parent, "Window_Bar", square, x, y, 0.05f, 0.36f, "#2A3345", 1f, 9);
         }
     }
 }
