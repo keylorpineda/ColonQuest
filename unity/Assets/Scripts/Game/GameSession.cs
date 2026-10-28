@@ -84,6 +84,8 @@ namespace ColonQuest.Game
         public void StartNewGame()
         {
             Loop.NewGame();
+            CasinoNet = 0L;
+            SinpeSent = 0L;
             Busy = false;
             CurrentEvent = null;
             CurrentNegotiation = null;
@@ -294,6 +296,45 @@ namespace ColonQuest.Game
             CurrentEvent = negotiation.ToEvent();
             LastDeal = negotiation.Report(buy);
             Choose(buy ? Negotiation.BuyChoice : Negotiation.SkipChoice);
+        }
+
+        /// <summary>What the casino has taken (negative) or paid (positive) in this run, to show how it adds up.</summary>
+        public long CasinoNet { get; private set; }
+
+        /// <summary>Everything sent by SINPE from the phone in this run.</summary>
+        public long SinpeSent { get; private set; }
+
+        /// <summary>Sends money by SINPE from the phone. Only the finance engine moves the cash; false when there is not enough.</summary>
+        public bool SendSinpe(long amount)
+        {
+            if (Busy || Loop.IsFinished || amount <= 0L || !FinanceEngine.TrySpendCash(State, amount))
+            {
+                return false;
+            }
+
+            SinpeSent += amount;
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>One bet at the phone's casino. The stake leaves the cash first; a win pays it back with the prize.</summary>
+        public bool TryCasino(long stake, out CasinoResult result)
+        {
+            result = default;
+            if (Busy || Loop.IsFinished || !CasinoGame.IsValidStake(stake) || !FinanceEngine.TrySpendCash(State, stake))
+            {
+                return false;
+            }
+
+            result = CasinoGame.Play(stake, UnityEngine.Random.Range(0, 100));
+            if (result.Net > 0L)
+            {
+                FinanceEngine.CreditCash(State, stake + result.Net);
+            }
+
+            CasinoNet += result.Net;
+            Changed?.Invoke();
+            return true;
         }
 
         public void CloseMonth()
