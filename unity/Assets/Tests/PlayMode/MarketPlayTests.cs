@@ -54,7 +54,8 @@ namespace ColonQuest.World.PlayModeTests
                 Assert.IsNotNull(MarketAssumptions.FindHome(home.Lines[0]), home.name + " names a listing that exists");
             }
 
-            Assert.AreEqual(1, Stations(StationType.CarDealer).Length);
+            Assert.AreEqual(0, Stations(StationType.CarDealer).Length, "the agency's desk is inside the building now");
+            Assert.AreEqual(1, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Count(d => d.TargetScene == SceneNames.Agencia), "one door into the agency");
             Assert.AreEqual(1, Stations(StationType.Farm).Length);
         }
 
