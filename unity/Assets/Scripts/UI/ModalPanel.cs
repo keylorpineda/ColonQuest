@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ColonQuest.Game;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,14 @@ namespace ColonQuest.UI
         private readonly Transform parent;
         private readonly List<ModalOption> options = new List<ModalOption>();
 
+        // A talking window shows its text a few letters at a time while the speaker's face moves its mouth.
+        private Text revealText;
+        private string revealFull = string.Empty;
+        private float revealShown;
+        private int revealTotal;
+        private RectTransform mouth;
+        private float talkClock;
+
         public ModalPanel(Transform canvas)
         {
             parent = canvas;
@@ -50,10 +59,67 @@ namespace ColonQuest.UI
 
         public int OptionCount => options.Count;
 
-        public void Show(string title, string subtitle, string body, IList<ModalOption> choices)
+        /// <summary>True while the text is still appearing.</summary>
+        public bool IsRevealing => revealText != null && revealShown < revealTotal;
+
+        /// <summary>Shows all the text at once and the speaker stops talking.</summary>
+        public void Complete()
+        {
+            if (revealText != null)
+            {
+                revealShown = revealTotal;
+                revealText.text = revealFull;
+                CloseMouth();
+            }
+        }
+
+        /// <summary>Moves the typing and the mouth on. Call it every frame.</summary>
+        public void Tick(float deltaSeconds)
+        {
+            if (!IsOpen || revealText == null)
+            {
+                return;
+            }
+
+            if (!IsRevealing)
+            {
+                CloseMouth();
+                return;
+            }
+
+            revealShown = Mathf.Min(revealTotal, revealShown + deltaSeconds * TextReveal.LettersPerSecond);
+            revealText.text = TextReveal.Prefix(revealFull, Mathf.FloorToInt(revealShown));
+
+            talkClock += deltaSeconds;
+            if (mouth != null)
+            {
+                float open = Mathf.Abs(Mathf.Sin(talkClock * 13f)) * (0.55f + 0.45f * Mathf.Abs(Mathf.Sin(talkClock * 5.3f)));
+                mouth.sizeDelta = new Vector2(34f, 6f + 22f * open);
+            }
+
+            if (!IsRevealing)
+            {
+                CloseMouth();
+            }
+        }
+
+        private void CloseMouth()
+        {
+            if (mouth != null)
+            {
+                mouth.sizeDelta = new Vector2(34f, 6f);
+            }
+        }
+
+        /// <param name="speaker">When set, the window talks: the text types itself and a face in this name's color speaks it.</param>
+        public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null)
         {
             Clear();
             options.AddRange(choices);
+            revealText = null;
+            mouth = null;
+            talkClock = 0f;
+            bool talks = speaker != null && !string.IsNullOrEmpty(body);
 
             // Measure first, so the card can be sized to its content.
             float textWidth = CardWidth - Pad * 2f - UiKit.Outline * 2f;
@@ -70,7 +136,12 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             float y = -Pad + UiKit.Outline;
 
-            UiKit.Label(card, title, 46, UiKit.Ink, new Vector2(textWidth, titleHeight), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, title, 46, UiKit.Ink, new Vector2(talks ? textWidth - 130f : textWidth, titleHeight), top, new Vector2(talks ? -65f : 0f, y), TextAnchor.MiddleLeft);
+            if (talks)
+            {
+                BuildFace(card, speaker, new Vector2(CardWidth * 0.5f - Pad - 56f, y - 6f));
+            }
+
             y -= titleHeight;
 
             if (subtitleHeight > 0f)
@@ -84,6 +155,14 @@ namespace ColonQuest.UI
                 y -= 12f;
                 var text = UiKit.Label(card, body, 32, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
                 text.fontStyle = FontStyle.Normal;
+                if (talks)
+                {
+                    revealText = text;
+                    revealFull = body;
+                    revealTotal = TextReveal.VisibleLength(body);
+                    revealShown = 0f;
+                    text.text = string.Empty;
+                }
                 y -= bodyHeight + 8f;
             }
 
@@ -100,6 +179,23 @@ namespace ColonQuest.UI
             }
 
             root.SetActive(true);
+        }
+
+        /// <summary>A face in the speaker's color: two eyes and a mouth that opens while the text appears.</summary>
+        private void BuildFace(RectTransform card, string speaker, Vector2 position)
+        {
+            int hash = 0;
+            foreach (char c in speaker)
+            {
+                hash = hash * 31 + c;
+            }
+
+            float hue = (hash & 0x7fffffff) % 360 / 360f;
+            var face = UiKit.Card(card, "Face", Color.HSVToRGB(hue, 0.35f, 0.98f), new Vector2(112f, 112f), new Vector2(0.5f, 1f), position);
+            UiKit.Fill(face, "EyeL", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(-20f, 14f));
+            UiKit.Fill(face, "EyeR", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(20f, 14f));
+            var lips = UiKit.Fill(face, "Mouth", UiKit.Ink, new Vector2(34f, 6f), new Vector2(0.5f, 0.5f), new Vector2(0f, -22f));
+            mouth = lips.rectTransform;
         }
 
         /// <summary>Presses the option with this index, as if it was clicked. Used for the number keys.</summary>
@@ -119,6 +215,13 @@ namespace ColonQuest.UI
 
         private void Activate(Action action)
         {
+            if (IsRevealing)
+            {
+                // A first press only finishes the line; the next one chooses.
+                Complete();
+                return;
+            }
+
             Hide();
             action?.Invoke();
         }

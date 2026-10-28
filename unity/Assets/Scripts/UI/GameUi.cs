@@ -220,6 +220,7 @@ namespace ColonQuest.UI
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
 
+            modal.Tick(Time.unscaledDeltaTime);
             if (open)
             {
                 promptCard.SetActive(false);
@@ -387,7 +388,7 @@ namespace ColonQuest.UI
             }
 
             AudioDirector.Talk(gameEvent.Narrative, gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
-            modal.Show(gameEvent.Title, who, gameEvent.Narrative, options);
+            modal.Show(gameEvent.Title, who, gameEvent.Narrative, options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
         }
 
         private void ShowOutcome(ChoiceOutcome outcome)
@@ -503,7 +504,15 @@ namespace ColonQuest.UI
             thingUses[key] = uses + 1;
             string line = ThingLines.Pick(station.Lines, uses, session.State);
             AudioDirector.Talk(line, station.DisplayName);
-            modal.Show(station.DisplayName, null, line, new[] { Continue(null) });
+
+            // A pedestrian stops walking to chat.
+            var walker = station.GetComponentInParent<Patrol>();
+            var player = GameObject.FindWithTag(Station.PlayerTag);
+            if (walker != null && player != null)
+            {
+                walker.Greet(player.transform.position, 8f);
+            }
+            modal.Show(station.DisplayName, null, line, new[] { Continue(null) }, station.DisplayName);
         }
 
         /// <summary>The phone opens with P anywhere: the SINPE notice, what is left to do this month and the account.</summary>

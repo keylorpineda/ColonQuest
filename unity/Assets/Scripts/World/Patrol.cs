@@ -17,6 +17,7 @@ namespace ColonQuest.World
         private PlayerAnimator animator;
         private Vector2 target;
         private float waitUntil;
+        private float chatUntil;
 
         public void Configure(Vector2 a, Vector2 b, float walkSpeed, float restSeconds)
         {
@@ -24,6 +25,16 @@ namespace ColonQuest.World
             pointB = b;
             speed = walkSpeed;
             pause = restSeconds;
+        }
+
+        /// <summary>The player talks to this walker: it stops where it is and turns to face them for a while.</summary>
+        public void Greet(Vector2 playerPosition, float seconds)
+        {
+            chatUntil = Time.time + seconds;
+            if (visual != null)
+            {
+                visual.localScale = new Vector3(playerPosition.x >= transform.position.x ? 1f : -1f, 1f, 1f);
+            }
         }
 
         private void Start()
@@ -41,7 +52,7 @@ namespace ColonQuest.World
 
         private void Update()
         {
-            if (Time.time < waitUntil)
+            if (Time.time < waitUntil || Time.time < chatUntil)
             {
                 SetWalking(0f);
                 return;

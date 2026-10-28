@@ -258,7 +258,8 @@ namespace ColonQuest.World
 
             hash &= 0x7fffffff;
             float basePitch = 0.8f + (hash % 100) / 100f * 0.55f;
-            int count = Mathf.Clamp(text.Length / 4, 3, 14);
+            // About one syllable for every three letters, so the babble lasts as long as the text takes to appear.
+            int count = Mathf.Clamp(text.Length / 3, 3, 70);
             var random = new System.Random(hash + text.Length);
             voiceSource.volume = 0.6f * Master;
 
@@ -266,7 +267,7 @@ namespace ColonQuest.World
             {
                 voiceSource.pitch = basePitch * (0.9f + (float)random.NextDouble() * 0.3f);
                 voiceSource.PlayOneShot(syllables[random.Next(syllables.Length)]);
-                yield return new WaitForSecondsRealtime(i % 5 == 4 ? 0.2f : 0.09f);
+                yield return new WaitForSecondsRealtime(i % 5 == 4 ? 0.1f : 0.07f);
             }
 
             talking = null;
