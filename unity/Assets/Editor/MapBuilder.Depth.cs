@@ -12,10 +12,26 @@ namespace ColonQuest.EditorTools
     {
         private static void BuildDepth(Transform parent, Transform shadows, System.Random random)
         {
-            BuildDistanceHaze(parent);
+            // Flat on the ground, back to front.
+            BuildSunPatches(parent, random);
+            BuildContactShadows(shadows);
+            BuildShells(parent, random);
+            BuildWaterSparkles(parent, random);
+            BuildMist(parent, random);
+
+            // Standing things, sorted by their feet.
             BuildGroundCover(parent, shadows, random);
+            BuildReeds(parent);
+
+            // In the air, from the nearest layer to the farthest.
+            BuildDistanceHaze(parent);
+            BuildColorGrade(parent);
+            BuildLeafShadows(parent, random);
             BuildMotes(parent, random);
             BuildLightBeams(parent, random);
+            BuildFallingLeaves(parent, random);
+            BuildBirds(parent, random);
+            BuildHighClouds(parent, random);
         }
 
         /// <summary>The farther north, the paler and bluer, as far things look through the air.</summary>
@@ -83,7 +99,7 @@ namespace ColonQuest.EditorTools
         {
             var map = parent.parent;
             int placed = 0;
-            for (int attempt = 0; attempt < 2600 && placed < 190; attempt++)
+            for (int attempt = 0; attempt < 4200 && placed < 330; attempt++)
             {
                 float x = (float)(random.NextDouble() * 88.0 - 44.0);
                 float y = (float)(random.NextDouble() * 54.0 - 27.0);
