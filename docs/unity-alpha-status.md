@@ -67,8 +67,9 @@ them with a warning. Money for these purchases moves only in `FinanceEngine` (`H
 - Frame rate in a browser. The town has thousands of sprite renderers; the download is small but the draw
   cost is unmeasured.
 - The deployed backend URL. `ApiConfig` still points to `http://localhost:8000/api`.
-- Voice. The `.jslib` recorder and the multipart upload to `/negotiation/voice` are not written yet.
-- Portraits, sound and the loading indicator.
+- Voice in the browser. The `.jslib` recorder and the upload exist, but nobody has tried them in a real browser with a microphone over HTTPS.
+- Pregenerated portraits: windows draw a colored face until a picture named like the character (`don_rafa.png`) is placed in `Resources/Portraits`.
+- The loading indicator.
 
 ## Commands
 
