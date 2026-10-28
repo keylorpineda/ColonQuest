@@ -171,7 +171,7 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name);
             Assert.AreEqual(0f, Body.position.x, 0.6f);
-            Assert.AreEqual(-1.9f, Body.position.y, 0.6f);
+            Assert.AreEqual(MapLayout.CasaMat.y + 1.3f, Body.position.y, 0.6f);
         }
 
         [UnityTest]

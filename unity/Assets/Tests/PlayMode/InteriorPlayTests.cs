@@ -17,21 +17,21 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             Assert.AreEqual(0f, Body.position.x, 0.5f);
-            Assert.AreEqual(-1.9f, Body.position.y, 0.5f);
+            Assert.AreEqual(MapLayout.BancoMat.y + 1.3f, Body.position.y, 0.5f);
         }
 
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheRoomWall()
         {
-            yield return Walk(new Vector2(2.4f, -1.5f), Vector2.left, 3f);
+            yield return Walk(new Vector2(-8f, -0.4f), Vector2.left, 3f);
 
-            Assert.Greater(Body.position.x, -6f);
+            Assert.Greater(Body.position.x, -MapLayout.BancoSize.x * 0.5f);
         }
 
         [UnityTest]
         public IEnumerator Player_IsBlockedByTheAtm()
         {
-            yield return Walk(new Vector2(3f, -0.4f), Vector2.right, 1.5f);
+            yield return Walk(new Vector2(3f, 3.8f), Vector2.right, 1.5f);
 
             // The ATM body starts at x = 4.6, so the player stops before it.
             Assert.Less(Body.position.x, 4.7f);
@@ -97,7 +97,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheBank()
         {
-            Teleport(new Vector2(0f, -3.2f));
+            Teleport(MapLayout.BancoMat);
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 
@@ -140,7 +140,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheShop()
         {
-            Teleport(new Vector2(0f, -3.2f));
+            Teleport(MapLayout.TiendaMat);
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 
@@ -156,16 +156,16 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsBlockedByTheBed()
         {
-            yield return Walk(new Vector2(-4.9f, -1.0f), Vector2.down, 1.5f);
+            yield return Walk(new Vector2(-4.9f, 1.0f), Vector2.down, 1.5f);
 
-            // The bed ends at y = -1.8, so the player stops above it.
-            Assert.Greater(Body.position.y, -2.0f);
+            // The bed top is at y = 0.2 once the furniture leans on the bigger room's back wall.
+            Assert.Greater(Body.position.y, 0.0f);
         }
 
         [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheHouse()
         {
-            Teleport(new Vector2(0f, -3.2f));
+            Teleport(MapLayout.CasaMat);
             yield return WaitForScene(SceneNames.Town, 3f);
             FindPlayer();
 
