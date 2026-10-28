@@ -16,7 +16,7 @@ namespace ColonQuest.UI
     /// modal windows for events, results, the statement and the end of the run. It is the only
     /// place that turns what happens in <see cref="GameSession"/> into screens.
     /// </summary>
-    public sealed class GameUi : MonoBehaviour
+    public sealed partial class GameUi : MonoBehaviour
     {
         private GameSession session;
         private Canvas canvas;
@@ -239,7 +239,7 @@ namespace ColonQuest.UI
             {
                 promptCard.SetActive(false);
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 9; i++)
                 {
                     if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
                     {
@@ -287,6 +287,10 @@ namespace ColonQuest.UI
                     return "[E]  " + station.DisplayName;
                 case StationType.Atm:
                     return "[E]  Consultar tu saldo en el cajero";
+                case StationType.RealEstate:
+                case StationType.CarDealer:
+                case StationType.Farm:
+                    return "[E]  " + station.DisplayName;
                 default:
                     if (loop.CanDoTask(station.Type))
                     {
@@ -313,6 +317,15 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Store:
                     session.BeginNegotiation();
+                    break;
+                case StationType.RealEstate:
+                    ShowRealEstate(station);
+                    break;
+                case StationType.CarDealer:
+                    ShowCarCatalog();
+                    break;
+                case StationType.Farm:
+                    ShowFarm();
                     break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
@@ -445,6 +458,10 @@ namespace ColonQuest.UI
             string verb = deal.Bought ? "Terminas pagando" : "A cuotas ibas a pagar";
             text.AppendLine($"{verb}  <color={GameUiColors.Hex(GameUiColors.Loss)}>{SellerOffer.FormatColones(deal.TotalCost)}</color>  ({SellerOffer.FormatColones(deal.ExtraOverCash)} más)");
             text.AppendLine($"Preguntas clave que hiciste  {deal.QuestionsAsked} de {deal.QuestionsTotal}");
+            if (!string.IsNullOrEmpty(deal.Note))
+            {
+                text.AppendLine($"<color={GameUiColors.Hex(GameUiColors.Loss)}>{deal.Note}</color>");
+            }
         }
 
         private static void Line(StringBuilder text, string label, long delta, bool moreIsGood)
@@ -564,8 +581,22 @@ namespace ColonQuest.UI
             text.AppendLine($"Lo que debes: {Money.Format(summary.TotalDebt)}");
             text.Append($"Lo que tienes menos lo que debes: {Money.Format(summary.NetWorth)}");
 
+            var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
+            if (assets.Count == 0)
+            {
+                modal.Show("Fin de la partida", $"{summary.MonthsPlayed} meses jugados", text.ToString(), new[]
+                {
+                    new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                });
+                return;
+            }
+
+            long withAssets = GameRules.NetWorth(session.State, session.Loop.Holdings);
+            text.AppendLine();
+            text.Append($"Con lo que compraste: {Money.Format(withAssets)}");
             modal.Show("Fin de la partida", $"{summary.MonthsPlayed} meses jugados", text.ToString(), new[]
             {
+                new ModalOption { Label = "Ver lo que compraste", Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
                 new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
             });
         }

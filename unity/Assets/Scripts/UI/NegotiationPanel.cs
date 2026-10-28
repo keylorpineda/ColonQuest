@@ -75,7 +75,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice;
+            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
             if (IsOpen && key == lastKey)
             {
                 return;
@@ -204,9 +204,9 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             float y = -Pad + UiKit.Outline;
 
-            UiKit.Label(card, "Tienda  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth, 60f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, negotiation.Venue + "  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth, 60f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
             y -= 60f;
-            UiKit.Label(card, "Te ofrece un " + negotiation.Offer.Item + " en cuotas", 26, GameUiColors.Muted, new Vector2(textWidth, 38f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth, 38f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
             y -= 50f;
 
             var log = UiKit.Label(card, ConversationText(negotiation), 30, UiKit.Ink, new Vector2(textWidth, LogHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
@@ -243,11 +243,28 @@ namespace ColonQuest.UI
             UiKit.MakeButton(card, "Me lo llevo", GameUiColors.Green, new Vector2(half, 80f), top, new Vector2(left, y), () => session.AcceptDeal());
             UiKit.MakeButton(card, "Mejor me voy", GameUiColors.Pink, new Vector2(half, 80f), top, new Vector2(-left, y), () => session.WalkAway());
 
+            if (!string.IsNullOrEmpty(session.DealNotice))
+            {
+                UiKit.Label(card, session.DealNotice, 26, GameUiColors.Loss, new Vector2(textWidth, 70f), top, new Vector2(0f, y - 88f), TextAnchor.UpperCenter);
+            }
+
             root.SetActive(true);
             if (input != null)
             {
                 input.ActivateInputField();
             }
+        }
+
+        /// <summary>The line under the title: what is offered and, at the car agency, the costs that come with the car.</summary>
+        private string SubtitleFor(Negotiation negotiation)
+        {
+            var car = session.CurrentCar;
+            if (car == null)
+            {
+                return "Te ofrece un " + negotiation.Offer.Item + " en cuotas";
+            }
+
+            return $"Un {negotiation.Offer.Item}: prima {Money.Format(car.DownPayment)}, marchamo {Money.Format(car.MarchamoFirstYear)}, gasolina {Money.Format(car.RunningCostsMonthly)} al mes (ejemplo)";
         }
 
         private void BuildChips(RectTransform card, Negotiation negotiation, float textWidth, float y)

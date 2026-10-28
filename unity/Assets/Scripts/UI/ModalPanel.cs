@@ -112,7 +112,9 @@ namespace ColonQuest.UI
         }
 
         /// <param name="speaker">When set, the window talks: the text types itself and a face in this name's color speaks it.</param>
-        public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null)
+        /// <param name="bodyFontSize">Smaller than the default for windows that carry a lot of figures.</param>
+        /// <param name="maxBodyHeight">Zero keeps the default; a bigger value leaves room for a longer text.</param>
+        public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null, int bodyFontSize = 32, float maxBodyHeight = 0f)
         {
             Clear();
             options.AddRange(choices);
@@ -123,8 +125,8 @@ namespace ColonQuest.UI
 
             // Measure first, so the card can be sized to its content.
             float textWidth = CardWidth - Pad * 2f - UiKit.Outline * 2f;
-            var probe = UiKit.Label(root.transform, body, 32, UiKit.Ink, new Vector2(textWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
-            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, textWidth) + 8f, MaxBodyHeight);
+            var probe = UiKit.Label(root.transform, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, textWidth) + 8f, maxBodyHeight > 0f ? maxBodyHeight : MaxBodyHeight);
             UnityEngine.Object.Destroy(probe.gameObject);
 
             float titleHeight = 64f;
@@ -153,7 +155,7 @@ namespace ColonQuest.UI
             if (bodyHeight > 0f)
             {
                 y -= 12f;
-                var text = UiKit.Label(card, body, 32, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
+                var text = UiKit.Label(card, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
                 text.fontStyle = FontStyle.Normal;
                 if (talks)
                 {
