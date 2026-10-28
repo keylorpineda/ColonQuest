@@ -381,6 +381,67 @@ namespace ColonQuest.Game
             Changed?.Invoke();
         }
 
+        // ---------------------------------------------------------------- things that happen to the player
+
+        /// <summary>The police take the player away: a fine, days of the month lost and a lower mood.</summary>
+        public bool Arrest()
+        {
+            if (Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.ArrestPlayer());
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>A car ran the player over. It happens once a month at most; false when it did not count.</summary>
+        public bool Hospitalize()
+        {
+            if (Loop.IsFinished || Busy || Loop.HurtThisMonth)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.HospitalizePlayer());
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool BuyHealthInsurance()
+        {
+            if (!Loop.BuyHealthInsurance())
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool InArrears => !Loop.IsFinished && Loop.InArrears;
+
+        public long CollectionDemand => Loop.CollectionDemand;
+
+        public void PayCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.PayCollectors());
+            Changed?.Invoke();
+        }
+
+        public void NegotiateCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.NegotiateCollectors());
+            Changed?.Invoke();
+        }
+
+        public void IgnoreCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.IgnoreCollectors());
+            Changed?.Invoke();
+        }
+
         // ---------------------------------------------------------------- homes and the farm
 
         /// <summary>Signs a lease. The finance engine moves the money; false when it cannot be done.</summary>

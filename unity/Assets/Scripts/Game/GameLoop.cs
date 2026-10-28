@@ -70,6 +70,7 @@ namespace ColonQuest.Game
             Decisions = 0;
             Holdings = new Holdings();
             LastRunningCosts = 0L;
+            HurtThisMonth = false;
             doneStations.Clear();
         }
 
@@ -77,7 +78,8 @@ namespace ColonQuest.Game
         public static bool IsTaskStation(StationType type)
         {
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
-                && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm;
+                && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm
+                && type != StationType.HealthDesk;
         }
 
         public bool CanDoTask(StationType type)
@@ -91,6 +93,83 @@ namespace ColonQuest.Game
         }
 
         public bool AllTasksDone => TasksDone >= GameRules.TasksPerMonth;
+
+        /// <summary>True once the player has been run over this month; it happens once a month at most.</summary>
+        public bool HurtThisMonth { get; private set; }
+
+        /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): they count as tasks not done.</summary>
+        public void LoseTasks(int days)
+        {
+            TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days));
+        }
+
+        // ---------------------------------------------------------------- things that happen to the player
+
+        public ChoiceOutcome ArrestPlayer()
+        {
+            var before = State.Clone();
+            FinanceEngine.ChargeFine(State, MarketAssumptions.TrespassFine);
+            FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.JailWellbeingLoss);
+            LoseTasks(MarketAssumptions.JailDaysLost);
+            Decisions++;
+            return OutcomeFrom(before, "Te arrestaron por entrar a una casa ajena");
+        }
+
+        /// <summary>The player was run over: the bill depends on having health insurance and on the emergency fund.</summary>
+        public ChoiceOutcome HospitalizePlayer()
+        {
+            var before = State.Clone();
+            long bill = Holdings.HasHealthInsurance
+                ? FinanceEngine.PatientShare(MarketAssumptions.HospitalBill, MarketAssumptions.InsuredPatientSharePct)
+                : MarketAssumptions.HospitalBill;
+            FinanceEngine.ChargeMedicalBill(State, bill);
+            FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.HospitalWellbeingLoss);
+            LoseTasks(MarketAssumptions.HospitalDaysLost);
+            HurtThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Holdings.HasHealthInsurance ? "Te atropelló un carro (con seguro de salud)" : "Te atropelló un carro (sin seguro de salud)");
+        }
+
+        public bool BuyHealthInsurance()
+        {
+            if (Holdings.HasHealthInsurance || IsFinished)
+            {
+                return false;
+            }
+
+            Holdings.SetHealthInsurance(MarketAssumptions.HealthInsurancePremium);
+            State.RecordHistory("bought_health_insurance");
+            return true;
+        }
+
+        /// <summary>True when the player owes enough, and late enough, that the collectors come: an informal loan, or a card that is almost full.</summary>
+        public bool InArrears => CollectionRules.InArrears(State);
+
+        public long CollectionDemand => CollectionRules.Demand(State);
+
+        public ChoiceOutcome PayCollectors()
+        {
+            var before = State.Clone();
+            FinanceEngine.PayCollectors(State, CollectionRules.Demand(State));
+            Decisions++;
+            return OutcomeFrom(before, "Pagar a los cobradores");
+        }
+
+        public ChoiceOutcome NegotiateCollectors()
+        {
+            var before = State.Clone();
+            FinanceEngine.NegotiateCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionNegotiateSurchargePct);
+            Decisions++;
+            return OutcomeFrom(before, "Negociar con los cobradores");
+        }
+
+        public ChoiceOutcome IgnoreCollectors()
+        {
+            var before = State.Clone();
+            FinanceEngine.IgnoreCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionIgnoreFeePct, MarketAssumptions.CollectionIgnoreWellbeingLoss);
+            Decisions++;
+            return OutcomeFrom(before, "Ignorar a los cobradores");
+        }
 
         /// <summary>Applies the chosen option through the finance engine and counts the task.</summary>
         /// <exception cref="InvalidGameEventEffectException">The choice breaks the contract ranges; nothing changed.</exception>
@@ -208,6 +287,7 @@ namespace ColonQuest.Game
 
             MonthsPlayed++;
             TasksDone = 0;
+            HurtThisMonth = false;
             doneStations.Clear();
             return report;
         }

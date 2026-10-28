@@ -214,6 +214,52 @@ namespace ColonQuest.Game
             return null;
         }
 
+        // ---------------------------------------------------------------- the law, the hospital and the collectors
+
+        // All of these are illustrative, like everything in this file: check them against a real source (the
+        // courts, the CCSS and the INS for health care, the SUGEF for collections) before stating any of them as fact.
+
+        /// <summary>The fine for entering a house that is not yours, in colones.</summary>
+        public const long TrespassFine = 120_000L;
+
+        /// <summary>Days of the month lost to the night in jail and the hearing.</summary>
+        public const int JailDaysLost = 2;
+
+        public const int JailWellbeingLoss = 12;
+
+        /// <summary>Seconds the owner gives before calling the police.</summary>
+        public const float TrespassGraceSeconds = 9f;
+
+        /// <summary>What a hospital stay costs a person with no health insurance.</summary>
+        public const long HospitalBill = 380_000L;
+
+        /// <summary>The monthly premium of the health insurance.</summary>
+        public const long HealthInsurancePremium = 16_000L;
+
+        /// <summary>The share of the hospital bill an insured patient still pays, in percent.</summary>
+        public const int InsuredPatientSharePct = 15;
+
+        public const int HospitalDaysLost = 1;
+
+        public const int HospitalWellbeingLoss = 15;
+
+        /// <summary>A card at or above this share of its limit counts as being in arrears.</summary>
+        public const int ArrearsCardUsagePct = 90;
+
+        /// <summary>The collectors ask for this share of what is owed, between the two limits.</summary>
+        public const int CollectionDemandPct = 25;
+
+        public const long CollectionMinDemand = 20_000L;
+        public const long CollectionMaxDemand = 250_000L;
+
+        /// <summary>When negotiating, the half not paid now comes back with this surcharge, as a new informal loan.</summary>
+        public const int CollectionNegotiateSurchargePct = 10;
+
+        /// <summary>Ignoring the collectors adds this share of the demand as a late fee on the card.</summary>
+        public const int CollectionIgnoreFeePct = 12;
+
+        public const int CollectionIgnoreWellbeingLoss = 10;
+
         // ---------------------------------------------------------------- farm
 
         /// <summary>The stakes the farm accepts, in colones.</summary>

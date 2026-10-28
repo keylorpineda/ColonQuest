@@ -10,6 +10,11 @@ namespace ColonQuest.World
         public const string Casa = "Casa";
         public const string Tienda = "Tienda";
         public const string Banco = "Banco";
+        public const string Agencia = "Agencia";
+        public const string Carcel = "Carcel";
+        public const string Hospital = "Hospital";
+        public const string HospitalArriba = "HospitalArriba";
+        public const string Vecino = "Vecino";
     }
 
     /// <summary>
@@ -27,6 +32,15 @@ namespace ColonQuest.World
         public const string TownFromCasa = "Town_FromCasa";
         public const string TownFromTienda = "Town_FromTienda";
         public const string TownFromBanco = "Town_FromBanco";
+        public const string TownFromAgencia = "Town_FromAgencia";
+        public const string TownFromComisaria = "Town_FromComisaria";
+        public const string TownFromHospital = "Town_FromHospital";
+        public const string TownFromVecino = "Town_FromVecino";
+
+        // Inside: the cell, the hospital bed and the two ends of the hospital stairs.
+        public const string JailCell = "Carcel_Cell";
+        public const string HospitalBed = "Hospital_Bed";
+        public const string HospitalFromAbove = "Hospital_FromAbove";
     }
 
     /// <summary>Sizes shared by the map builder and the tests.</summary>
@@ -81,5 +95,16 @@ namespace ColonQuest.World
         public static readonly Vector2 CasaMat = new Vector2(0f, -5f);
         public static readonly Vector2 TiendaMat = new Vector2(0f, -5.3f);
         public static readonly Vector2 BancoMat = new Vector2(0f, -7.4f);
+
+        public static readonly Vector2 AgenciaSize = new Vector2(22f, 14f);
+        public static readonly Vector2 AgenciaMat = new Vector2(0f, -6f);
+        public static readonly Vector2 CarcelSize = new Vector2(20f, 13f);
+        public static readonly Vector2 CarcelMat = new Vector2(0f, -5.5f);
+        public static readonly Vector2 HospitalSize = new Vector2(24f, 14f);
+        public static readonly Vector2 HospitalMat = new Vector2(0f, -6f);
+        public static readonly Vector2 HospitalArribaSize = new Vector2(22f, 12f);
+        public static readonly Vector2 HospitalArribaMat = new Vector2(-8f, -5f);
+        public static readonly Vector2 VecinoSize = new Vector2(16.5f, 12f);
+        public static readonly Vector2 VecinoMat = new Vector2(0f, -5f);
     }
 }

@@ -29,7 +29,10 @@ namespace ColonQuest.World
         CarDealer,
 
         /// <summary>The farm: coffee or cattle. Not a task.</summary>
-        Farm
+        Farm,
+
+        /// <summary>The reception of the hospital, where the health insurance is taken out. Not a task.</summary>
+        HealthDesk
     }
 
     /// <summary>
