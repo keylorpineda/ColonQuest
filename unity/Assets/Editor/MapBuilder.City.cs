@@ -653,15 +653,13 @@ namespace ColonQuest.EditorTools
 
         /// <summary>
         /// What sits on each roof follows what the building is. Homes have the water tank every Costa Rican
-        /// house has, some an antenna; shops and offices have their air conditioning units in a row at the
-        /// back; the workshop has an exhaust pipe. Nothing is placed at random.
+        /// house has, some an antenna; the workshop has an exhaust pipe. Nothing is placed at random.
         /// </summary>
         private static void BuildRoofDetails(Transform parent, System.Random random)
         {
             var tanks = CityGroup(parent, "RoofWaterTanks");
             var antennas = CityGroup(parent, "RoofAntennas");
             var solar = CityGroup(parent, "SolarPanels");
-            var units = CityGroup(parent, "RoofAcUnits");
             var pipes = CityGroup(parent, "RoofPipes");
 
             int house = 0;
@@ -695,18 +693,6 @@ namespace ColonQuest.EditorTools
                     }
 
                     house++;
-                }
-                else if (IsBusiness(b))
-                {
-                    float w = b.XMax - b.XMin;
-                    float[] spots = w > 7f ? new[] { cx - 1.4f, cx + 1.4f } : new[] { cx };
-                    foreach (float x in spots)
-                    {
-                        var unit = Root(units, "AcUnit", new Vector2(x, roofY), b.YBottom - 0.05f);
-                        Part(unit, rounded, new Vector2(0f, 0.3f), new Vector2(0.9f, 0.6f), "#D7DDE8", 0);
-                        Shape(unit, "Fan", ring, new Vector2(0f, 0.32f), new Vector2(0.44f, 0.44f), Hex("#6B7186"), 3);
-                        Shape(unit, "Hub", circle, new Vector2(0f, 0.32f), Vector2.one * 0.1f, Hex("#6B7186"), 4);
-                    }
                 }
                 else if (b.Name == "Taller")
                 {

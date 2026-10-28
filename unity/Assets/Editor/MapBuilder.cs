@@ -34,11 +34,9 @@ namespace ColonQuest.EditorTools
         private const int OrderRug = 40;
 
         private const int OrderShadow = 0;
-        private const int OrderGlow = 3;
         private const int OrderLight = 4;
         private const int OrderProp = 5;
         private const int OrderWall = 8;
-        private const int OrderMarker = 10;
         private const int OrderLabel = 12;
         private const int OrderPlayer = 20;
 
@@ -397,8 +395,8 @@ namespace ColonQuest.EditorTools
             }
         }
 
-        private static void BuildStation(Transform parent, string name, StationType type, string displayName, Vector2 center,
-            int glowOrder = OrderGlow, int markerOrder = OrderMarker)
+        /// <summary>An invisible area: walking into it shows the prompt to interact. Nothing is drawn on the floor.</summary>
+        private static void BuildStation(Transform parent, string name, StationType type, string displayName, Vector2 center)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -410,10 +408,6 @@ namespace ColonQuest.EditorTools
 
             var station = go.AddComponent<Station>();
             station.Configure(type, displayName);
-
-            Flickering(Glow(go.transform, "Glow", Vector2.zero, 3.6f, "#FFD23F", 0.2f, glowOrder), 0.3f, 1.1f, center.x + center.y);
-            var marker = Shape(go.transform, "Marker", ring, Vector2.zero, Vector2.one * 1.3f, GamePalette.Marker, markerOrder);
-            marker.gameObject.AddComponent<StationMarker>().Bind(station);
         }
 
         private static void BuildSpawnPoint(Transform parent, string id, Vector2 position)

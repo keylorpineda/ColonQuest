@@ -19,8 +19,6 @@ namespace ColonQuest.EditorTools
         private const int TownAlley = 13;
         private const int TownRoadMark = 14;
         private const int TownShadow = 50;
-        private const int TownStationGlow = 60;
-        private const int TownStationMarker = 61;
 
         private enum Entrance
         {

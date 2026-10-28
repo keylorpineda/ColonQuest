@@ -346,13 +346,13 @@ namespace ColonQuest.EditorTools
 
             // Out in the street the stations lie on the ground, in front of each place.
             currentLayer = LayerFloor;
-            BuildStation(parent, "Station_Garage", StationType.Garage, "Taller de Don Rafa", new Vector2(19.5f, 4.9f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Grocery", StationType.Grocery, "Pulperia", new Vector2(-19.5f, -9.0f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Kiosk", StationType.Kiosk, "Kiosco SINPE", new Vector2(12f, -8.9f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f), TownStationGlow, TownStationMarker);
-            BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f), TownStationGlow, TownStationMarker);
+            BuildStation(parent, "Station_Garage", StationType.Garage, "Taller de Don Rafa", new Vector2(19.5f, 4.9f));
+            BuildStation(parent, "Station_Grocery", StationType.Grocery, "Pulperia", new Vector2(-19.5f, -9.0f));
+            BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f));
+            BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
+            BuildStation(parent, "Station_Kiosk", StationType.Kiosk, "Kiosco SINPE", new Vector2(12f, -8.9f));
+            BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
+            BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f));
             currentLayer = LayerWorld;
         }
 
