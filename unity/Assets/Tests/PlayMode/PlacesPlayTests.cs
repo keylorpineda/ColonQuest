@@ -277,6 +277,32 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator NewBuildings_StandOnClearGroundAwayFromEveryOtherBuilding()
+        {
+            yield return null;
+
+            var all = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            var buildings = Object.FindObjectsByType<BoxCollider2D>(FindObjectsSortMode.None)
+                .Where(c => !c.isTrigger && c.transform.Find("Roof") != null)
+                .ToArray();
+
+            foreach (var name in new[] { "Comisaria", "Hospital" })
+            {
+                var building = buildings.First(c => c.name == name);
+                foreach (var other in buildings.Where(c => c != building))
+                {
+                    Assert.IsFalse(building.bounds.Intersects(other.bounds), name + " overlaps " + other.name);
+                }
+
+                var area = building.bounds;
+                foreach (var item in all.Where(t => t.name == "Rock" || t.name == "Tree" || t.name == "Bush"))
+                {
+                    Assert.IsFalse(area.Contains(item.position), name + " has a " + item.name + " inside it at " + item.position);
+                }
+            }
+        }
+
+        [UnityTest]
         public IEnumerator Cars_MovingOnesShowADriverAndParkedOnesAreEmpty()
         {
             yield return null;

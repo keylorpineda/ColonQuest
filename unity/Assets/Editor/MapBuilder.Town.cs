@@ -58,6 +58,7 @@ namespace ColonQuest.EditorTools
 
             new GameObject("GameBootstrap").AddComponent<ColonQuest.UI.GameBootstrap>();
 
+            ClearNewBuildingFootprints(map);
             SaveScene(scene, SceneNames.Town);
         }
 

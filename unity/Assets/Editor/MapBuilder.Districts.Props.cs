@@ -28,10 +28,11 @@ namespace ColonQuest.EditorTools
         private static readonly Vector2 CarDealerSpot = new Vector2(9f, 31f);
         private static readonly Vector2 FarmSpot = new Vector2(54.5f, 4.9f);
 
-        // The new public buildings: where their doors are. The police station is on the avenue, the hospital by the east streets.
+        // The new public buildings: where their doors are. The police station is at the east end of the avenue and
+        // the hospital between the car agency and the river, on the same row. Both are ten units wide.
         private const float PoliceX = 56f;
-        private const float HospitalX = 54f;
-        private const float HospitalY = 8f;
+        private const float HospitalX = 22f;
+        private const float HospitalY = NorthSidewalkY;
 
         // ---------------------------------------------------------------- north district
 
@@ -70,7 +71,7 @@ namespace ColonQuest.EditorTools
             var hospital = Building(parent, shadows, new BuildingSpec
             {
                 Name = "Hospital", Sign = "HOSPITAL", Roof = "#9FB4CC", Wall = "#F5F8FB",
-                XMin = HospitalX - 7f, XMax = HospitalX + 7f, YBottom = HospitalY, YTop = HospitalY + 8.4f, DoorX = HospitalX, FacadeHeight = 5.6f, Entrance = Entrance.Door
+                XMin = HospitalX - 5f, XMax = HospitalX + 5f, YBottom = HospitalY, YTop = HospitalY + 8.4f, DoorX = HospitalX, FacadeHeight = 5.6f, Entrance = Entrance.Door
             });
             Banner(hospital, "URGENCIAS", 0f, 5.6f + 1.4f, "#E8505B");
             Shape(hospital, "CrossBar", square, new Vector2(4.2f, 3.9f), new Vector2(1.1f, 0.34f), GamePalette.Hex("#E8505B"), 6);
@@ -226,6 +227,36 @@ namespace ColonQuest.EditorTools
             }
         }
 
+        /// <summary>
+        /// Takes away the rocks, trees and bushes the scenery put where the police station and the hospital now stand.
+        /// It runs last, once every prop of the town is down.
+        /// </summary>
+        private static void ClearNewBuildingFootprints(Transform map)
+        {
+            var areas = new[]
+            {
+                new Rect(PoliceX - 5.5f, NorthSidewalkY - 0.6f, 11f, 8.6f),
+                new Rect(HospitalX - 5.5f, NorthSidewalkY - 0.6f, 11f, 10.4f)
+            };
+
+            foreach (var item in map.GetComponentsInChildren<Transform>(true))
+            {
+                if (item == null || !(item.name == "Rock" || item.name == "Tree" || item.name == "Bush"))
+                {
+                    continue;
+                }
+
+                foreach (var area in areas)
+                {
+                    if (area.Contains(item.position))
+                    {
+                        Object.DestroyImmediate(item.gameObject);
+                        break;
+                    }
+                }
+            }
+        }
+
         // ---------------------------------------------------------------- places and people
 
         private static void BuildMarketStations(Transform parent)
@@ -238,7 +269,7 @@ namespace ColonQuest.EditorTools
             Doorway(parent, new Vector2(-8.5f, -7.8f), SceneNames.Vecino);
             BuildSpawnPoint(parent, SpawnIds.TownFromAgencia, new Vector2(CarDealerSpot.x, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromComisaria, new Vector2(PoliceX, 31.6f));
-            BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 6.8f));
+            BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-8.5f, -9.2f));
             BuildStation(parent, "Station_Farm", StationType.Farm, "Hablar de invertir en la finca", FarmSpot);
 
