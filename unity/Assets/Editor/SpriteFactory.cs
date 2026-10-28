@@ -19,6 +19,7 @@ namespace ColonQuest.EditorTools
         public const string SoftCirclePath = Folder + "/SoftCircle.png";
         public const string VignettePath = Folder + "/Vignette.png";
         public const string SquarePath = Folder + "/Square.png";
+        public const string NoisePath = Folder + "/Noise.png";
 
         [MenuItem("Colon Quest/Art/Generate Sprites")]
         public static void Generate()
@@ -37,6 +38,9 @@ namespace ColonQuest.EditorTools
 
             // A plain 1 by 1 unit square for thin lines such as floor tile joints.
             Write(SquarePath, 4, 4, 0, (x, y) => 1f);
+
+            // Fine grain that tiles seamlessly, to give flat colors a little texture.
+            Write(NoisePath, 128, 32, 0, (x, y) => GrainAlpha((int)x, (int)y), true);
             AssetDatabase.Refresh();
         }
 
@@ -44,10 +48,20 @@ namespace ColonQuest.EditorTools
         {
             if (!File.Exists(RoundedRectPath) || !File.Exists(RoundedRectSmallPath)
                 || !File.Exists(CirclePath) || !File.Exists(RingPath)
-                || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath) || !File.Exists(SquarePath))
+                || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath) || !File.Exists(SquarePath)
+                || !File.Exists(NoisePath))
             {
                 Generate();
             }
+        }
+
+        /// <summary>A repeatable pseudo-random value per pixel, so the same grain is generated every time.</summary>
+        private static float GrainAlpha(int x, int y)
+        {
+            uint h = (uint)(x * 374761393 + y * 668265263);
+            h = (h ^ (h >> 13)) * 1274126177u;
+            h ^= h >> 16;
+            return (h & 0xFFFFu) / 65535f;
         }
 
         private static float SoftCircleAlpha(float x, float y, int size)
@@ -92,7 +106,7 @@ namespace ColonQuest.EditorTools
             return Mathf.Clamp01(0.5f - distance);
         }
 
-        private static void Write(string path, int size, int pixelsPerUnit, int border, Func<float, float, float> alphaAt)
+        private static void Write(string path, int size, int pixelsPerUnit, int border, Func<float, float, float> alphaAt, bool repeat = false)
         {
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
             for (int y = 0; y < size; y++)
@@ -114,6 +128,7 @@ namespace ColonQuest.EditorTools
             importer.spriteBorder = new Vector4(border, border, border, border);
             importer.filterMode = FilterMode.Bilinear;
             importer.mipmapEnabled = false;
+            importer.wrapMode = repeat ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
             importer.alphaIsTransparency = true;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
 

@@ -174,6 +174,7 @@ namespace ColonQuest.EditorTools
             softCircle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SoftCirclePath);
             vignette = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.VignettePath);
             square = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SquarePath);
+            noise = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.NoisePath);
         }
 
         private static Transform Group(Transform parent, string name)

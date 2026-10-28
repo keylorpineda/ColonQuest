@@ -15,6 +15,7 @@ namespace ColonQuest.EditorTools
             // Flat on the ground, back to front.
             BuildSunPatches(parent, random);
             BuildContactShadows(shadows);
+            BuildRealism(parent, shadows);
             BuildShells(parent, random);
             BuildWaterSparkles(parent, random);
             BuildMist(parent, random);
