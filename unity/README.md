@@ -62,6 +62,35 @@ Each place is a kind of money decision the game master can throw at the player.
 Today the stations only fire `PlayerEntered` and `PlayerExited`; the overlay panels that react to
 them come with the playable month.
 
+## Playing a run
+
+A run is three months (`GameRules.MonthsToPlay`). Each month has `GameRules.TasksPerMonth` tasks and
+ends at the bank. The overlay appears over the town scene and follows the player into the buildings.
+
+| Where | Key | What happens |
+| --- | --- | --- |
+| Any street place (garage, grocery, lender, stand, kiosk, cooperative, soda, store) | E | Asks the game master for an event and opens it as a window. One task per place and month |
+| Event window | 1 to 4 or click | Applies the chosen option through `FinanceEngine.ApplyChoice`, shows what changed, and records the decision in the backend |
+| Banco (cashier) | E | Collects the salary and runs the month with `FinanceEngine.RunMonthlyTick`: installments, the card cycle and interest, living expenses |
+| Casa | E | The account statement: cash, savings, card, installments, loans and net worth |
+| After the last month | | The summary from the backend, or a local one when it is offline, and "Jugar de nuevo" |
+
+The status card in the top left shows the month, the tasks done, cash, savings, the card balance,
+the installments per month and well-being. Windows block the player's movement
+(`PlayerController.Blocked`).
+
+| File | What it does |
+| --- | --- |
+| `Scripts/Game/GameRules.cs` | Length of a run, the starting `PlayerState`, debt and net worth helpers, and `Money.Format` (₡85 000) |
+| `Scripts/Game/GameLoop.cs` | The rules without Unity: which tasks are done, applying a choice, closing the month |
+| `Scripts/Game/GameSession.cs` | Joins the loop with `ApiClient` and raises events for the UI |
+| `Scripts/UI/UiKit.cs`, `ModalPanel.cs` | The Among Us style cards, buttons and the single modal window |
+| `Scripts/UI/GameUi.cs` | Status card, prompt, loading card and every window |
+| `Scripts/UI/GameBootstrap.cs` | Placed in the Town scene; creates the session and the overlay once |
+
+Without a backend the run is fully playable with the local events. To play against the real one:
+start it (see `server/README.md`) and keep the default `ApiConfig.LocalUrl`.
+
 ## Backend client
 
 `Assets/Scripts/Api/` (assembly `ColonQuest.Api`) is the only code that talks to the FastAPI
