@@ -62,6 +62,11 @@ namespace ColonQuest.Game
             StartNewGame();
         }
 
+        private void Update()
+        {
+            DayTint.Progress = DayCycle.ProgressOf(Loop.MonthsPlayed, Loop.TasksDone, GameRules.MonthsToPlay, GameRules.TasksPerMonth);
+        }
+
         private void OnDestroy()
         {
             if (Instance == this)
