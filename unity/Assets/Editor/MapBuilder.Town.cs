@@ -255,12 +255,14 @@ namespace ColonQuest.EditorTools
             Bench(parent, shadows, -12f, -0.9f);
             Bench(parent, shadows, 12f, -0.9f);
 
-            Car(parent, shadows, -21f, 0.95f, "#E8505B");
-            Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF");
-            Car(parent, shadows, -14f, 3.05f, "#FFD23F");
-            Car(parent, shadows, -6f, -10.95f, "#55E08F");
-            Car(parent, shadows, 8f, -13.05f, "#F1F4FF");
-            Car(parent, shadows, -18f, -13.05f, "#FF8A3D");
+            // Traffic keeps to the right: east along the south lane of each road, west along the north lane.
+            // Cars in the same lane share a speed, so none catches up with the one ahead.
+            Car(parent, shadows, -21f, 0.95f, "#E8505B", 2.4f);
+            Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
+            Car(parent, shadows, -14f, 3.05f, "#FFD23F", -2.0f);
+            Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
+            Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
+            Car(parent, shadows, -18f, -13.05f, "#FF8A3D", 2.6f);
         }
 
         private static void BuildPlazaAndPark(Transform parent, Transform shadows)
@@ -358,7 +360,7 @@ namespace ColonQuest.EditorTools
             var trigger = go.AddComponent<BoxCollider2D>();
             trigger.size = new Vector2(1.3f, 1.0f);
             trigger.isTrigger = true;
-            go.AddComponent<Door>().Configure(targetScene, SpawnIds.FromTown);
+            go.AddComponent<Door>().Configure(targetScene, SpawnIds.FromTown, Vector2.up);
         }
 
         private static void BuildPeople(Transform parent)

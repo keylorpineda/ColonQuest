@@ -34,7 +34,52 @@ namespace ColonQuest.EditorTools
         {
             bool inRiver = x > MapLayout.RiverXMin - 0.5f && x < MapLayout.RiverXMax + 0.5f;
             bool onBeach = y < -19f && x > -27f;
-            return !inRiver && !onBeach && y < MapLayout.NorthEdgeY && y > MapLayout.ShoreY && Mathf.Abs(x) < 45f;
+            return !inRiver && !onBeach && y < MapLayout.NorthEdgeY && y > MapLayout.ShoreY && Mathf.Abs(x) < 45f && !OnPavement(x, y, 0.4f);
+        }
+
+        /// <summary>
+        /// Ground that is built or wet: the roads, the plaza, the alley, the gravel lot, the park path, the
+        /// pond and the fountain. Nothing green grows there, so plants never end up on an asphalt lane.
+        /// </summary>
+        private static bool OnPavement(float x, float y, float margin)
+        {
+            var p = new Vector2(x, y);
+            foreach (var area in PavedAreas)
+            {
+                var grown = new Rect(area.xMin - margin, area.yMin - margin, area.width + margin * 2f, area.height + margin * 2f);
+                if (grown.Contains(p))
+                {
+                    return true;
+                }
+            }
+
+            return Vector2.Distance(p, new Vector2(0f, 9f)) < 2.4f + margin;
+        }
+
+        private static readonly Rect[] PavedAreas =
+        {
+            new Rect(-50f, 0f, 100f, 4f),
+            new Rect(-50f, -14f, 100f, 4f),
+            new Rect(-2f, -10f, 4f, 10f),
+            new Rect(-4f, 4f, 8f, 9f),
+            new Rect(-16f, -8f, 4f, 6f),
+            new Rect(4f, -7.4f, 6f, 4.8f),
+            new Rect(14.5f, -4.12f, 9.5f, 1.14f),
+            new Rect(16.7f, -7.2f, 5.6f, 2.6f)
+        };
+
+        /// <summary>True under the walls of a building. Behind its roof line (north of it) is still fine.</summary>
+        private static bool InsideBuilding(float x, float y)
+        {
+            foreach (var b in buildingSpecs)
+            {
+                if (x > b.XMin - 0.3f && x < b.XMax + 0.3f && y > b.YBottom - 0.3f && y < b.YTop)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // ---------------------------------------------------------------- ground

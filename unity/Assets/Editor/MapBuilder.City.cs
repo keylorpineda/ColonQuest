@@ -810,6 +810,12 @@ namespace ColonQuest.EditorTools
                 Part(root, circle, new Vector2(0f, 0.14f), new Vector2(0.44f, 0.3f), "#F8F5E8", 0);
                 Part(root, circle, new Vector2(0.18f, 0.28f), new Vector2(0.22f, 0.2f), "#F8F5E8", 1);
                 Shape(root, "Beak", roundedSmall, new Vector2(0.32f, 0.27f), new Vector2(0.12f, 0.07f), Hex("#FF9F43"), 6);
+
+                // The ducks swim up and down the river, some each way, slowly.
+                bool north = i % 2 == 0;
+                float speed = 0.25f + (float)random.NextDouble() * 0.2f;
+                root.gameObject.AddComponent<Drift>().Configure(new Vector2(0f, north ? speed : -speed), new Vector2(60f, 24f));
+                root.localRotation = Quaternion.Euler(0f, 0f, north ? 90f : -90f);
             }
 
             var fish = CityGroup(parent, "FishShadows");

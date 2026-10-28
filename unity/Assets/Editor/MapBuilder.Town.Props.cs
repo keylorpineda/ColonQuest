@@ -235,6 +235,11 @@ namespace ColonQuest.EditorTools
 
         private static void Tree(Transform parent, Transform shadows, float x, float y, float scale, string leaf, bool fruit)
         {
+            if (OnPavement(x, y, 0.3f) || InsideBuilding(x, y))
+            {
+                return;
+            }
+
             var root = Root(parent, "Tree", new Vector2(x, y), y);
             GroundShadow(shadows, new Vector2(x + 0.25f, y - 0.05f), new Vector2(2.1f * scale, 0.75f * scale));
 
@@ -292,6 +297,11 @@ namespace ColonQuest.EditorTools
 
         private static void Bush(Transform parent, Transform shadows, float x, float y, float scale)
         {
+            if (OnPavement(x, y, 0.5f) || InsideBuilding(x, y))
+            {
+                return;
+            }
+
             var root = Root(parent, "Bush", new Vector2(x, y), y);
             GroundShadow(shadows, new Vector2(x + 0.15f, y), new Vector2(1.3f * scale, 0.5f * scale), 0.22f);
             Shape(root, "Outline", circle, new Vector2(0f, 0.45f * scale), Vector2.one * 1.2f * scale, GamePalette.Outline, 0);
@@ -301,12 +311,29 @@ namespace ColonQuest.EditorTools
             Shape(root, "Light", circle, new Vector2(-0.2f * scale, 0.65f * scale), Vector2.one * 0.4f * scale, light, 2);
         }
 
-        private static void Car(Transform parent, Transform shadows, float x, float y, string hex)
+        /// <summary>A car on the street. With a speed it drives along its lane and wraps around; without, it stands parked.</summary>
+        private static void Car(Transform parent, Transform shadows, float x, float y, string hex, float speed = 0f)
         {
             var root = Root(parent, "Car", new Vector2(x, y), y - 0.55f);
-            BuildThing(root, "Car", "Ver el carro", Vector2.zero, new Vector2(2.4f, 1.1f),
-                "Un carro no es solo la cuota: marchamo, RTV, seguro, gasolina y mantenimiento, todos los años.");
-            GroundShadowRect(shadows, new Vector2(x + 0.12f, y - 0.2f), new Vector2(2.6f, 1.3f), 0.3f);
+            bool driving = speed != 0f;
+            if (driving)
+            {
+                // The shadow travels with the car, and a car that moves has nothing to interact with.
+                var shadowColor = GamePalette.Outline;
+                shadowColor.a = 0.16f;
+                OnGround(root, "Shadow", softCircle, new Vector2(0.12f, -0.2f), new Vector2(2.6f, 1.3f), shadowColor, TownShadow);
+                root.gameObject.AddComponent<Drift>().Configure(new Vector2(speed, 0f), new Vector2(49f, 100f));
+                if (speed < 0f)
+                {
+                    root.localScale = new Vector3(-1f, 1f, 1f);
+                }
+            }
+            else
+            {
+                BuildThing(root, "Car", "Ver el carro", Vector2.zero, new Vector2(2.4f, 1.1f),
+                    "Un carro no es solo la cuota: marchamo, RTV, seguro, gasolina y mantenimiento, todos los años.");
+                GroundShadowRect(shadows, new Vector2(x + 0.12f, y - 0.2f), new Vector2(2.6f, 1.3f), 0.3f);
+            }
 
             var body = GamePalette.Hex(hex);
             foreach (float sx in new[] { -0.8f, 0.8f })
@@ -325,8 +352,11 @@ namespace ColonQuest.EditorTools
             Shape(root, "Headlight", circle, new Vector2(1.18f, 0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
             Shape(root, "Headlight", circle, new Vector2(1.18f, -0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
 
-            var collider = root.gameObject.AddComponent<BoxCollider2D>();
-            collider.size = new Vector2(2.5f, 1.1f);
+            if (!driving)
+            {
+                var collider = root.gameObject.AddComponent<BoxCollider2D>();
+                collider.size = new Vector2(2.5f, 1.1f);
+            }
         }
 
         private static void Hedge(Transform parent, Vector2 center, Vector2 size)
@@ -350,26 +380,63 @@ namespace ColonQuest.EditorTools
 
         private static void Fountain(Transform parent, Transform shadows, Vector2 center)
         {
-            GroundShadow(shadows, center + new Vector2(0.2f, -0.2f), new Vector2(4.2f, 3.2f), 0.25f);
-            var root = Root(parent, "Fountain", center, center.y - 1.5f);
-            BuildThing(root, "Fountain", "Ver la fuente", Vector2.zero, new Vector2(3.7f, 3.7f),
+            GroundShadow(shadows, center + new Vector2(0.25f, -0.55f), new Vector2(4.8f, 2.2f), 0.25f);
+            var root = Root(parent, "Fountain", center, center.y - 1.3f);
+            BuildThing(root, "Fountain", "Ver la fuente", Vector2.zero, new Vector2(3.7f, 3.0f),
                 "Hay monedas en el fondo. Pedir un deseo es gratis; cumplirlo casi siempre empieza por ahorrar.");
 
-            Shape(root, "Basin_Outline", circle, Vector2.zero, Vector2.one * 3.7f, GamePalette.Outline, 0);
-            Shape(root, "Basin", circle, Vector2.zero, Vector2.one * 3.5f, GamePalette.Hex("#C7CEE0"), 1);
-            Shape(root, "Water", circle, Vector2.zero, Vector2.one * 2.9f, GamePalette.Hex("#6EC1E8"), 2);
+            var stone = GamePalette.Hex("#D5DAE8");
+            var water = GamePalette.Hex("#5CB8E6");
 
+            // The wide basin, seen from a little above: a stone rim, the inner wall and the water.
+            Shape(root, "Basin_Outline", circle, new Vector2(0f, 0f), new Vector2(4.3f, 2.9f), GamePalette.Outline, 0);
+            Shape(root, "Basin_Front", circle, new Vector2(0f, -0.1f), new Vector2(4.1f, 2.7f), GamePalette.Shade(stone, 0.78f), 1);
+            Shape(root, "Basin_Rim", circle, new Vector2(0f, 0.05f), new Vector2(4.1f, 2.6f), stone, 2);
+            Shape(root, "Basin_Wall", circle, new Vector2(0f, 0.08f), new Vector2(3.5f, 2.1f), GamePalette.Shade(stone, 0.72f), 3);
+            Shape(root, "Water", circle, new Vector2(0f, 0.04f), new Vector2(3.3f, 1.95f), water, 4);
+
+            var glint = GamePalette.White;
+            glint.a = 0.35f;
+            Shape(root, "Water_Glint", softCircle, new Vector2(-0.8f, 0.25f), new Vector2(1.6f, 0.5f), glint, 5);
             var ripple = GamePalette.White;
             ripple.a = 0.5f;
-            Flickering(Shape(root, "Ripple", ring, Vector2.zero, Vector2.one * 2.4f, ripple, 3), 0.5f, 1.6f, 3f);
-            Flickering(Shape(root, "Ripple", ring, Vector2.zero, Vector2.one * 1.6f, ripple, 3), 0.5f, 2.1f, 9f);
+            Flickering(Shape(root, "Ripple", ring, new Vector2(0f, 0.04f), new Vector2(2.7f, 1.5f), ripple, 5), 0.5f, 1.6f, 3f);
+            Flickering(Shape(root, "Ripple", ring, new Vector2(0f, 0.04f), new Vector2(1.9f, 1.05f), ripple, 5), 0.5f, 2.1f, 9f);
 
-            Shape(root, "Pillar_Outline", circle, Vector2.zero, Vector2.one * 1.2f, GamePalette.Outline, 4);
-            Shape(root, "Pillar", circle, Vector2.zero, Vector2.one * 1.0f, GamePalette.Hex("#DDE2EE"), 5);
-            Shape(root, "Spout", circle, Vector2.zero, Vector2.one * 0.5f, GamePalette.Hex("#9ADBF5"), 6);
+            // The pedestal rises from the middle: a base, a column and a smaller bowl on top.
+            Shape(root, "Base_Outline", circle, new Vector2(0f, 0.1f), new Vector2(1.5f, 0.85f), GamePalette.Outline, 6);
+            Shape(root, "Base", circle, new Vector2(0f, 0.12f), new Vector2(1.34f, 0.72f), stone, 7);
+            Shape(root, "Column_Outline", roundedSmall, new Vector2(0f, 0.75f), new Vector2(0.56f, 1.3f), GamePalette.Outline, 8);
+            Shape(root, "Column", roundedSmall, new Vector2(0f, 0.75f), new Vector2(0.4f, 1.24f), GamePalette.Shade(stone, 1.04f), 9);
+            Shape(root, "Bowl_Outline", circle, new Vector2(0f, 1.45f), new Vector2(2.1f, 1.0f), GamePalette.Outline, 10);
+            Shape(root, "Bowl_Front", circle, new Vector2(0f, 1.38f), new Vector2(1.96f, 0.9f), GamePalette.Shade(stone, 0.78f), 11);
+            Shape(root, "Bowl_Rim", circle, new Vector2(0f, 1.46f), new Vector2(1.96f, 0.86f), stone, 12);
+            Shape(root, "Bowl_Water", circle, new Vector2(0f, 1.48f), new Vector2(1.6f, 0.68f), water, 13);
+            Shape(root, "Finial", circle, new Vector2(0f, 1.75f), Vector2.one * 0.3f, GamePalette.Shade(stone, 1.06f), 14);
+
+            // Jets arch out of the top and fall into the bowl; the droplets keep flickering.
+            var spray = GamePalette.White;
+            spray.a = 0.85f;
+            for (int k = -2; k <= 2; k++)
+            {
+                float angle = k * 24f;
+                float length = 0.95f - Mathf.Abs(k) * 0.12f;
+                var jet = Shape(root, "Jet", roundedSmall,
+                    new Vector2(Mathf.Sin(angle * Mathf.Deg2Rad) * length * 0.55f, 1.8f + Mathf.Cos(angle * Mathf.Deg2Rad) * length * 0.5f),
+                    new Vector2(0.07f, length), spray, 15);
+                Tilt(jet, -angle);
+                Flickering(jet, 0.55f, 2.4f + Mathf.Abs(k) * 0.3f, k * 1.7f);
+            }
+
+            for (int k = -3; k <= 3; k++)
+            {
+                var drop = Shape(root, "Drop", circle, new Vector2(k * 0.34f, 1.7f - Mathf.Abs(k) * 0.12f), Vector2.one * 0.1f, spray, 15);
+                Flickering(drop, 0.3f, 3.1f, k * 2.3f);
+            }
 
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
-            collider.radius = 1.7f;
+            collider.radius = 1.45f;
+            collider.offset = new Vector2(0f, 0.1f);
         }
 
         /// <summary>Colored dots on the ground for flower beds and wildflowers.</summary>
@@ -380,6 +447,11 @@ namespace ColonQuest.EditorTools
             {
                 float x = area.xMin + (float)random.NextDouble() * area.width;
                 float y = area.yMin + (float)random.NextDouble() * area.height;
+                if (OnPavement(x, y, 0.3f) || InsideBuilding(x, y))
+                {
+                    continue;
+                }
+
                 OnGround(parent, "Flower", circle, new Vector2(x, y), Vector2.one * (0.16f + (float)random.NextDouble() * 0.08f),
                     GamePalette.Hex(colors[random.Next(colors.Length)]), TownGroundDetail + 1);
             }
