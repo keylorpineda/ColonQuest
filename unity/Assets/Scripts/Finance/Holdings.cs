@@ -113,11 +113,16 @@ namespace ColonQuest.Finance
 
         public HomeHolding Home { get; private set; }
         public CarHolding Car { get; private set; }
+
+        /// <summary>The monthly premium of the health insurance, or zero when the player has none.</summary>
+        public long HealthPremium { get; private set; }
+
+        public bool HasHealthInsurance => HealthPremium > 0L;
         public IReadOnlyList<FarmStake> Farm => farm;
 
-        public bool IsEmpty => Home == null && Car == null && farm.Count == 0;
+        public bool IsEmpty => Home == null && Car == null && farm.Count == 0 && HealthPremium == 0L;
 
-        public long MonthlyRunningCosts => Car != null ? Car.MonthlyRunningCosts : 0L;
+        public long MonthlyRunningCosts => (Car != null ? Car.MonthlyRunningCosts : 0L) + HealthPremium;
 
         public long FarmInvested
         {
@@ -156,6 +161,17 @@ namespace ColonQuest.Finance
         public void SetHome(HomeHolding home)
         {
             Home = home ?? throw new ArgumentNullException(nameof(home));
+        }
+
+        /// <summary>Takes out the health insurance; the premium is charged every month with the other running costs.</summary>
+        public void SetHealthInsurance(long monthlyPremium)
+        {
+            if (monthlyPremium <= 0L)
+            {
+                throw new ArgumentOutOfRangeException(nameof(monthlyPremium), "The premium must be positive.");
+            }
+
+            HealthPremium = monthlyPremium;
         }
 
         public void SetCar(CarHolding car)
