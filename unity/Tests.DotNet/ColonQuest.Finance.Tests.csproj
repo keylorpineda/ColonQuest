@@ -13,6 +13,9 @@
   <ItemGroup>
     <Compile Include="..\Assets\Scripts\Finance\**\*.cs" LinkBase="Finance" />
     <Compile Include="..\Assets\Tests\EditMode\**\*.cs" LinkBase="Tests" />
+    <Compile Remove="..\Assets\Tests\EditMode\World\**" />
+    <Compile Remove="..\Assets\Tests\EditMode\Api\**" />
+    <Compile Remove="..\Assets\Tests\EditMode\Game\**" />
   </ItemGroup>
 
   <ItemGroup>
