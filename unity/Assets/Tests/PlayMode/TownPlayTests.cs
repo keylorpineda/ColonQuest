@@ -22,28 +22,28 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Player_IsStoppedByTheCliffInTheWest()
+        public IEnumerator Player_IsStoppedByTheInvisibleWallInTheWest()
         {
-            yield return Walk(new Vector2(-40f, -22f), Vector2.left, 2f);
+            yield return Walk(new Vector2(-30f, 2f), Vector2.left, 2f);
 
-            Assert.Greater(Body.position.x, MapLayout.WestEdgeX - 0.1f);
+            Assert.Greater(Body.position.x, MapLayout.PlayWestX - 0.1f);
         }
 
         [UnityTest]
-        public IEnumerator Player_IsStoppedByTheCliffInTheEast()
+        public IEnumerator Player_IsStoppedByTheInvisibleWallInTheEast()
         {
-            yield return Walk(new Vector2(41f, -21f), Vector2.right, 2f);
+            yield return Walk(new Vector2(33f, 2f), Vector2.right, 2f);
 
-            Assert.Less(Body.position.x, MapLayout.EastEdgeX + 0.1f);
+            Assert.Less(Body.position.x, MapLayout.PlayEastX + 0.1f);
         }
 
         [UnityTest]
-        public IEnumerator Player_IsStoppedByTheCliffInTheNorth()
+        public IEnumerator Player_IsStoppedByTheInvisibleWallInTheNorth()
         {
-            // Up the trail to the lookout, which ends at the rock face.
-            yield return Walk(new Vector2(0.2f, 16f), Vector2.up, 3f);
+            // Up the trail into the forest, which ends at the invisible wall.
+            yield return Walk(new Vector2(0.2f, 15f), Vector2.up, 3f);
 
-            Assert.Less(Body.position.y, MapLayout.NorthEdgeY + 0.1f);
+            Assert.Less(Body.position.y, MapLayout.PlayNorthY + 0.1f);
         }
 
         [UnityTest]

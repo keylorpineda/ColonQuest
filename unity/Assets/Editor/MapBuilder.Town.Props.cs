@@ -48,6 +48,9 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>An object that is sorted by the height of its feet, so the player can pass in front of or behind it.</summary>
+        /// <summary>Ground taken by the buildings, so the ground cover is not planted under them.</summary>
+        private static readonly System.Collections.Generic.List<Rect> footprints = new System.Collections.Generic.List<Rect>();
+
         private static Transform Root(Transform parent, string name, Vector2 position, float footY)
         {
             var go = new GameObject(name);
@@ -86,6 +89,7 @@ namespace ColonQuest.EditorTools
 
         private static Transform Building(Transform parent, Transform shadows, BuildingSpec b)
         {
+            footprints.Add(new Rect(b.XMin - 1f, b.YBottom - 1.5f, b.XMax - b.XMin + 2f, b.YTop - b.YBottom + b.FacadeHeight + 3f));
             float cx = (b.XMin + b.XMax) * 0.5f;
             float w = b.XMax - b.XMin;
             float h = b.YTop - b.YBottom;

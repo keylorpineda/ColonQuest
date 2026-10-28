@@ -34,10 +34,17 @@ namespace ColonQuest.World
         /// <summary>Everything the camera may show in the town.</summary>
         public static readonly Rect TownBounds = new Rect(-46f, -34f, 92f, 66f);
 
-        // The natural edges of the world: rock faces to the north, west and east, the sea to the south.
+        // Where the rock face and the sea are drawn; the player is stopped well before them.
         public const float NorthEdgeY = 23f;
-        public const float WestEdgeX = -41.5f;
-        public const float EastEdgeX = 41.5f;
+
+        /// <summary>
+        /// Where the invisible walls stand. The world goes on past them (roads, trees, river, sea), so the
+        /// player sees there is more but cannot get to it.
+        /// </summary>
+        public const float PlayWestX = -33f;
+        public const float PlayEastX = 35.5f;
+        public const float PlayNorthY = 17f;
+
         public const float ShoreY = -27.2f;
 
         // The river that runs north to south on the east side, and the pier on the beach.

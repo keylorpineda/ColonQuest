@@ -34,7 +34,7 @@ namespace ColonQuest.EditorTools
         {
             bool inRiver = x > MapLayout.RiverXMin - 0.5f && x < MapLayout.RiverXMax + 0.5f;
             bool onBeach = y < -19f && x > -27f;
-            return !inRiver && !onBeach && y < MapLayout.NorthEdgeY && y > MapLayout.ShoreY && Mathf.Abs(x) < MapLayout.EastEdgeX;
+            return !inRiver && !onBeach && y < MapLayout.NorthEdgeY && y > MapLayout.ShoreY && Mathf.Abs(x) < 45f;
         }
 
         // ---------------------------------------------------------------- ground
@@ -190,41 +190,6 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Mountain_Snow", circle, new Vector2(x - 0.2f, 27.5f + height * 0.78f), new Vector2(width * 0.2f, height * 0.5f), GamePalette.White, WorldSand + 4);
         }
 
-        /// <summary>
-        /// Fog over the west and east ends of the map. The roads keep going into it and the invisible
-        /// walls stand inside it, so the world seems to go on instead of stopping at a drawn edge.
-        /// </summary>
-        private static void BuildFog(Transform parent)
-        {
-            var previous = currentLayer;
-            currentLayer = LayerForeground;
-
-            var fog = GamePalette.Hex("#DDE8F1");
-            for (int side = -1; side <= 1; side += 2)
-            {
-                // Solid past the edge of the camera, then soft puffs thinning out toward the town.
-                var wall = fog;
-                wall.a = 1f;
-                Shape(parent, "Fog_Solid", square, new Vector2(side * 49.5f, -1f), new Vector2(10f, 70f), wall, 5);
-
-                int seed = 0;
-                for (float x = 38f; x <= 47f; x += 1.8f)
-                {
-                    float depth = Mathf.InverseLerp(38f, 46f, x);
-                    for (float y = -36f; y <= 34f; y += 4.2f, seed++)
-                    {
-                        var puff = fog;
-                        puff.a = Mathf.Lerp(0.16f, 0.5f, depth);
-                        float wobble = (seed % 3) * 0.7f;
-                        var cloud = Shape(parent, "Fog", softCircle, new Vector2(side * (x + wobble * 0.4f), y + wobble), Vector2.one * (7f + wobble), puff, 6);
-                        Flickering(cloud, 0.05f, 0.3f + (seed % 5) * 0.05f, seed);
-                    }
-                }
-            }
-
-            currentLayer = previous;
-        }
-
         /// <summary>A rock face: dark outline, strata lines and round boulders along the edge the player sees.</summary>
         private static void CliffBlock(Transform parent, Rect area, int bumpSide, System.Random random)
         {
@@ -301,9 +266,9 @@ namespace ColonQuest.EditorTools
         private static void BuildWorldBorders(Transform parent)
         {
             float width = MapLayout.TownBounds.width;
-            Wall(parent, "North_Cliff", new Vector2(0f, MapLayout.NorthEdgeY + 0.5f), new Vector2(width, 1f));
-            Wall(parent, "West_Cliff", new Vector2(MapLayout.WestEdgeX - 0.5f, -1f), new Vector2(1f, 66f));
-            Wall(parent, "East_Cliff", new Vector2(MapLayout.EastEdgeX + 0.5f, -1f), new Vector2(1f, 66f));
+            Wall(parent, "North_Wall", new Vector2(0f, MapLayout.PlayNorthY + 0.5f), new Vector2(width, 1f));
+            Wall(parent, "West_Wall", new Vector2(MapLayout.PlayWestX - 0.5f, -1f), new Vector2(1f, 66f));
+            Wall(parent, "East_Wall", new Vector2(MapLayout.PlayEastX + 0.5f, -1f), new Vector2(1f, 66f));
 
             // The sea stops the player at the shore, except along the pier.
             float shore = MapLayout.ShoreY;

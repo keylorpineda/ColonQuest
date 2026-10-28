@@ -21,6 +21,7 @@ namespace ColonQuest.EditorTools
             var scene = BeginScene();
             var map = new GameObject("Map").transform;
             var random = new System.Random(11);
+            footprints.Clear();
 
             currentLayer = LayerFloor;
             BuildGround(Group(map, "Ground"), random);
@@ -40,7 +41,7 @@ namespace ColonQuest.EditorTools
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
             BuildClouds(Group(map, "Clouds"), random);
-            BuildFog(Group(map, "Fog"));
+            BuildDepth(Group(map, "Depth"), Group(map, "DepthShadows"), random);
 
             BuildSpawnPoint(map, SpawnIds.Start, new Vector2(0f, 2f));
             BuildSpawnPoint(map, SpawnIds.TownFromCasa, new Vector2(-19.5f, 4.3f));
@@ -378,8 +379,8 @@ namespace ColonQuest.EditorTools
             BuildNpc(parent, "DonaLucia", new Vector2(14.3f, -25.0f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#00A8A8" }, true);
 
             BuildPedestrian(parent, "Peaton_F", new Vector2(-25f, -17.8f), new Vector2(40f, -17.8f), new Look { Skin = "#4DA3FF", Extra = Accessory.Cap, ExtraColor = "#FFD23F" }, 1.3f);
-            BuildPedestrian(parent, "Peaton_G", new Vector2(-42f, 5.2f), new Vector2(-28f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);
-            BuildPedestrian(parent, "Peaton_H", new Vector2(33f, 5.2f), new Vector2(42f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#55E08F" }, 1.1f);
+            BuildPedestrian(parent, "Peaton_G", new Vector2(-46f, 5.2f), new Vector2(-36f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);
+            BuildPedestrian(parent, "Peaton_H", new Vector2(38f, 5.2f), new Vector2(46f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#55E08F" }, 1.1f);
             BuildPedestrian(parent, "Peaton_I", new Vector2(-40f, -9.0f), new Vector2(-26f, -9.0f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#4DA3FF" }, 1.2f);
             BuildPedestrian(parent, "Peaton_A", new Vector2(-24f, 5.2f), new Vector2(-14.5f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#FF7A5C" }, 1.1f);
             BuildPedestrian(parent, "Peaton_B", new Vector2(24f, -9.0f), new Vector2(14.5f, -9.0f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.2f);
