@@ -467,6 +467,7 @@ namespace ColonQuest.EditorTools
             mesh.fontStyle = FontStyle.Bold;
             mesh.anchor = anchor;
             mesh.color = color;
+            go.AddComponent<LocalizedMesh>().Bind(text);
 
             var renderer = go.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = font.material;
