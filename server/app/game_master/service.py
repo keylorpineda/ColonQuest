@@ -130,7 +130,7 @@ class GameMaster:
                     system=SYSTEM_PROMPT,
                     user=user_prompt,
                     output=GameEvent,
-                    reasoning_effort="low",
+                    reasoning_effort=self._settings.live_reasoning_effort,
                 )
             except ProviderResponseError:
                 await self._record_failure(ledger, session_id, model, started)

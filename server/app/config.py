@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     model_api_key: SecretStr = SecretStr("")
     meta_base_url: str = "https://api.meta.ai/v1"
     model_timeout_s: float = Field(default=8.0, gt=0)
+    # Calls the player waits on (monthly event, negotiation). Measured on Oct 28: with "low",
+    # Muse Wonder took 14-18 s and Spark 5-8 s; with "minimal", Spark answers in 3-4.5 s.
+    live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
