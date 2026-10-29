@@ -52,8 +52,8 @@ namespace ColonQuest.UI
 
         public void Show()
         {
-            Refresh();
             root.SetActive(true);
+            Refresh();
         }
 
         public void Hide()

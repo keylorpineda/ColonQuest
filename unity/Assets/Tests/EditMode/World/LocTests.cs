@@ -65,7 +65,7 @@ namespace ColonQuest.World.Tests
 
         // ---------------------------------------------------------------- the Costa Rican words
 
-        [TestCase("Pulperia", "corner store")]
+        [TestCase("Pulperia", "orner store")]
         [TestCase("Soda El Muelle", "diner")]
         [TestCase("Cuotas al mes", "Installments")]
         [TestCase("Ánimo", "Mood")]

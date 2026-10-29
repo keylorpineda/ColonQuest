@@ -13,6 +13,7 @@ namespace ColonQuest.UI
     public sealed class LocalizedText : MonoBehaviour
     {
         private string spanish = string.Empty;
+        private GameLanguage applied;
 
         public string Spanish => spanish;
 
@@ -25,7 +26,13 @@ namespace ColonQuest.UI
         private void OnEnable()
         {
             Loc.Changed += Apply;
-            Apply();
+
+            // Only a language that changed while this label was hidden needs writing again; a label the code
+            // filled in itself (a button that says "Sound: on") keeps its text.
+            if (applied != Loc.Current)
+            {
+                Apply();
+            }
         }
 
         private void OnDisable()
@@ -36,6 +43,7 @@ namespace ColonQuest.UI
         private void Apply()
         {
             var label = GetComponent<Text>();
+            applied = Loc.Current;
             if (label != null)
             {
                 label.text = Loc.T(spanish);
