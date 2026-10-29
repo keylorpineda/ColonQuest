@@ -13,7 +13,7 @@ from app.providers.base import (
     StructuredResult,
     Usage,
 )
-from app.providers.open_weights import OpenWeightsProvider
+from app.providers.open_weights import REASONING_HEADROOM_TOKENS, OpenWeightsProvider
 from app.providers.routing import FallbackProvider, build_npc_provider
 
 from .fakes import FakeProvider, fail
@@ -66,7 +66,7 @@ async def test_open_weights_uses_its_own_endpoint_and_model() -> None:
         http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(handler)),
     )
     result = await provider.structured(
-        model="muse-wonder-1.0", system="s", user="u", output=Line, reasoning_effort="low"
+        model="muse-wonder-1.0", system="s", user="u", output=Line, max_tokens=600
     )
 
     assert result.value.text.startswith("Mae")
@@ -75,7 +75,9 @@ async def test_open_weights_uses_its_own_endpoint_and_model() -> None:
     assert seen["url"] == "https://model-abc.api.baseten.co/v1/chat/completions"
     assert seen["auth"] == "Bearer ow-key"
     assert seen["body"]["model"] == "muse-spark-open"
-    assert "reasoning_effort" not in seen["body"]
+    # Muse Spark Open always reasons: keep it low and leave room for the answer after it.
+    assert seen["body"]["reasoning_effort"] == "low"
+    assert seen["body"]["max_tokens"] == 600 + REASONING_HEADROOM_TOKENS
 
 
 async def test_unconfigured_open_weights_fails_fast() -> None:
