@@ -538,7 +538,11 @@ namespace ColonQuest.World
             { "Te sentás un rato a ver pasar la gente. Pasear por el parque no cuesta nada.", "You sit for a while and watch people go by. Walking in the park costs nothing." },
             { "Un carro no es solo la cuota: marchamo, RTV, seguro, gasolina y mantenimiento, todos los años.", "A car is not just the installment: marchamo, RTV, insurance, gas and upkeep, every year." },
             { "Hay monedas en el fondo. Pedir un deseo es gratis; cumplirlo casi siempre empieza por ahorrar.", "There are coins at the bottom. Making a wish is free; making it come true almost always starts with saving." },
-            { "SINPE Móvil", "SINPE Móvil (instant mobile transfers)" }
+            { "SINPE Móvil", "SINPE Móvil (instant mobile transfers)" },
+            { "Te multaron por cruzar en rojo", "You were fined for crossing on red" },
+            { "Un oficial te vio cruzar con el semáforo en rojo y te para.", "An officer saw you cross against the red light and stops you." },
+            { "Te pone una multa de {0}. Esperar unos segundos en la acera no cuesta nada.", "He gives you a fine of {0}. Waiting a few seconds on the sidewalk costs nothing." },
+            { "Cruzar en rojo", "Crossing on red" }
         };
     }
 }

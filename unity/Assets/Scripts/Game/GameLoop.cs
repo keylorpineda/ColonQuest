@@ -115,6 +115,16 @@ namespace ColonQuest.Game
             return OutcomeFrom(before, Loc.T("Te arrestaron por entrar a una casa ajena"));
         }
 
+        /// <summary>An officer saw the player cross on red: a fine and a little stress, no jail and no lost days.</summary>
+        public ChoiceOutcome FineRedLight()
+        {
+            var before = State.Clone();
+            FinanceEngine.ChargeFine(State, MarketAssumptions.RedLightFine);
+            FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.RedLightWellbeingLoss);
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Te multaron por cruzar en rojo"));
+        }
+
         /// <summary>The player was run over: the bill depends on having health insurance and on the emergency fund.</summary>
         public ChoiceOutcome HospitalizePlayer()
         {
