@@ -19,7 +19,7 @@ namespace ColonQuest.EditorTools
 
             BuildStreetOfficer(parent, "Oficial_Plaza", new Vector2(0.4f, 5.2f));
             BuildStreetOfficer(parent, "Oficial_Sur", new Vector2(6.2f, -8.9f));
-            BuildStreetOfficer(parent, "Oficial_Este", new Vector2(64.6f, 5.0f));
+            BuildStreetOfficer(parent, "Oficial_Este", new Vector2(60.2f, 5.0f));
         }
 
         private static void BuildSignal(Transform parent, string name, float x, float yMin, float yMax, float phase)

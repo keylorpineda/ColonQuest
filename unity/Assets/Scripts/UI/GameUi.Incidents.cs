@@ -126,7 +126,8 @@ namespace ColonQuest.UI
 
         private void OnPlayerHit()
         {
-            if (SceneTransition.IsBusy || !session.Hospitalize())
+            // A window that is open (an officer's fine, for one) is not interrupted by a car that goes by.
+            if (SceneTransition.IsBusy || modal.IsOpen || !session.Hospitalize())
             {
                 return;
             }
