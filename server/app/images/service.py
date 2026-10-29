@@ -55,7 +55,7 @@ class ImageService:
 
         started = time.perf_counter()
         try:
-            async with asyncio.timeout(self._settings.model_timeout_s):
+            async with asyncio.timeout(self._settings.image_timeout_s):
                 image = await self._generator.generate_image(
                     build_image_prompt(key), size="512x512"
                 )

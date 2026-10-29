@@ -119,6 +119,7 @@ class MetaProvider:
                 size=size,  # Meta accepts any WxH aspect ratio
                 response_format="b64_json",
                 output_format="png",
+                timeout=self._settings.image_timeout_s,  # far slower than text calls
             )
         except openai.OpenAIError as error:
             raise translate_sdk_error(error, PROVIDER) from error
