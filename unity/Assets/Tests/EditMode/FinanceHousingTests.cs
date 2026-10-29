@@ -44,7 +44,7 @@ namespace ColonQuest.Finance.Tests
             Assert.AreEqual("Alquiler: Casa Vecina D", state.Installments[0].Item);
             Assert.AreEqual(260_000L, state.Installments[0].Monthly);
             Assert.AreEqual(12, state.Installments[0].MonthsLeft);
-            Assert.IsFalse(holdings.Home.Owned);
+            Assert.IsFalse(holdings.Home!.Owned);
             Assert.AreEqual(0L, holdings.AssetValue, "a rented home is not worth anything to the renter");
             Assert.AreEqual(wellbeing + FinanceEngine.HomeWellbeingBoost, state.Wellbeing);
             Assert.Contains("rented_home", state.History);
@@ -158,7 +158,7 @@ namespace ColonQuest.Finance.Tests
             Assert.AreEqual("Hipoteca: Casa Vecina B", state.Installments[0].Item);
             Assert.AreEqual(90_000L, state.Installments[0].Monthly);
             Assert.AreEqual(100, state.Installments[0].MonthsLeft);
-            Assert.IsTrue(holdings.Home.Owned);
+            Assert.IsTrue(holdings.Home!.Owned);
             Assert.AreEqual(12_000_000L, holdings.AssetValue);
             Assert.Contains("bought_home", state.History);
         }
