@@ -39,11 +39,17 @@ places (Don Rafa, El Muelle) stay as they are.
 ## What is translated today
 
 The main menu and its credits, the settings, the pause window, the HUD, the prompts and station names, the result
-window, the health insurance desk, the collectors and the trespass warning.
+window, the health insurance desk, the collectors and the trespass warning, the events of the local fallback catalog
+(title, story and choices), the month report and the end screen, the statement, the phone (SINPE, bank, search,
+calculator, casino), the seller of the store and of the car agency (the local seller also understands questions typed
+in English), the house, car and farm windows with the end report of what was bought, and the lines of the everyday
+objects. A test (`TranslationCoverageTests`) fails when one of those data driven texts has no English entry.
 
 ## What is not translated yet
 
-These stay in Spanish until their texts get entries in `Translations.cs`: the events of the game master and the local
-fallback events, the seller and the car and house negotiations, the phone, the month report and the end screen, the
-house, car and farm windows, the explanations of everyday objects (the lines of each `Thing`) and the `MarketAssumptions`
-disclaimers. The backend answers in Spanish, so its text needs its own translation step.
+- Text that comes from the backend (the game master events, the seller replies and the final summary when the server
+  answers). The backend answers in Spanish and `server/` is not touched from here, so it needs its own translation step.
+- The letters painted on signs inside the scenes (for example "SE VENDE", "BANCO DEL PUEBLO"): they are part of the
+  generated scenes, not labels.
+- The names of installments that the finance engine keeps in its state ("Alquiler: ...", "Hipoteca: ...", "Carro: ...")
+  have entries for the current houses and cars only; a new house or car needs its own entry.
