@@ -111,8 +111,8 @@ namespace ColonQuest.Finance
     {
         private readonly List<FarmStake> farm = new List<FarmStake>();
 
-        public HomeHolding Home { get; private set; }
-        public CarHolding Car { get; private set; }
+        public HomeHolding? Home { get; private set; }
+        public CarHolding? Car { get; private set; }
 
         /// <summary>The monthly premium of the health insurance, or zero when the player has none.</summary>
         public long HealthPremium { get; private set; }
