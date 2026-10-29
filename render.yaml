@@ -21,7 +21,11 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: GAME_MASTER_MODEL
-        value: "muse-wonder-1.0"
+        value: "muse-spark-1.3"  # Wonder took 6-10 s even at minimal effort; Unity waits 8 s
+      - key: LIVE_REASONING_EFFORT
+        value: "minimal"
+      - key: IMAGE_TIMEOUT_S
+        value: "30"
       - key: SUMMARY_MODEL
         value: "muse-spark-1.3"
       - key: DAILY_BUDGET_USD
@@ -31,13 +35,15 @@ services:
       - key: CLIENT_HASH_SALT
         generateValue: true
       - key: AGENTIC_GAME_MASTER
-        value: "false"
+        value: "true"
       - key: SEASON_PLANNER
-        value: "false"
+        value: "true"
       - key: SELLER_AGENT
         value: "false"
       - key: NPC_PROVIDER
-        value: "meta_api"
+        value: "open_weights"
+      - key: OPEN_WEIGHTS_TIMEOUT_S
+        value: "5"
       - key: OPEN_WEIGHTS_BASE_URL
         value: "https://inference.baseten.co/v1"
       - key: OPEN_WEIGHTS_NPC_MODEL
