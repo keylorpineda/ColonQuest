@@ -146,8 +146,8 @@ class ClassExplainer:
                     system=SYSTEM_PROMPT,
                     user=figures_payload(figures),
                     output=ExplanationText,
-                    reasoning_effort="low",
-                    max_tokens=800,
+                    reasoning_effort=self._settings.live_reasoning_effort,
+                    max_tokens=2000,  # reasoning tokens count against this
                 )
         except (TimeoutError, ProviderError):
             await ledger.record(
