@@ -18,6 +18,9 @@ from app.providers.openai_compat import structured_completion
 logger = logging.getLogger(__name__)
 
 PROVIDER = "open_weights"
+# Muse Spark Open always reasons before answering, and reasoning tokens count against max_tokens.
+# Without headroom a long prompt can spend the whole budget thinking and return no answer.
+REASONING_HEADROOM_TOKENS = 3072
 
 
 class OpenWeightsProvider:
@@ -54,7 +57,7 @@ class OpenWeightsProvider:
     ) -> StructuredResult[T]:
         if not self.configured:
             raise ProviderUnavailableError("open-weights endpoint is not configured")
-        # Open-weights servers may not implement reasoning_effort; leave it to their defaults.
+        # NPC lines are short: keep the reasoning low so the reply stays fast.
         return await structured_completion(
             self._client,
             provider=PROVIDER,
@@ -62,5 +65,6 @@ class OpenWeightsProvider:
             system=system,
             user=user,
             output=output,
-            max_tokens=max_tokens,
+            reasoning_effort=reasoning_effort or "low",
+            max_tokens=max_tokens + REASONING_HEADROOM_TOKENS,
         )
