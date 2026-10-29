@@ -25,14 +25,14 @@ namespace ColonQuest.UI
             warningText = UiKit.Label(card, string.Empty, 34, UiKit.Ink, new Vector2(840f, 100f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             warningCard.SetActive(false);
 
-            TrespassWatch.Arrested += OnArrested;
+            PoliceOfficer.StoppedPlayer += OnStoppedByOfficer;
             TrafficCar.PlayerHit += OnPlayerHit;
             CollectorCar.Arrived += OnCollectorsArrived;
         }
 
         private void ReleaseIncidents()
         {
-            TrespassWatch.Arrested -= OnArrested;
+            PoliceOfficer.StoppedPlayer -= OnStoppedByOfficer;
             TrafficCar.PlayerHit -= OnPlayerHit;
             CollectorCar.Arrived -= OnCollectorsArrived;
             CollectorCar.Armed = false;
@@ -46,7 +46,7 @@ namespace ColonQuest.UI
             warningCard.SetActive(shouting);
             if (shouting)
             {
-                warningText.text = watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
+                warningText.text = watch.PoliceCalled ? watch.CalledWarning : watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
             }
 
             CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
@@ -54,14 +54,39 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- the law
 
-        private void OnArrested()
+        /// <summary>
+        /// A fine never comes by itself: an officer has to reach the player first. Only then the window opens, and the
+        /// fine, the lost days and the trip to the station are charged when it is closed.
+        /// </summary>
+        private void OnStoppedByOfficer(OffenseKind offense)
         {
-            if (SceneTransition.IsBusy || !session.Arrest())
+            if (offense != OffenseKind.Trespass || SceneTransition.IsBusy || modal.IsOpen)
             {
                 return;
             }
 
-            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+            var text = new StringBuilder();
+            text.AppendLine(Loc.T("Un oficial te para y te pide los papeles: alguien llamó a la policía porque estás dentro de una casa que no es tuya."));
+            text.AppendLine();
+            text.Append(Loc.F("Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", Money.Format(MarketAssumptions.TrespassFine), MarketAssumptions.JailDaysLost));
+
+            var options = new List<ModalOption>
+            {
+                new ModalOption
+                {
+                    Label = Loc.T("Continuar"),
+                    Color = GameUiColors.Yellow,
+                    OnPress = () =>
+                    {
+                        if (session.Arrest())
+                        {
+                            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+                        }
+                    }
+                }
+            };
+
+            modal.Show(Loc.T("El oficial te detiene"), Loc.T("Entrar a una casa ajena"), text.ToString(), options);
         }
 
         // ---------------------------------------------------------------- the street

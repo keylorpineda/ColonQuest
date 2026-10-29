@@ -5,13 +5,13 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// The countdown of an owner who found a stranger in the house: it runs while the player stays inside and
-    /// ends in the arrest. Plain data, so it can be tested without a scene.
+    /// ends in the call to the police. Plain data, so it can be tested without a scene.
     /// </summary>
     public sealed class TrespassClock
     {
         public float Remaining { get; private set; }
 
-        /// <summary>True once the time ran out. It stays true; the arrest happens once.</summary>
+        /// <summary>True once the time ran out. It stays true; the call happens once.</summary>
         public bool Expired { get; private set; }
 
         public TrespassClock(float graceSeconds)
@@ -39,28 +39,32 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Sits in a house that is not the player's. The owner shouts a warning as the player comes in and, if the
-    /// player is still inside when the time is up, <see cref="Arrested"/> is raised once. Walking out through
-    /// the door loads the town, which destroys this object and cancels everything.
+    /// Sits in a house that is not the player's. The owner shouts a warning as the player comes in. When the time is up
+    /// and the player is still inside, the owner calls the police: the offense is raised and the officer comes in.
+    /// The fine is not charged here: it arrives only if the officer reaches the player. Walking out through the door
+    /// loads the town, which destroys this object and the offense with it.
     /// </summary>
     public sealed class TrespassWatch : MonoBehaviour
     {
         [SerializeField] private string ownerName = "El dueño";
         [SerializeField] private float graceSeconds = 9f;
+        [SerializeField] private PoliceOfficer officer;
 
         private TrespassClock clock;
 
         /// <summary>The watch of the house the player is in now, or null in any other scene.</summary>
         public static TrespassWatch Active { get; private set; }
 
-        /// <summary>Raised once when the owner calls the police and the player is still inside.</summary>
-        public static event Action Arrested;
-
         public string OwnerName => ownerName;
 
         public float Remaining => clock != null ? clock.Remaining : 0f;
 
+        /// <summary>True once the owner has called the police.</summary>
+        public bool PoliceCalled => clock != null && clock.Expired;
+
         public string Warning => Loc.F("{0}: ¡Salga de mi casa o llamo a la policía!", ownerName);
+
+        public string CalledWarning => Loc.F("{0} llamó a la policía. ¡Sal antes de que llegue el oficial!", ownerName);
 
         public void Configure(string owner, float seconds)
         {
@@ -72,6 +76,11 @@ namespace ColonQuest.World
             }
         }
 
+        public void SetOfficer(PoliceOfficer who)
+        {
+            officer = who;
+        }
+
         private void OnEnable()
         {
             clock = new TrespassClock(graceSeconds);
@@ -80,6 +89,7 @@ namespace ColonQuest.World
 
         private void OnDisable()
         {
+            Offenses.Clear(OffenseKind.Trespass);
             if (Active == this)
             {
                 Active = null;
@@ -95,7 +105,11 @@ namespace ColonQuest.World
 
             if (clock.Tick(Time.deltaTime))
             {
-                Arrested?.Invoke();
+                Offenses.Raise(OffenseKind.Trespass);
+                if (officer != null)
+                {
+                    officer.Alert();
+                }
             }
         }
     }

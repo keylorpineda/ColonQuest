@@ -221,6 +221,17 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Neighbor_NoOfficerComesWhileTheOwnerHasNotCalled()
+        {
+            PlaceTestSetup.StartOfflineRun();
+            yield return null;
+
+            var officer = Object.FindObjectsByType<PoliceOfficer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Single();
+            Assert.IsFalse(officer.gameObject.activeSelf, "he is not in the house until the owner calls");
+            Assert.AreEqual(OffenseKind.None, Offenses.Current, "no offense, so no fine");
+        }
+
+        [UnityTest]
         public IEnumerator Neighbor_LeavingInTimeCostsNothing()
         {
             var session = PlaceTestSetup.StartOfflineRun();
@@ -243,7 +254,22 @@ namespace ColonQuest.World.PlayModeTests
             session.State.Cash = 500_000L;
             yield return null;
             TrespassWatch.Active.Configure("Don Mario", 0.3f);
+            yield return new WaitForSeconds(0.6f);
 
+            // The owner called, but nothing is charged until the officer reaches the player.
+            Assert.IsTrue(TrespassWatch.Active.PoliceCalled);
+            Assert.AreEqual(OffenseKind.Trespass, Offenses.Current);
+
+            var window = GameObject.Find("GameUi").transform.Find("Modal");
+            for (float waited = 0f; waited < 6f && !window.gameObject.activeSelf; waited += Time.deltaTime)
+            {
+                Assert.AreEqual(500_000L, session.State.Cash, "no fine before the officer stops the player");
+                yield return null;
+            }
+
+            Assert.IsTrue(window.gameObject.activeSelf, "the officer reached the player and the window opened");
+            Assert.AreEqual(500_000L, session.State.Cash, "the fine is charged when the window is closed, not before");
+            window.GetComponentInChildren<UnityEngine.UI.Button>().onClick.Invoke();
             yield return WaitForScene(SceneNames.Carcel, 4f);
 
             Assert.AreEqual(SceneNames.Carcel, SceneManager.GetActiveScene().name);

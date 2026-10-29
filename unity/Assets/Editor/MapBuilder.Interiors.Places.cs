@@ -410,8 +410,15 @@ namespace ColonQuest.EditorTools
 
             BuildNpc(parts.People, "DonMario", new Vector2(3.0f, 0.4f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#2A7F8C" }, false);
 
+            // The officer is not here until the owner calls: he comes in by the door and goes straight to the player.
+            var officerNpc = BuildNpc(parts.People, "Oficial", MatFor(SceneNames.Vecino) + new Vector2(0f, 0.3f), new Look { Skin = "#3C78D8", Extra = Accessory.Cap, ExtraColor = "#1D2238" }, false);
+            var officer = officerNpc.gameObject.AddComponent<PoliceOfficer>();
+            officerNpc.gameObject.SetActive(false);
+
             var watch = new GameObject("TrespassWatch");
-            watch.AddComponent<TrespassWatch>().Configure("Don Mario", MarketAssumptions.TrespassGraceSeconds);
+            var trespass = watch.AddComponent<TrespassWatch>();
+            trespass.Configure("Don Mario", MarketAssumptions.TrespassGraceSeconds);
+            trespass.SetOfficer(officer);
         }
     }
 }

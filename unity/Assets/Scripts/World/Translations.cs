@@ -125,6 +125,11 @@ namespace ColonQuest.World
             { "Negociar con los cobradores", "Negotiate with the collectors" },
             { "Ignorar a los cobradores", "Ignore the collectors" },
             { "{0}: ¡Salga de mi casa o llamo a la policía!", "{0}: Get out of my house or I'm calling the police!" },
+            { "{0} llamó a la policía. ¡Sal antes de que llegue el oficial!", "{0} called the police. Get out before the officer gets here!" },
+            { "El oficial te detiene", "The officer stops you" },
+            { "Entrar a una casa ajena", "Going into someone else's house" },
+            { "Un oficial te para y te pide los papeles: alguien llamó a la policía porque estás dentro de una casa que no es tuya.", "An officer stops you and asks for your papers: someone called the police because you are inside a house that is not yours." },
+            { "Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", "He writes you a fine of {0}, takes you to the station, and you lose {1} days of the month." },
 
             // ---- health insurance desk
             { "Seguro de salud", "Health insurance" },
