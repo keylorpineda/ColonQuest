@@ -11,18 +11,34 @@ namespace ColonQuest.Api
     /// </summary>
     public static class LocalSeller
     {
+        /// <summary>
+        /// Writes a text in the player's language. The API layer does not know the language, so the game sets
+        /// this once (to <c>Loc.T</c>); until then the Spanish text is used as it is.
+        /// </summary>
+        public static System.Func<string, string> Translate = text => text;
+
+        public static string T(string spanish)
+        {
+            return Translate(spanish);
+        }
+
+        public static string F(string spanishTemplate, params object[] values)
+        {
+            return string.Format(Translate(spanishTemplate), values);
+        }
+
         private static readonly Dictionary<KeyQuestion, string[]> Patterns = new Dictionary<KeyQuestion, string[]>
         {
-            { KeyQuestion.TotalCost, new[] { @"\btotal\b", "al final", @"cuanto (?:pago|sale|cuesta|termino pagando|seria) (?:todo|en todo)", @"\bcosto (?:real|completo)" } },
-            { KeyQuestion.HiddenFees, new[] { "comision", @"cargos?\b", @"cobros? (?:extra|adicional)", @"costos? (?:extra|adicional|oculto|escondido)", @"letra (?:pequena|chiquita)", @"algo mas que (?:pagar|cobren)", "escondid" } },
+            { KeyQuestion.TotalCost, new[] { @"\btotal\b", "al final", @"cuanto (?:pago|sale|cuesta|termino pagando|seria) (?:todo|en todo)", @"\bcosto (?:real|completo)", @"how much (?:do i pay|does it cost) (?:in total|overall)", "in the end", @"\bfull cost" } },
+            { KeyQuestion.HiddenFees, new[] { "comision", @"cargos?\b", @"cobros? (?:extra|adicional)", @"costos? (?:extra|adicional|oculto|escondido)", @"letra (?:pequena|chiquita)", @"algo mas que (?:pagar|cobren)", "escondid", "commission", @"\bfees?\b", @"extra (?:charge|cost)s?", "hidden", "fine print" } },
             { KeyQuestion.InterestRate, new[] { "interes", @"\btasa\b" } },
-            { KeyQuestion.Term, new[] { @"\bplazo\b", "cuantos meses", "cuantas cuotas", "cuanto tiempo", "por cuantos" } },
-            { KeyQuestion.CashPrice, new[] { "contado", "precio real", "sin cuotas", "en efectivo", "de una vez" } },
-            { KeyQuestion.Insurance, new[] { "seguro", "poliza" } }
+            { KeyQuestion.Term, new[] { @"\bplazo\b", "cuantos meses", "cuantas cuotas", "cuanto tiempo", "por cuantos", @"\bterm\b", "how many months", "how many installments", "how long" } },
+            { KeyQuestion.CashPrice, new[] { "contado", "precio real", "sin cuotas", "en efectivo", "de una vez", "cash price", "real price", "in cash", "no installments", "all at once" } },
+            { KeyQuestion.Insurance, new[] { "seguro", "poliza", "insurance", "policy" } }
         };
 
-        private static readonly Regex Accept = new Regex(@"\b(acepto|me lo llevo|trato hecho|de una|deme uno)\b", RegexOptions.IgnoreCase);
-        private static readonly Regex Leave = new Regex(@"\b(no gracias|me voy|mejor no|paso|no me interesa)\b", RegexOptions.IgnoreCase);
+        private static readonly Regex Accept = new Regex(@"\b(acepto|me lo llevo|trato hecho|de una|deme uno|i accept|i'll take it|deal)\b", RegexOptions.IgnoreCase);
+        private static readonly Regex Leave = new Regex(@"\b(no gracias|me voy|mejor no|paso|no me interesa|no thanks|i'm leaving|better not|not interested)\b", RegexOptions.IgnoreCase);
 
         /// <summary>Lowercase without accents, so "interés" and "INTERES" match the same pattern.</summary>
         public static string Normalize(string text)
@@ -88,8 +104,8 @@ namespace ColonQuest.Api
 
             if (facts.Count == 0)
             {
-                string down = offer.DownPayment > 0L ? $", más la prima de {SellerOffer.FormatColones(offer.DownPayment)}" : string.Empty;
-                reply.NpcReply = $"Mae, este {offer.Item} sale a solo {offer.Describe(SellerFact.MonthlyPayment)} al mes{down}. ¡Se lo lleva hoy mismo!";
+                string down = offer.DownPayment > 0L ? F(", más la prima de {0}", SellerOffer.FormatColones(offer.DownPayment)) : string.Empty;
+                reply.NpcReply = F("Mae, este {0} sale a solo {1} al mes{2}. ¡Se lo lleva hoy mismo!", T(offer.Item), offer.Describe(SellerFact.MonthlyPayment), down);
                 reply.RevealedFacts = new List<SellerFact> { SellerFact.MonthlyPayment };
                 return reply;
             }
@@ -97,13 +113,13 @@ namespace ColonQuest.Api
             var parts = new List<string>();
             foreach (var fact in facts)
             {
-                parts.Add(Label(fact) + " " + offer.Describe(fact));
+                parts.Add(T(Label(fact)) + " " + offer.Describe(fact));
             }
 
-            reply.NpcReply = "Bueno, diay... " + string.Join("; ", parts) + ".";
+            reply.NpcReply = T("Bueno, diay... ") + string.Join("; ", parts) + ".";
             if (offer.DownPayment > 0L && AsksAboutDownPayment(playerText))
             {
-                reply.NpcReply += $" La prima es de {SellerOffer.FormatColones(offer.DownPayment)}.";
+                reply.NpcReply += F(" La prima es de {0}.", SellerOffer.FormatColones(offer.DownPayment));
             }
 
             reply.RevealedFacts = facts;
@@ -113,16 +129,16 @@ namespace ColonQuest.Api
         public static string Greeting(SellerOffer offer)
         {
             string terms = offer.DownPayment > 0L
-                ? $"con una prima de {SellerOffer.FormatColones(offer.DownPayment)} se lo dejo en cuotas bien cómodas"
-                : "se lo dejo en cuotas bien cómodas";
-            return $"¡Pura vida! Soy {offer.SellerName}. Mire este {offer.Item}: {terms}. ¿Qué le interesa saber?";
+                ? F("con una prima de {0} se lo dejo en cuotas bien cómodas", SellerOffer.FormatColones(offer.DownPayment))
+                : T("se lo dejo en cuotas bien cómodas");
+            return F("¡Pura vida! Soy {0}. Mire este {1}: {2}. ¿Qué le interesa saber?", offer.SellerName, T(offer.Item), terms);
         }
 
         /// <summary>The down payment is not one of the key questions of the backend, so it is answered on the side.</summary>
         private static bool AsksAboutDownPayment(string text)
         {
             string normalized = Normalize(text ?? string.Empty);
-            return normalized.Contains("prima") || normalized.Contains("entrada");
+            return normalized.Contains("prima") || normalized.Contains("entrada") || normalized.Contains("down payment");
         }
 
         private static List<SellerFact> FactsAnswering(List<KeyQuestion> questions)

@@ -1,4 +1,5 @@
 using ColonQuest.Finance;
+using ColonQuest.World;
 
 namespace ColonQuest.Game
 {
@@ -17,7 +18,7 @@ namespace ColonQuest.Game
             }
 
             int index = ((use % lines.Length) + lines.Length) % lines.Length;
-            string line = lines[index] ?? string.Empty;
+            string line = Loc.T(lines[index] ?? string.Empty);
             if (state == null)
             {
                 return line;

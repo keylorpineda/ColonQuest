@@ -112,7 +112,7 @@ namespace ColonQuest.Game
             FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.JailWellbeingLoss);
             LoseTasks(MarketAssumptions.JailDaysLost);
             Decisions++;
-            return OutcomeFrom(before, "Te arrestaron por entrar a una casa ajena");
+            return OutcomeFrom(before, Loc.T("Te arrestaron por entrar a una casa ajena"));
         }
 
         /// <summary>The player was run over: the bill depends on having health insurance and on the emergency fund.</summary>
@@ -127,7 +127,7 @@ namespace ColonQuest.Game
             LoseTasks(MarketAssumptions.HospitalDaysLost);
             HurtThisMonth = true;
             Decisions++;
-            return OutcomeFrom(before, Holdings.HasHealthInsurance ? "Te atropelló un carro (con seguro de salud)" : "Te atropelló un carro (sin seguro de salud)");
+            return OutcomeFrom(before, Loc.T(Holdings.HasHealthInsurance ? "Te atropelló un carro (con seguro de salud)" : "Te atropelló un carro (sin seguro de salud)"));
         }
 
         public bool BuyHealthInsurance()
@@ -152,7 +152,7 @@ namespace ColonQuest.Game
             var before = State.Clone();
             FinanceEngine.PayCollectors(State, CollectionRules.Demand(State));
             Decisions++;
-            return OutcomeFrom(before, "Pagar a los cobradores");
+            return OutcomeFrom(before, Loc.T("Pagar a los cobradores"));
         }
 
         public ChoiceOutcome NegotiateCollectors()
@@ -160,7 +160,7 @@ namespace ColonQuest.Game
             var before = State.Clone();
             FinanceEngine.NegotiateCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionNegotiateSurchargePct);
             Decisions++;
-            return OutcomeFrom(before, "Negociar con los cobradores");
+            return OutcomeFrom(before, Loc.T("Negociar con los cobradores"));
         }
 
         public ChoiceOutcome IgnoreCollectors()
@@ -168,7 +168,7 @@ namespace ColonQuest.Game
             var before = State.Clone();
             FinanceEngine.IgnoreCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionIgnoreFeePct, MarketAssumptions.CollectionIgnoreWellbeingLoss);
             Decisions++;
-            return OutcomeFrom(before, "Ignorar a los cobradores");
+            return OutcomeFrom(before, Loc.T("Ignorar a los cobradores"));
         }
 
         /// <summary>Applies the chosen option through the finance engine and counts the task.</summary>
@@ -212,22 +212,22 @@ namespace ColonQuest.Game
 
         public AssetPurchase RentHome(HomeListing home)
         {
-            return Buy("Alquilar " + home.Name, () => FinanceEngine.TryRentHome(State, Holdings, home.Name, MarketAssumptions.QuoteRent(home)));
+            return Buy(Loc.F("Alquilar {0}", Loc.T(home.Name)), () => FinanceEngine.TryRentHome(State, Holdings, home.Name, MarketAssumptions.QuoteRent(home)));
         }
 
         public AssetPurchase BuyHome(HomeListing home)
         {
-            return Buy("Comprar " + home.Name, () => FinanceEngine.TryBuyHome(State, Holdings, home.Name, MarketAssumptions.QuoteMortgage(home)));
+            return Buy(Loc.F("Comprar {0}", Loc.T(home.Name)), () => FinanceEngine.TryBuyHome(State, Holdings, home.Name, MarketAssumptions.QuoteMortgage(home)));
         }
 
         public AssetPurchase BuyCar(CarModel car)
         {
-            return Buy("Comprar " + car.Name, () => FinanceEngine.TryBuyCar(State, Holdings, car.ToPlan()));
+            return Buy(Loc.F("Comprar {0}", Loc.T(car.Name)), () => FinanceEngine.TryBuyCar(State, Holdings, car.ToPlan()));
         }
 
         public AssetPurchase InvestInFarm(FarmOption option, long amount)
         {
-            return Buy("Invertir en " + option.Name.ToLowerInvariant(), () => FinanceEngine.TryInvestInFarm(State, Holdings, option.Kind, amount));
+            return Buy(Loc.F("Invertir en {0}", Loc.T(option.Name).ToLowerInvariant()), () => FinanceEngine.TryInvestInFarm(State, Holdings, option.Kind, amount));
         }
 
         /// <summary>Why a rental cannot be signed right now, or None. Nothing changes.</summary>

@@ -88,9 +88,9 @@ namespace ColonQuest.Api
             {
                 case SellerFact.CashPrice: return FormatColones(CashPrice);
                 case SellerFact.MonthlyPayment: return FormatColones(MonthlyPayment);
-                case SellerFact.TermMonths: return TermMonths + " meses";
-                case SellerFact.InterestRate: return MonthlyRatePct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "% mensual";
-                case SellerFact.InsuranceFee: return FormatColones(InsuranceMonthly) + " al mes";
+                case SellerFact.TermMonths: return LocalSeller.F("{0} meses", TermMonths);
+                case SellerFact.InterestRate: return LocalSeller.F("{0}% mensual", MonthlyRatePct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture));
+                case SellerFact.InsuranceFee: return LocalSeller.F("{0} al mes", FormatColones(InsuranceMonthly));
                 case SellerFact.Commission: return FormatColones(Commission);
                 case SellerFact.TotalCost: return FormatColones(TotalCost);
                 default: return string.Empty;

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text;
 using ColonQuest.Api;
 using ColonQuest.Game;
+using ColonQuest.World;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -165,13 +166,13 @@ namespace ColonQuest.UI
             switch (recorder.State)
             {
                 case VoiceRecorderState.Starting:
-                    talkLabel.text = "Abriendo micro...";
+                    talkLabel.text = Loc.T("Abriendo micro...");
                     break;
                 case VoiceRecorderState.Recording:
-                    talkLabel.text = $"Enviar voz  {Mathf.FloorToInt(recorder.Seconds)}/{WavEncoder.MaxSeconds} s";
+                    talkLabel.text = Loc.F("Enviar voz  {0}/{1} s", Mathf.FloorToInt(recorder.Seconds), WavEncoder.MaxSeconds);
                     break;
                 default:
-                    talkLabel.text = "Hablar";
+                    talkLabel.text = Loc.T("Hablar");
                     break;
             }
         }
@@ -205,7 +206,7 @@ namespace ColonQuest.UI
             float y = -Pad + UiKit.Outline;
 
             UiKit.Portrait(card, negotiation.Offer.SellerName, 92f, top, new Vector2(textWidth * 0.5f - 46f, y - 4f));
-            UiKit.Label(card, negotiation.Venue + "  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, Loc.F("{0}  ·  {1}", Loc.T(negotiation.Venue), negotiation.Offer.SellerName), 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 60f;
             UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth - 110f, 38f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 50f;
@@ -231,7 +232,7 @@ namespace ColonQuest.UI
 
             if (session.Busy)
             {
-                UiKit.Label(card, negotiation.Offer.SellerName + " está pensando...", 32, GameUiColors.Muted, new Vector2(textWidth, 84f), top, new Vector2(0f, y - 10f), TextAnchor.MiddleCenter);
+                UiKit.Label(card, Loc.F("{0} está pensando...", negotiation.Offer.SellerName), 32, GameUiColors.Muted, new Vector2(textWidth, 84f), top, new Vector2(0f, y - 10f), TextAnchor.MiddleCenter);
             }
             else
             {
@@ -262,10 +263,10 @@ namespace ColonQuest.UI
             var car = session.CurrentCar;
             if (car == null)
             {
-                return "Te ofrece un " + negotiation.Offer.Item + " en cuotas";
+                return Loc.F("Te ofrece un {0} en cuotas", Loc.T(negotiation.Offer.Item));
             }
 
-            return $"Un {negotiation.Offer.Item}: prima {Money.Format(car.DownPayment)}, marchamo {Money.Format(car.MarchamoFirstYear)}, gasolina {Money.Format(car.RunningCostsMonthly)} al mes (ejemplo)";
+            return Loc.F("Un {0}: prima {1}, marchamo {2}, gasolina {3} al mes (ejemplo)", Loc.T(negotiation.Offer.Item), Money.Format(car.DownPayment), Money.Format(car.MarchamoFirstYear), Money.Format(car.RunningCostsMonthly));
         }
 
         private void BuildChips(RectTransform card, Negotiation negotiation, float textWidth, float y)
@@ -329,7 +330,7 @@ namespace ColonQuest.UI
             var lines = new System.Collections.Generic.List<string> { $"<b>{seller}:</b> {negotiation.Opening}" };
             foreach (var turn in negotiation.Turns)
             {
-                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>Tú:</b> {Escape(turn.Player)}</color>");
+                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>{Loc.T("Tú:")}</b> {Escape(turn.Player)}</color>");
                 lines.Add($"<b>{seller}:</b> {turn.Seller}");
             }
 
