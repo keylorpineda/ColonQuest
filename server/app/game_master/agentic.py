@@ -74,6 +74,7 @@ class AgenticGameMaster:
             ),
             max_steps=self._settings.agent_max_steps,
             timeout_s=self._settings.agent_timeout_s,
+            reasoning_effort=self._settings.live_reasoning_effort,
         )
         try:
             result = await run_tool_loop(self._provider, ledger, request)
