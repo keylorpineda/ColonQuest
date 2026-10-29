@@ -131,8 +131,9 @@ namespace ColonQuest.UI
 
             float titleHeight = 64f;
             float subtitleHeight = string.IsNullOrEmpty(subtitle) ? 0f : 40f;
+            float faceGap = talks && bodyHeight > 0f ? 16f : 0f;
             float buttonsHeight = options.Count == 0 ? 0f : options.Count * ButtonHeight + (options.Count - 1) * ButtonGap;
-            float height = Pad + titleHeight + subtitleHeight + (bodyHeight > 0f ? bodyHeight + 20f : 0f) + (buttonsHeight > 0f ? buttonsHeight + 24f : 0f) + Pad;
+            float height = Pad + titleHeight + subtitleHeight + faceGap + (bodyHeight > 0f ? bodyHeight + 20f : 0f) + (buttonsHeight > 0f ? buttonsHeight + 24f : 0f) + Pad;
 
             var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, height), new Vector2(0.5f, 0.5f), Vector2.zero);
             var top = new Vector2(0.5f, 1f);
@@ -154,7 +155,7 @@ namespace ColonQuest.UI
 
             if (bodyHeight > 0f)
             {
-                y -= 12f;
+                y -= 12f + faceGap;
                 var text = UiKit.Label(card, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
                 text.fontStyle = FontStyle.Normal;
                 if (talks)

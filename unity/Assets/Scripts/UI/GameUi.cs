@@ -161,8 +161,8 @@ namespace ColonQuest.UI
         private Text Row(RectTransform card, string label, int index)
         {
             float y = -(14f + 44f + index * 40f) + 36f;
-            UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(220f, 36f), new Vector2(0f, 1f), new Vector2(22f, y));
-            return UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(220f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
+            UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(280f, 36f), new Vector2(0f, 1f), new Vector2(22f, y));
+            return UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(160f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
         }
 
         private void BuildPrompt()
@@ -474,7 +474,7 @@ namespace ColonQuest.UI
             }
 
             AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
-            modal.Show(gameEvent.Title, who, gameEvent.Narrative, options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
+            modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
         }
 
         private void ShowOutcome(ChoiceOutcome outcome)
