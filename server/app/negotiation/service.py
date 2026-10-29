@@ -167,8 +167,8 @@ class Negotiator:
                     system=SYSTEM_PROMPT,
                     user=prompt,
                     output=SellerTurn,
-                    reasoning_effort="low",
-                    max_tokens=600,
+                    reasoning_effort=self._settings.live_reasoning_effort,
+                    max_tokens=1500,  # reasoning tokens count against this
                 )
             except ProviderError as error:
                 await ledger.record(
