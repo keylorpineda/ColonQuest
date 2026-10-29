@@ -84,7 +84,8 @@ class SellerAgent:
             context=ToolContext(offer=offer),
             max_steps=self._settings.agent_max_steps,
             timeout_s=self._settings.agent_timeout_s,
-            max_tokens=800,
+            reasoning_effort=self._settings.live_reasoning_effort,
+            max_tokens=2400,  # reasoning tokens count against this
         )
         try:
             result = await run_tool_loop(self._provider, ledger, request)

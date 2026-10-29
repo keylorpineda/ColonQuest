@@ -45,8 +45,8 @@ class AgentRequest[T: BaseModel]:
     context: ToolContext
     max_steps: int = 5
     timeout_s: float = 10.0
-    reasoning_effort: ReasoningEffort | None = "low"
-    max_tokens: int = 2048
+    reasoning_effort: ReasoningEffort | None = "minimal"
+    max_tokens: int = 4096  # per step; reasoning tokens count against it
 
 
 async def run_tool_loop[T: BaseModel](
