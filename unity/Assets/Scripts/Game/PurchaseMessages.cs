@@ -1,4 +1,5 @@
 using ColonQuest.Finance;
+using ColonQuest.World;
 
 namespace ColonQuest.Game
 {
@@ -10,13 +11,13 @@ namespace ColonQuest.Game
             switch (failure)
             {
                 case PurchaseFailure.NotEnoughCash:
-                    return "No te alcanza el efectivo para entrar. Lo que debes poner al firmar sale de tu efectivo, no de la tarjeta.";
+                    return Loc.T("No te alcanza el efectivo para entrar. Lo que debes poner al firmar sale de tu efectivo, no de la tarjeta.");
                 case PurchaseFailure.AlreadyHasHome:
-                    return "Ya tienes una casa en esta partida.";
+                    return Loc.T("Ya tienes una casa en esta partida.");
                 case PurchaseFailure.AlreadyHasCar:
-                    return "Ya tienes un carro en esta partida.";
+                    return Loc.T("Ya tienes un carro en esta partida.");
                 case PurchaseFailure.TooManyInstallments:
-                    return "Ya tienes demasiadas cuotas abiertas. Termina de pagar alguna antes de firmar otra.";
+                    return Loc.T("Ya tienes demasiadas cuotas abiertas. Termina de pagar alguna antes de firmar otra.");
                 default:
                     return string.Empty;
             }

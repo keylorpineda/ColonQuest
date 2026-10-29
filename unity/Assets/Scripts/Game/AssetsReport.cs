@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ColonQuest.Finance;
+using ColonQuest.World;
 
 namespace ColonQuest.Game
 {
@@ -27,7 +28,7 @@ namespace ColonQuest.Game
                 AddFarm(lines, stake, monthsPlayed);
             }
 
-            lines.Add(MarketAssumptions.Disclaimer);
+            lines.Add(Loc.T(MarketAssumptions.Disclaimer));
             return lines;
         }
 
@@ -41,12 +42,12 @@ namespace ColonQuest.Game
             if (home.Owned)
             {
                 int left = Math.Max(0, home.Months - monthsPlayed);
-                lines.Add($"Casa: compraste {home.Name} con hipoteca. Pagas {Money.Format(home.Monthly)} al mes y todavía faltan {left} cuotas. Valor de ejemplo de la casa: {Money.Format(home.Value)}.");
+                lines.Add(Loc.F("Casa: compraste {0} con hipoteca. Pagas {1} al mes y todavía faltan {2} cuotas. Valor de ejemplo de la casa: {3}.", Loc.T(home.Name), Money.Format(home.Monthly), left, Money.Format(home.Value)));
             }
             else
             {
                 int paid = Math.Min(monthsPlayed, home.Months);
-                lines.Add($"Casa: alquilas {home.Name} por {Money.Format(home.Monthly)} al mes. El contrato es de {home.Months} meses y en la partida pagaste {paid}; el resto lo seguirías debiendo.");
+                lines.Add(Loc.F("Casa: alquilas {0} por {1} al mes. El contrato es de {2} meses y en la partida pagaste {3}; el resto lo seguirías debiendo.", Loc.T(home.Name), Money.Format(home.Monthly), home.Months, paid));
             }
         }
 
@@ -57,7 +58,7 @@ namespace ColonQuest.Game
                 return;
             }
 
-            lines.Add($"Carro: {car.Name}. Además de la cuota gasta {Money.Format(car.MonthlyRunningCosts)} al mes en gasolina y mantenimiento. Valor de reventa de ejemplo: {Money.Format(car.ResaleValue)}, porque un carro pierde valor apenas sale de la agencia.");
+            lines.Add(Loc.F("Carro: {0}. Además de la cuota gasta {1} al mes en gasolina y mantenimiento. Valor de reventa de ejemplo: {2}, porque un carro pierde valor apenas sale de la agencia.", Loc.T(car.Name), Money.Format(car.MonthlyRunningCosts), Money.Format(car.ResaleValue)));
         }
 
         private static void AddFarm(List<string> lines, FarmStake stake, int monthsPlayed)
@@ -67,14 +68,14 @@ namespace ColonQuest.Game
             int held = Math.Max(0, monthsPlayed - stake.MonthsPlayedWhenBought);
             int left = projection.MonthsLeftAfter(held);
             string wait = option.MonthsMin == option.MonthsMax
-                ? $"{option.MonthsMax} meses"
-                : $"{option.MonthsMin} a {option.MonthsMax} meses";
+                ? Loc.F("{0} meses", option.MonthsMax)
+                : Loc.F("{0} a {1} meses", option.MonthsMin, option.MonthsMax);
 
             lines.Add(
-                $"Finca ({option.Name.ToLowerInvariant()}): metiste {Money.Format(stake.Invested)} y esa plata no vuelve pronto. " +
-                $"A tiempo real tarda unos {wait} desde la compra; en la partida pasaron {held}, así que todavía faltan {left}. " +
-                $"Proyección de ejemplo cuando se cobre: en un mal escenario {Money.Format(projection.LowValue)}, " +
-                $"en uno normal {Money.Format(projection.BaseValue)} y en uno bueno {Money.Format(projection.HighValue)}.");
+                Loc.F("Finca ({0}): metiste {1} y esa plata no vuelve pronto. ", Loc.T(option.Name).ToLowerInvariant(), Money.Format(stake.Invested)) +
+                Loc.F("A tiempo real tarda unos {0} desde la compra; en la partida pasaron {1}, así que todavía faltan {2}. ", wait, held, left) +
+                Loc.F("Proyección de ejemplo cuando se cobre: en un mal escenario {0}, ", Money.Format(projection.LowValue)) +
+                Loc.F("en uno normal {0} y en uno bueno {1}.", Money.Format(projection.BaseValue), Money.Format(projection.HighValue)));
         }
     }
 }
