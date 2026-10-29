@@ -1,10 +1,12 @@
 # Render Blueprint for the Colón Quest FastAPI backend (SCRUM-52).
-# Deploys from `main` only after GitHub Actions CI passes.
+# Deploys from `develop` while the game is in development; switch to `main` for judging.
+# Only after GitHub Actions CI passes.
 services:
   - type: web
     name: colon-quest-api
     runtime: python
-    branch: main
+    branch: develop
+    region: ohio  # next to the Neon database (us-east-2)
     rootDir: server
     plan: free
     autoDeployTrigger: checksPass
@@ -37,6 +39,8 @@ services:
       - key: NPC_PROVIDER
         value: "meta_api"
       - key: OPEN_WEIGHTS_BASE_URL
-        sync: false
+        value: "https://inference.baseten.co/v1"
+      - key: OPEN_WEIGHTS_NPC_MODEL
+        value: "meta-models/muse-spark-open-1026"
       - key: OPEN_WEIGHTS_API_KEY
         sync: false
