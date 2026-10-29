@@ -102,8 +102,8 @@ class SummaryWriter:
                     system=SYSTEM_PROMPT,
                     user=stats_payload(stats),
                     output=SummaryText,
-                    reasoning_effort="low",
-                    max_tokens=700,
+                    reasoning_effort=self._settings.live_reasoning_effort,
+                    max_tokens=2000,  # reasoning tokens count against this
                 )
         except (TimeoutError, ProviderError):
             await ledger.record(

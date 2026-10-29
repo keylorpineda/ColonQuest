@@ -91,8 +91,8 @@ class SeasonPlanner:
                     system=SYSTEM_PROMPT,
                     user=build_user_prompt(state),
                     output=SeasonPlan,
-                    reasoning_effort="low",
-                    max_tokens=1500,
+                    reasoning_effort=self._settings.live_reasoning_effort,
+                    max_tokens=4000,  # 12 months of JSON plus the reasoning before it
                 )
         except (TimeoutError, ProviderError):
             await ledger.record(

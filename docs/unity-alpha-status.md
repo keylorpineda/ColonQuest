@@ -46,13 +46,15 @@ One run is three months. Each month has three tasks, then the bank closes the mo
 
 | Place | What happens |
 | --- | --- |
-| Garage, grocery, lender, pyramid, kiosk, coop, soda | One event from the game master, or a local one when the backend fails or takes more than 8 s |
+| Garage, grocery, lender, pyramid, coop, soda | One event from the game master, or a local one when the backend fails or takes more than 8 s |
 | Store | Negotiation with the seller (text). Buying adds the installment with insurance and charges the opening commission |
 | Bank | Closes the month: salary, installments, card cycle, interest, living expenses |
 | Home | Account statement |
 | Real estate agency (north district) and the house signs | Four houses to rent or buy. Rent is a 12 month installment with a deposit; buying needs a down payment, closing costs and a mortgage at the longest term the installment contract allows (120 months). The window shows the real total and the share of the salary. Not a task of the month |
 | Car agency (north district) | Negotiation with the seller about a car with a down payment (`prima`). The seller is the local one: the offers are client only and never reach the backend. Buying charges the first marchamo; fuel and upkeep are charged every month. Not a task |
 | Farm (east district) | Coffee or cattle. The stake leaves the cash now and does not come back during the run. The end of the run shows a projection at real time with a bad, a normal and a good scenario. Not a task |
+| ATMs | Account balance |
+| Everyday objects and townspeople | A line of dialogue, rotating; they never move money |
 
 The store rotates four offers (phone, TV, fridge, motorbike). The seller keeps a hidden sheet with the true
 figures; the player only learns them by asking. Asking about total cost, hidden fees, interest, term, cash
@@ -80,23 +82,24 @@ them with a warning. Money for these purchases moves only in `FinanceEngine` (`H
   walls with doorways; the bank has four numbered windows, a closed staff side with the vault, a queue,
   waiting chairs, offices and ATMs; the store sells exactly the four offers of the seller.
 - Town buildings get details by use (homes: water tank, flower boxes, door number, no shop sign; shops
-  and offices: roof AC units, cameras where money changes hands). Five homes can be reached; two carry
+  and offices: cameras where money changes hands). Five homes can be reached; two carry
   "SE VENDE" and "SE ALQUILA" signs, ready for renting, buying and mortgages later.
-- Also: cast shadows to the lower right of every building, a fine tiling grain over the
-  colors and a wash of light that goes from warm morning to blue dusk as the run advances (`DayCycle`).
+- Stations are invisible zones with an "[E]" prompt: no rings or glow. SINPE is not a place; it will be a
+  phone alert.
+- Also: soft ground shadows under the buildings, a fine tiling grain over the colors and a wash of light
+  that goes from warm morning to blue dusk as the run advances (`DayCycle`).
 
 ## Verified
 
-- EditMode 124 of 124 and PlayMode 45 of 45 pass (28 October).
-- WebGL build succeeds with 0 errors in about 6 minutes. Output is 9.9 MB (wasm 7.7 MB, data 2.1 MB), gzip
-  with the fallback loader, so any static host works.
+- EditMode 146 of 146 and PlayMode 51 of 51 pass (28 October, branch `feat/SCRUM-48-voice-on-tip`).
+- Windows build succeeds with 0 errors, 91 MB, and starts without exceptions; with the backend off it
+  plays offline on the local events and seller.
 - Scenes rebuild from code with `Colon Quest > Build All Scenes`.
 
 ## Not verified
 
-- The north and east districts: the code was written without compiling or running anything, and the scenes
-  have not been regenerated yet. Nobody has looked at the new windows (agencies, farm, end report) or at the
-  districts on screen.
+- A full month played by a person on the Windows build, and the north and east districts on screen (the scenes are generated and the tests pass, nobody has judged them visually).
+
 - Nobody has looked at the new lighting, shadows or the negotiation window on screen. Batch captures hang,
   so a person has to open `Assets/Scenes/Town.unity` and judge them. The amounts are constants in
   `MapBuilder.Realism.cs` and `DayCycle.cs`.

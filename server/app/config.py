@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     model_api_key: SecretStr = SecretStr("")
     meta_base_url: str = "https://api.meta.ai/v1"
     model_timeout_s: float = Field(default=8.0, gt=0)
+    # Calls the player waits on (monthly event, negotiation). Measured on Oct 28: with "low",
+    # Muse Wonder took 14-18 s and Spark 5-8 s; with "minimal", Spark answers in 3-4.5 s.
+    live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
+    # Muse Image took about 14 s per 512x512 image on Oct 28; images are cached after the first one.
+    image_timeout_s: float = Field(default=30.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
@@ -34,8 +39,8 @@ class Settings(BaseSettings):
     npc_provider: Literal["meta_api", "open_weights"] = "meta_api"
     open_weights_base_url: str = ""
     open_weights_api_key: SecretStr = SecretStr("")
-    open_weights_npc_model: str = "muse-spark-open"
-    open_weights_timeout_s: float = Field(default=4.0, gt=0)
+    open_weights_npc_model: str = "meta-models/muse-spark-open-1026"
+    open_weights_timeout_s: float = Field(default=5.0, gt=0)
 
     # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
     agentic_game_master: bool = False
