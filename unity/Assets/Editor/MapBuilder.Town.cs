@@ -42,6 +42,7 @@ namespace ColonQuest.EditorTools
             BuildWorldBorders(Group(map, "Borders"));
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
+            BuildCrossings(Group(map, "Crossings"));
             BuildClouds(Group(map, "Clouds"), random);
             var depthShadows = Group(map, "DepthShadows");
             BuildDepth(Group(map, "Depth"), depthShadows, random);
