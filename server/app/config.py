@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     npc_provider: Literal["meta_api", "open_weights"] = "meta_api"
     open_weights_base_url: str = ""
     open_weights_api_key: SecretStr = SecretStr("")
-    open_weights_npc_model: str = "muse-spark-open"
+    open_weights_npc_model: str = "meta-models/muse-spark-open-1026"
     open_weights_timeout_s: float = Field(default=4.0, gt=0)
 
     # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
