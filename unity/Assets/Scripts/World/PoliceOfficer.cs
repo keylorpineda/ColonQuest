@@ -7,7 +7,8 @@ namespace ColonQuest.World
     public enum OffenseKind
     {
         None,
-        Trespass
+        Trespass,
+        RedLight
     }
 
     /// <summary>
@@ -99,7 +100,18 @@ namespace ColonQuest.World
 
         private void Update()
         {
-            if (stopped || SceneTransition.IsBusy)
+            if (stopped)
+            {
+                // An officer on the street can stop the player again once the offense is over; one who was called cannot.
+                if (!called && Offenses.Current == OffenseKind.None)
+                {
+                    stopped = false;
+                }
+
+                return;
+            }
+
+            if (SceneTransition.IsBusy)
             {
                 return;
             }
