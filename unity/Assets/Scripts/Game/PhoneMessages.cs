@@ -1,3 +1,5 @@
+using ColonQuest.World;
+
 namespace ColonQuest.Game
 {
     /// <summary>
@@ -18,7 +20,7 @@ namespace ColonQuest.Game
         public static string SinpeNotice(int openings)
         {
             int count = SinpeNotices.Length;
-            return SinpeNotices[((openings % count) + count) % count];
+            return Loc.T(SinpeNotices[((openings % count) + count) % count]);
         }
     }
 }
