@@ -15,6 +15,46 @@ namespace ColonQuest.Api.Tests
         }
 
         [Test]
+        public void Next_DoesNotTalkAboutAVehicleThePlayerLacks()
+        {
+            var state = new PlayerState { Month = 1, SalaryNet = 332686L };
+            var seen = new HashSet<string>();
+            for (int i = 0; i < FallbackEvents.Catalog.Count + 3; i++)
+            {
+                var next = FallbackEvents.Next(state, seen);
+                StringAssert.DoesNotContain("moto", next.EventId);
+                StringAssert.DoesNotContain("marchamo", next.EventId);
+                seen.Add(next.EventId);
+            }
+        }
+
+        [Test]
+        public void Next_CanTalkAboutTheVehicleThePlayerHas()
+        {
+            var state = new PlayerState { Month = 1, SalaryNet = 332686L };
+            state.Installments.Add(new Installment("moto 125 cc", 30000L, 40));
+            var seen = new HashSet<string>();
+            for (int i = 0; i < FallbackEvents.Catalog.Count; i++)
+            {
+                seen.Add(FallbackEvents.Next(state, seen).EventId);
+            }
+
+            Assert.IsTrue(seen.Contains("evt_moto_dañada"));
+            Assert.IsTrue(FinanceEngine.OwnsVehicle(state));
+        }
+
+        [Test]
+        public void OwnsVehicle_ReadsTheStateAndNotAMotor()
+        {
+            var state = new PlayerState { Month = 1 };
+            state.Installments.Add(new Installment("Motor de la refri", 9000L, 6));
+            Assert.IsFalse(FinanceEngine.OwnsVehicle(state));
+
+            state.RecordHistory("bought_car");
+            Assert.IsTrue(FinanceEngine.OwnsVehicle(state));
+        }
+
+        [Test]
         public void Catalog_EventsHaveValidChoicesAndEffects()
         {
             foreach (var gameEvent in FallbackEvents.Catalog)
