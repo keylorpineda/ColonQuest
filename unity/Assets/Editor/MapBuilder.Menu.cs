@@ -20,7 +20,7 @@ namespace ColonQuest.EditorTools
             view.orthographic = true;
             view.orthographicSize = 5f;
             view.clearFlags = CameraClearFlags.SolidColor;
-            view.backgroundColor = GamePalette.Hex("#8FD3FF");
+            view.backgroundColor = GamePalette.Hex("#17201E");
             camera.AddComponent<AudioListener>();
 
             new GameObject("MainMenu").AddComponent<MainMenu>();

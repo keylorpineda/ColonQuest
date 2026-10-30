@@ -26,7 +26,7 @@ namespace ColonQuest.UI
 
         private const float ArtWidth = 1920f;
         private const float ArtHeight = 1080f;
-        private const float ArtMargin = 1.04f;
+        private const float ArtMargin = 1.15f;
         private const float ParallaxReach = 14f;
 
         private static readonly Color Cream = GamePalette.Hex("#F8F1DC");
@@ -64,6 +64,24 @@ namespace ColonQuest.UI
             openedAt = Time.unscaledTime;
         }
 
+        private void OnEnable()
+        {
+            Loc.Changed += OnLanguageChanged;
+        }
+
+        private void OnDisable()
+        {
+            Loc.Changed -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged()
+        {
+            if (slots != null && slots.activeSelf)
+            {
+                RefreshSlots();
+            }
+        }
+
         private void Update()
         {
             float dt = Time.unscaledDeltaTime;
@@ -88,7 +106,7 @@ namespace ColonQuest.UI
         /// <summary>
         /// The picture always covers the window, whatever its shape, with a small margin for the movement: it breathes very
         /// slowly and drifts against the mouse. A window narrower than the picture loses its left side, where the buttons are,
-        /// so the toucan stays whole.
+        /// so the toucan stays whole. Clamped so borders never detach to expose the background.
         /// </summary>
         private void MoveLayers(float dt)
         {
@@ -100,8 +118,21 @@ namespace ColonQuest.UI
             float cover = Mathf.Max(window.width / ArtWidth, window.height / ArtHeight);
             float scale = cover * (ArtMargin + Mathf.Sin(Time.unscaledTime * 0.12f) * 0.006f);
             art.localScale = new Vector3(scale, scale, 1f);
+
+            float halfW = ArtWidth * scale * 0.5f;
+            float halfH = ArtHeight * scale * 0.5f;
+            float minX = window.width * 0.5f - halfW;
+            float maxX = halfW - window.width * 0.5f;
+            float minY = window.height * 0.5f - halfH;
+            float maxY = halfH - window.height * 0.5f;
+
             float keepRight = (window.width - ArtWidth * cover) * 0.5f;
-            art.anchoredPosition = new Vector2(keepRight, 0f) - parallax * ParallaxReach;
+            float desiredX = keepRight - parallax.x * ParallaxReach;
+            float desiredY = -parallax.y * ParallaxReach;
+
+            float clampedX = minX <= maxX ? Mathf.Clamp(desiredX, minX, maxX) : 0f;
+            float clampedY = minY <= maxY ? Mathf.Clamp(desiredY, minY, maxY) : 0f;
+            art.anchoredPosition = new Vector2(clampedX, clampedY);
         }
 
         private void SlideIn(float seconds)
@@ -232,7 +263,7 @@ namespace ColonQuest.UI
                 var entry = entries[i];
                 bool main = entry == MenuEntry.Story;
                 var button = UiKit.MakeButton(root, MenuEntries.LabelOf(entry), main ? Beak : Cream, new Vector2(ButtonWidth, ButtonHeight), topLeft, new Vector2(ColumnX, ButtonsTop - i * (ButtonHeight + ButtonGap)), () => Press(entry));
-                button.transform.Find("Body/Text").GetComponent<Text>().fontSize = 34;
+                UiKit.SetFontSize(button, 34);
                 Slide((RectTransform)button.transform, 760f);
                 if (i == 0)
                 {

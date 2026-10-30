@@ -194,6 +194,23 @@ namespace ColonQuest.UI
             return label;
         }
 
+        /// <summary>A text label with raw text (not registered to LocalizedText) for dynamically formatted strings.</summary>
+        public static Text PlainLabel(Transform parent, string name, string text, int fontSize, Color color, Vector2 size, Vector2 anchor, Vector2 position, TextAnchor alignment = TextAnchor.MiddleLeft)
+        {
+            var rect = Rect(parent, name, size, anchor, position);
+            var label = rect.gameObject.AddComponent<Text>();
+            label.font = Font;
+            label.fontSize = fontSize;
+            label.fontStyle = FontStyle.Bold;
+            label.color = color;
+            label.alignment = alignment;
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Overflow;
+            label.raycastTarget = false;
+            label.text = text;
+            return label;
+        }
+
         /// <summary>A chunky button. The label is centered; <paramref name="onClick"/> runs when it is pressed.</summary>
         public static Button MakeButton(Transform parent, string text, Color color, Vector2 size, Vector2 anchor, Vector2 position, Action onClick)
         {
@@ -214,6 +231,9 @@ namespace ColonQuest.UI
 
             var label = Label(body.transform, text, 30, Ink, size - new Vector2(40f, 20f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             label.name = "Text";
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 14;
+            label.resizeTextMaxSize = 30;
             if (onClick != null)
             {
                 button.onClick.AddListener(() =>
@@ -254,6 +274,17 @@ namespace ColonQuest.UI
         public static void SetLabel(Button button, string text)
         {
             button.transform.Find("Body/Text").GetComponent<Text>().text = text;
+        }
+
+        public static void SetFontSize(Button button, int size)
+        {
+            var textComp = button.transform.Find("Body/Text")?.GetComponent<Text>();
+            if (textComp != null)
+            {
+                textComp.fontSize = size;
+                textComp.resizeTextMaxSize = size;
+                textComp.resizeTextForBestFit = true;
+            }
         }
 
         /// <summary>

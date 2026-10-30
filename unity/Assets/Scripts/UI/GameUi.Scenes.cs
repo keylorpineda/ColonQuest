@@ -56,6 +56,13 @@ namespace ColonQuest.UI
         /// </summary>
         private void OpenPhone()
         {
+            PlayerController.Blocked = true;
+            var hero = GameObject.FindWithTag("Player");
+            if (hero != null && hero.TryGetComponent<Rigidbody2D>(out var rb))
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+
             var scene = new Interaction().Pose(PersonPose.Pocket, 0.28f).Sound(SoundEffectKind.Swish).HoldProp("phone")
                 .Pose(PersonPose.Type, 0.5f).Sound(SoundEffectKind.Keys).Wait(0.12f).Sound(SoundEffectKind.Chime)
                 .Apply(() => phone.Open())
