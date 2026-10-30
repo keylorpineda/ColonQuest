@@ -35,5 +35,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Vecino.unity
     guid: 6707da3d26a322a438adc6bce5781147
+  - enabled: 1
+    path: Assets/Scenes/Finca.unity
+    guid: 8d2963dc3121dcd4b936e22df6c24af8
+  - enabled: 1
+    path: Assets/Scenes/Inmobiliaria.unity
+    guid: d5874c485ff1d0946887611eb2b26289
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
