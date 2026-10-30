@@ -202,7 +202,7 @@ namespace ColonQuest.UI
             string cop = officer.name;
             return new Interaction()
                 .NpcWalk(cop, beside, 0.5f).Wait(0.5f).Face(beside)
-                .Say("Oficial", "¡Manos arriba! Queda detenido.")
+                .Say("Oficial", PlayerProfile.Pick("¡Manos arriba! Queda detenido.", "¡Manos arriba! Queda detenida."))
                 .Pose(PersonPose.HandsUp, 1.3f)
                 .NpcPose(cop, PersonPose.Handover, 1.1f).Sound(SoundEffectKind.Cuffs)
                 .Fly("cuffs", beside + new Vector2(0f, 0.3f), me + new Vector2(0f, 0.15f), 0.4f).Wait(0.6f)

@@ -55,6 +55,8 @@ namespace ColonQuest.Game
     public sealed class SaveSlot
     {
         public string name = string.Empty;
+        public string characterName = string.Empty;
+        public bool female;
         public string savedAt = string.Empty;
         public RunSnapshot run = new RunSnapshot();
 
