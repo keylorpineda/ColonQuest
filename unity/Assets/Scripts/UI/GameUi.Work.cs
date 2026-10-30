@@ -2,6 +2,7 @@ using System;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace ColonQuest.UI
@@ -20,6 +21,9 @@ namespace ColonQuest.UI
         private RectTransform workArrow;
         private Text workGuideText;
         private Station workStation;
+        private GameObject homeDoor;
+
+        private const string HomeDoorName = "Door_" + SceneNames.Cuarto;
 
         private void BuildWorkGuide()
         {
@@ -63,12 +67,16 @@ namespace ColonQuest.UI
             return Sprite.Create(texture, new Rect(0f, 0f, ArrowSize, ArrowSize), new Vector2(0.5f, 0.5f));
         }
 
-        /// <summary>In the morning, until the player clocks in: it points at the time clock, or asks to go out from an interior.</summary>
+        /// <summary>
+        /// In the morning, until the player clocks in, it points at the time clock; at night, at the door of the room. Inside a
+        /// building, where the arrow means nothing, it only says what to do.
+        /// </summary>
         private void TickWorkGuide()
         {
             var clock = session.Loop.Clock;
             bool free = !modal.IsOpen && !phone.IsOpen && !pause.IsOpen && !negotiationPanel.IsOpen && !openingPlaying && !LoadingScreen.IsLoading;
-            bool show = free && !session.Loop.IsFinished && session.Loop.Job.ExpectedAt(clock.Minutes);
+            bool toWork = session.Loop.Job.ExpectedAt(clock.Minutes);
+            bool show = free && !session.Loop.IsFinished && (toWork || clock.IsNight);
             workGuide.SetActive(show);
             if (!show)
             {
@@ -76,18 +84,30 @@ namespace ColonQuest.UI
             }
 
             bool late = JobRecord.IsLate(clock.Minutes);
+            GameObject target = toWork ? (workStation != null ? workStation.gameObject : null) : homeDoor;
             var hero = GameObject.FindWithTag(Station.PlayerTag);
-            if (workStation == null || hero == null)
+            if (target == null || hero == null)
             {
                 workArrow.gameObject.SetActive(false);
-                workGuideText.text = Loc.T(late ? "¡Vas tarde! Salí para la soda" : "Salí para la soda: entrás a las 7:00");
+                if (toWork)
+                {
+                    workGuideText.text = Loc.T(late ? "¡Vas tarde! Salí para la soda" : "Salí para la soda: entrás a las 7:00");
+                }
+                else
+                {
+                    bool inRoom = SceneManager.GetActiveScene().name == SceneNames.Cuarto;
+                    workGuideText.text = Loc.T(inRoom ? "Ya es tarde: acostate a dormir" : "Ya es tarde: andá a tu cuarto");
+                }
+
                 return;
             }
 
-            Vector2 toWork = (Vector2)workStation.transform.position - (Vector2)hero.transform.position;
+            Vector2 direction = (Vector2)target.transform.position - (Vector2)hero.transform.position;
             workArrow.gameObject.SetActive(true);
-            workArrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(toWork.y, toWork.x) * Mathf.Rad2Deg - 90f);
-            workGuideText.text = Loc.T(late ? "¡Vas tarde al trabajo!" : "Al trabajo: entrás a las 7:00");
+            workArrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);
+            workGuideText.text = toWork
+                ? Loc.T(late ? "¡Vas tarde al trabajo!" : "Al trabajo: entrás a las 7:00")
+                : Loc.T("Ya es tarde: andá a tu cuarto");
         }
 
         private string WorkPrompt()

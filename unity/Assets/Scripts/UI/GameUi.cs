@@ -219,6 +219,7 @@ namespace ColonQuest.UI
             HideSpeech();
             usedStations.Clear();
             workStation = null;
+            homeDoor = null;
             TryStartOpening(scene);
             BindStations();
         }
@@ -226,6 +227,7 @@ namespace ColonQuest.UI
         private void BindStations()
         {
             inside.Clear();
+            homeDoor = GameObject.Find(HomeDoorName);
             foreach (var station in FindObjectsByType<Station>(FindObjectsSortMode.None))
             {
                 station.PlayerEntered += OnStationEntered;
@@ -458,6 +460,8 @@ namespace ColonQuest.UI
                 case StationType.Wardrobe:
                 case StationType.Beach:
                     return "[E]  " + station.DisplayName;
+                case StationType.Furniture:
+                    return "[E]  " + station.DisplayName;
                 case StationType.Work:
                     return WorkPrompt();
                 default:
@@ -505,6 +509,9 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Beach:
                     ShowBeach();
+                    break;
+                case StationType.Furniture:
+                    ShowFurniture();
                     break;
                 case StationType.Work:
                     session.FinishShift();
@@ -693,6 +700,11 @@ namespace ColonQuest.UI
             }
 
             text.AppendLine(Loc.F("Gastos de vida  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(GameRules.LivingExpenses)}</color>"));
+            if (session.Loop.LastRoomRent > 0L)
+            {
+                text.AppendLine(Loc.F("Alquiler del cuarto  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(session.Loop.LastRoomRent)}</color>"));
+            }
+
             if (report.InstallmentsCharged > 0L)
             {
                 text.AppendLine(Loc.F("Cuotas  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(report.InstallmentsCharged)}</color>"));

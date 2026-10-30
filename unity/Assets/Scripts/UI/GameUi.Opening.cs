@@ -88,7 +88,7 @@ namespace ColonQuest.UI
                 .Pose(PersonPose.HandsUp, 1.2f).Sound(SoundEffectKind.Chime)
                 .Say(string.Empty, "¡Me contrataron, mami!").Wait(1.2f)
                 .NpcPose(Mother, PersonPose.Wave, 3f)
-                .Say("Mamá", "¡Qué orgullo! Andá a conocer el pueblo. Y cuidá esa platica.").Wait(3.2f)
+                .Say("Mamá", "¡Qué orgullo! Ya tenés tu cuartito alquilado en el barrio. Cuidá esa platica.").Wait(3.2f)
                 .WalkTo(new Vector2(-2.9f, 1.6f)).WalkTo(new Vector2(-2.9f, -0.3f))
                 .Say(string.Empty, "Bueno. A empezar mi vida.")
                 .WalkTo(new Vector2(0f, -3.4f)).Wait(0.8f);

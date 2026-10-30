@@ -76,7 +76,7 @@ namespace ColonQuest.UI
             text.AppendLine();
             text.AppendLine(Loc.T("Elige una casa para ver lo que cuesta de verdad, no solo el precio del letrero."));
             text.AppendLine();
-            text.AppendLine(Loc.F("Tus gastos de vida ({0} al mes) ya cubren donde vives hoy. Una casa nueva se suma a eso.", Money.Format(GameRules.LivingExpenses)));
+            text.AppendLine(Loc.F("Hoy alquilás un cuarto por {0} al mes. Si te mudás a una casa, ese alquiler ya no se paga.", Money.Format(MarketAssumptions.RoomRent)));
             text.AppendLine();
             text.Append(Loc.T(MarketAssumptions.ShortDisclaimer));
 
