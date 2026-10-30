@@ -120,7 +120,7 @@ async def client(
 async def test_get_image_generates_once_and_serves_second_request_from_cache(
     client: httpx2.AsyncClient, generator: FakeImageGenerator, db: AsyncSession
 ) -> None:
-    first = await client.get("/api/images/scene_taller_mecanico")
+    first = await client.get("/api/images/scene_test_only_cache")
 
     assert first.status_code == 200
     assert first.headers["x-image-source"] == "model"
@@ -128,7 +128,7 @@ async def test_get_image_generates_once_and_serves_second_request_from_cache(
     assert first.content == SAMPLE_PNG
     assert len(generator.prompts) == 1
 
-    second = await client.get("/api/images/scene_taller_mecanico")
+    second = await client.get("/api/images/scene_test_only_cache")
 
     assert second.status_code == 200
     assert second.headers["x-image-source"] == "cache"
