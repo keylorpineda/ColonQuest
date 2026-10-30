@@ -49,6 +49,9 @@ namespace ColonQuest.Game
         public int TasksDone { get; private set; }
         public int Decisions { get; private set; }
 
+        /// <summary>The week of the month and the hour of the day.</summary>
+        public GameClock Clock { get; private set; } = new GameClock();
+
         /// <summary>The home, the car and the farm stakes the player bought in this run.</summary>
         public Holdings Holdings { get; private set; } = new Holdings();
 
@@ -76,6 +79,7 @@ namespace ColonQuest.Game
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
+            Clock = new GameClock();
             doneStations.Clear();
         }
 
@@ -189,6 +193,27 @@ namespace ColonQuest.Game
             SleptThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Dormiste en tu cama"));
+        }
+
+        /// <summary>
+        /// A night in the own bed: the clock skips to the next morning. The rest for the mood comes once a month (see
+        /// <see cref="Rest"/>), so it returns null on the other nights.
+        /// </summary>
+        public ChoiceOutcome Sleep()
+        {
+            var outcome = Rest();
+            Clock.SleepToMorning();
+            return outcome;
+        }
+
+        /// <summary>The day ended away from the bed: the player falls asleep where they are and wakes up tired.</summary>
+        public ChoiceOutcome FallAsleep()
+        {
+            var before = State.Clone();
+            FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
+            Clock.SleepToMorning();
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Te quedaste dormido fuera de la cama"));
         }
 
         /// <summary>Cooking at home instead of eating out: a small saving and a little better mood. Once a month.</summary>
@@ -398,6 +423,7 @@ namespace ColonQuest.Game
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
+            Clock.StartMonth();
             doneStations.Clear();
             return report;
         }
