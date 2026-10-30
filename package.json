@@ -1,0 +1,16 @@
+{
+  "name": "colon-quest",
+  "private": true,
+  "description": "Publishes the Unity WebGL build of Colón Quest to Cloudflare Pages",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "webgl:serve": "wrangler pages dev unity/Builds/webgl --port 8080",
+    "webgl:deploy": "wrangler pages deploy unity/Builds/webgl --project-name colon-quest"
+  },
+  "devDependencies": {
+    "wrangler": "4.155.0"
+  }
+}

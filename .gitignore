@@ -16,6 +16,10 @@ htmlcov/
 dist/
 build/
 
+# --- Node (WebGL publishing with pnpm) ---
+node_modules/
+.wrangler/
+
 # --- Unity (paths relative to unity/) ---
 unity/[Ll]ibrary/
 unity/[Tt]emp/
