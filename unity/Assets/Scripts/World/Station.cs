@@ -38,7 +38,10 @@ namespace ColonQuest.World
         Wardrobe,
 
         /// <summary>The shore of the beach: a swim once a month, with the swimsuit. Not a task.</summary>
-        Beach
+        Beach,
+
+        /// <summary>The time clock of the first job: the player clocks in and works the morning. Not a task.</summary>
+        Work
     }
 
     /// <summary>
