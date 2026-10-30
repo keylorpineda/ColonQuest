@@ -6,14 +6,20 @@ always answers with its own configured open-weights model.
 """
 
 import logging
+from typing import Any
 
 import httpx2
 from openai import AsyncOpenAI
 from pydantic import BaseModel
 
 from app.config import Settings
-from app.providers.base import ProviderUnavailableError, ReasoningEffort, StructuredResult
-from app.providers.openai_compat import structured_completion
+from app.providers.base import (
+    ChatTurn,
+    ProviderUnavailableError,
+    ReasoningEffort,
+    StructuredResult,
+)
+from app.providers.openai_compat import chat_completion, structured_completion
 
 logger = logging.getLogger(__name__)
 
@@ -69,4 +75,29 @@ class OpenWeightsProvider:
             reasoning_effort=reasoning_effort or "low",
             max_tokens=max_tokens + REASONING_HEADROOM_TOKENS,
             timeout_s=timeout_s,
+        )
+
+    async def chat(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        output: type[BaseModel],
+        reasoning_effort: ReasoningEffort | None = None,
+        max_tokens: int = 2048,
+    ) -> ChatTurn:
+        """One tool-calling step of the seller agent, on the open-weights model."""
+        if not self.configured:
+            raise ProviderUnavailableError("open-weights endpoint is not configured")
+        # Muse Spark Open answers empty with less than "low" effort and no token headroom.
+        return await chat_completion(
+            self._client,
+            provider=PROVIDER,
+            model=self._settings.open_weights_npc_model,
+            messages=messages,
+            tools=tools,
+            output=output,
+            reasoning_effort="low",
+            max_tokens=max_tokens + REASONING_HEADROOM_TOKENS,
         )

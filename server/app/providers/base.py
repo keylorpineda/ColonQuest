@@ -115,3 +115,7 @@ class ModelProvider(Protocol):
         max_tokens: int = 2048,
         timeout_s: float | None = None,  # overrides the HTTP timeout for slow background calls
     ) -> StructuredResult[T]: ...
+
+
+class ChatModelProvider(ModelProvider, ToolCallingProvider, Protocol):
+    """Structured answers and tool-calling steps: what the NPCs need from a provider."""
