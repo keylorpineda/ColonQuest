@@ -843,6 +843,15 @@
       "SessionSummary": {
         "additionalProperties": false,
         "properties": {
+          "cardImageKey": {
+            "enum": [
+              "card_year_debt_free",
+              "card_year_some_debt",
+              "card_year_heavy_debt"
+            ],
+            "title": "Cardimagekey",
+            "type": "string"
+          },
           "conceptsTaught": {
             "items": {
               "$ref": "#/components/schemas/TeachingConcept"
@@ -904,7 +913,8 @@
           "totalDebt",
           "netWorth",
           "narrative",
-          "source"
+          "source",
+          "cardImageKey"
         ],
         "title": "SessionSummary",
         "type": "object"
