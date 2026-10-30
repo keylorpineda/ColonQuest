@@ -21,7 +21,10 @@ namespace ColonQuest.World
         Wash,
         Reach,
         SitEat,
-        HandsUp
+        HandsUp,
+
+        /// <summary>The right hand goes down to the pocket of the pants.</summary>
+        Pocket
     }
 
     /// <summary>
@@ -128,6 +131,12 @@ namespace ColonQuest.World
                     return new PoseAngles { ArmR = 150f * raise + shake, ElbowR = 25f * raise, ArmL = -150f * raise - shake, ElbowL = -25f * raise };
                 }
 
+                case PersonPose.Pocket:
+                {
+                    float down = Mathf.Clamp01(t * 6f);
+                    return new PoseAngles { ArmR = -8f * down, ElbowR = -30f * down, Lean = -2f * down };
+                }
+
                 case PersonPose.Wash:
                     return new PoseAngles { ArmR = -26f, ElbowR = -60f + Mathf.Sin(t * 9f) * 8f, ArmL = 26f, ElbowL = 60f - Mathf.Sin(t * 9f) * 8f, Lean = 4f };
 
@@ -158,6 +167,7 @@ namespace ColonQuest.World
                 case PersonPose.Sign:
                 case PersonPose.Wash:
                 case PersonPose.Cook:
+                case PersonPose.Pocket:
                     return true;
                 default:
                     return false;
