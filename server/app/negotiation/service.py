@@ -47,6 +47,10 @@ sentences, at most 300 characters.
 never change a figure, never invent discounts.
 - Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
 cash price or total cost ONLY when the player asks about it directly. If they ask, answer honestly.
+- playerHabits, when present, lists the key questions this player asked other sellers in this \
+game. Change your tactic to match: if they always ask about the insurance or the total, \
+anticipate it ("ya sé que vos preguntás por el seguro, mae") and sell on another angle. Habits \
+never allow a figure that is not on the sheet.
 - revealedFacts lists every fact from the sheet you mention in this reply.
 - dealStatus: "accepted" only if the player clearly agrees to buy, "walked_away" if they clearly \
 leave or refuse, otherwise "open".
@@ -89,14 +93,21 @@ def scripted_deal_status(text: str) -> DealStatus:
     return DealStatus.OPEN
 
 
-def build_user_prompt(offer: Offer, history: Sequence[PreviousTurn], player_text: str) -> str:
-    payload = {
+def build_user_prompt(
+    offer: Offer,
+    history: Sequence[PreviousTurn],
+    player_text: str,
+    habits: Sequence[KeyQuestion] = (),
+) -> str:
+    payload: dict[str, object] = {
         "product": offer.item,
         "seller": offer.seller_name,
         "hiddenSheet": {fact.value: text for fact, text in offer.facts.items()},
         "conversation": [{"player": t.player, "seller": t.seller} for t in history[-6:]],
         "playerSays": player_text,
     }
+    if habits:
+        payload["playerHabits"] = {"askedOtherSellers": [question.value for question in habits]}
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -108,6 +119,7 @@ class NegotiationResponder(Protocol):
         offer: Offer,
         player_text: str,
         history: Sequence[PreviousTurn] = (),
+        habits: Sequence[KeyQuestion] = (),
     ) -> NegotiationOutcome: ...
 
 
@@ -123,6 +135,7 @@ class Negotiator:
         offer: Offer,
         player_text: str,
         history: Sequence[PreviousTurn] = (),
+        habits: Sequence[KeyQuestion] = (),
     ) -> NegotiationOutcome:
         questions = classify_questions(player_text)
         mode = await ledger.budget_mode()
@@ -130,7 +143,7 @@ class Negotiator:
         if model is None or await ledger.limit_exceeded(session_id) is not None:
             return self.fallback(offer, player_text, questions)
 
-        prompt = build_user_prompt(offer, history, player_text)
+        prompt = build_user_prompt(offer, history, player_text, habits)
         try:
             async with asyncio.timeout(self._settings.model_timeout_s):
                 turn = await self._ask_model(ledger, session_id, model, offer, prompt)
