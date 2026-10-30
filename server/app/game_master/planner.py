@@ -1,7 +1,8 @@
-"""Season planner: Muse Spark drafts the year's plan once per session; the default plan backs it.
+"""Season planner: Muse Wonder drafts the year's plan once per session; the default plan backs it.
 
 The model only chooses the order of concepts and the themes. The plan schema enforces the
-calendar rules, and any failure (budget, timeout, invalid answer) uses ``default_plan``.
+calendar rules, and any failure (budget, timeout, invalid answer) uses ``default_plan``. It runs
+as a background task after the first event (6 to 18 s with Wonder), never on a live request.
 """
 
 import asyncio
@@ -78,14 +79,14 @@ class SeasonPlanner:
         if await ledger.limit_exceeded(session_id) is not None:
             return fallback
         model = select_text_model(
-            self._settings.summary_model, await ledger.budget_mode(), self._settings
+            self._settings.planner_model, await ledger.budget_mode(), self._settings
         )
         if model is None:
             return fallback
 
         started = time.perf_counter()
         try:
-            async with asyncio.timeout(self._settings.model_timeout_s):
+            async with asyncio.timeout(self._settings.planner_timeout_s):
                 result = await self._provider.structured(
                     model=model,
                     system=SYSTEM_PROMPT,
@@ -93,6 +94,7 @@ class SeasonPlanner:
                     output=SeasonPlan,
                     reasoning_effort=self._settings.live_reasoning_effort,
                     max_tokens=4000,  # 12 months of JSON plus the reasoning before it
+                    timeout_s=self._settings.planner_timeout_s,
                 )
         except (TimeoutError, ProviderError):
             await ledger.record(

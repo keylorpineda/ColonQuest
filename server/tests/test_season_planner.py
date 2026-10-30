@@ -50,7 +50,8 @@ async def test_model_plan_is_used_and_recorded() -> None:
 
     assert planned.source == "model"
     assert planned.plan.months[1] == default_plan(STATE).months[2]
-    assert provider.calls[0]["model"] == SETTINGS.summary_model
+    assert provider.calls[0]["model"] == "muse-wonder-1.0"
+    assert provider.calls[0]["timeout_s"] == SETTINGS.planner_timeout_s == 30.0
     assert '"cardUtilizationPct":0' in provider.calls[0]["user"]
     assert ledger.records[0]["endpoint"] == "season_plan"
     assert ledger.records[0]["ok"] is True
