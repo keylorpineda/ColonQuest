@@ -30,6 +30,14 @@ namespace ColonQuest.Game
 
         private const int MaxNegotiationText = 300;
 
+        // The event asked for ahead of time (see PrefetchTask): the answer kept, or the task waiting for it. A new game
+        // changes the generation, so an answer from the previous run is dropped.
+        private bool prefetching;
+        private StationType prefetchStation;
+        private ApiResult<GameEvent> prefetched;
+        private Action<ApiResult<GameEvent>> waitingForPrefetch;
+        private int prefetchGeneration;
+
         /// <summary>Shown in the text box when a spoken turn could not be understood.</summary>
         public const string VoiceFailedNotice = "No te entendí, escribilo.";
 
@@ -98,6 +106,10 @@ namespace ColonQuest.Game
             CasinoNet = 0L;
             SinpeSent = 0L;
             Busy = false;
+            prefetchGeneration++;
+            prefetching = false;
+            prefetched = null;
+            waitingForPrefetch = null;
             CurrentEvent = null;
             CurrentNegotiation = null;
             VoiceNotice = null;
@@ -119,6 +131,43 @@ namespace ColonQuest.Game
             Changed?.Invoke();
         }
 
+        /// <summary>
+        /// Starts asking the game master for the event of this place while the greeting scene plays, without showing a wait.
+        /// <see cref="BeginTask"/> then takes the answer if it already came, or waits for the one on its way. The state does
+        /// not change during the greeting, so the event still fits.
+        /// </summary>
+        public void PrefetchTask(StationType station)
+        {
+            if (Busy || prefetching || !Loop.CanDoTask(station))
+            {
+                return;
+            }
+
+            prefetching = true;
+            prefetchStation = station;
+            prefetched = null;
+            int generation = prefetchGeneration;
+            ApiClient.Instance.RequestEvent(State.Clone(), result =>
+            {
+                if (generation != prefetchGeneration)
+                {
+                    return;
+                }
+
+                prefetching = false;
+                var waiting = waitingForPrefetch;
+                waitingForPrefetch = null;
+                if (waiting != null)
+                {
+                    waiting(result);
+                }
+                else
+                {
+                    prefetched = result;
+                }
+            });
+        }
+
         /// <summary>Asks the game master for an event for this place. The result arrives through <see cref="EventReady"/>.</summary>
         public void BeginTask(StationType station)
         {
@@ -131,14 +180,33 @@ namespace ColonQuest.Game
             CurrentStation = station;
             LastDeal = null;
             Changed?.Invoke();
-            ApiClient.Instance.RequestEvent(State.Clone(), result =>
+
+            Action<ApiResult<GameEvent>> deliver = result =>
             {
                 Busy = false;
                 CurrentEvent = result.Value;
                 CurrentEventSource = result.Source;
                 EventReady?.Invoke(result.Value, result.Source);
                 Changed?.Invoke();
-            });
+            };
+
+            bool forThisPlace = prefetchStation == station;
+            if (prefetched != null && forThisPlace)
+            {
+                var ready = prefetched;
+                prefetched = null;
+                deliver(ready);
+                return;
+            }
+
+            if (prefetching && forThisPlace)
+            {
+                waitingForPrefetch = deliver;
+                return;
+            }
+
+            prefetched = null;
+            ApiClient.Instance.RequestEvent(State.Clone(), deliver);
         }
 
         public void Choose(string choiceId)
