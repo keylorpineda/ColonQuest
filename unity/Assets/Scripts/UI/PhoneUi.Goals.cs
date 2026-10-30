@@ -20,6 +20,7 @@ namespace ColonQuest.UI
                 case GoalKind.EmergencyFund: return "Juntar el fondo de emergencia";
                 case GoalKind.PayDownCard: return "Bajar la tarjeta a la mitad";
                 case GoalKind.Savings: return "Juntar un ahorro";
+                case GoalKind.BuyMotorbike: return "Comprar la moto";
                 default: return "Amueblar tu cuarto";
             }
         }
@@ -35,6 +36,10 @@ namespace ColonQuest.UI
                     return Loc.F("{0} de {1}", Money.Format(state.Savings), Money.Format(goal.Target));
                 case GoalKind.PayDownCard:
                     return Loc.F("La tarjeta debe {0}. La meta es {1}.", Money.Format(state.CreditCard.Balance), Money.Format(goal.Target));
+                case GoalKind.BuyMotorbike:
+                    return (FinanceEngine.OwnsVehicle(state) || (session.Holdings != null && session.Holdings.Car != null))
+                        ? Loc.T("Ya tenés tu moto.")
+                        : Loc.F("{0} de {1} para la prima", Money.Format(state.Savings), Money.Format(goal.Target));
                 default:
                     int pieces = 0;
                     foreach (var unused in session.Holdings.Furniture)

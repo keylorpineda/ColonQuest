@@ -68,6 +68,7 @@ namespace ColonQuest.Game
         public event Action<GameEvent, ResultSource> EventReady;
         public event Action<ChoiceOutcome> ChoiceApplied;
         public event Action<MonthlyTickReport> MonthClosed;
+        public event Action<long> QuincenaPaid;
         public event Action<SessionSummary> Finished;
 
         public PlayerState State => Loop.State;
@@ -117,6 +118,11 @@ namespace ColonQuest.Game
         private void Awake()
         {
             Instance = this;
+            if (Loop != null)
+            {
+                Loop.QuincenaPaid += q => QuincenaPaid?.Invoke(q);
+            }
+
             StartNewGame();
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
         }

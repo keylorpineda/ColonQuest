@@ -74,6 +74,10 @@ namespace ColonQuest.Game
         /// <summary>The rent of the room that went out with the last closed month: none after moving to another home.</summary>
         public long LastRoomRent { get; private set; }
 
+        public long QuincenaPaidThisMonth { get; private set; }
+
+        public event Action<long> QuincenaPaid;
+
         public bool IsFinished => MonthsPlayed >= GameRules.MonthsToPlay;
 
         public GameLoop()
@@ -129,7 +133,8 @@ namespace ColonQuest.Game
                 billsArrived = Bills.ArrivedThisMonth,
                 punctualDays = Job.PunctualDays,
                 jobPosition = (int)Job.Position,
-                attendedToday = Courses.AttendedToday
+                attendedToday = Courses.AttendedToday,
+                quincenaPaidThisMonth = QuincenaPaidThisMonth
             };
 
             foreach (var course in Career.Courses)
@@ -180,6 +185,7 @@ namespace ColonQuest.Game
             SwamThisMonth = snapshot.swamThisMonth;
             SleptThisMonth = snapshot.sleptThisMonth;
             CookedThisMonth = snapshot.cookedThisMonth;
+            QuincenaPaidThisMonth = Math.Max(0L, snapshot.quincenaPaidThisMonth);
             Clock.Restore(snapshot.day, snapshot.minutes);
             Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday, snapshot.punctualDays, (JobPosition)snapshot.jobPosition);
             Courses.AttendedToday = snapshot.attendedToday;
@@ -369,13 +375,36 @@ namespace ColonQuest.Game
             }
         }
 
+        public void PayMidMonthQuincena()
+        {
+            if (QuincenaPaidThisMonth > 0L)
+            {
+                return;
+            }
+
+            long half = State.SalaryNet / 2L;
+            if (half > 0L)
+            {
+                FinanceEngine.CreditCash(State, half);
+                QuincenaPaidThisMonth = half;
+                State.RecordHistory("sinpe_quincena");
+                QuincenaPaid?.Invoke(half);
+            }
+        }
+
         /// <summary>Only a night that starts a new week closes the working day: the last week waits at the bank.</summary>
         private void NextMorning()
         {
             Courses.AttendedToday = false;
+            int previousDay = Clock.Day;
             if (Clock.SleepToMorning())
             {
                 EndWorkingDay();
+                if (previousDay == 2)
+                {
+                    PayMidMonthQuincena();
+                }
+
                 if (Clock.IsLastDay)
                 {
                     Bills.Arrive(BillAmount);
@@ -743,9 +772,11 @@ namespace ColonQuest.Game
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
                 FixedLivingExpensesColones = GameRules.LivingExpenses + LastRoomRent + LastRunningCosts,
-                SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, Job.MissedThisMonth)
+                SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, Job.MissedThisMonth),
+                SalaryAlreadyPaidColones = QuincenaPaidThisMonth
             });
 
+            QuincenaPaidThisMonth = 0L;
             MonthsPlayed++;
             TasksDone = 0;
             HurtThisMonth = false;

@@ -108,6 +108,7 @@ namespace ColonQuest.UI
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
+            session.QuincenaPaid += ShowQuincenaNotice;
             session.Finished += ShowEnd;
             SceneManager.sceneLoaded += OnSceneLoaded;
 
@@ -138,6 +139,7 @@ namespace ColonQuest.UI
                 session.EventReady -= ShowEvent;
                 session.ChoiceApplied -= ShowOutcome;
                 session.MonthClosed -= ShowMonthReport;
+                session.QuincenaPaid -= ShowQuincenaNotice;
                 session.Finished -= ShowEnd;
             }
         }
@@ -754,6 +756,15 @@ namespace ColonQuest.UI
             {
                 new ModalOption { Label = last ? "Ver mi resumen" : "Seguir", Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
             });
+        }
+
+        private void ShowQuincenaNotice(long amount)
+        {
+            modal.Show(
+                Loc.T("SINPE Móvil"),
+                Loc.T("Pago de quincena"),
+                Loc.F("Depósito por {0} de Soda El Muelle por concepto de adelanto quincenal de salario.", Money.Format(amount)),
+                new[] { Continue(null) });
         }
 
         /// <summary>Everyday objects only talk: they never move money, that is the finance engine's job.</summary>

@@ -9,7 +9,8 @@ namespace ColonQuest.Game
         EmergencyFund,
         PayDownCard,
         FurnishRoom,
-        Savings
+        Savings,
+        BuyMotorbike
     }
 
     /// <summary>One goal of the run: what it asks for and whether it was already reached. A goal reached stays reached.</summary>
@@ -42,6 +43,7 @@ namespace ColonQuest.Game
     {
         public const long FundTarget = 100_000L;
         public const long SavingsTarget = 150_000L;
+        public const long MotorbikeTarget = 150_000L;
         public const int RoomPieces = 4;
 
         private readonly List<Goal> goals = new List<Goal>();
@@ -85,6 +87,13 @@ namespace ColonQuest.Game
                     return Share(state.Savings, goal.Target);
                 case GoalKind.FurnishRoom:
                     return Share(Pieces(holdings), goal.Target);
+                case GoalKind.BuyMotorbike:
+                    if (FinanceEngine.OwnsVehicle(state) || (holdings != null && holdings.Car != null))
+                    {
+                        return 1f;
+                    }
+
+                    return Share(state.Savings, goal.Target);
                 default:
                     return Share(goal.Start - state.CreditCard.Balance, goal.Start - goal.Target);
             }

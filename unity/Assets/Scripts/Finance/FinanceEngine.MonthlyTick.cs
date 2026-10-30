@@ -20,6 +20,9 @@ namespace ColonQuest.Finance
 
         /// <summary>What comes off the salary for being late or missing work. See <see cref="FinanceEngine.CalculateDockedPay"/>.</summary>
         public long SalaryDockedColones { get; set; }
+
+        /// <summary>Salary already paid mid-month (Day 2 quincena). Deducted from the month-end salary payout.</summary>
+        public long SalaryAlreadyPaidColones { get; set; }
     }
 
     /// <summary>
@@ -155,8 +158,9 @@ namespace ColonQuest.Finance
 
             // 1. Salary
             long salaryDocked = Math.Max(0L, Math.Min(state.SalaryNet, opts.SalaryDockedColones));
-            long salaryCredited = state.SalaryNet - salaryDocked;
-            state.Cash = ContractLimits.ClampColones(state.Cash + salaryCredited);
+            long totalPayable = Math.Max(0L, state.SalaryNet - salaryDocked);
+            long salaryCreditedAtMonthEnd = Math.Max(0L, totalPayable - opts.SalaryAlreadyPaidColones);
+            state.Cash = ContractLimits.ClampColones(state.Cash + salaryCreditedAtMonthEnd);
 
             // 2. December aguinaldo
             long aguinaldoCredited = 0L;
@@ -208,7 +212,7 @@ namespace ColonQuest.Finance
 
             return new MonthlyTickReport(
                 monthProcessed,
-                salaryCredited,
+                totalPayable,
                 aguinaldoCredited,
                 installmentsCharged,
                 marchamoCharged,

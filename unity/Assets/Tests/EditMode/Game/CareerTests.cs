@@ -41,6 +41,8 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(GameRules.MinimumWageGross, Career.GrossSalary(JobPosition.Helper));
             Assert.Greater(Career.GrossSalary(JobPosition.Cashier), Career.GrossSalary(JobPosition.Helper));
             Assert.Greater(Career.GrossSalary(JobPosition.Manager), Career.GrossSalary(JobPosition.Cashier));
+            Assert.Greater(Career.GrossSalary(JobPosition.Administrator), Career.GrossSalary(JobPosition.Manager));
+            Assert.AreEqual(720_000L, Career.GrossSalary(JobPosition.Administrator));
         }
 
         [Test]
@@ -137,9 +139,10 @@ namespace ColonQuest.Game.Tests
         public void Promotion_StopsAtTheTop()
         {
             var loop = new GameLoop();
-            WorkOnTime(loop, 7);
+            WorkOnTime(loop, 12);
             FinishCourse(loop, CourseKind.Ina);
             FinishCourse(loop, CourseKind.Una);
+            Assert.IsTrue(loop.Promote());
             Assert.IsTrue(loop.Promote());
             Assert.IsTrue(loop.Promote());
 
@@ -167,9 +170,31 @@ namespace ColonQuest.Game.Tests
         [TestCase("Curso del INA")]
         [TestCase("¡Te ascendieron!")]
         [TestCase("Encargada")]
+        [TestCase("Administrador")]
+        [TestCase("Administradora")]
         public void TheTexts_AreTranslated(string spanish)
         {
             Assert.AreNotEqual(spanish, Loc.Translate(spanish, GameLanguage.English));
+        }
+
+        [Test]
+        public void Promotion_ReachesAdministratorAtTopLadder()
+        {
+            var loop = new GameLoop();
+            WorkOnTime(loop, 12);
+            FinishCourse(loop, CourseKind.Ina);
+            FinishCourse(loop, CourseKind.Una);
+
+            Assert.IsTrue(loop.Promote());
+            Assert.AreEqual(JobPosition.Cashier, loop.Job.Position);
+
+            Assert.IsTrue(loop.Promote());
+            Assert.AreEqual(JobPosition.Manager, loop.Job.Position);
+
+            Assert.IsTrue(loop.Promote());
+            Assert.AreEqual(JobPosition.Administrator, loop.Job.Position);
+            Assert.AreEqual(Career.TopPosition, loop.Job.Position);
+            Assert.IsFalse(loop.CanBePromoted);
         }
     }
 }
