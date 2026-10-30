@@ -30,6 +30,11 @@ namespace ColonQuest.Game
     {
         public int DaysWorked { get; private set; }
 
+        /// <summary>The days clocked in on time. These are the ones a promotion looks at.</summary>
+        public int PunctualDays { get; private set; }
+
+        public JobPosition Position { get; private set; } = JobPosition.Helper;
+
         public int LatesThisMonth { get; private set; }
 
         public int MissedThisMonth { get; private set; }
@@ -74,6 +79,7 @@ namespace ColonQuest.Game
             DaysWorked++;
             if (!IsLate(minutes))
             {
+                PunctualDays++;
                 return ClockInResult.OnTime;
             }
 
@@ -112,9 +118,16 @@ namespace ColonQuest.Game
             OnShift = false;
         }
 
-        /// <summary>Puts the record back where a saved game left it.</summary>
-        public void Restore(int daysWorked, int latesThisMonth, int missedThisMonth, bool workedToday)
+        public void MoveUp()
         {
+            Position++;
+        }
+
+        /// <summary>Puts the record back where a saved game left it.</summary>
+        public void Restore(int daysWorked, int latesThisMonth, int missedThisMonth, bool workedToday, int punctualDays, JobPosition position)
+        {
+            PunctualDays = Math.Max(0, punctualDays);
+            Position = position;
             DaysWorked = Math.Max(0, daysWorked);
             LatesThisMonth = Math.Max(0, latesThisMonth);
             MissedThisMonth = Math.Max(0, missedThisMonth);

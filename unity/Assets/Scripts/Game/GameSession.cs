@@ -775,6 +775,28 @@ namespace ColonQuest.Game
         public long SinpeSent { get; private set; }
 
         /// <summary>Sends money by SINPE from the phone. Only the finance engine moves the cash; false when there is not enough.</summary>
+        public bool TakeClass(CourseKind kind)
+        {
+            if (Busy || Loop.IsFinished || !Loop.TakeClass(kind))
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool Promote()
+        {
+            if (Busy || Loop.IsFinished || !Loop.Promote())
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
         public void PutInFund(long amount)
         {
             if (!Busy && !Loop.IsFinished)

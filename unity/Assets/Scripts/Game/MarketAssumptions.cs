@@ -296,6 +296,9 @@ namespace ColonQuest.Game
             }
         }
 
+        /// <summary>The mood a promotion gives.</summary>
+        public const int PromotionWellbeing = 5;
+
         /// <summary>What a real bed adds to the rest of the month, against the mattress on the floor.</summary>
         public const int BedRestBonus = 2;
 
