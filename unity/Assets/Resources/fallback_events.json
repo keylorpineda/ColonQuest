@@ -480,7 +480,7 @@
       "type": "income",
       "title": "Revisá tu colilla",
       "narrative": "Tu colilla de pago trae rebajos de CCSS y renta, pero te faltan las horas extra de la semana pasada: ₡35 000 que nadie te mencionó.",
-      "imageKey": "scene_oficina",
+      "imageKey": "scene_soda",
       "choices": [
         {
           "id": "claim",
