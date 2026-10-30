@@ -28,6 +28,8 @@ namespace ColonQuest.World
             Wait,
             NpcPose,
             Wobble,
+            Swing,
+            Reveal,
             Apply
         }
 
@@ -43,6 +45,8 @@ namespace ColonQuest.World
             public SoundEffectKind Sound;
             public Color Color;
             public bool Through;
+            public bool HasFront;
+            public Vector2 Front;
             public Action Action;
         }
 
@@ -89,16 +93,35 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>Walks the player to a point and waits until there.</summary>
+        /// <summary>
+        /// Walks the player to a point and waits until there. When the point is inside solid furniture, the player stops at
+        /// the closest free spot in front of it instead.
+        /// </summary>
         public Interaction WalkTo(Vector2 point)
         {
             return Add(new Step { Kind = Kind.WalkTo, Point = point });
         }
 
-        /// <summary>Like <see cref="WalkTo"/> but the player can walk over furniture, to lie in a bed or sit on a sofa.</summary>
+        /// <summary>
+        /// Like <see cref="WalkTo"/> but the player can get onto furniture, to lie in a bed or sit on a sofa. The player first
+        /// walks with collisions to the free spot in front of it, and at the end of the scene steps back to that spot before
+        /// the collider comes back, so physics never pushes the player out of the furniture.
+        /// </summary>
         public Interaction WalkInto(Vector2 point)
         {
             return Add(new Step { Kind = Kind.WalkTo, Point = point, Through = true });
+        }
+
+        /// <summary>Like <see cref="WalkInto(Vector2)"/> with the spot to come from and go back to given by the scene.</summary>
+        public Interaction WalkInto(Vector2 point, Vector2 front)
+        {
+            return Add(new Step { Kind = Kind.WalkTo, Point = point, Through = true, HasFront = true, Front = front });
+        }
+
+        /// <summary>Gets onto a seat and holds a sitting pose. The player stands up and steps back in front of it at the end.</summary>
+        public Interaction SitOn(Vector2 seat, float seconds, PersonPose pose = PersonPose.Sit)
+        {
+            return WalkInto(seat).Pose(pose, seconds);
         }
 
         /// <summary>Turns the player toward a point.</summary>
@@ -171,6 +194,21 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.Wobble, Name = objectName, Seconds = seconds });
         }
 
+        /// <summary>
+        /// Swings a door leaf (found by name) by squeezing its width from the hinge: 1 is closed, a small value is open
+        /// edge-on. The named object is the hinge. It does not wait.
+        /// </summary>
+        public Interaction Swing(string objectName, float width, float seconds)
+        {
+            return Add(new Step { Kind = Kind.Swing, Name = objectName, Seconds = seconds, Point = new Vector2(width, 0f) });
+        }
+
+        /// <summary>Shows or hides the drawing of an object found by name, such as the swimsuit inside the wardrobe.</summary>
+        public Interaction Reveal(string objectName, bool visible)
+        {
+            return Add(new Step { Kind = Kind.Reveal, Name = objectName, Through = visible });
+        }
+
         /// <summary>The moment the game changes. It runs even if the player skips the scene.</summary>
         public Interaction Apply(Action action)
         {
@@ -219,6 +257,7 @@ namespace ColonQuest.World
         {
             private const float WalkSpeed = 3.4f;
             private const float WalkTimeout = 4f;
+            private const float StuckSeconds = 0.35f;
 
             private bool skip;
 
@@ -233,6 +272,7 @@ namespace ColonQuest.World
                 var bob = player.transform.Find("Bob");
                 var animator = bob != null ? bob.GetComponent<PlayerAnimator>() : null;
                 bool through = false;
+                Vector2 entry = Vector2.zero;
 
                 try
                 {
@@ -244,11 +284,24 @@ namespace ColonQuest.World
                             case Kind.WalkTo:
                                 if (step.Through && collider != null)
                                 {
-                                    collider.enabled = false;
-                                    through = true;
+                                    if (!through)
+                                    {
+                                        // Reach the front of the furniture with collisions, and remember it to step back there.
+                                        Vector2 front = FreeSpot.Near(step.HasFront ? step.Front : step.Point, collider);
+                                        yield return Walk(body, controller, front);
+                                        entry = body != null ? body.position : (Vector2)player.transform.position;
+                                        collider.enabled = false;
+                                        through = true;
+                                    }
+
+                                    yield return Walk(body, controller, step.Point);
+                                }
+                                else
+                                {
+                                    bool solid = collider != null && collider.enabled;
+                                    yield return Walk(body, controller, solid ? FreeSpot.Near(step.Point, collider) : step.Point);
                                 }
 
-                                yield return Walk(body, controller, step.Point);
                                 break;
 
                             case Kind.Face:
@@ -308,10 +361,30 @@ namespace ColonQuest.World
                                 StartCoroutine(Wobble(step.Name, step.Seconds));
                                 break;
 
+                            case Kind.Swing:
+                                StartCoroutine(Swing(step.Name, step.Point.x, skip ? 0f : step.Seconds));
+                                break;
+
+                            case Kind.Reveal:
+                                SetVisible(step.Name, step.Through);
+                                break;
+
                             case Kind.Apply:
                                 step.Action?.Invoke();
                                 break;
                         }
+                    }
+
+                    if (through)
+                    {
+                        // Stand up and step back in front of the furniture while the collider is still off.
+                        if (animator != null)
+                        {
+                            animator.SetPose(PersonPose.None);
+                        }
+
+                        yield return Hold(0.2f);
+                        yield return Walk(body, controller, entry);
                     }
                 }
                 finally
@@ -323,6 +396,12 @@ namespace ColonQuest.World
 
                     if (through && collider != null)
                     {
+                        if (body != null && (body.position - entry).sqrMagnitude > 0.01f)
+                        {
+                            body.position = entry;
+                            body.transform.position = entry;
+                        }
+
                         collider.enabled = true;
                     }
 
@@ -355,10 +434,20 @@ namespace ColonQuest.World
                     yield break;
                 }
 
+                Vector2 last = body.position;
+                float still = 0f;
                 for (float t = 0f; t < WalkTimeout && !skip; t += Time.deltaTime)
                 {
                     Vector2 toTarget = target - body.position;
                     if (toTarget.magnitude < 0.12f)
+                    {
+                        break;
+                    }
+
+                    // Pressed against something for a moment: stop pushing instead of walking into it for seconds.
+                    still = t > 0.1f && (body.position - last).sqrMagnitude < 0.00002f ? still + Time.deltaTime : 0f;
+                    last = body.position;
+                    if (still > StuckSeconds)
                     {
                         break;
                     }
@@ -418,6 +507,47 @@ namespace ColonQuest.World
                 if (animator != null)
                 {
                     animator.SetPose(pose, seconds);
+                }
+            }
+
+            private static IEnumerator Swing(string objectName, float width, float seconds)
+            {
+                var hinge = GameObject.Find(objectName);
+                if (hinge == null)
+                {
+                    yield break;
+                }
+
+                Vector3 start = hinge.transform.localScale;
+                var goal = new Vector3(width, start.y, start.z);
+                for (float t = 0f; t < seconds; t += Time.deltaTime)
+                {
+                    if (hinge == null)
+                    {
+                        yield break;
+                    }
+
+                    hinge.transform.localScale = Vector3.Lerp(start, goal, Mathf.SmoothStep(0f, 1f, t / seconds));
+                    yield return null;
+                }
+
+                if (hinge != null)
+                {
+                    hinge.transform.localScale = goal;
+                }
+            }
+
+            private static void SetVisible(string objectName, bool visible)
+            {
+                var target = GameObject.Find(objectName);
+                if (target == null)
+                {
+                    return;
+                }
+
+                foreach (var renderer in target.GetComponentsInChildren<SpriteRenderer>(true))
+                {
+                    renderer.enabled = visible;
                 }
             }
 
