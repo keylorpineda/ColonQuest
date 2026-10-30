@@ -104,7 +104,7 @@ namespace ColonQuest.World
 
             instance = this;
             Apply(GameSettings.Current);
-            foreach (MusicTrack track in new[] { MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
+            foreach (MusicTrack track in new[] { MusicTrack.Menu, MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
             {
                 music[track] = Source("Music_" + track, true);
             }
@@ -143,6 +143,8 @@ namespace ColonQuest.World
         /// <summary>Makes the clips one per frame so the game never stalls, the tune of the town first.</summary>
         private IEnumerator Prepare()
         {
+            Play(music[MusicTrack.Menu], ProceduralSound.Music(MusicTrack.Menu));
+            yield return null;
             Play(music[MusicTrack.Town], ProceduralSound.Music(MusicTrack.Town));
             yield return null;
             Play(sea, ProceduralSound.Sea());

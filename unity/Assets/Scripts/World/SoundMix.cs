@@ -5,6 +5,7 @@ namespace ColonQuest.World
     public enum MusicTrack
     {
         None,
+        Menu,
         Town,
         Store,
         Bank,
@@ -61,7 +62,8 @@ namespace ColonQuest.World
                 case SceneNames.Town:
                     return Town(position);
                 default:
-                    return new SoundLevels { Track = MusicTrack.Town, Music = 0.3f };
+                    // The title screen has a tune of its own, so it does not carry on into the town.
+                    return new SoundLevels { Track = MusicTrack.Menu, Music = 0.3f };
             }
         }
 

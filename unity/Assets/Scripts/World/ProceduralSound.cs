@@ -80,6 +80,8 @@ namespace ColonQuest.World
         {
             switch (track)
             {
+                case MusicTrack.Menu:
+                    return MakeTune("Music_Menu", new Tune { Bpm = 100f, Bars = 4, Pad = 0.12f, Melody = 0.3f, Chance = 0.6f, Decay = 7f, Bass = true, Seed = 21 });
                 case MusicTrack.Store:
                     return MakeTune("Music_Store", new Tune { Bpm = 112f, Bars = 4, Pad = 0.05f, Melody = 0.32f, Chance = 0.75f, Decay = 9f, Bass = true, Seed = 7 });
                 case MusicTrack.Bank:
