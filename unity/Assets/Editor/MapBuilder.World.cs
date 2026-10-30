@@ -517,8 +517,6 @@ namespace ColonQuest.EditorTools
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
 
-            Car(parent, shadows, -33f, 3.05f, "#7B5BA8");
-            Car(parent, shadows, -27f, -13.05f, "#F1F4FF");
             foreach (float x in new[] { -41f, -33f, -26f })
             {
                 Lamp(parent, x, 4.5f);

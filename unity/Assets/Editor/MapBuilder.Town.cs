@@ -262,7 +262,7 @@ namespace ColonQuest.EditorTools
             // Cars in the same lane share a speed, so none catches up with the one ahead.
             Car(parent, shadows, -21f, 0.95f, "#E8505B", 2.4f);
             Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
-            Car(parent, shadows, -14f, 3.05f, "#FFD23F", -2.0f);
+            // The north lane of the main street belongs to the collectors' car, so no other car shares it.
             Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
             Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
             Car(parent, shadows, -18f, -13.05f, "#FF8A3D", 2.6f);
