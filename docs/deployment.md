@@ -21,7 +21,8 @@ FastAPI backend (`server/`) from `main` only after GitHub Actions CI passes (`au
 | `PLANNER_TIMEOUT_S` | Timeout of the background season planner | `30` |
 | `SUMMARY_TIMEOUT_S` | Timeout of the year-end summary; Unity waits up to 30 s there | `25` |
 | `CLASS_REPORT_MODEL` | Model for the teacher dashboard explanation (a live call, keep it on Spark) | `muse-spark-1.3` |
-| `DAILY_BUDGET_USD` | Daily spend ceiling before automatic Spark downgrade (80%) and fallback (100%) | `5.0` |
+| `DAILY_BUDGET_USD` | Daily Meta spend ceiling before automatic Spark downgrade (80%) and fallback (100%) | `5.0` |
+| `OPEN_WEIGHTS_DAILY_BUDGET_USD` | Daily Baseten spend; once reached, the NPCs use Meta until midnight UTC | `3` |
 
 ### 2. Health check and migrations
 
