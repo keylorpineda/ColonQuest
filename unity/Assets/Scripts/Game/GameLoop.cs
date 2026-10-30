@@ -74,6 +74,8 @@ namespace ColonQuest.Game
             Arrests = 0;
             HasSwimsuit = false;
             SwamThisMonth = false;
+            SleptThisMonth = false;
+            CookedThisMonth = false;
             doneStations.Clear();
         }
 
@@ -106,6 +108,11 @@ namespace ColonQuest.Game
         public bool HasSwimsuit { get; private set; }
 
         public bool SwamThisMonth { get; private set; }
+
+        /// <summary>True once the player slept in the bed this month. Skipping it costs a little mood when the month closes.</summary>
+        public bool SleptThisMonth { get; private set; }
+
+        public bool CookedThisMonth { get; private set; }
 
         /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): they count as tasks not done.</summary>
         public void LoseTasks(int days)
@@ -167,6 +174,37 @@ namespace ColonQuest.Game
             SwamThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Te diste un chapuzón en el mar"));
+        }
+
+        /// <summary>A night in the own bed: free, a little rest for the mood. Once a month.</summary>
+        public ChoiceOutcome Rest()
+        {
+            if (SleptThisMonth)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.RestWellbeing);
+            SleptThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Dormiste en tu cama"));
+        }
+
+        /// <summary>Cooking at home instead of eating out: a small saving and a little better mood. Once a month.</summary>
+        public ChoiceOutcome Cook()
+        {
+            if (CookedThisMonth)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            FinanceEngine.CreditCash(State, MarketAssumptions.HomeCookingSaving);
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.CookWellbeing);
+            CookedThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Cocinaste en casa"));
         }
 
         /// <summary>An officer saw the player cross on red: a fine and a little stress, no jail and no lost days.</summary>
@@ -344,6 +382,11 @@ namespace ColonQuest.Game
         public MonthlyTickReport CloseMonth()
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
+            if (!SleptThisMonth)
+            {
+                FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
+            }
+
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
                 FixedLivingExpensesColones = GameRules.LivingExpenses + LastRunningCosts
@@ -353,6 +396,8 @@ namespace ColonQuest.Game
             TasksDone = 0;
             HurtThisMonth = false;
             SwamThisMonth = false;
+            SleptThisMonth = false;
+            CookedThisMonth = false;
             doneStations.Clear();
             return report;
         }

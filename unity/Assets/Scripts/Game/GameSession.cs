@@ -422,6 +422,16 @@ namespace ColonQuest.Game
             return Apply(Loop.Swim());
         }
 
+        public bool Rest()
+        {
+            return Apply(Loop.Rest());
+        }
+
+        public bool Cook()
+        {
+            return Apply(Loop.Cook());
+        }
+
         private bool Apply(ChoiceOutcome outcome)
         {
             if (outcome == null || Loop.IsFinished || Busy)
