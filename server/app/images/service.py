@@ -36,6 +36,7 @@ class ImageOutcome:
     media_type: str
     source: str
     cacheable: bool
+    latency_ms: int = 0
 
 
 def build_image_prompt(key: str) -> str:
@@ -86,4 +87,6 @@ class ImageService:
             ok=True,
             session_id=None,
         )
-        return ImageOutcome(image.data, image.media_type, "model", cacheable=True)
+        return ImageOutcome(
+            image.data, image.media_type, "model", cacheable=True, latency_ms=image.latency_ms
+        )
