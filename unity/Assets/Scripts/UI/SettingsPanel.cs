@@ -18,6 +18,7 @@ namespace ColonQuest.UI
         private readonly Action onBack;
         private readonly Button soundButton;
         private readonly Button languageButton;
+        private readonly Button screenButton;
         private readonly RectTransform volumeFill;
         private readonly Text volumeText;
 
@@ -25,7 +26,7 @@ namespace ColonQuest.UI
         {
             onBack = back;
             root = UiKit.Overlay(parent, "Settings");
-            var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, 700f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, 800f), new Vector2(0.5f, 0.5f), Vector2.zero);
             var top = new Vector2(0.5f, 1f);
 
             UiKit.Label(card, "Ajustes", 56, UiKit.Ink, new Vector2(CardWidth - 80f, 70f), top, new Vector2(0f, -30f), TextAnchor.MiddleCenter);
@@ -33,14 +34,16 @@ namespace ColonQuest.UI
             languageButton = UiKit.MakeButton(card, "Idioma", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -130f), ToggleLanguage);
             soundButton = UiKit.MakeButton(card, "Sonido", GameUiColors.Green, new Vector2(520f, 84f), top, new Vector2(0f, -240f), ToggleSound);
 
-            UiKit.Label(card, "Volumen", 34, GameUiColors.Muted, new Vector2(CardWidth - 80f, 44f), top, new Vector2(0f, -362f), TextAnchor.MiddleCenter);
-            UiKit.MakeButton(card, "-", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(-250f, -420f), () => ChangeVolume(-1));
-            UiKit.MakeButton(card, "+", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(250f, -420f), () => ChangeVolume(1));
+            screenButton = UiKit.MakeButton(card, "Pantalla", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -350f), ToggleScreen);
 
-            UiKit.Fill(card, "VolumeBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 30f), top, new Vector2(0f, -447f));
-            volumeFill = UiKit.Fill(card, "VolumeFill", GameUiColors.Gain, new Vector2(BarWidth, 30f), top, new Vector2(-BarWidth * 0.5f, -447f)).rectTransform;
+            UiKit.Label(card, "Volumen", 34, GameUiColors.Muted, new Vector2(CardWidth - 80f, 44f), top, new Vector2(0f, -462f), TextAnchor.MiddleCenter);
+            UiKit.MakeButton(card, "-", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(-250f, -520f), () => ChangeVolume(-1));
+            UiKit.MakeButton(card, "+", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(250f, -520f), () => ChangeVolume(1));
+
+            UiKit.Fill(card, "VolumeBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 30f), top, new Vector2(0f, -547f));
+            volumeFill = UiKit.Fill(card, "VolumeFill", GameUiColors.Gain, new Vector2(BarWidth, 30f), top, new Vector2(-BarWidth * 0.5f, -547f)).rectTransform;
             volumeFill.pivot = new Vector2(0f, 1f);
-            volumeText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(200f, 40f), top, new Vector2(0f, -494f), TextAnchor.MiddleCenter);
+            volumeText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(200f, 40f), top, new Vector2(0f, -594f), TextAnchor.MiddleCenter);
 
             UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), Back);
 
@@ -75,6 +78,12 @@ namespace ColonQuest.UI
             Refresh();
         }
 
+        private void ToggleScreen()
+        {
+            FullscreenKeys.Toggle();
+            Refresh();
+        }
+
         private void ToggleSound()
         {
             var settings = GameSettings.Current;
@@ -102,6 +111,7 @@ namespace ColonQuest.UI
             // Both names stay in their own language, so the player can always find the way back.
             UiKit.SetLabel(languageButton, settings.Language == GameLanguage.English ? "Language: English" : "Idioma: Español");
             UiKit.SetLabel(soundButton, Loc.T(settings.SoundOn ? "Sonido: activado" : "Sonido: desactivado"));
+            UiKit.SetLabel(screenButton, Loc.T(FullscreenKeys.IsFull ? "Pantalla completa: sí" : "Pantalla completa: no"));
             volumeFill.sizeDelta = new Vector2(BarWidth * settings.Volume, volumeFill.sizeDelta.y);
             volumeText.text = settings.VolumePercent + " %";
         }

@@ -613,6 +613,8 @@ namespace ColonQuest.World
             { "Mejor me compro un bañador antes de meterme al agua.", "I'd better buy a swimsuit before getting in the water." },
             { "Vecino", "Neighbor" },
             { "El del puesto", "The stand guy" },
+            { "Pantalla completa: sí", "Full screen: on" },
+            { "Pantalla completa: no", "Full screen: off" },
         };
     }
 }

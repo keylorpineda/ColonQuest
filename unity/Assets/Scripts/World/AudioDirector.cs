@@ -151,6 +151,7 @@ namespace ColonQuest.World
             }
 
             instance = this;
+            gameObject.AddComponent<FullscreenKeys>();
             Apply(GameSettings.Current);
             foreach (MusicTrack track in new[] { MusicTrack.Menu, MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
             {
