@@ -1,5 +1,12 @@
 from app.schemas import KeyQuestion, PlayerState, TeachingConcept
-from app.summary.stats import NegotiationRecord, build_stats, net_worth, total_debt
+from app.summary.stats import (
+    HEAVY_DEBT_FROM,
+    NegotiationRecord,
+    build_stats,
+    net_worth,
+    total_debt,
+    year_card_key,
+)
 
 STATE = PlayerState.model_validate(
     {
@@ -50,3 +57,11 @@ def test_empty_game() -> None:
     assert stats.decisions == 0
     assert stats.concepts_taught == []
     assert stats.key_questions_asked == []
+
+
+def test_year_card_follows_final_debt() -> None:
+    assert year_card_key(0) == "card_year_debt_free"
+    assert year_card_key(1) == "card_year_some_debt"
+    assert year_card_key(HEAVY_DEBT_FROM - 1) == "card_year_some_debt"
+    assert year_card_key(HEAVY_DEBT_FROM) == "card_year_heavy_debt"
+    assert build_stats(STATE, [], []).card_image_key == "card_year_some_debt"

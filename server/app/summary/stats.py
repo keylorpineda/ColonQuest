@@ -5,8 +5,15 @@ Nothing here comes from a model: the narrative may only repeat these numbers.
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 from app.schemas import KeyQuestion, PlayerState, TeachingConcept
+
+YearCardKey = Literal["card_year_debt_free", "card_year_some_debt", "card_year_heavy_debt"]
+
+# Total debt (colones) from which the year card turns to the heavy-debt illustration: about two
+# net salaries, e.g. a maxed card plus a phone on 36 installments.
+HEAVY_DEBT_FROM = 900_000
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +35,10 @@ class SessionStats:
     wellbeing: int
 
     @property
+    def card_image_key(self) -> YearCardKey:
+        return year_card_key(self.total_debt)
+
+    @property
     def amounts(self) -> frozenset[int]:
         """Numbers the narrative is allowed to quote as colones."""
         return frozenset({self.total_debt, self.net_worth, abs(self.net_worth)})
@@ -37,6 +48,15 @@ def total_debt(state: PlayerState) -> int:
     installments = sum(item.monthly * item.months_left for item in state.installments)
     informal = sum(loan.balance for loan in state.informal_loans)
     return state.credit_card.balance + installments + informal
+
+
+def year_card_key(debt: int) -> YearCardKey:
+    """Pick the pre-generated year card illustration from the final debt, never from a model."""
+    if debt <= 0:
+        return "card_year_debt_free"
+    if debt < HEAVY_DEBT_FROM:
+        return "card_year_some_debt"
+    return "card_year_heavy_debt"
 
 
 def net_worth(state: PlayerState) -> int:
