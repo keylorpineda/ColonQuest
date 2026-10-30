@@ -13,6 +13,20 @@ namespace ColonQuest.Game
         /// <summary>Tasks (events) the player does each month before collecting the salary at the bank.</summary>
         public const int TasksPerMonth = 3;
 
+        /// <summary>Days of play in a month. Each one stands for a week, so the month has four.</summary>
+        public const int DaysPerMonth = 4;
+
+        /// <summary>The day starts at this hour and ends at <see cref="DayEndHour"/>, when the player has to sleep.</summary>
+        public const int DayStartHour = 6;
+
+        public const int DayEndHour = 22;
+
+        /// <summary>From this hour the evening begins: the town gets darker.</summary>
+        public const int NightHour = 18;
+
+        /// <summary>Real seconds for one hour of the game: a day of 16 hours lasts about 4 minutes.</summary>
+        public const float SecondsPerGameHour = 15f;
+
         /// <summary>Rent, food and transport, charged every month.</summary>
         public const long LivingExpenses = 200_000L;
 
