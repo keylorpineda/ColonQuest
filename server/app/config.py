@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
     # Muse Image took about 14 s per 512x512 image on Oct 28; images are cached after the first one.
     image_timeout_s: float = Field(default=30.0, gt=0)
+    # Year-end summary with Muse Wonder (5.8 to 10.5 s at "minimal"); Unity waits up to 30 s there.
+    summary_timeout_s: float = Field(default=25.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
