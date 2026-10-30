@@ -25,6 +25,9 @@ namespace ColonQuest.Game
         public StationType CurrentStation { get; private set; }
         public SessionSummary Summary { get; private set; }
 
+        /// <summary>True while the summary of the year is being written, so the screen can say so.</summary>
+        public bool Finishing { get; private set; }
+
         private const int MaxNegotiationText = 300;
 
         /// <summary>Shown in the text box when a spoken turn could not be understood.</summary>
@@ -553,10 +556,12 @@ namespace ColonQuest.Game
             }
 
             Busy = true;
+            Finishing = true;
             Changed?.Invoke();
             ApiClient.Instance.RequestSummary(State.Clone(), result =>
             {
                 Busy = false;
+                Finishing = false;
                 Summary = result.Ok ? result.Value : LocalSummary();
                 Finished?.Invoke(Summary);
                 Changed?.Invoke();

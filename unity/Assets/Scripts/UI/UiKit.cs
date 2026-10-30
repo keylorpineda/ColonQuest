@@ -204,7 +204,7 @@ namespace ColonQuest.UI
         public static RectTransform Portrait(RectTransform parent, string name, float size, Vector2 anchor, Vector2 position)
         {
             var face = Card(parent, "Portrait", Color.white, new Vector2(size, size), anchor, position);
-            var picture = Resources.Load<Sprite>("Portraits/" + PortraitKey(name));
+            var picture = Resources.Load<Sprite>("Portraits/" + PortraitKey(name)) ?? RemoteImages.Get("npc_" + PortraitKey(name));
             if (picture != null)
             {
                 var image = Fill(face, "Picture", Color.white, new Vector2(size - Outline * 2f, size - Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);

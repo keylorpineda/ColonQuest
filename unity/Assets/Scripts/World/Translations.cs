@@ -615,6 +615,8 @@ namespace ColonQuest.World
             { "El del puesto", "The stand guy" },
             { "Pantalla completa: sí", "Full screen: on" },
             { "Pantalla completa: no", "Full screen: off" },
+            { "Armando tu año", "Putting your year together" },
+            { "El game master está pensando", "The game master is thinking" },
         };
     }
 }

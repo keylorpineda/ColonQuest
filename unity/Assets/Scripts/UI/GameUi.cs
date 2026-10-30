@@ -41,6 +41,7 @@ namespace ColonQuest.UI
         private GameObject promptCard;
         private Text promptText;
         private GameObject loadingCard;
+        private Text loadingText;
 
         private const float BarWidth = 190f;
 
@@ -181,7 +182,7 @@ namespace ColonQuest.UI
         {
             var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(640f, 120f), new Vector2(0.5f, 0.5f), Vector2.zero);
             loadingCard = card.parent.gameObject;
-            UiKit.Label(card, "El game master está pensando...", 34, UiKit.Ink, new Vector2(580f, 80f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+            loadingText = UiKit.Label(card, string.Empty, 34, UiKit.Ink, new Vector2(580f, 80f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             loadingCard.SetActive(false);
         }
 
@@ -282,6 +283,14 @@ namespace ColonQuest.UI
 
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
+            if (loadingCard.activeSelf)
+            {
+                // The wait for the summary of the year says what is being made, with dots that come and go.
+                string wait = Loc.T(session.Finishing ? "Armando tu año" : "El game master está pensando");
+                loadingText.text = wait + new string('.', 1 + (int)(Time.unscaledTime * 2.5f) % 3);
+            }
+
+            RemoteImages.Prefetch();
 
             modal.Tick(Time.unscaledDeltaTime);
             if (open)
@@ -479,6 +488,7 @@ namespace ColonQuest.UI
                 who = (who.Length > 0 ? who + "  ·  " : string.Empty) + Loc.T("evento local");
             }
 
+            modal.Backdrop = RemoteImages.Get(gameEvent.ImageKey);
             AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
             modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
         }
@@ -680,6 +690,7 @@ namespace ColonQuest.UI
         private void ShowEnd(SessionSummary summary)
         {
             phone.Close();
+            modal.Backdrop = RemoteImages.Get(RemoteImages.PostcardKey);
             var text = new StringBuilder();
             text.AppendLine(Loc.T(summary.Narrative));
             text.AppendLine();
