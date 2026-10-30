@@ -41,7 +41,10 @@ namespace ColonQuest.World
         Beach,
 
         /// <summary>The time clock of the first job: the player clocks in and works the morning. Not a task.</summary>
-        Work
+        Work,
+
+        /// <summary>The furniture corner of the store: cash down or in installments. Not a task.</summary>
+        Furniture
     }
 
     /// <summary>

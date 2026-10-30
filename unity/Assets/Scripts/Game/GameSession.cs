@@ -53,6 +53,9 @@ namespace ColonQuest.Game
         /// <summary>The car being negotiated at the agency, or null at the store. The agency is not known to the backend.</summary>
         public CarModel CurrentCar { get; private set; }
 
+        /// <summary>The piece of furniture being talked over with the seller, or null.</summary>
+        public FurnitureModel CurrentFurniture { get; private set; }
+
         /// <summary>Why the agency refused to close the deal, shown in the negotiation window; null when there is nothing to say.</summary>
         public string DealNotice { get; private set; }
 
@@ -76,9 +79,15 @@ namespace ColonQuest.Game
                 return Instance;
             }
 
+            RoomPiece.Owned = OwnsRoomPiece;
             var go = new GameObject("GameSession");
             DontDestroyOnLoad(go);
             return go.AddComponent<GameSession>();
+        }
+
+        private static bool OwnsRoomPiece(string piece)
+        {
+            return Instance != null && Enum.TryParse(piece, out FurnitureKind kind) && Instance.Loop.Holdings.Has(kind);
         }
 
         /// <summary>The three saved games of story mode. The tests swap the store for one in memory.</summary>
@@ -178,6 +187,7 @@ namespace ColonQuest.Game
             VoiceNotice = null;
             LastDeal = null;
             CurrentCar = null;
+            CurrentFurniture = null;
             DealNotice = null;
             Summary = null;
 
@@ -447,7 +457,7 @@ namespace ColonQuest.Game
 
             if (negotiation.IsLocalOnly)
             {
-                ConcludeCarDeal(negotiation, buy);
+                ConcludeLocalDeal(negotiation, buy);
                 return;
             }
 
@@ -456,6 +466,30 @@ namespace ColonQuest.Game
             CurrentEvent = negotiation.ToEvent();
             LastDeal = negotiation.Report(buy);
             Choose(buy ? Negotiation.BuyChoice : Negotiation.SkipChoice);
+        }
+
+        // ---------------------------------------------------------------- furniture
+
+        /// <summary>The furniture corner of the store, cash down. The session shows what it did.</summary>
+        public bool BuyFurniture(FurnitureModel item)
+        {
+            return Apply(() => Loop.BuyFurniture(item));
+        }
+
+        /// <summary>Opens the conversation with the seller about this piece. The panel listens to <see cref="NegotiationStarted"/>.</summary>
+        public void BeginFurnitureNegotiation(FurnitureModel item)
+        {
+            if (item == null || Busy || CurrentNegotiation != null || Loop.IsFinished || Holdings.Has(item.Kind))
+            {
+                return;
+            }
+
+            CurrentFurniture = item;
+            LastDeal = null;
+            VoiceNotice = null;
+            DealNotice = null;
+            CurrentNegotiation = new Negotiation(item.ToSellerOffer());
+            NegotiationStarted?.Invoke(CurrentNegotiation);
         }
 
         // ---------------------------------------------------------------- car agency
@@ -477,17 +511,18 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// Closes the car conversation. Buying goes through the finance engine and needs the cash for the down
-        /// payment and the commission: when it is missing and the window is still open, the agency says so and
-        /// waits; when the deal was already closed by the typed words, it ends without a purchase.
+        /// Closes a conversation only the client knows: a car or a piece of furniture. Buying goes through the finance
+        /// engine and needs the cash that is paid when signing: when it is missing and the window is still open, the
+        /// seller says so and waits; when the deal was already closed by the typed words, it ends without a purchase.
         /// </summary>
-        private void ConcludeCarDeal(Negotiation negotiation, bool buy)
+        private void ConcludeLocalDeal(Negotiation negotiation, bool buy)
         {
             var car = CurrentCar;
+            var furniture = CurrentFurniture;
             string note = string.Empty;
-            if (buy && car != null)
+            if (buy && (car != null || furniture != null))
             {
-                var refusal = Loop.CheckBuyCar(car);
+                var refusal = car != null ? Loop.CheckBuyCar(car) : Loop.CheckBuyFurnitureInInstallments(furniture);
                 if (refusal != PurchaseFailure.None)
                 {
                     note = PurchaseMessages.For(refusal);
@@ -506,11 +541,21 @@ namespace ColonQuest.Game
             negotiation.Close(buy ? DealStatus.Accepted : DealStatus.WalkedAway);
             CurrentNegotiation = null;
             CurrentCar = null;
+            CurrentFurniture = null;
             DealNotice = null;
             LastDeal = negotiation.Report(buy);
             LastDeal.Note = note;
 
-            ChoiceOutcome outcome = buy ? Loop.BuyCar(car).Outcome : new ChoiceOutcome { ChoiceLabel = "No comprar" };
+            ChoiceOutcome outcome;
+            if (!buy)
+            {
+                outcome = new ChoiceOutcome { ChoiceLabel = "No comprar" };
+            }
+            else
+            {
+                outcome = car != null ? Loop.BuyCar(car).Outcome : Loop.BuyFurnitureInInstallments(furniture).Outcome;
+            }
+
             ChoiceApplied?.Invoke(outcome);
             Changed?.Invoke();
         }

@@ -62,6 +62,9 @@ namespace ColonQuest.Game
         /// <summary>The fuel and upkeep that went out with the last closed month, to show in its report.</summary>
         public long LastRunningCosts { get; private set; }
 
+        /// <summary>The rent of the room that went out with the last closed month: none after moving to another home.</summary>
+        public long LastRoomRent { get; private set; }
+
         public bool IsFinished => MonthsPlayed >= GameRules.MonthsToPlay;
 
         public GameLoop()
@@ -77,6 +80,7 @@ namespace ColonQuest.Game
             Decisions = 0;
             Holdings = new Holdings();
             LastRunningCosts = 0L;
+            LastRoomRent = 0L;
             HurtThisMonth = false;
             Arrests = 0;
             HasSwimsuit = false;
@@ -154,7 +158,7 @@ namespace ColonQuest.Game
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
                 && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm
                 && type != StationType.HealthDesk && type != StationType.Wardrobe && type != StationType.Beach
-                && type != StationType.Work;
+                && type != StationType.Work && type != StationType.Furniture;
         }
 
         public bool CanDoTask(StationType type)
@@ -255,7 +259,8 @@ namespace ColonQuest.Game
             }
 
             var before = State.Clone();
-            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.RestWellbeing);
+            int rest = MarketAssumptions.RestWellbeing + (Holdings.Has(FurnitureKind.Bed) ? MarketAssumptions.BedRestBonus : 0);
+            FinanceEngine.ChangeWellbeing(State, rest);
             SleptThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Dormiste en tu cama"));
@@ -450,6 +455,17 @@ namespace ColonQuest.Game
             return Buy(Loc.F("Comprar {0}", Loc.T(car.Name)), () => FinanceEngine.TryBuyCar(State, Holdings, car.ToPlan()));
         }
 
+        public AssetPurchase BuyFurniture(FurnitureModel item)
+        {
+            return Buy(Loc.F("Comprar {0}", Loc.T(item.Name)), () => FinanceEngine.TryBuyFurniture(State, Holdings, item.Kind, item.Price));
+        }
+
+        public AssetPurchase BuyFurnitureInInstallments(FurnitureModel item)
+        {
+            var offer = item.ToSellerOffer();
+            return Buy(Loc.F("Comprar {0}", Loc.T(item.Name)), () => FinanceEngine.TryBuyFurnitureInInstallments(State, Holdings, item.Kind, item.Name, offer.MonthlyCharge, offer.TermMonths, offer.Commission));
+        }
+
         public AssetPurchase InvestInFarm(FarmOption option, long amount)
         {
             return Buy(Loc.F("Invertir en {0}", Loc.T(option.Name).ToLowerInvariant()), () => FinanceEngine.TryInvestInFarm(State, Holdings, option.Kind, amount));
@@ -469,6 +485,19 @@ namespace ColonQuest.Game
         public PurchaseFailure CheckBuyCar(CarModel car)
         {
             return Probe((state, holdings) => FinanceEngine.TryBuyCar(state, holdings, car.ToPlan()));
+        }
+
+        /// <summary>Why this piece cannot be paid cash down right now, or None. Nothing changes.</summary>
+        public PurchaseFailure CheckBuyFurniture(FurnitureModel item)
+        {
+            return Probe((state, holdings) => FinanceEngine.TryBuyFurniture(state, holdings, item.Kind, item.Price));
+        }
+
+        /// <summary>Why this piece cannot be signed in installments right now, or None. Nothing changes.</summary>
+        public PurchaseFailure CheckBuyFurnitureInInstallments(FurnitureModel item)
+        {
+            var offer = item.ToSellerOffer();
+            return Probe((state, holdings) => FinanceEngine.TryBuyFurnitureInInstallments(state, holdings, item.Kind, item.Name, offer.MonthlyCharge, offer.TermMonths, offer.Commission));
         }
 
         private AssetPurchase Buy(string label, Func<PurchaseResult> purchase)
@@ -498,6 +527,11 @@ namespace ColonQuest.Game
                 probe.SetCar(Holdings.Car);
             }
 
+            foreach (var kind in Holdings.Furniture)
+            {
+                probe.AddFurniture(kind);
+            }
+
             return purchase(State.Clone(), probe).Failure;
         }
 
@@ -505,6 +539,7 @@ namespace ColonQuest.Game
         public MonthlyTickReport CloseMonth()
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
+            LastRoomRent = Holdings.Home == null ? MarketAssumptions.RoomRent : 0L;
             if (!SleptThisMonth)
             {
                 FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
@@ -518,7 +553,7 @@ namespace ColonQuest.Game
 
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
-                FixedLivingExpensesColones = GameRules.LivingExpenses + LastRunningCosts,
+                FixedLivingExpensesColones = GameRules.LivingExpenses + LastRoomRent + LastRunningCosts,
                 SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, Job.MissedThisMonth)
             });
 
