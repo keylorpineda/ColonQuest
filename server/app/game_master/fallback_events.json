@@ -167,7 +167,7 @@
     "type": "income",
     "title": "Revisá tu colilla",
     "narrative": "Tu colilla de pago trae rebajos de CCSS y renta, pero te faltan las horas extra de la semana pasada: ₡35 000 que nadie te mencionó.",
-    "imageKey": "scene_oficina",
+    "imageKey": "scene_soda",
     "choices": [
       {"id": "claim", "label": "Reclamar las horas extra", "effects": [{"kind": "income", "amount": 35000}]},
       {"id": "ignore", "label": "Dejarlo así", "effects": []}
@@ -227,10 +227,10 @@
   {
     "eventId": "evt_bank_horas_extra_oficina",
     "type": "income",
-    "title": "Horas extra en la oficina",
-    "narrative": "En la oficina te ofrecen horas extra por ₡120 000 todo el mes, o ₡60 000 por la mitad. Son varios sábados de brete, mae, y en casa ya contaban con vos para los mandados y descansar en familia.",
-    "npc": {"id": "npc_marce_jefa", "name": "Marce, tu jefa de brete", "role": "Jefa de oficina"},
-    "imageKey": "scene_oficina",
+    "title": "Horas extra en la soda",
+    "narrative": "En la soda te ofrecen horas extra por ₡120 000 todo el mes, o ₡60 000 por la mitad. Son varios sábados de brete, mae, y en casa ya contaban con vos para los mandados y descansar en familia.",
+    "npc": {"id": "dona_lucia", "name": "Doña Lucía", "role": "Dueña de la soda"},
+    "imageKey": "scene_soda",
     "choices": [
       {"id": "aceptar_todo", "label": "Aceptar todo y ajustar mi presupuesto", "effects": [{"kind": "income", "amount": 120000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -6}]},
       {"id": "aceptar_mitad", "label": "Aceptar solo la mitad", "effects": [{"kind": "income", "amount": 60000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -2}]},
@@ -550,9 +550,9 @@
     "eventId": "evt_bank_primer_pago_neto",
     "type": "income",
     "title": "Tu primer pago neto",
-    "narrative": "Primer pago de tu brete en la oficina: te depositan ₡185 000 ya con los rebajos de planilla de la CCSS. Tu compa te dice: “Mae, gastá tranquilo, eso era más plata”, y te enseña un antojo carísimo.",
+    "narrative": "Primer pago de tu brete en la soda: te depositan ₡185 000 ya con los rebajos de planilla de la CCSS. Tu compa te dice: “Mae, gastá tranquilo, eso era más plata”, y te enseña un antojo carísimo.",
     "npc": {"id": "npc_marlene_planilla", "name": "Doña Marlene", "role": "Encargada de planilla"},
-    "imageKey": "scene_oficina",
+    "imageKey": "scene_soda",
     "choices": [
       {"id": "revisar_colilla", "label": "Revisar la colilla y presupuestar con el neto", "effects": [{"kind": "income", "amount": 185000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 5}]},
       {"id": "guardar_una_parte", "label": "Guardar una parte apenas cae el depósito", "effects": [{"kind": "income", "amount": 185000, "source": "cash"}, {"kind": "savings_change", "amount": 50000, "source": "savings"}, {"kind": "wellbeing_change", "amount": 3}]},
@@ -564,9 +564,9 @@
     "eventId": "evt_bank_pago_menor",
     "type": "expense",
     "title": "El pago llegó más bajo",
-    "narrative": "Mae, cayó tu primer pago del brete y vienen ₡60 000 menos de lo esperado. En la oficina, doña Marlene te muestra la colilla: ya trae rebajos de CCSS y renta. Hoy vence un recibo y quedaste corto.",
+    "narrative": "Mae, cayó tu primer pago del brete y vienen ₡60 000 menos de lo esperado. En la soda, doña Lucía te muestra la colilla: ya trae rebajos de CCSS y renta. Hoy vence un recibo y quedaste corto.",
     "npc": {"id": "donna_marlene", "name": "Doña Marlene, de planilla", "role": "Planilla"},
-    "imageKey": "scene_oficina",
+    "imageKey": "scene_soda",
     "choices": [
       {"id": "usar_fondo", "label": "Cubrirlo con tu fondo de emergencia", "effects": [{"kind": "expense", "amount": 60000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": -3}]},
       {"id": "pasar_tarjeta", "label": "Pasarlo a la tarjeta y salir del apuro", "effects": [{"kind": "expense", "amount": 60000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 3}]},
@@ -579,9 +579,9 @@
     "eventId": "evt_bank_bono_colilla",
     "type": "bonus",
     "title": "El bono llegó con rebajos",
-    "narrative": "En la oficina te anuncian un bono de ₡150 000 por tu buen brete, pero al revisar la colilla ves rebajos de CCSS y renta. Tu compa te dice: “Mae, diay, gastátelo ya, vos te lo merecés”.",
-    "npc": {"id": "jefe_oficina", "name": "Don Róger", "role": "jefe de oficina"},
-    "imageKey": "scene_oficina",
+    "narrative": "En la soda te anuncian un bono de ₡150 000 por tu buen brete, pero al revisar la colilla ves rebajos de CCSS y renta. Tu compa te dice: “Mae, diay, gastátelo ya, vos te lo merecés”.",
+    "npc": {"id": "dona_lucia", "name": "Doña Lucía", "role": "Dueña de la soda"},
+    "imageKey": "scene_soda",
     "choices": [
       {"id": "revisar_colilla_guardar", "label": "Revisar la colilla y guardar una parte del bono", "effects": [{"kind": "income", "amount": 150000, "source": "cash"}, {"kind": "savings_change", "amount": 60000}, {"kind": "wellbeing_change", "amount": 4}]},
       {"id": "gastarlo_de_una", "label": "Diay, gastarlo casi todo en un gustazo esta semana", "effects": [{"kind": "income", "amount": 150000, "source": "cash"}, {"kind": "expense", "amount": 140000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 6}]},
