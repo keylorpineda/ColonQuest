@@ -15,6 +15,28 @@ namespace ColonQuest.Finance
             return ApplyPercentage(amountDue, BillLateFeePct);
         }
 
+        /// <summary>
+        /// Pays down the card out of cash, outside the monthly cycle. Pays only what the cash reaches and what is owed; returns
+        /// what was paid.
+        /// </summary>
+        public static long PayTowardCard(PlayerState state, long requested)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (requested < 0L || requested > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(nameof(requested), "The amount must be between 0 and MaxColones.");
+
+            long paid = Math.Min(requested, Math.Min(state.Cash, state.CreditCard.Balance));
+            state.Cash -= paid;
+            state.CreditCard.Balance -= paid;
+            if (paid > 0L)
+            {
+                state.RecordHistory("paid_extra_to_card");
+            }
+
+            return paid;
+        }
+
         /// <summary>Pays a bill out of cash. Nothing changes when the cash is not enough.</summary>
         public static bool TryPayBill(PlayerState state, long amountDue)
         {
