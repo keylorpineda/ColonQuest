@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
+    # The teacher dashboard is a live call (8 s): it stays on Spark when the summary uses Wonder.
+    class_report_model: str = "muse-spark-1.3-contributor"
     image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
