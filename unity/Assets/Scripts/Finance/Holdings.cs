@@ -15,7 +15,17 @@ namespace ColonQuest.Finance
         AlreadyHasHome,
         AlreadyHasCar,
         NotEnoughCash,
-        TooManyInstallments
+        TooManyInstallments,
+        AlreadyHasFurniture
+    }
+
+    /// <summary>The furniture of the rented room, bought one piece at a time.</summary>
+    public enum FurnitureKind
+    {
+        Bed,
+        Fridge,
+        Tv,
+        Table
     }
 
     /// <summary>
@@ -110,6 +120,7 @@ namespace ColonQuest.Finance
     public sealed class Holdings
     {
         private readonly List<FarmStake> farm = new List<FarmStake>();
+        private readonly HashSet<FurnitureKind> furniture = new HashSet<FurnitureKind>();
 
         public HomeHolding? Home { get; private set; }
         public CarHolding? Car { get; private set; }
@@ -119,6 +130,7 @@ namespace ColonQuest.Finance
 
         public bool HasHealthInsurance => HealthPremium > 0L;
         public IReadOnlyList<FarmStake> Farm => farm;
+        public IEnumerable<FurnitureKind> Furniture => furniture;
 
         public bool IsEmpty => Home == null && Car == null && farm.Count == 0 && HealthPremium == 0L;
 
@@ -156,6 +168,16 @@ namespace ColonQuest.Finance
 
                 return total;
             }
+        }
+
+        public bool Has(FurnitureKind kind)
+        {
+            return furniture.Contains(kind);
+        }
+
+        public void AddFurniture(FurnitureKind kind)
+        {
+            furniture.Add(kind);
         }
 
         public void SetHome(HomeHolding home)
