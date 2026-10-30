@@ -274,6 +274,44 @@ namespace ColonQuest.EditorTools
             SecurityCamera(IL(parts.Labels, "SecurityCameras"), new Vector2(9.4f, 6.0f));
         }
 
+        /// <summary>
+        /// The hospital elevator: a steel frame, the dark cabin, two leaves that slide to the sides (each hangs from a hinge
+        /// at its outer edge, which the <see cref="Elevator"/> squeezes), the call buttons and the ASCENSOR plate. Its door
+        /// keeps the logic of the old stairs; the elevator plays the ride before the floor changes.
+        /// </summary>
+        private static void BuildElevator(InteriorParts parts, Vector2 center, Vector2 doorAt, Vector2 doorSize, string targetScene, string targetSpawn, Vector2 entry, Vector2 inside)
+        {
+            const float halfWidth = 0.95f;
+            var lift = IL(parts.Props, "Elevator");
+            Deco(lift, "Elevator_Frame_Outline", rounded, center.x, center.y, 2.5f, 1.35f, "#2A3345", 1f, 7);
+            Deco(lift, "Elevator_Frame", rounded, center.x, center.y, 2.4f, 1.25f, "#B7C0D0", 1f, 8);
+            Deco(lift, "Elevator_Cabin", square, center.x, center.y, halfWidth * 2f, 1.0f, "#3A4152", 1f, 9);
+
+            foreach (int side in new[] { -1, 1 })
+            {
+                var hinge = Group(lift, side < 0 ? "Elevator_LeafL" : "Elevator_LeafR");
+                hinge.localPosition = new Vector2(center.x + side * halfWidth, center.y);
+                Deco(hinge, "Leaf", square, -side * halfWidth * 0.5f, 0f, halfWidth, 1.0f, "#D5DBE6", 1f, 10);
+                Deco(hinge, "Leaf_Shine", square, -side * halfWidth * 0.75f, 0f, 0.06f, 0.9f, "#F2F5FA", 1f, 11);
+                Deco(hinge, "Leaf_Edge", square, -side * (halfWidth - 0.02f), 0f, 0.04f, 1.0f, "#8E96AA", 1f, 11);
+            }
+
+            var buttons = new Vector2(center.x + 1.55f, center.y);
+            Deco(lift, "Buttons", roundedSmall, buttons.x, buttons.y, 0.3f, 0.55f, "#4B5568", 1f, 8);
+            Deco(lift, "ButtonUp", circle, buttons.x, buttons.y + 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
+            Deco(lift, "ButtonDown", circle, buttons.x, buttons.y - 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
+            WallPlate(parts.Labels, "ASCENSOR", new Vector2(center.x, center.y + 0.95f), 1.5f, "#2A3345", GamePalette.White, 0.022f);
+
+            var door = new GameObject("Door_Elevator");
+            door.transform.SetParent(parts.Stations, false);
+            door.transform.localPosition = doorAt;
+            var trigger = door.AddComponent<BoxCollider2D>();
+            trigger.size = doorSize;
+            trigger.isTrigger = true;
+            door.AddComponent<Door>().Configure(targetScene, targetSpawn, entry);
+            door.AddComponent<Elevator>().Configure("Elevator_LeafL", "Elevator_LeafR", buttons, inside);
+        }
+
         private const float CellGateHalf = 0.7f;
 
         /// <summary>
@@ -356,21 +394,10 @@ namespace ColonQuest.EditorTools
             BuildThing(parts.Stations, "EmergencyWard", "Mirar las camas", new Vector2(7.0f, -2.4f), new Vector2(4.0f, 1.2f),
                 "Una noche en urgencias se paga entera cuando no hay seguro. El fondo de emergencia existe para golpes así.");
 
-            // The stairs to the consulting rooms, at the back left.
-            var stairs = IL(parts.Props, "Stairs");
-            for (int i = 0; i < 5; i++)
-            {
-                Deco(stairs, "Step", square, -8.4f, 3.6f + i * 0.45f, 2.4f, 0.4f, i % 2 == 0 ? "#B7C0D0" : "#9AA3B8", 1f, 7);
-            }
-
-            var door = new GameObject("Door_Upstairs");
-            door.transform.SetParent(parts.Stations, false);
-            door.transform.localPosition = new Vector2(-8.4f, 5.9f);
-            var trigger = door.AddComponent<BoxCollider2D>();
-            trigger.size = new Vector2(2.0f, 0.8f);
-            trigger.isTrigger = true;
-            door.AddComponent<Door>().Configure(SceneNames.HospitalArriba, SpawnIds.FromTown, Vector2.up);
-            WallPlate(parts.Labels, "CONSULTORIOS ARRIBA", new Vector2(-8.4f, 6.4f), 3.0f, "#1D4F8C", GamePalette.White, 0.024f);
+            // The elevator to the consulting rooms, at the back left.
+            BuildElevator(parts, new Vector2(-8.4f, 5.45f), new Vector2(-8.4f, 4.95f), new Vector2(1.6f, 0.6f),
+                SceneNames.HospitalArriba, SpawnIds.FromTown, Vector2.up, new Vector2(-8.4f, 5.6f));
+            WallPlate(parts.Labels, "CONSULTORIOS ARRIBA", new Vector2(-5.0f, 6.4f), 3.0f, "#1D4F8C", GamePalette.White, 0.024f);
 
             foreach (var at in new[] { new Vector2(-7f, 0f), new Vector2(3f, -2f), new Vector2(9f, -2f), new Vector2(-5f, -4f) })
             {
@@ -433,7 +460,6 @@ namespace ColonQuest.EditorTools
             }
 
             Rug(corridor, 0f, -0.7f, 20f, 1.2f, "#7DD0C8", "#3E9A90");
-            WallPlate(parts.Labels, "ESCALERAS", new Vector2(-8.0f, -5.7f), 1.6f, "#2A3345", GamePalette.White, 0.024f);
             Plant(IL(parts.Props, "Plants"), 10.0f, -5.4f);
 
             foreach (var at in new[] { new Vector2(-7f, 3f), new Vector2(0f, 3f), new Vector2(7f, 3f), new Vector2(0f, -3f) })

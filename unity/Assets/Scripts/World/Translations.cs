@@ -574,6 +574,7 @@ namespace ColonQuest.World
             { "COOPERATIVA", "CREDIT UNION" },
             { "CUARTO", "BEDROOM" },
             { "ESCALERAS", "STAIRS" },
+            { "ASCENSOR", "ELEVATOR" },
             { "FILA", "LINE" },
             { "FINANCIAMIENTO", "FINANCING" },
             { "FINCA", "FARM" },
