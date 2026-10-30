@@ -360,6 +360,7 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
             BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f));
             BuildStation(parent, "Station_Work", StationType.Work, "Reloj marcador de la soda", new Vector2(15.2f, -25.1f));
+            BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(0f, 4.6f));
             currentLayer = LayerWorld;
         }
 
