@@ -123,6 +123,25 @@ namespace ColonQuest.World
             instance.Effects().PlayOneShot(instance.clickClip, 0.6f * instance.Level);
         }
 
+        private readonly Dictionary<EffectKind, AudioClip> effectClips = new Dictionary<EffectKind, AudioClip>();
+
+        /// <summary>A big moment: the hit of a car, the police siren, the door of the cell.</summary>
+        public static void Effect(EffectKind kind)
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            if (!instance.effectClips.TryGetValue(kind, out var clip))
+            {
+                clip = ProceduralSound.Effect(kind);
+                instance.effectClips[kind] = clip;
+            }
+
+            instance.Effects().PlayOneShot(clip, 0.8f * instance.Level);
+        }
+
         /// <summary>A very soft tap when the mouse reaches a button.</summary>
         public static void Tick()
         {

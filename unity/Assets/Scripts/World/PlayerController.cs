@@ -22,6 +22,9 @@ namespace ColonQuest.World
         /// <summary>Set while a modal panel is open. It outlives scene changes, unlike <see cref="InputEnabled"/>.</summary>
         public static bool Blocked { get; set; }
 
+        /// <summary>Set while an animation moves the player (a hit, an arrest): the keys do nothing and the walk does not fight the animation.</summary>
+        public static bool Frozen { get; set; }
+
         /// <summary>Sets the child that is mirrored to face the walking direction.</summary>
         public void SetVisual(Transform target)
         {
@@ -49,11 +52,11 @@ namespace ColonQuest.World
 
         private void Update()
         {
-            input = InputEnabled && !Blocked
+            input = InputEnabled && !Blocked && !Frozen
                 ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
                 : Vector2.zero;
 
-            if (Time.time < nudgeUntil && InputEnabled && !Blocked)
+            if (Time.time < nudgeUntil && InputEnabled && !Blocked && !Frozen)
             {
                 input = nudge;
             }
@@ -67,6 +70,11 @@ namespace ColonQuest.World
 
         private void FixedUpdate()
         {
+            if (Frozen)
+            {
+                return;
+            }
+
             body.linearVelocity = MovementMath.Velocity(input, speed);
         }
     }

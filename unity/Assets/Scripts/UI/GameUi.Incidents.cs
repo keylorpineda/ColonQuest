@@ -89,7 +89,7 @@ namespace ColonQuest.UI
                         {
                             // The term depends on how many times the player was taken away before this one.
                             StartSentence(JailSentence.TermSeconds(session.Loop.Arrests - 1));
-                            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+                            StartCoroutine(ArrestSequence());
                         }
                     }
                 }
@@ -130,12 +130,38 @@ namespace ColonQuest.UI
         private void OnPlayerHit()
         {
             // A window that is open (an officer's fine, for one) is not interrupted by a car that goes by.
-            if (SceneTransition.IsBusy || modal.IsOpen || !session.Hospitalize())
+            if (SceneTransition.IsBusy || modal.IsOpen || HitAnimation.Playing || session.Loop.HurtThisMonth)
             {
                 return;
             }
 
-            SceneTransition.Go(SceneNames.Hospital, SpawnIds.HospitalBed);
+            var player = GameObject.FindWithTag(Station.PlayerTag);
+            effects.Flash(new Color(1f, 1f, 1f, 0.8f), 0.5f);
+            HitAnimation.Play(player != null ? player.transform : null, TrafficCar.LastHitFrom, () =>
+            {
+                if (session.Hospitalize())
+                {
+                    SceneTransition.Go(SceneNames.Hospital, SpawnIds.HospitalBed);
+                }
+            });
+        }
+
+        /// <summary>The arrest: the police lights flash over the screen with the siren, and then the cell door closes behind the player.</summary>
+        private System.Collections.IEnumerator ArrestSequence()
+        {
+            PlayerController.Frozen = true;
+            AudioDirector.Effect(EffectKind.Siren);
+            effects.Siren(2.2f);
+            yield return new WaitForSecondsRealtime(2.2f);
+            PlayerController.Frozen = false;
+            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+            while (SceneTransition.IsBusy)
+            {
+                yield return null;
+            }
+
+            AudioDirector.Effect(EffectKind.Slam);
+            effects.Flash(new Color(0f, 0f, 0f, 0.7f), 0.6f);
         }
 
         // ---------------------------------------------------------------- health insurance

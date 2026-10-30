@@ -413,6 +413,49 @@ namespace ColonQuest.World
             return ToClip("Step_" + kind + variant % 3, buffer, 0.35f);
         }
 
+        /// <summary>A big moment: the thud of a hit, the two tones of a police siren, the slam of a cell door.</summary>
+        public static AudioClip Effect(EffectKind kind)
+        {
+            var random = new System.Random(77 + (int)kind);
+            float seconds = kind == EffectKind.Siren ? 2.2f : kind == EffectKind.Slam ? 0.7f : 0.45f;
+            int length = Mathf.RoundToInt(seconds * Rate);
+            var buffer = new float[length];
+            float lowpassed = 0f;
+            for (int i = 0; i < length; i++)
+            {
+                float t = i / (float)Rate;
+                float noise = (float)random.NextDouble() * 2f - 1f;
+                switch (kind)
+                {
+                    case EffectKind.Siren:
+                    {
+                        // Two tones that swap four times a second, like the lights.
+                        float tone = ((int)(t * 4f) % 2 == 0) ? 740f : 980f;
+                        float fade = Mathf.Clamp01(t * 8f) * Mathf.Clamp01((seconds - t) * 4f);
+                        buffer[i] = Mathf.Sin((float)TwoPi * tone * t) * fade * 0.6f;
+                        break;
+                    }
+
+                    case EffectKind.Slam:
+                    {
+                        lowpassed += (noise - lowpassed) * 0.25f;
+                        buffer[i] = (Mathf.Sin((float)TwoPi * 90f * t) * Mathf.Exp(-9f * t) + lowpassed * 0.9f * Mathf.Exp(-22f * t)) * 1f
+                            + 0.4f * Mathf.Sin((float)TwoPi * 520f * t) * Mathf.Exp(-5f * Mathf.Max(0f, t - 0.18f)) * (t > 0.18f ? 1f : 0f);
+                        break;
+                    }
+
+                    default:
+                    {
+                        lowpassed += (noise - lowpassed) * 0.35f;
+                        buffer[i] = Mathf.Sin((float)TwoPi * 62f * t) * Mathf.Exp(-12f * t) + lowpassed * 0.8f * Mathf.Exp(-30f * t);
+                        break;
+                    }
+                }
+            }
+
+            return ToClip("Effect_" + kind, buffer, 0.7f);
+        }
+
         /// <summary>The tap of a button: two quick tones that rise a little.</summary>
         public static AudioClip Click()
         {

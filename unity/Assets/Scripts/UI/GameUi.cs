@@ -25,6 +25,7 @@ namespace ColonQuest.UI
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
         private SubtitleBar subtitles;
+        private ScreenEffects effects;
         private NegotiationPanel negotiationPanel;
         private PhoneUi phone;
         private PauseMenu pause;
@@ -73,6 +74,7 @@ namespace ColonQuest.UI
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
             subtitles = new SubtitleBar(canvas.transform);
+            effects = new ScreenEffects(canvas.transform);
             Thoughts.Said += OnThought;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
@@ -238,6 +240,7 @@ namespace ColonQuest.UI
 
             TickIncidents();
             TickCell();
+            effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
 
             if (pause.IsOpen)
