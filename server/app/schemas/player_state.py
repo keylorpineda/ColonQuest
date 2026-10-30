@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.schemas.base import Colones, ContractModel, Percent
 
@@ -39,3 +39,20 @@ class PlayerState(ContractModel):
     informal_loans: Annotated[list[InformalLoan], Field(default_factory=list, max_length=10)]
     history: Annotated[list[ShortText], Field(default_factory=list, max_length=50)]
     wellbeing: Annotated[int, Field(ge=0, le=100)]
+    character_name: Annotated[ShortText | None, Field(default=None)] = None
+    week: Annotated[int | None, Field(default=None, ge=1, le=4)] = None
+    job_position: Annotated[ShortText | None, Field(default=None)] = None
+
+    @field_validator("character_name", "job_position", mode="before")
+    @classmethod
+    def _empty_str_to_none(cls, v: object) -> object:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+    @field_validator("week", mode="before")
+    @classmethod
+    def _zero_to_none(cls, v: object) -> object:
+        if v == 0 or v == "0":
+            return None
+        return v

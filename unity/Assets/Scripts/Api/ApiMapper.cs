@@ -20,6 +20,9 @@ namespace ColonQuest.Api
         {
             var dto = new PlayerStateDto
             {
+                characterName = state.CharacterName,
+                week = state.Week,
+                jobPosition = state.JobPosition,
                 month = state.Month,
                 salaryNet = state.SalaryNet,
                 cash = state.Cash,
@@ -55,6 +58,9 @@ namespace ColonQuest.Api
             var card = dto.creditCard ?? new CreditCardDto();
             var state = new PlayerState
             {
+                CharacterName = dto.characterName ?? string.Empty,
+                Week = dto.week > 0 ? dto.week : 1,
+                JobPosition = dto.jobPosition ?? string.Empty,
                 Month = dto.month,
                 SalaryNet = dto.salaryNet,
                 Cash = dto.cash,

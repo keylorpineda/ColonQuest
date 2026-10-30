@@ -132,6 +132,9 @@ namespace ColonQuest.Finance
     [Serializable]
     public sealed class PlayerState
     {
+        public string CharacterName { get; set; } = string.Empty;
+        public int Week { get; set; } = 1;
+        public string JobPosition { get; set; } = string.Empty;
         public int Month { get; set; } = 1;
         public long SalaryNet { get; set; }
         public long Cash { get; set; }
@@ -147,6 +150,9 @@ namespace ColonQuest.Finance
         {
             return new PlayerState
             {
+                CharacterName = CharacterName,
+                Week = Week,
+                JobPosition = JobPosition,
                 Month = Month,
                 SalaryNet = SalaryNet,
                 Cash = Cash,

@@ -41,6 +41,7 @@ class TeachingConcept(StrEnum):
     INFLATION = "inflation"
     EXCHANGE_RATE = "exchange_rate"
     PAYROLL_DEDUCTIONS = "payroll_deductions"
+    INVEST_IN_YOURSELF = "invest_in_yourself"
 
 
 class DealStatus(StrEnum):

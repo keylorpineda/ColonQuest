@@ -764,6 +764,19 @@
             "title": "Cash",
             "type": "integer"
           },
+          "characterName": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charactername"
+          },
           "creditCard": {
             "$ref": "#/components/schemas/CreditCard"
           },
@@ -799,6 +812,19 @@
             "title": "Installments",
             "type": "array"
           },
+          "jobPosition": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jobposition"
+          },
           "month": {
             "maximum": 12.0,
             "minimum": 1.0,
@@ -816,6 +842,19 @@
             "minimum": 0.0,
             "title": "Savings",
             "type": "integer"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "maximum": 4.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
           },
           "wellbeing": {
             "maximum": 100.0,
@@ -955,7 +994,8 @@
           "pyramid_scheme",
           "inflation",
           "exchange_rate",
-          "payroll_deductions"
+          "payroll_deductions",
+          "invest_in_yourself"
         ],
         "title": "TeachingConcept",
         "type": "string"

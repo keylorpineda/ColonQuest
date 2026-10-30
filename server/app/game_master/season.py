@@ -28,6 +28,7 @@ CONCEPT_EVENT_TYPE: dict[TeachingConcept, EventType] = {
     TeachingConcept.INFLATION: EventType.MACRO_NEWS,
     TeachingConcept.EXCHANGE_RATE: EventType.MACRO_NEWS,
     TeachingConcept.PAYROLL_DEDUCTIONS: EventType.INCOME,
+    TeachingConcept.INVEST_IN_YOURSELF: EventType.OFFER,
 }
 
 THEMES: dict[TeachingConcept, str] = {
@@ -41,6 +42,7 @@ THEMES: dict[TeachingConcept, str] = {
     TeachingConcept.INFLATION: "Todo sube de precio este mes",
     TeachingConcept.EXCHANGE_RATE: "Una compra en dólares y el tipo de cambio",
     TeachingConcept.PAYROLL_DEDUCTIONS: "Revisar la colilla: CCSS, renta y horas extra",
+    TeachingConcept.INVEST_IN_YOURSELF: "Cursos del INA o la UNA: invertir en uno mismo",
 }
 DECEMBER_THEME = "Aguinaldo y gastos de fin de año"
 
@@ -88,9 +90,11 @@ def concept_priority(state: PlayerState) -> list[TeachingConcept]:
 
 
 def default_plan(state: PlayerState) -> SeasonPlan:
-    """Deterministic plan: every concept once in months 1-10, the two most relevant repeated."""
+    """Deterministic plan: every concept once in months 1-11, December is bonus/budget."""
     ordered = concept_priority(state)
-    concepts = [*ordered, ordered[1]]  # months 1-11
+    concepts = ordered[:11]
+    if len(concepts) < 11 and ordered:
+        concepts = ([*ordered, *ordered])[:11]
     months = [
         PlannedMonth(
             month=index + 1,

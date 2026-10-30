@@ -121,6 +121,12 @@ def build_user_prompt(context: PromptContext) -> str:
         "avoid": list(context.recent_event_ids),
         "notTaughtYet": untaught,
     }
+    if state.character_name:
+        payload["characterName"] = state.character_name
+    if state.week is not None:
+        payload["week"] = state.week
+    if state.job_position:
+        payload["jobPosition"] = state.job_position
     if context.planned is not None:
         payload["plannedFocus"] = context.planned.model_dump(mode="json", by_alias=True)
     return "Create the event for this month.\n" + json.dumps(
