@@ -655,6 +655,7 @@ namespace ColonQuest.World
 
             // ---- animated interactions
             { "Cajera", "Teller" },
+            { "Perfecto, mae. Firme aquí y es suyo.", "Perfect, dude. Sign here and it is yours." },
             { "El prestamista", "The lender" },
             { "La asesora", "The advisor" },
             { "La agente", "The agent" },

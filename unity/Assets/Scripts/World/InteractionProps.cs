@@ -135,6 +135,10 @@ namespace ColonQuest.World
                     Piece(t, false, Vector2.zero, new Vector2(0.26f, 0.16f), new Color(0.85f, 0.2f, 0.25f, 0.9f), -8f, 0);
                     Piece(t, false, Vector2.zero, new Vector2(0.2f, 0.1f), new Color(0.98f, 0.9f, 0.9f, 0.9f), -8f, 1);
                     break;
+                case "box":
+                    Piece(t, false, Vector2.zero, new Vector2(0.38f, 0.3f), new Color(0.74f, 0.55f, 0.32f), 0f, 0);
+                    Piece(t, false, Vector2.zero, new Vector2(0.06f, 0.3f), new Color(0.9f, 0.8f, 0.55f), 0f, 1);
+                    break;
                 case "key":
                     Piece(t, true, new Vector2(-0.07f, 0f), new Vector2(0.1f, 0.1f), new Color(1f, 0.82f, 0.25f), 0f, 0);
                     Piece(t, false, new Vector2(0.04f, 0f), new Vector2(0.14f, 0.03f), new Color(1f, 0.82f, 0.25f), 0f, 0);

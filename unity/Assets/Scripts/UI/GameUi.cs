@@ -78,6 +78,7 @@ namespace ColonQuest.UI
             Thoughts.Said += OnThought;
             Interaction.Spoke += OnSpoke;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
+            negotiationPanel.SignContract = PlayContract;
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
             BuildIncidents();
@@ -320,9 +321,9 @@ namespace ColonQuest.UI
                 return;
             }
 
-            if (!session.Busy && Input.GetKeyDown(KeyCode.P))
+            if (!session.Busy && !Interaction.Playing && Input.GetKeyDown(KeyCode.P))
             {
-                phone.Open();
+                OpenPhone();
                 return;
             }
 

@@ -37,6 +37,48 @@ namespace ColonQuest.UI
             }
         }
 
+        private static Vector2 HeroAt()
+        {
+            var hero = GameObject.FindWithTag(Station.PlayerTag);
+            return hero != null ? (Vector2)hero.transform.position : Vector2.zero;
+        }
+
+        /// <summary>The phone (SINPE, messages): the player takes it out and taps on it before the screen opens.</summary>
+        private void OpenPhone()
+        {
+            Vector2 me = HeroAt();
+            var scene = new Interaction().Pose(PersonPose.Type, 1.1f).Sound(SoundEffectKind.Keys)
+                .Fly("phone", me + new Vector2(0.25f, 0.1f), me + new Vector2(0.25f, 0.55f), 0.5f)
+                .Wait(0.3f).Sound(SoundEffectKind.Chime).Apply(() => phone.Open());
+            if (!scene.Play())
+            {
+                phone.Open();
+            }
+        }
+
+        /// <summary>
+        /// Closing a deal at the store: the seller slides the contract over, the player signs it, the seller stamps it, they shake
+        /// hands and the box changes owner. The purchase itself is made by the finance engine in <paramref name="accept"/>.
+        /// </summary>
+        private void PlayContract(Action accept)
+        {
+            negotiationPanel.Hide();
+            Vector2 me = HeroAt();
+            Vector2 seller = PersonAt("Vendedor", me + new Vector2(0f, 2f));
+            var scene = new Interaction().Face(seller)
+                .NpcPose("Vendedor", PersonPose.Handover, 1.2f).Say("Kevin", "Perfecto, mae. Firme aquí y es suyo.")
+                .Sound(SoundEffectKind.Swish).Fly("paper", seller, me + new Vector2(0f, 0.3f), 0.8f)
+                .Wait(0.9f).Pose(PersonPose.Sign, 1.8f).Sound(SoundEffectKind.Scribble)
+                .Wait(0.5f).Sound(SoundEffectKind.Stamp).Fly("stamp", seller + new Vector2(0f, -0.3f), seller + new Vector2(0f, -0.4f), 0.3f)
+                .Wait(0.5f).Pose(PersonPose.Handover, 0.8f).NpcPose("Vendedor", PersonPose.Wave, 1.2f)
+                .Sound(SoundEffectKind.Coin).Fly("box", seller, me + new Vector2(0f, 0.2f), 0.9f)
+                .Wait(0.9f).Apply(accept);
+            if (!scene.Play())
+            {
+                accept();
+            }
+        }
+
         private static Vector2 Here(Station station, float dx = 0f, float dy = 0f)
         {
             return (Vector2)station.transform.position + new Vector2(dx, dy);

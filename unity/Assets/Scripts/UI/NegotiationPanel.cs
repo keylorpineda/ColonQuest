@@ -53,6 +53,12 @@ namespace ColonQuest.UI
 
         public bool IsOpen => root.activeSelf;
 
+        /// <summary>
+        /// Set by the game window: it plays the signing of the contract and then runs the action it is given, which closes the deal.
+        /// Without it the deal closes at once.
+        /// </summary>
+        public System.Action<System.Action> SignContract;
+
         public void Hide()
         {
             recorder.Cancel();
@@ -84,6 +90,18 @@ namespace ColonQuest.UI
 
             lastKey = key;
             Build(negotiation);
+        }
+
+        private void Accept()
+        {
+            if (SignContract != null)
+            {
+                SignContract(() => session.AcceptDeal());
+            }
+            else
+            {
+                session.AcceptDeal();
+            }
         }
 
         /// <summary>Enter sends the typed line, like the send button. It also follows the recording.</summary>
@@ -242,7 +260,7 @@ namespace ColonQuest.UI
             y -= 100f;
             float half = (textWidth - 20f) / 2f;
             float left = -(half + 20f) / 2f;
-            UiKit.MakeButton(card, "Me lo llevo", GameUiColors.Green, new Vector2(half, 80f), top, new Vector2(left, y), () => session.AcceptDeal());
+            UiKit.MakeButton(card, "Me lo llevo", GameUiColors.Green, new Vector2(half, 80f), top, new Vector2(left, y), () => Accept());
             UiKit.MakeButton(card, "Mejor me voy", GameUiColors.Pink, new Vector2(half, 80f), top, new Vector2(-left, y), () => session.WalkAway());
 
             if (!string.IsNullOrEmpty(session.DealNotice))
