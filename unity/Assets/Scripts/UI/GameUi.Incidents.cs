@@ -150,7 +150,7 @@ namespace ColonQuest.UI
         private System.Collections.IEnumerator ArrestSequence()
         {
             PlayerController.Frozen = true;
-            AudioDirector.Effect(EffectKind.Siren);
+            AudioDirector.Effect(SoundEffectKind.Siren);
             effects.Siren(2.2f);
             yield return new WaitForSecondsRealtime(2.2f);
             PlayerController.Frozen = false;
@@ -160,7 +160,7 @@ namespace ColonQuest.UI
                 yield return null;
             }
 
-            AudioDirector.Effect(EffectKind.Slam);
+            AudioDirector.Effect(SoundEffectKind.Slam);
             effects.Flash(new Color(0f, 0f, 0f, 0.7f), 0.6f);
         }
 

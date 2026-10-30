@@ -414,10 +414,10 @@ namespace ColonQuest.World
         }
 
         /// <summary>A big moment: the thud of a hit, the two tones of a police siren, the slam of a cell door.</summary>
-        public static AudioClip Effect(EffectKind kind)
+        public static AudioClip Effect(SoundEffectKind kind)
         {
             var random = new System.Random(77 + (int)kind);
-            float seconds = kind == EffectKind.Siren ? 2.2f : kind == EffectKind.Slam ? 0.7f : 0.45f;
+            float seconds = kind == SoundEffectKind.Siren ? 2.2f : kind == SoundEffectKind.Slam ? 0.7f : 0.45f;
             int length = Mathf.RoundToInt(seconds * Rate);
             var buffer = new float[length];
             float lowpassed = 0f;
@@ -427,7 +427,7 @@ namespace ColonQuest.World
                 float noise = (float)random.NextDouble() * 2f - 1f;
                 switch (kind)
                 {
-                    case EffectKind.Siren:
+                    case SoundEffectKind.Siren:
                     {
                         // Two tones that swap four times a second, like the lights.
                         float tone = ((int)(t * 4f) % 2 == 0) ? 740f : 980f;
@@ -436,7 +436,7 @@ namespace ColonQuest.World
                         break;
                     }
 
-                    case EffectKind.Slam:
+                    case SoundEffectKind.Slam:
                     {
                         lowpassed += (noise - lowpassed) * 0.25f;
                         buffer[i] = (Mathf.Sin((float)TwoPi * 90f * t) * Mathf.Exp(-9f * t) + lowpassed * 0.9f * Mathf.Exp(-22f * t)) * 1f

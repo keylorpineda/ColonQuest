@@ -36,7 +36,7 @@ namespace ColonQuest.World
         {
             Playing = true;
             PlayerController.Frozen = true;
-            AudioDirector.Effect(EffectKind.Thud);
+            AudioDirector.Effect(SoundEffectKind.Thud);
 
             var body = player.GetComponent<Rigidbody2D>();
             var bob = player.Find("Bob");

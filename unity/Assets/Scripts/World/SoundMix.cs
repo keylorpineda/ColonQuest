@@ -13,7 +13,7 @@ namespace ColonQuest.World
     }
 
     /// <summary>One-off effects of the big moments: the hit of a car, the siren of the police and the door of the cell.</summary>
-    public enum EffectKind
+    public enum SoundEffectKind
     {
         Thud,
         Siren,
