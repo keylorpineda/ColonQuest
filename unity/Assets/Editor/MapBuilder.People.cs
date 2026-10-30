@@ -63,6 +63,21 @@ namespace ColonQuest.EditorTools
             torso.SetParent(visual, false);
             torso.localPosition = new Vector3(0f, -0.02f, 0f);
             Part2(torso, "Torso", rounded, Vector2.zero, new Vector2(0.52f, 0.52f), shirt, OrderPlayer + 6);
+
+            // Light from the upper left: a lit strip on that side, a darker band at the waist, a belt with its buckle and seams.
+            Shape(torso, "TorsoShade", rounded, new Vector2(0.03f, -0.15f), new Vector2(0.44f, 0.18f), GamePalette.Shade(shirt, 0.82f), OrderPlayer + 7);
+            Shape(torso, "TorsoLight", roundedSmall, new Vector2(-0.16f, 0.04f), new Vector2(0.09f, 0.34f), GamePalette.Shade(shirt, 1.18f), OrderPlayer + 7);
+            Shape(torso, "Belt", roundedSmall, new Vector2(0f, -0.215f), new Vector2(0.5f, 0.055f), GamePalette.Hex("#2A2F45"), OrderPlayer + 8);
+            Shape(torso, "Buckle", roundedSmall, new Vector2(0f, -0.215f), new Vector2(0.07f, 0.05f), GamePalette.Hex("#FFD23F"), OrderPlayer + 9);
+            if (look.Extra == Accessory.None || look.Extra == Accessory.Cap || look.Extra == Accessory.Helmet || look.Extra == Accessory.Hood)
+            {
+                foreach (float by in new[] { 0.1f, -0.02f, -0.14f })
+                {
+                    Shape(torso, "Button", circle, new Vector2(0f, by), Vector2.one * 0.035f, GamePalette.Shade(shirt, 0.66f), OrderPlayer + 9);
+                }
+            }
+
+            Shape(visual, "Neck", roundedSmall, new Vector2(0f, 0.245f), new Vector2(0.13f, 0.1f), GamePalette.Shade(skin, 0.84f), OrderPlayer + 8);
             Shape(torso, "Collar", roundedSmall, new Vector2(0f, 0.22f), new Vector2(0.2f, 0.07f), GamePalette.Shade(shirt, 0.8f), OrderPlayer + 9);
             DrawTorsoAccessory(torso, look);
             rig.Torso = torso;
@@ -84,7 +99,9 @@ namespace ColonQuest.EditorTools
             pivot.SetParent(parent, false);
             pivot.localPosition = new Vector3(x, -0.17f, 0f);
             Part2(pivot, "Leg", roundedSmall, new Vector2(0f, -0.17f), new Vector2(0.17f, 0.36f), pants, OrderPlayer + 1);
+            Shape(pivot, "Crease", roundedSmall, new Vector2(0f, -0.17f), new Vector2(0.025f, 0.28f), GamePalette.Shade(pants, 0.78f), OrderPlayer + 2);
             Part2(pivot, "Shoe", roundedSmall, new Vector2(0.02f, -0.36f), new Vector2(0.23f, 0.11f), GamePalette.Hex("#2A2F45"), OrderPlayer + 3);
+            Shape(pivot, "Sole", roundedSmall, new Vector2(0.02f, -0.405f), new Vector2(0.24f, 0.03f), GamePalette.Hex("#F1F4FF"), OrderPlayer + 4);
             return pivot;
         }
 
@@ -96,6 +113,7 @@ namespace ColonQuest.EditorTools
             pivot.localPosition = new Vector3(x, 0.17f, 0f);
             Part2(pivot, "Sleeve", roundedSmall, new Vector2(0f, -0.15f), new Vector2(0.14f, 0.34f), shirt, OrderPlayer + 4);
             Part2(pivot, "Hand", circle, new Vector2(0f, -0.35f), new Vector2(0.15f, 0.15f), skin, OrderPlayer + 4);
+            Shape(pivot, "Cuff", roundedSmall, new Vector2(0f, -0.29f), new Vector2(0.15f, 0.04f), GamePalette.Shade(shirt, 0.78f), OrderPlayer + 5);
             return pivot;
         }
 
@@ -109,7 +127,12 @@ namespace ColonQuest.EditorTools
 
             Part2(head, "EarL", circle, new Vector2(-0.23f, 0.18f), new Vector2(0.1f, 0.13f), skin, OrderPlayer + 11);
             Part2(head, "EarR", circle, new Vector2(0.23f, 0.18f), new Vector2(0.1f, 0.13f), skin, OrderPlayer + 11);
+            // A darker disc just under the face shows as a soft shadow along the chin; a pale patch lights the forehead.
+            Shape(head, "FaceShade", circle, new Vector2(0f, 0.16f), new Vector2(0.47f, 0.47f), GamePalette.Shade(skin, 0.84f), OrderPlayer + 12);
             Part2(head, "Face", circle, new Vector2(0f, 0.2f), new Vector2(0.47f, 0.47f), skin, OrderPlayer + 13);
+            var forehead = GamePalette.White;
+            forehead.a = 0.22f;
+            Shape(head, "FaceShine", circle, new Vector2(-0.1f, 0.33f), new Vector2(0.13f, 0.07f), forehead, OrderPlayer + 15);
 
             var blush = GamePalette.Hex("#FF7A8A");
             blush.a = 0.4f;
@@ -155,6 +178,12 @@ namespace ColonQuest.EditorTools
         }
 
         private static void DrawHair(Transform head, Color hair, int style)
+        {
+            DrawHairStyle(head, hair, style);
+            Shape(head, "HairShine", roundedSmall, new Vector2(-0.08f, 0.49f), new Vector2(0.16f, 0.035f), GamePalette.Shade(hair, 1.45f), OrderPlayer + 29);
+        }
+
+        private static void DrawHairStyle(Transform head, Color hair, int style)
         {
             switch (style)
             {

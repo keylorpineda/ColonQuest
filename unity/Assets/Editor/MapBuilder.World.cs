@@ -702,6 +702,18 @@ namespace ColonQuest.EditorTools
             Shape(visual, "Leg", roundedSmall, new Vector2(-0.5f, -0.52f), new Vector2(0.2f, 0.3f), GamePalette.Outline, OrderPlayer);
             Shape(visual, "Leg", roundedSmall, new Vector2(0.45f, -0.52f), new Vector2(0.2f, 0.3f), GamePalette.Outline, OrderPlayer);
 
+            // The rest of the animal: a shaded belly, an udder, a tail with its tuft, ears, nostrils, a second horn and a bell.
+            Shape(visual, "BodyShade", rounded, new Vector2(0f, -0.24f), new Vector2(1.4f, 0.26f), GamePalette.Shade(hide, 0.86f), OrderPlayer + 2);
+            Shape(visual, "Udder", roundedSmall, new Vector2(-0.12f, -0.45f), new Vector2(0.3f, 0.14f), GamePalette.Hex("#F4A6B8"), OrderPlayer);
+            Shape(visual, "Tail", roundedSmall, new Vector2(-0.9f, 0.05f), new Vector2(0.07f, 0.52f), GamePalette.Outline, OrderPlayer);
+            Shape(visual, "TailTuft", circle, new Vector2(-0.9f, -0.24f), new Vector2(0.17f, 0.2f), spot, OrderPlayer + 1);
+            Shape(visual, "Ear", roundedSmall, new Vector2(0.68f, 0.42f), new Vector2(0.2f, 0.11f), GamePalette.Shade(hide, 0.9f), OrderPlayer + 2);
+            Shape(visual, "Horn", roundedSmall, new Vector2(1.08f, 0.5f), new Vector2(0.1f, 0.2f), GamePalette.Hex("#F2E3B0"), OrderPlayer + 2);
+            Shape(visual, "Nostril", circle, new Vector2(1.24f, 0.05f), Vector2.one * 0.04f, GamePalette.Outline, OrderPlayer + 3);
+            Shape(visual, "Nostril", circle, new Vector2(1.24f, -0.05f), Vector2.one * 0.04f, GamePalette.Outline, OrderPlayer + 3);
+            Shape(visual, "Bell", circle, new Vector2(0.78f, -0.2f), Vector2.one * 0.14f, GamePalette.Hex("#FFD23F"), OrderPlayer + 3);
+            Shape(visual, "BodyShine", roundedSmall, new Vector2(-0.1f, 0.3f), new Vector2(0.6f, 0.06f), GamePalette.White, OrderPlayer + 3);
+
             cow.AddComponent<Patrol>().Configure(from, to, speed, 2.5f);
         }
 

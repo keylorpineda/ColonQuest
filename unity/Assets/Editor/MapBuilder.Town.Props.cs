@@ -371,6 +371,24 @@ namespace ColonQuest.EditorTools
             Shape(root, "Headlight", circle, new Vector2(1.18f, 0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
             Shape(root, "Headlight", circle, new Vector2(1.18f, -0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
 
+            // The details that make it a car and not a rounded box: gloss on the paint, panel lines, mirrors, tail lights and a glow
+            // in front of the headlights.
+            var gloss = GamePalette.White;
+            gloss.a = 0.24f;
+            var seam = GamePalette.Shade(body, 0.7f);
+            Shape(root, "Gloss", roundedSmall, new Vector2(-0.4f, 0.46f), new Vector2(1.1f, 0.09f), gloss, 5);
+            Shape(root, "RoofShine", roundedSmall, new Vector2(-0.3f, 0.2f), new Vector2(0.5f, 0.07f), gloss, 5);
+            Shape(root, "HoodLine", roundedSmall, new Vector2(0.98f, 0f), new Vector2(0.03f, 0.9f), seam, 4);
+            Shape(root, "TrunkLine", roundedSmall, new Vector2(-1.06f, 0f), new Vector2(0.03f, 0.9f), seam, 4);
+            Shape(root, "MirrorL", roundedSmall, new Vector2(0.5f, 0.68f), new Vector2(0.16f, 0.1f), seam, 5);
+            Shape(root, "MirrorR", roundedSmall, new Vector2(0.5f, -0.68f), new Vector2(0.16f, 0.1f), seam, 5);
+            Shape(root, "Taillight", circle, new Vector2(-1.2f, 0.4f), Vector2.one * 0.16f, GamePalette.Hex("#E8505B"), 4);
+            Shape(root, "Taillight", circle, new Vector2(-1.2f, -0.4f), Vector2.one * 0.16f, GamePalette.Hex("#E8505B"), 4);
+            var headGlow = GamePalette.Hex("#FFF1A8");
+            headGlow.a = 0.22f;
+            Shape(root, "HeadGlow", circle, new Vector2(1.34f, 0.4f), Vector2.one * 0.5f, headGlow, 3);
+            Shape(root, "HeadGlow", circle, new Vector2(1.34f, -0.4f), Vector2.one * 0.5f, headGlow, 3);
+
             if (!driving)
             {
                 var collider = root.gameObject.AddComponent<BoxCollider2D>();
