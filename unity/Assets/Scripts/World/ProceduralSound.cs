@@ -413,11 +413,58 @@ namespace ColonQuest.World
             return ToClip("Step_" + kind + variant % 3, buffer, 0.35f);
         }
 
-        /// <summary>A big moment: the thud of a hit, the two tones of a police siren, the slam of a cell door.</summary>
+        /// <summary>How long the clip of an effect lasts, in seconds.</summary>
+        public static float EffectSeconds(SoundEffectKind kind)
+        {
+            switch (kind)
+            {
+                case SoundEffectKind.Siren:
+                    return 2.2f;
+                case SoundEffectKind.Slam:
+                    return 0.7f;
+                case SoundEffectKind.Bills:
+                    return 0.9f;
+                case SoundEffectKind.Printer:
+                    return 1.2f;
+                case SoundEffectKind.Stamp:
+                    return 0.35f;
+                case SoundEffectKind.Sizzle:
+                    return 1.4f;
+                case SoundEffectKind.Water:
+                    return 1.6f;
+                case SoundEffectKind.Beep:
+                    return 0.18f;
+                case SoundEffectKind.Keys:
+                    return 0.5f;
+                case SoundEffectKind.Chime:
+                    return 0.9f;
+                case SoundEffectKind.Alarm:
+                    return 1.2f;
+                case SoundEffectKind.Coin:
+                    return 0.5f;
+                case SoundEffectKind.Scribble:
+                    return 0.6f;
+                case SoundEffectKind.Knock:
+                    return 0.6f;
+                case SoundEffectKind.Splash:
+                    return 0.9f;
+                case SoundEffectKind.Munch:
+                    return 0.55f;
+                case SoundEffectKind.Swish:
+                    return 0.6f;
+                default:
+                    return 0.45f;
+            }
+        }
+
+        /// <summary>
+        /// A one-off effect: the thud of a hit, the two tones of a police siren, the slam of a cell door and the small
+        /// sounds of the animated interactions (bills, a printer, a stamp, a pan, water, a beep, keys, a chime...).
+        /// </summary>
         public static AudioClip Effect(SoundEffectKind kind)
         {
             var random = new System.Random(77 + (int)kind);
-            float seconds = kind == SoundEffectKind.Siren ? 2.2f : kind == SoundEffectKind.Slam ? 0.7f : 0.45f;
+            float seconds = EffectSeconds(kind);
             int length = Mathf.RoundToInt(seconds * Rate);
             var buffer = new float[length];
             float lowpassed = 0f;
@@ -425,6 +472,9 @@ namespace ColonQuest.World
             {
                 float t = i / (float)Rate;
                 float noise = (float)random.NextDouble() * 2f - 1f;
+                lowpassed += (noise - lowpassed) * 0.25f;
+                float highpassed = noise - lowpassed;
+                float fadeOut = Mathf.Clamp01((seconds - t) * 12f);
                 switch (kind)
                 {
                     case SoundEffectKind.Siren:
@@ -438,15 +488,119 @@ namespace ColonQuest.World
 
                     case SoundEffectKind.Slam:
                     {
-                        lowpassed += (noise - lowpassed) * 0.25f;
                         buffer[i] = (Mathf.Sin((float)TwoPi * 90f * t) * Mathf.Exp(-9f * t) + lowpassed * 0.9f * Mathf.Exp(-22f * t)) * 1f
                             + 0.4f * Mathf.Sin((float)TwoPi * 520f * t) * Mathf.Exp(-5f * Mathf.Max(0f, t - 0.18f)) * (t > 0.18f ? 1f : 0f);
                         break;
                     }
 
+                    case SoundEffectKind.Bills:
+                    {
+                        // Fourteen riffles a second: short bursts of bright noise.
+                        float gate = (t * 14f) % 1f < 0.4f ? 1f : 0f;
+                        buffer[i] = highpassed * gate * 0.7f * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Printer:
+                    {
+                        // A motor buzz with the pulses of the print head.
+                        float buzz = Mathf.Sign(Mathf.Sin((float)TwoPi * 95f * t)) * (0.5f + 0.5f * Mathf.Sin((float)TwoPi * 26f * t));
+                        float pulse = (t * 22f) % 1f < 0.2f ? highpassed : 0f;
+                        buffer[i] = (buzz * 0.35f + pulse * 0.6f) * fadeOut * Mathf.Clamp01(t * 20f);
+                        break;
+                    }
+
+                    case SoundEffectKind.Stamp:
+                    {
+                        buffer[i] = Mathf.Sin((float)TwoPi * 140f * t) * Mathf.Exp(-18f * t) + lowpassed * 0.6f * Mathf.Exp(-45f * t);
+                        break;
+                    }
+
+                    case SoundEffectKind.Sizzle:
+                    {
+                        float crackle = random.NextDouble() < 0.02 ? 1.8f : 1f;
+                        buffer[i] = highpassed * 0.45f * crackle * Mathf.Clamp01(t * 12f) * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Water:
+                    {
+                        float wobble = 0.8f + 0.2f * Mathf.Sin((float)TwoPi * 3f * t);
+                        buffer[i] = (highpassed * 0.5f + lowpassed * 0.15f) * wobble * Mathf.Clamp01(t * 6f) * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Beep:
+                    {
+                        buffer[i] = Mathf.Sign(Mathf.Sin((float)TwoPi * 1760f * t)) * 0.4f * Mathf.Exp(-6f * t) * Mathf.Clamp01(t * 400f);
+                        break;
+                    }
+
+                    case SoundEffectKind.Keys:
+                    {
+                        // Four taps: a short click each.
+                        float local = t % 0.12f;
+                        buffer[i] = t < 0.48f ? (Mathf.Sin((float)TwoPi * 1300f * local) * 0.5f + highpassed * 0.5f) * Mathf.Exp(-70f * local) : 0f;
+                        break;
+                    }
+
+                    case SoundEffectKind.Chime:
+                    {
+                        float later = Mathf.Max(0f, t - 0.18f);
+                        buffer[i] = (Mathf.Sin((float)TwoPi * 880f * t) * Mathf.Exp(-5f * t)
+                            + 0.8f * Mathf.Sin((float)TwoPi * 1320f * later) * Mathf.Exp(-5f * later) * (t > 0.18f ? 1f : 0f)) * Mathf.Clamp01(t * 300f);
+                        break;
+                    }
+
+                    case SoundEffectKind.Alarm:
+                    {
+                        float on = (t * 6f) % 1f < 0.5f ? 1f : 0f;
+                        buffer[i] = Mathf.Sin((float)TwoPi * 1050f * t) * 0.5f * on * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Coin:
+                    {
+                        buffer[i] = (Mathf.Sin((float)TwoPi * 1568f * t) + 0.7f * Mathf.Sin((float)TwoPi * 2093f * t)) * Mathf.Exp(-9f * t) * 0.5f * Mathf.Clamp01(t * 500f);
+                        break;
+                    }
+
+                    case SoundEffectKind.Scribble:
+                    {
+                        float stroke = 0.5f + 0.5f * Mathf.Sin((float)TwoPi * 13f * t);
+                        buffer[i] = lowpassed * stroke * 0.6f * Mathf.Clamp01(t * 30f) * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Knock:
+                    {
+                        float local = t % 0.2f;
+                        buffer[i] = t < 0.5f ? Mathf.Sin((float)TwoPi * 120f * local) * Mathf.Exp(-26f * local) + lowpassed * 0.3f * Mathf.Exp(-60f * local) : 0f;
+                        break;
+                    }
+
+                    case SoundEffectKind.Splash:
+                    {
+                        buffer[i] = (lowpassed * 0.9f + highpassed * 0.3f) * Mathf.Exp(-4.5f * t) * Mathf.Clamp01(t * 80f);
+                        break;
+                    }
+
+                    case SoundEffectKind.Munch:
+                    {
+                        float local = t % 0.16f;
+                        buffer[i] = t < 0.5f ? (lowpassed * 0.9f + Mathf.Sin((float)TwoPi * 210f * local) * 0.3f) * Mathf.Exp(-30f * local) : 0f;
+                        break;
+                    }
+
+                    case SoundEffectKind.Swish:
+                    {
+                        float arc = Mathf.Sin(Mathf.PI * Mathf.Clamp01(t / seconds));
+                        buffer[i] = lowpassed * arc * 0.7f;
+                        break;
+                    }
+
                     default:
                     {
-                        lowpassed += (noise - lowpassed) * 0.35f;
                         buffer[i] = Mathf.Sin((float)TwoPi * 62f * t) * Mathf.Exp(-12f * t) + lowpassed * 0.8f * Mathf.Exp(-30f * t);
                         break;
                     }

@@ -12,12 +12,27 @@ namespace ColonQuest.World
         House
     }
 
-    /// <summary>One-off effects of the big moments: the hit of a car, the siren of the police and the door of the cell.</summary>
+    /// <summary>One-off effects: the big moments (a hit, the siren, the door of the cell) and the small sounds of the animated interactions.</summary>
     public enum SoundEffectKind
     {
         Thud,
         Siren,
-        Slam
+        Slam,
+        Bills,
+        Printer,
+        Stamp,
+        Sizzle,
+        Water,
+        Beep,
+        Keys,
+        Chime,
+        Alarm,
+        Coin,
+        Scribble,
+        Knock,
+        Splash,
+        Munch,
+        Swish
     }
 
     /// <summary>How loud each layer of the soundscape should be at one spot. All values are 0 to 1.</summary>
