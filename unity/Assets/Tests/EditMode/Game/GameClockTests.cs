@@ -79,6 +79,20 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Restore_StaysInsideTheLimitsAndNeverGetsStuckAtTheEndOfTheDay()
+        {
+            var clock = new GameClock();
+            clock.Restore(99, 99_999f);
+            Assert.AreEqual(GameRules.DaysPerMonth, clock.Day);
+            Assert.AreEqual("22:00", clock.Time);
+            Assert.IsTrue(clock.Advance(1f, Hour), "saved right at 22:00: the player still has to sleep");
+
+            clock.Restore(-3, 0f);
+            Assert.AreEqual(1, clock.Day);
+            Assert.AreEqual("06:00", clock.Time);
+        }
+
+        [Test]
         public void Loop_SleepMovesTheClockAndRestsOnceAMonth()
         {
             var loop = new GameLoop();
