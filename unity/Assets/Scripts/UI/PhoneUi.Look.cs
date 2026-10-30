@@ -229,6 +229,7 @@ namespace ColonQuest.UI
                 (App.Sinpe, "SINPE", SinpeColor),
                 (App.Bank, "Banco", BankColor),
                 (App.Bills, "Recibos", BillsColor),
+                (App.Goals, "Metas", GoalsColor),
                 (App.Search, "Buscador", SearchColor),
                 (App.Calculator, "Cuotas", CalculatorColor),
                 (App.Blocks, "Bloques", BlocksColor),
@@ -331,6 +332,11 @@ namespace ColonQuest.UI
                     Bar(icon, new Vector2(0f, -34f) * u, new Vector2(74f, 10f) * u, 0f, Color.white);
                     break;
 
+                case App.Goals:
+                    Bar(icon, new Vector2(-24f, 2f) * u, new Vector2(7f, 62f) * u, 0f, Color.white);
+                    Bar(icon, new Vector2(4f, 18f) * u, new Vector2(50f, 30f) * u, 0f, Color.white);
+                    break;
+
                 case App.Bills:
                     Bar(icon, Vector2.zero, new Vector2(56f, 74f) * u, 0f, Color.white);
                     Bar(icon, new Vector2(0f, 20f) * u, new Vector2(36f, 8f) * u, 0f, BillsColor);
@@ -420,6 +426,7 @@ namespace ColonQuest.UI
                 case App.Sinpe: return SinpeColor;
                 case App.Bank: return BankColor;
                 case App.Bills: return BillsColor;
+                case App.Goals: return GoalsColor;
                 case App.Search: return SearchColor;
                 case App.Calculator: return CalculatorColor;
                 case App.Blocks: return BlocksColor;
