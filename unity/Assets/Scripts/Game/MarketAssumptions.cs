@@ -106,6 +106,41 @@ namespace ColonQuest.Game
         }
     }
 
+    /// <summary>
+    /// A piece of furniture of the store. Like a car, its negotiation is client only: <see cref="ToSellerOffer"/> builds an
+    /// offer that the backend does not know, so the conversation is answered by <see cref="LocalSeller"/>.
+    /// </summary>
+    public sealed class FurnitureModel
+    {
+        public FurnitureKind Kind { get; }
+        public string Name { get; }
+        public string SellerItem { get; }
+        public string Description { get; }
+        public long Price { get; }
+        public int TermMonths { get; }
+        public decimal MonthlyRatePct { get; }
+        public long InsuranceMonthly { get; }
+        public long Commission { get; }
+
+        public FurnitureModel(FurnitureKind kind, string name, string sellerItem, string description, long price, int termMonths, decimal monthlyRatePct, long insuranceMonthly, long commission)
+        {
+            Kind = kind;
+            Name = name;
+            SellerItem = sellerItem;
+            Description = description;
+            Price = price;
+            TermMonths = termMonths;
+            MonthlyRatePct = monthlyRatePct;
+            InsuranceMonthly = insuranceMonthly;
+            Commission = commission;
+        }
+
+        public SellerOffer ToSellerOffer()
+        {
+            return new SellerOffer("furniture_" + Kind.ToString().ToLowerInvariant(), SellerItem, "Kevin", Price, TermMonths, MonthlyRatePct, InsuranceMonthly, Commission);
+        }
+    }
+
     public sealed class FarmOption
     {
         public FarmKind Kind { get; }
@@ -238,6 +273,20 @@ namespace ColonQuest.Game
 
         /// <summary>The mood lost at the end of a month in which the player never slept in the own bed.</summary>
         public const int SkippedSleepWellbeingLoss = 2;
+
+        /// <summary>The rent of the room the player starts in, per month, until moving to a home of the real estate agency.</summary>
+        public const long RoomRent = 90_000L;
+
+        /// <summary>What a real bed adds to the rest of the month, against the mattress on the floor.</summary>
+        public const int BedRestBonus = 2;
+
+        public static readonly IReadOnlyList<FurnitureModel> Furniture = new List<FurnitureModel>
+        {
+            new FurnitureModel(FurnitureKind.Table, "Mesa con dos sillas", "comedor de dos sillas", "Para comer sentado y anotar las cuentas del mes.", 75_000L, 12, 3.2m, 0L, 3_000L),
+            new FurnitureModel(FurnitureKind.Tv, "Tele de 32 pulgadas", "televisor de 32 pulgadas", "Para las noticias, los partidos y los anuncios de cuotas.", 130_000L, 12, 3.2m, 1_500L, 5_000L),
+            new FurnitureModel(FurnitureKind.Bed, "Cama con colchón", "juego de cama", "Adiós al colchón en el piso. Descansás mejor.", 165_000L, 12, 2.9m, 1_500L, 5_000L),
+            new FurnitureModel(FurnitureKind.Fridge, "Refri pequeña", "refrigerador pequeño", "La comida aguanta más, y el recibo de la luz sube un poco.", 240_000L, 18, 2.9m, 2_000L, 8_000L)
+        };
 
         /// <summary>The mood lost for each week the player did not show up at work.</summary>
         public const int MissedWorkWellbeingLoss = 3;

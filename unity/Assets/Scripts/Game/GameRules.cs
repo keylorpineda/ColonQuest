@@ -40,8 +40,8 @@ namespace ColonQuest.Game
         /// </summary>
         public const long MinimumWageGross = 373_092L;
 
-        /// <summary>Rent, food and transport, charged every month.</summary>
-        public const long LivingExpenses = 200_000L;
+        /// <summary>Food and transport, charged every month. The rent of the room goes apart (see <see cref="MarketAssumptions.RoomRent"/>).</summary>
+        public const long LivingExpenses = 110_000L;
 
         /// <summary>The starting situation: the minimum wage after its legal deductions, a card with a balance and a phone in installments.</summary>
         public static PlayerState NewPlayer()

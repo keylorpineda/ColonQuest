@@ -28,6 +28,8 @@ namespace ColonQuest.Game
         public List<int> farmKinds = new List<int>();
         public List<long> farmInvested = new List<long>();
         public List<int> farmMonthsWhenBought = new List<int>();
+
+        public List<int> furniture = new List<int>();
     }
 
     /// <summary>Everything a run needs to go on later: the finances, what the player owns, the month and the hour.</summary>
@@ -230,6 +232,11 @@ namespace ColonQuest.Game
                 snapshot.farmMonthsWhenBought.Add(stake.MonthsPlayedWhenBought);
             }
 
+            foreach (var kind in holdings.Furniture)
+            {
+                snapshot.furniture.Add((int)kind);
+            }
+
             return snapshot;
         }
 
@@ -260,6 +267,11 @@ namespace ColonQuest.Game
             for (int i = 0; i < stakes; i++)
             {
                 holdings.AddFarm((FarmKind)snapshot.farmKinds[i], snapshot.farmInvested[i], snapshot.farmMonthsWhenBought[i]);
+            }
+
+            foreach (int kind in snapshot.furniture ?? new List<int>())
+            {
+                holdings.AddFurniture((FurnitureKind)kind);
             }
 
             return holdings;

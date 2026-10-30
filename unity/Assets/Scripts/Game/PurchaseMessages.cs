@@ -16,6 +16,8 @@ namespace ColonQuest.Game
                     return Loc.T("Ya tienes una casa en esta partida.");
                 case PurchaseFailure.AlreadyHasCar:
                     return Loc.T("Ya tienes un carro en esta partida.");
+                case PurchaseFailure.AlreadyHasFurniture:
+                    return Loc.T("Ese mueble ya está en tu cuarto.");
                 case PurchaseFailure.TooManyInstallments:
                     return Loc.T("Ya tienes demasiadas cuotas abiertas. Termina de pagar alguna antes de firmar otra.");
                 default:
