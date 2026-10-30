@@ -129,7 +129,11 @@ namespace ColonQuest.EditorTools
             var room = RoomFor(sceneName);
             currentLayer = LayerFloor;
             BuildFloors(Group(map, "Floors"), new[] { room });
-            BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName), sceneName == SceneNames.HospitalArriba ? SceneNames.Hospital : SceneNames.Town);
+            bool upperFloor = sceneName == SceneNames.HospitalArriba;
+            if (!upperFloor)
+            {
+                BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName), SceneNames.Town);
+            }
             currentLayer = LayerWorld;
 
             var layout = new InteriorParts
@@ -181,9 +185,19 @@ namespace ColonQuest.EditorTools
                     break;
             }
 
-            var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
-            Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 1.0f, 0.3f, "#55E08F");
-            Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
+            if (upperFloor)
+            {
+                // The upper floor of the hospital has no way out but the elevator down, where the mat used to be.
+                var mat = MatFor(sceneName);
+                BuildElevator(layout, mat + new Vector2(0f, -0.45f), mat, new Vector2(1.6f, 0.8f),
+                    SceneNames.Hospital, TownSpawnFor(sceneName), Vector2.down, mat + new Vector2(0f, -0.4f));
+            }
+            else
+            {
+                var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
+                Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 1.0f, 0.3f, "#55E08F");
+                Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
+            }
             DustMotes(IL(layout.Props, "DustMotes"), new System.Random(5), room, 18);
 
             BuildRoomColliders(Group(map, "Colliders"), room);
