@@ -604,6 +604,11 @@ namespace ColonQuest.World
             { "TU CASA", "YOUR HOUSE" },
             { "TURNO A-27", "TICKET A-27" },
             { "URGENCIAS", "EMERGENCY ROOM" },
+            { "Hablar con el del puesto", "Talk to the guy at the stand" },
+            { "Triplicá tu plata en un mes. Solo traé efectivo y no le contés a nadie.", "Triple your money in a month. Just bring cash and don't tell anybody." },
+            { "Es seguro, es seguro. Papeles no tengo, pero confiá en mí.", "It's safe, it's safe. I have no papers, but trust me." },
+            { "Con los {cash} que tenés hoy, mañana tendrías el triple. Eso me dijeron mis clientes.", "With the {cash} you have today, tomorrow you would have triple. That's what my clients told me." },
+            { "Nadie puede garantizar 300% en un mes. Un negocio así se llama esquema piramidal: gana el que entra primero.", "Nobody can guarantee 300% in a month. A deal like that is a pyramid scheme: whoever gets in first wins." },
         };
     }
 }

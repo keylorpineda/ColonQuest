@@ -334,6 +334,14 @@ namespace ColonQuest.EditorTools
 
             table.gameObject.AddComponent<BoxCollider2D>().offset = new Vector2(0f, 0.3f);
             table.GetComponent<BoxCollider2D>().size = new Vector2(2.5f, 0.6f);
+
+            // The man of the stand, behind the table: the player can talk to him, and what he promises is the lesson.
+            var seller = BuildNpc(parent, "Estafador", new Vector2(7f, -4.7f), new Look { Skin = "#C98B5C", Extra = Accessory.Tie, ExtraColor = "#2E7D4F" }, true);
+            BuildThing(seller, "Talk", "Hablar con el del puesto", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "Triplicá tu plata en un mes. Solo traé efectivo y no le contés a nadie.",
+                "Es seguro, es seguro. Papeles no tengo, pero confiá en mí.",
+                "Con los {cash} que tenés hoy, mañana tendrías el triple. Eso me dijeron mis clientes.",
+                "Nadie puede garantizar 300% en un mes. Un negocio así se llama esquema piramidal: gana el que entra primero.");
         }
 
         private static void BuildDoorsAndStations(Transform parent)
