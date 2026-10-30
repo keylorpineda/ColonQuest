@@ -40,7 +40,7 @@ namespace ColonQuest.Game.Tests
             var state = GameRules.NewPlayer();
 
             Assert.AreEqual(1, state.Month);
-            Assert.AreEqual(450_000L, state.SalaryNet);
+            Assert.AreEqual(FinanceEngine.CalculateNetSalary(GameRules.MinimumWageGross), state.SalaryNet);
             Assert.AreEqual(180_000L, state.CreditCard.Balance);
             Assert.AreEqual(25_000L, GameRules.MonthlyInstallments(state));
             Assert.AreEqual(180_000L, GameRules.DebtBalance(state));
@@ -131,7 +131,7 @@ namespace ColonQuest.Game.Tests
 
             var report = loop.CloseMonth();
 
-            Assert.AreEqual(450_000L, report.SalaryCredited);
+            Assert.AreEqual(GameRules.NewPlayer().SalaryNet, report.SalaryCredited);
             Assert.AreEqual(25_000L, report.InstallmentsCharged);
             Assert.AreEqual(2, loop.State.Month);
             Assert.AreEqual(1, loop.MonthsPlayed);
