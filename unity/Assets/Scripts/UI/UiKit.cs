@@ -227,6 +227,30 @@ namespace ColonQuest.UI
         }
 
         /// <summary>Changes the text of a button made by <see cref="MakeButton"/>.</summary>
+        /// <summary>A one-line box to type in, with a grey hint while it is empty.</summary>
+        public static InputField TextBox(Transform parent, string name, string hintText, Vector2 size, Vector2 anchor, Vector2 position, int limit)
+        {
+            var outline = Fill(parent, name, Ink, size, anchor, position);
+            outline.raycastTarget = true;
+            var body = Fill(outline.transform, "Body", Color.white, size - new Vector2(Outline * 2f, Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            body.raycastTarget = false;
+
+            var inner = size - new Vector2(50f, 16f);
+            var text = Label(body.transform, string.Empty, 32, Ink, inner, new Vector2(0.5f, 0.5f), Vector2.zero);
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.fontStyle = FontStyle.Normal;
+            var hint = Label(body.transform, hintText, 28, new Color(0.5f, 0.52f, 0.6f, 1f), inner, new Vector2(0.5f, 0.5f), Vector2.zero);
+            hint.fontStyle = FontStyle.Italic;
+
+            var input = outline.gameObject.AddComponent<InputField>();
+            input.targetGraphic = outline;
+            input.textComponent = text;
+            input.placeholder = hint;
+            input.characterLimit = limit;
+            input.lineType = InputField.LineType.SingleLine;
+            return input;
+        }
+
         public static void SetLabel(Button button, string text)
         {
             button.transform.Find("Body/Text").GetComponent<Text>().text = text;
