@@ -134,14 +134,15 @@ namespace ColonQuest.World.PlayModeTests
         protected override string SceneToLoad => SceneNames.Hospital;
 
         [UnityTest]
-        public IEnumerator Hospital_HasTheInsuranceDeskTheWardAndTheStairs()
+        public IEnumerator Hospital_HasTheInsuranceDeskTheWardAndTheElevator()
         {
             yield return null;
 
             Assert.AreEqual(1, PlaceTestSetup.Stations(StationType.HealthDesk).Length);
             Assert.IsNotNull(GameObject.Find("EmergencyWard"));
-            var stairs = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Where(d => d.TargetScene == SceneNames.HospitalArriba).ToArray();
-            Assert.AreEqual(1, stairs.Length);
+            var elevators = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Where(d => d.TargetScene == SceneNames.HospitalArriba).ToArray();
+            Assert.AreEqual(1, elevators.Length);
+            Assert.IsNotNull(elevators[0].GetComponent<Elevator>(), "the way up is an elevator, not stairs");
         }
 
         [UnityTest]
@@ -166,19 +167,21 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Hospital_TheStairsLeadUpAndTheUpperMatLeadsBackDown()
+        public IEnumerator Hospital_TheElevatorGoesUpAndComesBackDown()
         {
-            var stairs = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).First(d => d.TargetScene == SceneNames.HospitalArriba);
+            // The ride (button, doors, step in) plays before the floor changes, so the waits are longer than a plain door.
+            var elevator = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).First(d => d.TargetScene == SceneNames.HospitalArriba);
             Body.linearVelocity = Vector2.zero;
-            Teleport((Vector2)stairs.transform.position + new Vector2(0f, -0.3f));
+            Teleport((Vector2)elevator.transform.position + new Vector2(0f, -0.3f));
             Body.linearVelocity = Vector2.up * 3f;
-            yield return WaitForScene(SceneNames.HospitalArriba, 3f);
+            yield return WaitForScene(SceneNames.HospitalArriba, 10f);
             Assert.AreEqual(SceneNames.HospitalArriba, SceneManager.GetActiveScene().name);
             FindPlayer();
             Body.GetComponent<PlayerController>().enabled = false;
 
-            Teleport(MapLayout.HospitalArribaMat);
-            yield return WaitForScene(SceneNames.Hospital, 3f);
+            Teleport(MapLayout.HospitalArribaMat + new Vector2(0f, 0.3f));
+            Body.linearVelocity = Vector2.down * 3f;
+            yield return WaitForScene(SceneNames.Hospital, 10f);
             FindPlayer();
 
             Assert.AreEqual(-8.4f, Body.position.x, 0.8f);
