@@ -189,7 +189,8 @@ namespace ColonQuest.EditorTools
             var half = room.Size * 0.5f;
             FloorChecks(IL(parts.Floor, "TileFloor"), Rect.MinMaxRect(-half.x + 0.5f, -half.y + 0.5f, half.x - 0.5f, half.y - 0.8f), 1f, "#FFFFFF", 0.1f);
 
-            // Four cells along the back. Each one has bars at the front, a gate that is open and a hard bed.
+            // Four cells along the back, each with bars at the front and a hard bed. The first one is where the player is
+            // locked up: its gate slides shut during the sentence. The other three are always closed.
             var cells = IL(parts.Walls, "Cells");
             float[] centers = { -7.6f, -2.6f, 2.6f, 7.6f };
             for (int i = 0; i < centers.Length; i++)
@@ -199,8 +200,16 @@ namespace ColonQuest.EditorTools
                 float right = x + 2.2f;
                 InnerWall(cells, new Vector2(left, 0.9f), new Vector2(left, 6.2f), "#6B7285");
                 InnerWall(cells, new Vector2(right, 0.9f), new Vector2(right, 6.2f), "#6B7285");
-                BarsRun(cells, left, x - 0.7f, 0.9f);
-                BarsRun(cells, x + 0.7f, right, 0.9f);
+                if (i == 0)
+                {
+                    BarsRun(cells, left, x - CellGateHalf, 0.9f);
+                    BarsRun(cells, x + CellGateHalf, right, 0.9f);
+                    CellGateBuild(cells, new Vector2(x, 0.9f));
+                }
+                else
+                {
+                    BarsRun(cells, left, right, 0.9f);
+                }
 
                 var bed = IL(parts.Props, "CellBed" + i);
                 Solid(bed, "Bunk", rounded, x - 0.9f, 4.9f, 1.6f, 0.9f, "#8E97AD");
@@ -221,15 +230,34 @@ namespace ColonQuest.EditorTools
             BuildThing(parts.Stations, "Counter", "Hablar con el oficial", new Vector2(-2.4f, -2.9f), new Vector2(3.0f, 0.8f),
                 "Las multas se pagan, y una multa que no se paga crece. Aquí quedan guardados los antecedentes.");
 
-            // The judge's bench, on a step, with the scales of justice on the wall.
+            // The judge's private office in the right corner: walls with a door on the side of the hall, the desk, two
+            // chairs for visitors, the flag and the scales. The cell bars close it at the back.
+            var office = IL(parts.Walls, "JudgeOffice");
+            float officeLeft = 4.2f;
+            float doorBottom = -3.6f;
+            float doorTop = -1.9f;
+            InnerWall(office, new Vector2(officeLeft, -half.y + 0.15f), new Vector2(officeLeft, doorBottom), "#C9B79C");
+            InnerWall(office, new Vector2(officeLeft, doorTop), new Vector2(officeLeft, 0.9f), "#C9B79C");
+            WallPlate(parts.Labels, "DESPACHO DEL JUEZ", new Vector2(2.6f, -1.45f), 2.6f, "#1D2238", GamePalette.White, 0.022f);
+
             var bench = IL(parts.Props, "JudgeBench");
-            Rug(bench, 6.6f, -2.0f, 4.6f, 2.8f, "#8B5A3C", "#5A3A22");
-            Solid(bench, "Bench", rounded, 6.6f, -1.6f, 3.6f, 1.0f, "#5A3A22");
-            Deco(bench, "Gavel", roundedSmall, 7.6f, -1.5f, 0.4f, 0.18f, "#C58B52", 1f, 9);
-            Deco(bench, "Plate", roundedSmall, 5.8f, -1.65f, 0.8f, 0.24f, "#FFD23F", 1f, 9);
-            BuildNpc(parts.People, "Juez", new Vector2(6.6f, -0.55f), new Look { Skin = "#B28DFF", Extra = Accessory.Hood, ExtraColor = "#1D2238" }, false);
-            WallPlate(parts.Labels, "JUZGADO", new Vector2(6.6f, -2.7f), 1.4f, "#1D2238", GamePalette.White, 0.024f);
-            BuildThing(parts.Stations, "Judge", "Hablar con el juez", new Vector2(6.6f, -2.9f), new Vector2(3.4f, 0.8f),
+            Rug(bench, 7.1f, -2.6f, 4.8f, 3.6f, "#8B5A3C", "#5A3A22");
+            Solid(bench, "Bench", rounded, 7.1f, -1.2f, 3.0f, 0.9f, "#5A3A22");
+            Deco(bench, "Gavel", roundedSmall, 8.0f, -1.1f, 0.4f, 0.18f, "#C58B52", 1f, 9);
+            Deco(bench, "Plate", roundedSmall, 6.3f, -1.25f, 0.8f, 0.24f, "#FFD23F", 1f, 9);
+            Deco(bench, "Papers", roundedSmall, 7.1f, -1.15f, 0.5f, 0.35f, "#FFFFFF", 1f, 9);
+            foreach (float chairX in new[] { 6.2f, 8.0f })
+            {
+                Solid(bench, "VisitorChair", roundedSmall, chairX, -2.6f, 0.55f, 0.5f, "#3B6FB6");
+            }
+
+            Solid(bench, "FlagPole", circle, 9.3f, -0.1f, 0.2f, 0.2f, "#9AA3B8");
+            Deco(bench, "Flag_Blue", square, 9.65f, 0.35f, 0.6f, 0.12f, "#1D4F8C", 1f, 9);
+            Deco(bench, "Flag_White", square, 9.65f, 0.23f, 0.6f, 0.12f, "#FFFFFF", 1f, 9);
+            Deco(bench, "Flag_Red", square, 9.65f, 0.11f, 0.6f, 0.12f, "#C0392B", 1f, 9);
+            Deco(bench, "Scales", circle, 5.0f, -0.2f, 0.4f, 0.4f, "#FFD23F", 1f, 9);
+            BuildNpc(parts.People, "Juez", new Vector2(7.1f, -0.25f), new Look { Skin = "#B28DFF", Extra = Accessory.Hood, ExtraColor = "#1D2238" }, false);
+            BuildThing(parts.Stations, "Judge", "Hablar con el juez", new Vector2(7.1f, -3.3f), new Vector2(3.0f, 0.8f),
                 "Entrar a una casa ajena sale caro: la multa y los días que dejas de trabajar. Un antecedente también te cierra puertas cuando pides un préstamo.",
                 "Una multa o un antecedente cuesta plata y tiempo. Esos días en el calabozo no se cobran salario.");
 
@@ -244,6 +272,31 @@ namespace ColonQuest.EditorTools
             }
 
             SecurityCamera(IL(parts.Labels, "SecurityCameras"), new Vector2(9.4f, 6.0f));
+        }
+
+        private const float CellGateHalf = 0.7f;
+
+        /// <summary>
+        /// The sliding gate of the player's cell: a collider that blocks the gap while it is shut, and a leaf of bars that
+        /// slides to the right, over the fixed bars, when it opens (see <see cref="CellGate"/>). It starts open.
+        /// </summary>
+        private static void CellGateBuild(Transform parent, Vector2 at)
+        {
+            var gate = Group(parent, "CellGate");
+            gate.localPosition = at;
+            var block = gate.gameObject.AddComponent<BoxCollider2D>();
+            block.size = new Vector2(CellGateHalf * 2f, 0.2f);
+
+            var leaf = Group(gate, "Leaf");
+            Deco(leaf, "GateTop", square, 0f, 0.3f, CellGateHalf * 2f, 0.1f, "#1D2238", 1f, 10);
+            Deco(leaf, "GateBottom", square, 0f, -0.36f, CellGateHalf * 2f, 0.08f, "#1D2238", 1f, 10);
+            for (float x = -CellGateHalf + 0.12f; x < CellGateHalf; x += 0.24f)
+            {
+                Deco(leaf, "GateBar", square, x, -0.03f, 0.08f, 0.66f, "#2F3646", 1f, 10);
+            }
+
+            Deco(leaf, "Lock", roundedSmall, -CellGateHalf + 0.1f, 0f, 0.16f, 0.2f, "#FFD23F", 1f, 11);
+            gate.gameObject.AddComponent<CellGate>().Configure(leaf, block, CellGateHalf * 2f);
         }
 
         private static void BarsRun(Transform parent, float xFrom, float xTo, float y)
