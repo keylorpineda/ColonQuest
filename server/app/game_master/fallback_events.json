@@ -209,5 +209,384 @@
       {"id": "skip", "label": "Ahora no", "effects": []}
     ],
     "teachingConcept": "compound_interest"
+  },
+  {
+    "eventId": "evt_bank_comisiones",
+    "type": "expense",
+    "title": "Cobros que no anotaste",
+    "narrative": "Abrís la app del banco en la soda y ves varios cobros chiquitos que suman ₡12 000. Diay, mae, no los tenías anotados y el mes ya va bien apretado.",
+    "npc": {"id": "app_banco", "name": "App del banco", "role": "Notificación bancaria"},
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pagar_y_anotar", "label": "Pagarlo y anotarlo en mi presupuesto", "effects": [{"kind": "expense", "amount": 12000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "pasar_tarjeta", "label": "Pasarlo a la tarjeta y ver después", "effects": [{"kind": "expense", "amount": 12000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "ignorar_cobro", "label": "Ignorarlo y seguir como si nada", "effects": [{"kind": "expense", "amount": 18000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -6}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_bank_horas_extra_oficina",
+    "type": "income",
+    "title": "Horas extra en la oficina",
+    "narrative": "En la oficina te ofrecen horas extra por ₡120 000 todo el mes, o ₡60 000 por la mitad. Son varios sábados de brete, mae, y en casa ya contaban con vos para los mandados y descansar en familia.",
+    "npc": {"id": "npc_marce_jefa", "name": "Marce, tu jefa de brete", "role": "Jefa de oficina"},
+    "imageKey": "scene_oficina",
+    "choices": [
+      {"id": "aceptar_todo", "label": "Aceptar todo y ajustar mi presupuesto", "effects": [{"kind": "income", "amount": 120000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -6}]},
+      {"id": "aceptar_mitad", "label": "Aceptar solo la mitad", "effects": [{"kind": "income", "amount": 60000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -2}]},
+      {"id": "no_aceptar", "label": "No aceptar y cuidar mi tiempo", "effects": [{"kind": "wellbeing_change", "amount": 6}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_bank_presupuesto_apartado",
+    "type": "offer",
+    "title": "La cuenta apartada de la cooperativa",
+    "narrative": "Estás en la cooperativa y doña Marlene te ofrece apartar ₡20 000 en una cuenta separada apenas te cae la plata, para que tu presupuesto no se desarme entre sodas, pasajes y antojos.",
+    "npc": {"id": "marlene_cooperativa", "name": "Doña Marlene, de la cooperativa", "role": "Ejecutiva de cuentas"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "apartar_completo", "label": "Apartar los ₡20 000 apenas me cae la plata", "effects": [{"kind": "savings_change", "amount": 20000}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "apartar_mitad", "label": "Empezar apartando ₡10 000 y ajustar después", "effects": [{"kind": "savings_change", "amount": 10000}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "gastar_en_promo", "label": "Diay, mejor aprovechar una promo de ₡45 000 con la tarjeta", "effects": [{"kind": "expense", "amount": 45000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 5}]}
+    ],
+    "teachingConcept": "budget"
+  },
+  {
+    "eventId": "evt_bank_tuberia_rota",
+    "type": "emergency",
+    "title": "Se reventó un tubo",
+    "narrative": "Mae, se reventó un tubo y el agua ya llega al corredor de tu casa. El plomero puede dejar todo listo hoy por ₡85 000, pero tenés que decidir ya cómo lo vas a pagar.",
+    "npc": {"id": "randall_plomero", "name": "Randall, el plomero del barrio>", "role": "plomero"},
+    "imageKey": "scene_esquina_barrio",
+    "choices": [
+      {"id": "usar_fondo_emergencias", "label": "Usar mi fondo de emergencias", "effects": [{"kind": "expense", "amount": 85000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "pagar_con_tarjeta", "label": "Tarjetazo y luego veo, mae", "effects": [{"kind": "expense", "amount": 85000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": -4}]},
+      {"id": "pedir_gota_a_gota", "label": "Pedir plata gota a gota sin papeleo", "effects": [{"kind": "new_informal_loan", "amount": 85000, "months": 6}, {"kind": "wellbeing_change", "amount": -6}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_bank_refri_sin_motor",
+    "type": "expense",
+    "title": "La refri amaneció tibia",
+    "narrative": "Despertás y la refri está tibia: el queso huele raro y la leche ya no sirve. Don Róger revisa y te dice: “Mae, cambiar el motor cuesta ₡65 000 y hoy mismo queda breteando”. Vos respirás y pensás en esa platita guardada.",
+    "npc": {"id": "don_roger", "name": "Don Róger, el técnico", "role": "Técnico de refrigeración"},
+    "imageKey": "scene_tienda_electro",
+    "choices": [
+      {"id": "usar_fondo_emergencias", "label": "Usar ₡65 000 de mi fondo de emergencias", "effects": [{"kind": "expense", "amount": 65000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "pagar_con_plata_del_mes", "label": "Pagar ₡65 000 con la plata del mes", "effects": [{"kind": "expense", "amount": 65000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -6}]},
+      {"id": "meterlo_a_la_tarjeta", "label": "Meter ₡65 000 a la tarjeta y luego veo", "effects": [{"kind": "expense", "amount": 65000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 1}]},
+      {"id": "aguantar_con_hielo", "label": "Aguantar con ₡8 000 de hielo mientras tanto", "effects": [{"kind": "expense", "amount": 8000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -9}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_bank_excedentes_cooperativa",
+    "type": "bonus",
+    "title": "¡Te cayeron excedentes, mae!",
+    "narrative": "Mae, en la cooperativa te avisaron que te tocan ₡120 000 de excedentes por tus ahorros. La plata cae hoy y varios compas ya están planeando en qué gastarla este finde.",
+    "npc": {"id": "empleada_cooperativa", "name": "Doña Marlene, de la cooperativa", "role": "empleada de cooperativa"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "guardar_todo_emergencia", "label": "Guardarlo todo en mi fondo de emergencia", "effects": [{"kind": "income", "amount": 120000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "mitad_emergencia_mitad_gusto", "label": "Mitad al fondo y mitad para darme un gusto", "effects": [{"kind": "income", "amount": 60000, "source": "emergency_fund"}, {"kind": "income", "amount": 60000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 7}]},
+      {"id": "recibir_efectivo_y_gastar", "label": "Recibirlo en efectivo y gastarlo este finde", "effects": [{"kind": "income", "amount": 120000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 10}]}
+    ],
+    "teachingConcept": "emergency_fund"
+  },
+  {
+    "eventId": "evt_bank_interes_compuesto",
+    "type": "offer",
+    "title": "Tu plata puede crecer sola",
+    "narrative": "En la cooperativa te enseñan una cuenta donde tus ₡100 000 podrían crecer mes a mes si los dejás quietos. Mae, ahí la plata genera intereses sobre intereses, pero no la podrías tocar por un tiempo.",
+    "npc": {"id": "empleada_cooperativa", "name": "Doña Marlene, de la cooperativa", "role": "asesora financiera"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "apartar_cuenta", "label": "Apartar ₡100 000 en esa cuenta", "effects": [{"kind": "expense", "amount": 100000, "source": "cash"}, {"kind": "savings_change", "amount": 100000}]},
+      {"id": "gastarlo_ya", "label": "Gastarme ₡85 000 ya en la tienda", "effects": [{"kind": "expense", "amount": 85000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "guardar_mitad", "label": "Guardar solo ₡50 000 y pensarlo", "effects": [{"kind": "savings_change", "amount": 50000}]}
+    ],
+    "teachingConcept": "compound_interest"
+  },
+  {
+    "eventId": "evt_bank_intereses_crecen",
+    "type": "expense",
+    "title": "Los intereses no duermen",
+    "narrative": "Abrís tu estado y ves un cargo de ₡24 000 solo por intereses: la deuda del mes pasado siguió creciendo sola, mae. Tus compas dicen que lo dejés rodar, pero ese monto ya se sumó a lo que debés.",
+    "npc": {"id": "empleada_banco", "name": "Doña Marlene", "role": "Empleada del banco"},
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pagar_intereses_ya", "label": "Pagar los ₡24 000 de mi plata", "effects": [{"kind": "expense", "amount": 24000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "pasar_a_cuotas", "label": "Pasarlo a cuotas de ₡5 000 por 6 meses", "effects": [{"kind": "new_installment", "amount": 5000, "months": 6}]},
+      {"id": "dejarlo_rodar", "label": "Dejarlo rodar y guardar la plata", "effects": [{"kind": "expense", "amount": 24000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 3}]}
+    ],
+    "teachingConcept": "compound_interest"
+  },
+  {
+    "eventId": "evt_bank_intereses_cooperativa",
+    "type": "bonus",
+    "title": "Los intereses de la cooperativa",
+    "narrative": "En la cooperativa, Marlene te enseña tu estado de cuenta: te abonaron ₡30 000 de intereses. Esa plata se sumó a tu ahorro mientras breteabas, mae, sin que movieras un dedo.",
+    "npc": {"id": "npc_marlene_cooperativa", "name": "Marlene, de la cooperativa", "role": "asesora"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "dejar_en_ahorro", "label": "Dejar los ₡30 000 en el ahorro y que sigan sumando", "effects": [{"kind": "savings_change", "amount": 30000, "source": "savings"}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "pasar_a_emergencias", "label": "Pasar los ₡30 000 a mi fondo de emergencias", "effects": [{"kind": "savings_change", "amount": 30000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "usar_de_prima", "label": "Retirarlos y usarlos de prima para un gustito a cuotas", "effects": [{"kind": "income", "amount": 30000, "source": "cash"}, {"kind": "new_installment", "amount": 20000, "source": "credit_card", "months": 18}, {"kind": "wellbeing_change", "amount": 5}]}
+    ],
+    "teachingConcept": "compound_interest"
+  },
+  {
+    "eventId": "evt_bank_pago_minimo_oferta",
+    "type": "offer",
+    "title": "La facilidad del banco",
+    "narrative": "Mae, te llega el estado de cuenta: el pago total es de ₡85 000, pero el banco te resalta una 'facilidad' para cancelar solo ₡15 000 este mes y seguir como si nada.",
+    "npc": {"id": "npc_ejecutiva_banco", "name": "Marlene, ejecutiva del banco", "role": "banco"},
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pagar_solo_minimo", "label": "Pagar solo el mínimo de ₡15 000 y quedar al día", "effects": [{"kind": "expense", "amount": 15000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -3}]},
+      {"id": "pagar_total", "label": "Pagar el total de ₡85 000 y cortar la deuda ahí", "effects": [{"kind": "expense", "amount": 85000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "pagar_mitad", "label": "Abonar ₡40 000 y dejar el resto para después", "effects": [{"kind": "expense", "amount": 40000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 1}]}
+    ],
+    "teachingConcept": "minimum_payment"
+  },
+  {
+    "eventId": "evt_bank_aviso_tarjeta",
+    "type": "expense",
+    "title": "El aviso del banco",
+    "narrative": "Mae, el banco te avisa que tu tarjeta tiene un saldo de ₡120 000 y el pago mínimo es de ₡15 000. La fecha límite es mañana y sentís la tentación de salir del apuro con lo menos posible.",
+    "npc": {"id": "marisol_banco", "name": "Marisol, del banco", "role": "Ejecutiva de la sucursal"},
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pagar_todo", "label": "Pagar los ₡120 000 completos", "effects": [{"kind": "expense", "amount": 120000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "pagar_minimo", "label": "Pagar solo el mínimo de ₡15 000 y dejar el resto para luego", "effects": [{"kind": "expense", "amount": 15000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "abonar_mitad", "label": "Abonar ₡60 000 ahora y cuidar el resto de la quincena", "effects": [{"kind": "expense", "amount": 60000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 3}]}
+    ],
+    "teachingConcept": "minimum_payment"
+  },
+  {
+    "eventId": "evt_bank_estado_urgente",
+    "type": "emergency",
+    "title": "El estado de cuenta vence mañana",
+    "narrative": "Mae, te llegó el estado de cuenta: debés ₡180 000 y el pago mínimo es de ₡25 000. El banco avisa que vence mañana y ya te están llamando. Diay, ¿cómo vas a salir de este apuro hoy?",
+    "npc": {"id": "npc_ejecutiva_banco", "name": "Marlene, del banco:", "role": "Ejecutiva bancaria"},
+    "imageKey": "scene_estado_cuenta",
+    "choices": [
+      {"id": "pagar_todo", "label": "Pagar los ₡180 000 de una vez", "effects": [{"kind": "expense", "amount": 180000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -4}]},
+      {"id": "pagar_solo_minimo", "label": "Pagar solo el mínimo de ₡25 000 y respirar", "effects": [{"kind": "expense", "amount": 25000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 6}]},
+      {"id": "abonar_mitad", "label": "Abonar ₡90 000 y dejar el resto para después", "effects": [{"kind": "expense", "amount": 90000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -2}]},
+      {"id": "no_pagar_hoy", "label": "No pagar hoy y ver qué pasa", "effects": [{"kind": "wellbeing_change", "amount": -12}]}
+    ],
+    "teachingConcept": "minimum_payment"
+  },
+  {
+    "eventId": "evt_bank_compu_cuotas",
+    "type": "offer",
+    "title": "La compu a cuotas en la cooperativa",
+    "narrative": "Mae, en la cooperativa te muestran una compu para estudiar y bretear: cuesta ₡180 000 de contado, pero te tientan con cuotas de ₡18 000 al mes. La asesora te dice que la estrenás hoy mismo sin soltar toda la plata.",
+    "npc": {"id": "npc_asesora_cooperativa", "name": "Doña Marlene, asesora de la cooperativa.", "role": "asesora"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "llevar_cuotas", "label": "Llevarla a cuotas de ₡18 000 al mes", "effects": [{"kind": "new_installment", "amount": 18000, "months": 12}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "pagar_contado", "label": "Pagar ₡180 000 de contado con mis ahorros", "effects": [{"kind": "expense", "amount": 180000, "source": "savings"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "esperar_y_ahorrar", "label": "Esperar, comparar precios y seguir ahorrando", "effects": [{"kind": "wellbeing_change", "amount": -3}]}
+    ],
+    "teachingConcept": "installments_total_cost"
+  },
+  {
+    "eventId": "evt_bank_lavadora_cuotas",
+    "type": "expense",
+    "title": "La lavadora quiere despegar",
+    "narrative": "Tu lavadora centrifuga como si fuera a despegar y en la tienda ves una en ₡120 000 de contado o en cuotas de ₡9 000 por 18 meses, sin prima y con entrega hoy mismo, mae.",
+    "npc": {"id": "vendedor_randall", "name": "Don Randall", "role": "vendedor de electrodomésticos"},
+    "imageKey": "scene_tienda_electro",
+    "choices": [
+      {"id": "pagar_contado", "label": "Pagarla de contado por ₡120 000", "effects": [{"kind": "expense", "amount": 120000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "llevarla_en_cuotas", "label": "Llevarla hoy en cuotas de ₡9 000 por 18 meses", "effects": [{"kind": "new_installment", "amount": 9000, "months": 18}, {"kind": "wellbeing_change", "amount": 6}]},
+      {"id": "comprar_usada", "label": "Comprar una usada por ₡45 000", "effects": [{"kind": "expense", "amount": 45000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -3}]},
+      {"id": "esperar_y_lavar_a_mano", "label": "Esperar y seguir lavando a mano por ahora", "effects": [{"kind": "wellbeing_change", "amount": -5}]}
+    ],
+    "teachingConcept": "installments_total_cost"
+  },
+  {
+    "eventId": "evt_bank_refri_gota",
+    "type": "emergency",
+    "title": "Plata ya, afuera de la cooperativa",
+    "narrative": "La refri de tu casa deja de enfriar y el técnico cobra ₡90 000 por repararla hoy. En la cooperativa te piden esperar la aprobación, pero afuera un mae te ofrece esa misma plata ya, sin papeleo.",
+    "npc": {"id": "prestamista_barrio", "name": "El mae de la esquina", "role": "Prestamista informal"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "aceptar_gota_a_gota", "label": "Aceptar la plata ya, sin papeleo", "effects": [{"kind": "new_informal_loan", "amount": 90000, "months": 4}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "pagar_con_tarjeta", "label": "Pagar la reparación con la tarjeta", "effects": [{"kind": "expense", "amount": 90000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": -3}]},
+      {"id": "usar_fondo_emergencias", "label": "Usar tu fondo de emergencias", "effects": [{"kind": "expense", "amount": 90000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": -2}]},
+      {"id": "comprar_hielo_mientras_tanto", "label": "Comprar hielo y esperar la aprobación del banco", "effects": [{"kind": "expense", "amount": 20000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -6}]}
+    ],
+    "teachingConcept": "informal_lending"
+  },
+  {
+    "eventId": "evt_bank_prestamo_express",
+    "type": "scam",
+    "title": "Plata express en la soda",
+    "narrative": "Estás en la soda y Don Róger te ofrece ₡100 000 en el acto, sin papeleo ni fiador. Solo te dice: “me lo devolvés en 6 meses, mae”. La plata te caería tuanis para salir ya del apuro.",
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "agarrar_prestamo", "label": "Agarrarlo ya, sin preguntas", "effects": [{"kind": "new_informal_loan", "amount": 100000, "months": 6}]},
+      {"id": "pedir_detalles", "label": "Pedirle todo por escrito y pensarlo", "effects": [{"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "rechazar_prestamo", "label": "Decirle que no y buscar otra opción", "effects": [{"kind": "wellbeing_change", "amount": -3}]}
+    ],
+    "teachingConcept": "informal_lending"
+  },
+  {
+    "eventId": "evt_bank_red_que_duplica",
+    "type": "scam",
+    "title": "La red que lo duplica",
+    "narrative": "Estás en la soda y tu compa Diego te enseña chats de gente cobrando: si metés ₡100 000 hoy, la red te lo duplica en semanas. Te dice que no lo pensés mucho porque los cupos vuelan, mae.",
+    "npc": {"id": "npc_diego", "name": "Diego, tu compa del barrio", "role": "amigo"},
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "invertir_todo", "label": "Meter los ₡100 000 ya, antes de que se acaben los cupos", "effects": [{"kind": "expense", "amount": 100000, "source": "savings"}, {"kind": "wellbeing_change", "amount": -6}]},
+      {"id": "invertir_poco", "label": "Probar con ₡25 000 para ver qué pasa", "effects": [{"kind": "expense", "amount": 25000, "source": "savings"}, {"kind": "wellbeing_change", "amount": -2}]},
+      {"id": "no_invertir", "label": "No meter plata y pedir pruebas de dónde sale la plata", "effects": [{"kind": "wellbeing_change", "amount": 4}]}
+    ],
+    "teachingConcept": "pyramid_scheme"
+  },
+  {
+    "eventId": "evt_bank_cadena_multiplica",
+    "type": "scam",
+    "title": "La cadena que se multiplica",
+    "narrative": "En la soda, tu compa Kevin te enseña chats de gente cobrando y te dice: “Mae, meté ₡50 000 hoy, invitás a dos compas y la plata se multiplica sola. Si no entrás ya, perdés el campo”.",
+    "npc": {"id": "kevin_compa", "name": "Kevin, tu compa de la soda", "role": "amigo"},
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "entrar_ya", "label": "Entrar ya con ₡50 000", "effects": [{"kind": "expense", "amount": 50000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "pedir_papeles", "label": "Pedirle papeles, nombres y tiempo para pensarlo", "effects": [{"kind": "wellbeing_change", "amount": -2}]},
+      {"id": "decir_que_no", "label": "Decirle que no y cambiar de tema", "effects": [{"kind": "wellbeing_change", "amount": 3}]}
+    ],
+    "teachingConcept": "pyramid_scheme"
+  },
+  {
+    "eventId": "evt_bank_club_duplica",
+    "type": "offer",
+    "title": "El club que duplica la plata",
+    "narrative": "En la soda, tu compa Kevin te enseña un chat donde todos presumen ganancias: metés ₡100 000 hoy y te prometen el doble si traés más gente. 'Mae, es tuanis, la vara se mueve sola', te dice.",
+    "npc": {"id": "kevin_compa", "name": "Kevin, tu compa de la soda", "role": "Amigo"},
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "meter_cien_mil", "label": "Meter los ₡100 000 y esperar el doble", "effects": [{"kind": "expense", "amount": 100000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 8}]},
+      {"id": "probar_con_poco", "label": "Probar solo con ₡25 000 a ver qué pasa", "effects": [{"kind": "expense", "amount": 25000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "no_entrar", "label": "Decir que no y seguir comiendo tranquilo", "effects": [{"kind": "wellbeing_change", "amount": -3}]}
+    ],
+    "teachingConcept": "pyramid_scheme"
+  },
+  {
+    "eventId": "evt_bank_inflacion_precios",
+    "type": "macro_news",
+    "title": "Todo está más caro",
+    "narrative": "Mae, en las noticias dicen que los precios de la comida y el pasaje subieron otra vez. En la soda del barrio ya se nota: todo cuesta más y tu plata rinde menos que antes.",
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "ajustar_presupuesto", "label": "Ajustar tu presupuesto de este mes", "effects": [{"kind": "expense", "amount": 12000, "source": "cash"}, {"kind": "price_inflation", "amount": 6}, {"kind": "wellbeing_change", "amount": -3}]},
+      {"id": "tarjetear_diferencia", "label": "Seguir igual y tarjetear la diferencia", "effects": [{"kind": "expense", "amount": 28000, "source": "credit_card"}, {"kind": "price_inflation", "amount": 6}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "comparar_en_feria", "label": "Comprar lo básico en la feria y comparar precios", "effects": [{"kind": "expense", "amount": 8000, "source": "cash"}, {"kind": "price_inflation", "amount": 6}, {"kind": "wellbeing_change", "amount": -1}]}
+    ],
+    "teachingConcept": "inflation"
+  },
+  {
+    "eventId": "evt_bank_inflacion_soda",
+    "type": "expense",
+    "title": "El casado subió de precio",
+    "narrative": "Vas a la soda de doña Carmen y el casado cuesta ₡6 500. La mae te dice que la verdura y el arroz subieron. Sentís que tu mismo presupuesto ahora alcanza para menos que el mes pasado.",
+    "npc": {"id": "dona_carmen", "name": "Doña Carmen", "role": "dueña de la soda"},
+    "imageKey": "scene_soda",
+    "choices": [
+      {"id": "pagar_efectivo", "label": "Pagar en efectivo y ajustar el resto del mes", "effects": [{"kind": "expense", "amount": 6500, "source": "cash"}, {"kind": "wellbeing_change", "amount": -1}]},
+      {"id": "pagar_tarjeta", "label": "Pasarlo a la tarjeta y no tocar el efectivo hoy", "effects": [{"kind": "expense", "amount": 6500, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "cocinar_casa", "label": "Volver a la casa, cocinar y llevar almuerzo mañana", "effects": [{"kind": "expense", "amount": 5000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -2}]}
+    ],
+    "teachingConcept": "inflation"
+  },
+  {
+    "eventId": "evt_bank_dolar_sube_tienda",
+    "type": "macro_news",
+    "title": "El dólar se movió",
+    "narrative": "Mae, en las noticias dicen que el dólar subió y en la tienda ya cambiaron los precios importados. Esos audífonos que querías ahora cuestan ₡60 000 al contado.",
+    "imageKey": "scene_tienda_electro",
+    "choices": [
+      {"id": "comprar_importado_tarjeta", "label": "Comprarlos ya con la tarjeta", "effects": [{"kind": "expense", "amount": 60000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "comprar_opcion_nacional", "label": "Buscar una opción nacional más barata", "effects": [{"kind": "expense", "amount": 35000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "esperar_guardar_plata", "label": "Esperar y guardar plata mientras tanto", "effects": [{"kind": "expense", "amount": 15000, "source": "cash"}, {"kind": "savings_change", "amount": 15000}, {"kind": "wellbeing_change", "amount": -2}]}
+    ],
+    "teachingConcept": "exchange_rate"
+  },
+  {
+    "eventId": "evt_bank_dolar_tienda",
+    "type": "expense",
+    "title": "Los audífonos subieron",
+    "narrative": "En la tienda, Kevin te dice que los audífonos importados que querías para tu brete ahora cuestan ₡68 000 porque el dólar subió. Diay, el precio en colones cambió sin que el producto cambiara.",
+    "imageKey": "scene_tienda_electro",
+    "choices": [
+      {"id": "pagar_efectivo", "label": "Pagar los ₡68 000 en efectivo", "effects": [{"kind": "expense", "amount": 68000, "source": "cash"}]},
+      {"id": "meterlo_a_cuotas", "label": "Meterlo a cuotas de ₡14 000 por mes", "effects": [{"kind": "new_installment", "amount": 14000, "months": 6}]},
+      {"id": "esperar_que_baje", "label": "Esperar a ver si el dólar baja", "effects": [{"kind": "wellbeing_change", "amount": -4}]}
+    ],
+    "teachingConcept": "exchange_rate"
+  },
+  {
+    "eventId": "evt_bank_dolares_cooperativa",
+    "type": "offer",
+    "title": "¿Lo pagás en dólares, mae?",
+    "narrative": "Estás en la cooperativa y Marlene te enseña un parlante importado: cuesta ₡180 000 en colones hoy, o podés llevarlo en cuotas en dólares que cada mes se convierten al tipo de cambio del día.",
+    "npc": {"id": "marlene_cooperativa", "name": "Marlene, de la cooperativa", "role": "asesora"},
+    "imageKey": "scene_cooperativa",
+    "choices": [
+      {"id": "pagar_colones", "label": "Pagalo ya en colones por ₡180 000", "effects": [{"kind": "expense", "amount": 180000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 6}]},
+      {"id": "cuotas_dolares", "label": "Aceptá cuotas en dólares de ₡15 000 al mes", "effects": [{"kind": "new_installment", "amount": 15000, "source": "credit_card", "months": 12}]},
+      {"id": "guardar_plata", "label": "No comprarlo y guardar ₡20 000", "effects": [{"kind": "savings_change", "amount": 20000}, {"kind": "wellbeing_change", "amount": 2}]}
+    ],
+    "teachingConcept": "exchange_rate"
+  },
+  {
+    "eventId": "evt_bank_primer_pago_neto",
+    "type": "income",
+    "title": "Tu primer pago neto",
+    "narrative": "Primer pago de tu brete en la oficina: te depositan ₡185 000 ya con los rebajos de planilla de la CCSS. Tu compa te dice: “Mae, gastá tranquilo, eso era más plata”, y te enseña un antojo carísimo.",
+    "npc": {"id": "npc_marlene_planilla", "name": "Doña Marlene", "role": "Encargada de planilla"},
+    "imageKey": "scene_oficina",
+    "choices": [
+      {"id": "revisar_colilla", "label": "Revisar la colilla y presupuestar con el neto", "effects": [{"kind": "income", "amount": 185000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 5}]},
+      {"id": "guardar_una_parte", "label": "Guardar una parte apenas cae el depósito", "effects": [{"kind": "income", "amount": 185000, "source": "cash"}, {"kind": "savings_change", "amount": 50000, "source": "savings"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "gastar_sin_revisar", "label": "Diay, celebrar ya y gastar sin revisar nada", "effects": [{"kind": "income", "amount": 185000, "source": "cash"}, {"kind": "expense", "amount": 60000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 4}]}
+    ],
+    "teachingConcept": "payroll_deductions"
+  },
+  {
+    "eventId": "evt_bank_pago_menor",
+    "type": "expense",
+    "title": "El pago llegó más bajo",
+    "narrative": "Mae, cayó tu primer pago del brete y vienen ₡60 000 menos de lo esperado. En la oficina, doña Marlene te muestra la colilla: ya trae rebajos de CCSS y renta. Hoy vence un recibo y quedaste corto.",
+    "npc": {"id": "donna_marlene", "name": "Doña Marlene, de planilla", "role": "Planilla"},
+    "imageKey": "scene_oficina",
+    "choices": [
+      {"id": "usar_fondo", "label": "Cubrirlo con tu fondo de emergencia", "effects": [{"kind": "expense", "amount": 60000, "source": "emergency_fund"}, {"kind": "wellbeing_change", "amount": -3}]},
+      {"id": "pasar_tarjeta", "label": "Pasarlo a la tarjeta y salir del apuro", "effects": [{"kind": "expense", "amount": 60000, "source": "credit_card"}, {"kind": "wellbeing_change", "amount": 3}]},
+      {"id": "pedir_gota", "label": "Pedirlo gota a gota, sin papeleo", "effects": [{"kind": "new_informal_loan", "amount": 60000, "months": 6}, {"kind": "wellbeing_change", "amount": 2}]},
+      {"id": "pagar_mitad", "label": "Negociar y pagar la mitad hoy", "effects": [{"kind": "expense", "amount": 30000, "source": "cash"}, {"kind": "wellbeing_change", "amount": -2}]}
+    ],
+    "teachingConcept": "payroll_deductions"
+  },
+  {
+    "eventId": "evt_bank_bono_colilla",
+    "type": "bonus",
+    "title": "El bono llegó con rebajos",
+    "narrative": "En la oficina te anuncian un bono de ₡150 000 por tu buen brete, pero al revisar la colilla ves rebajos de CCSS y renta. Tu compa te dice: “Mae, diay, gastátelo ya, vos te lo merecés”.",
+    "npc": {"id": "jefe_oficina", "name": "Don Róger", "role": "jefe de oficina"},
+    "imageKey": "scene_oficina",
+    "choices": [
+      {"id": "revisar_colilla_guardar", "label": "Revisar la colilla y guardar una parte del bono", "effects": [{"kind": "income", "amount": 150000, "source": "cash"}, {"kind": "savings_change", "amount": 60000}, {"kind": "wellbeing_change", "amount": 4}]},
+      {"id": "gastarlo_de_una", "label": "Diay, gastarlo casi todo en un gustazo esta semana", "effects": [{"kind": "income", "amount": 150000, "source": "cash"}, {"kind": "expense", "amount": 140000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 6}]},
+      {"id": "presupuesto_con_deposito", "label": "Hacer el presupuesto solo con lo que sí me depositaron", "effects": [{"kind": "income", "amount": 150000, "source": "cash"}, {"kind": "expense", "amount": 45000, "source": "cash"}, {"kind": "wellbeing_change", "amount": 2}]}
+    ],
+    "teachingConcept": "payroll_deductions"
   }
 ]
