@@ -463,6 +463,7 @@ namespace ColonQuest.UI
                 case StationType.Beach:
                     return "[E]  " + station.DisplayName;
                 case StationType.Furniture:
+                case StationType.Courses:
                     return "[E]  " + station.DisplayName;
                 case StationType.Work:
                     return WorkPrompt();
@@ -514,6 +515,9 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Furniture:
                     ShowFurniture();
+                    break;
+                case StationType.Courses:
+                    ShowCourses();
                     break;
                 case StationType.Work:
                     session.FinishShift();
