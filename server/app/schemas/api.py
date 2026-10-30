@@ -93,3 +93,8 @@ class HealthResponse(ContractModel):
     version: str
     database: Literal["ok", "unavailable", "not_configured"]
     budget: BudgetInfo | None = None
+    open_weights_budget: BudgetInfo | None = None  # Baseten NPCs, separate daily budget
+
+
+class PingResponse(ContractModel):
+    status: Literal["ok"]
