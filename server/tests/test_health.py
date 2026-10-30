@@ -19,6 +19,13 @@ def test_health_without_database() -> None:
     }
 
 
+def test_uptime_checks_with_head_are_accepted() -> None:
+    # UptimeRobot sends HEAD by default; 405 here took the monitor down on Oct 29.
+    client = TestClient(app)
+    assert client.head("/api/ping").status_code == 200
+    assert client.head("/api/health").status_code == 200
+
+
 def test_ping_needs_no_database_or_model() -> None:
     response = TestClient(app).get("/api/ping")
 
