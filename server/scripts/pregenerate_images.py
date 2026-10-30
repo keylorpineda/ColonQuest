@@ -5,6 +5,7 @@ Usage (from server/, with MODEL_API_KEY and DATABASE_URL in .env):
     uv run python scripts/pregenerate_images.py --force    # regenerate every key
     uv run python scripts/pregenerate_images.py --only npc_kevin_vendedor
 
+Images cached at full size by an earlier run are shrunk in place without a new call.
 Makes real, billed calls: each image takes 14 to 17 s and costs $0.01. Images are stored in the
 `images` table exactly like GET /api/images/{key}, so the game reads them from the cache and never
 waits on Muse Image. Run it against the QA database first. Exits 1 if any image fails.
@@ -25,7 +26,7 @@ from app.config import get_settings
 from app.db import CachedImage
 from app.db.session import get_engine, get_sessionmaker
 from app.game_master.ledger import DbLedger
-from app.images.service import CARD_SUBJECTS, ImageService
+from app.images.service import CARD_SUBJECTS, ImageService, shrink_image
 from app.providers.meta import MetaProvider
 
 FALLBACK_EVENTS = Path(__file__).resolve().parents[1] / "app/game_master/fallback_events.json"
@@ -66,19 +67,28 @@ async def main() -> int:
     total_ms = 0
     try:
         async with get_sessionmaker()() as db:
-            cached = set(
-                (
+            cached = {
+                image.key: image
+                for image in (
                     await db.execute(
-                        select(CachedImage.key).where(
+                        select(CachedImage).where(
                             CachedImage.key.in_(keys), CachedImage.data.is_not(None)
                         )
                     )
                 ).scalars()
-            )
+            }
             ledger = DbLedger(db, settings, None)
             for key in keys:
-                if key in cached and not args.force:
-                    print(f"SKIP  {key:<30} already cached")
+                image = cached.get(key)
+                if image is not None and image.data is not None and not args.force:
+                    # Old 1600x1600 images are shrunk in place, without a new call.
+                    data, media_type = shrink_image(image.data, image.media_type)
+                    if data is not image.data:
+                        image.data, image.media_type = data, media_type
+                        await db.commit()
+                        print(f"SHRINK {key:<29} {len(data) // 1024} KB")
+                    else:
+                        print(f"SKIP  {key:<30} already cached")
                     skipped += 1
                     continue
                 outcome = await service.generate(ledger, key)
