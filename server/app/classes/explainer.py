@@ -133,7 +133,7 @@ class ClassExplainer:
         if figures.students == 0:
             return Explanation(fallback_explanation(figures), "fallback")
         model = select_text_model(
-            self._settings.summary_model, await ledger.budget_mode(), self._settings
+            self._settings.class_report_model, await ledger.budget_mode(), self._settings
         )
         if model is None:
             return Explanation(fallback_explanation(figures), "fallback")
