@@ -66,6 +66,7 @@ namespace ColonQuest.Game
         public List<long> goalTargets = new List<long>();
         public List<long> goalStarts = new List<long>();
         public List<bool> goalsDone = new List<bool>();
+        public long quincenaPaidThisMonth;
     }
 
     /// <summary>One saved game: its name, when it was last played and the run.</summary>

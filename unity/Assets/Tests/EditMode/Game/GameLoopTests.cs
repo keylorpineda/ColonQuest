@@ -196,5 +196,46 @@ namespace ColonQuest.Game.Tests
             // 120 000 + 50 000 - 180 000 card - 25 000 x 33 installments
             Assert.AreEqual(120_000L + 50_000L - 180_000L - 825_000L, GameRules.NetWorth(state));
         }
+
+        [Test]
+        public void Quincena_IsPaidAtEndOfDay2_AndRemainderAtMonthClose()
+        {
+            long startingCash = loop.State.Cash;
+            long salaryNet = loop.State.SalaryNet;
+            long half = salaryNet / 2L;
+
+            // Day 1: work and sleep to Day 2
+            loop.ClockIn();
+            loop.FinishShift();
+            loop.Sleep();
+            Assert.AreEqual(2, loop.Clock.Day);
+            Assert.AreEqual(0L, loop.QuincenaPaidThisMonth);
+
+            // Day 2: work and sleep to Day 3 (end of day 2: quincena triggers)
+            long quincenaNotice = 0L;
+            loop.QuincenaPaid += q => quincenaNotice = q;
+            loop.ClockIn();
+            loop.FinishShift();
+            loop.Sleep();
+
+            Assert.AreEqual(3, loop.Clock.Day);
+            Assert.AreEqual(half, loop.QuincenaPaidThisMonth);
+            Assert.AreEqual(half, quincenaNotice);
+            Assert.AreEqual(startingCash + half, loop.State.Cash);
+            Assert.IsTrue(loop.State.History.Contains("sinpe_quincena"));
+
+            // Day 3: work and sleep to Day 4
+            loop.ClockIn();
+            loop.FinishShift();
+            loop.Sleep();
+            Assert.AreEqual(4, loop.Clock.Day);
+
+            // Day 4: work and close month: remaining salary is paid
+            loop.ClockIn();
+            loop.FinishShift();
+            var report = loop.CloseMonth();
+            Assert.AreEqual(salaryNet, report.SalaryCredited);
+            Assert.AreEqual(0L, loop.QuincenaPaidThisMonth);
+        }
     }
 }

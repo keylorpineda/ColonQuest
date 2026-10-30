@@ -6,7 +6,8 @@ namespace ColonQuest.Game
     {
         Helper,
         Cashier,
-        Manager
+        Manager,
+        Administrator
     }
 
     public enum CourseKind
@@ -49,7 +50,7 @@ namespace ColonQuest.Game
     /// </summary>
     public static class Career
     {
-        public const JobPosition TopPosition = JobPosition.Manager;
+        public const JobPosition TopPosition = JobPosition.Administrator;
 
         /// <summary>A class takes this many minutes of the afternoon.</summary>
         public const float ClassMinutes = 240f;
@@ -77,6 +78,8 @@ namespace ColonQuest.Game
                     return 430_000L;
                 case JobPosition.Manager:
                     return 560_000L;
+                case JobPosition.Administrator:
+                    return 720_000L;
                 default:
                     return GameRules.MinimumWageGross;
             }
@@ -85,13 +88,23 @@ namespace ColonQuest.Game
         /// <summary>The days on time that the next position asks for.</summary>
         public static int PunctualDaysFor(JobPosition next)
         {
-            return next == JobPosition.Manager ? 7 : 3;
+            switch (next)
+            {
+                case JobPosition.Cashier:
+                    return 3;
+                case JobPosition.Manager:
+                    return 7;
+                case JobPosition.Administrator:
+                    return 12;
+                default:
+                    return 3;
+            }
         }
 
         /// <summary>The course that the next position asks for.</summary>
         public static CourseKind CourseFor(JobPosition next)
         {
-            return next == JobPosition.Manager ? CourseKind.Una : CourseKind.Ina;
+            return next == JobPosition.Cashier ? CourseKind.Ina : CourseKind.Una;
         }
     }
 

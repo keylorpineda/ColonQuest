@@ -86,6 +86,18 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Motorbike_ProgressTracksSavingsAndVehicleOwnership()
+        {
+            var loop = new GameLoop();
+            var goal = new Goal(GoalKind.BuyMotorbike, 150_000L, 0L);
+            loop.State.Savings = 75_000L;
+            Assert.AreEqual(0.5f, GoalBook.Progress(goal, loop.State, loop.Holdings), 0.001f);
+
+            loop.State.History.Add("bought_car");
+            Assert.AreEqual(1f, GoalBook.Progress(goal, loop.State, loop.Holdings), "holding vehicle achieves goal");
+        }
+
+        [Test]
         public void Goals_AreSavedWithTheRun()
         {
             var loop = new GameLoop();

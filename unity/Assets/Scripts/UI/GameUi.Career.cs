@@ -123,6 +123,8 @@ namespace ColonQuest.UI
                     return PlayerProfile.Pick("Cajero", "Cajera");
                 case JobPosition.Manager:
                     return PlayerProfile.Pick("Encargado", "Encargada");
+                case JobPosition.Administrator:
+                    return PlayerProfile.Pick("Administrador", "Administradora");
                 default:
                     return PlayerProfile.Pick("Ayudante", "Ayudante");
             }
