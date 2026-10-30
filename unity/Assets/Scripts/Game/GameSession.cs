@@ -82,7 +82,7 @@ namespace ColonQuest.Game
             }
             if (Loop != null && Loop.Job != null)
             {
-                clone.JobPosition = Loop.Job.Current.ToString();
+                clone.JobPosition = Loop.Job.Position.ToString();
             }
             return clone;
         }
