@@ -81,11 +81,14 @@ async def structured_completion[T: BaseModel](
     output: type[T],
     reasoning_effort: ReasoningEffort | None = None,
     max_tokens: int = 2048,
+    timeout_s: float | None = None,
 ) -> StructuredResult[T]:
     """Ask for JSON that matches ``output`` and validate it with Pydantic."""
     extra: dict[str, Any] = {}
     if reasoning_effort is not None:
         extra["reasoning_effort"] = reasoning_effort
+    if timeout_s is not None:
+        extra["timeout"] = timeout_s  # per-request override of the client's default
     messages: list[ChatCompletionMessageParam] = [
         {"role": "system", "content": system},
         {"role": "user", "content": user},

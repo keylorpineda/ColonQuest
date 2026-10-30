@@ -54,6 +54,7 @@ class OpenWeightsProvider:
         output: type[T],
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
+        timeout_s: float | None = None,
     ) -> StructuredResult[T]:
         if not self.configured:
             raise ProviderUnavailableError("open-weights endpoint is not configured")
@@ -67,4 +68,5 @@ class OpenWeightsProvider:
             output=output,
             reasoning_effort=reasoning_effort or "low",
             max_tokens=max_tokens + REASONING_HEADROOM_TOKENS,
+            timeout_s=timeout_s,
         )
