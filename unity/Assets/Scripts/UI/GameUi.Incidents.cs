@@ -146,22 +146,85 @@ namespace ColonQuest.UI
             });
         }
 
-        /// <summary>The arrest: the police lights flash over the screen with the siren, and then the cell door closes behind the player.</summary>
+        /// <summary>
+        /// The arrest, as a scene: siren and lights, the officer steps up beside the player, the player raises the hands,
+        /// the handcuffs click on and they walk a few steps together. Then the station, where the cell gate slams shut.
+        /// Space skips the scene; the sentence itself was already applied by the finance engine.
+        /// </summary>
         private System.Collections.IEnumerator ArrestSequence()
         {
-            PlayerController.Frozen = true;
             AudioDirector.Effect(SoundEffectKind.Siren);
-            effects.Siren(2.2f);
-            yield return new WaitForSecondsRealtime(2.2f);
-            PlayerController.Frozen = false;
+            effects.Siren(ArrestSirenSeconds);
+
+            // The officer's lines belong to no place: they stay until they end.
+            sceneStation = null;
+            bool finished = false;
+            var scene = ArrestScene();
+            if (scene == null || !scene.Play(() => finished = true))
+            {
+                PlayerController.Frozen = true;
+                yield return new WaitForSecondsRealtime(ArrestSirenSeconds);
+                PlayerController.Frozen = false;
+                finished = true;
+            }
+
+            while (!finished)
+            {
+                yield return null;
+            }
+
             SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
             while (SceneTransition.IsBusy)
             {
                 yield return null;
             }
 
-            AudioDirector.Effect(SoundEffectKind.Slam);
+            yield return new WaitForSecondsRealtime(0.3f);
+            CellGate.Lock(true);
             effects.Flash(new Color(0f, 0f, 0f, 0.7f), 0.6f);
+        }
+
+        private const float ArrestSirenSeconds = 2.2f;
+
+        /// <summary>The arrest with the officer who stopped the player, or null when no officer is close enough to act it.</summary>
+        private Interaction ArrestScene()
+        {
+            var officer = NearestOfficer(HeroAt(), 6f);
+            if (officer == null)
+            {
+                return null;
+            }
+
+            Vector2 me = HeroAt();
+            float side = officer.position.x >= me.x ? 1f : -1f;
+            Vector2 beside = me + new Vector2(side * 0.9f, 0f);
+            Vector2 away = new Vector2(0f, -1.4f);
+            string cop = officer.name;
+            return new Interaction()
+                .NpcWalk(cop, beside, 0.5f).Wait(0.5f).Face(beside)
+                .Say("Oficial", "¡Manos arriba! Queda detenido.")
+                .Pose(PersonPose.HandsUp, 1.3f)
+                .NpcPose(cop, PersonPose.Handover, 1.1f).Sound(SoundEffectKind.Cuffs)
+                .Fly("cuffs", beside + new Vector2(0f, 0.3f), me + new Vector2(0f, 0.15f), 0.4f).Wait(0.6f)
+                .Say("Oficial", "Acompáñeme a la comisaría.")
+                .NpcWalk(cop, beside + away, 1.0f).WalkTo(me + away).Wait(0.3f);
+        }
+
+        private static Transform NearestOfficer(Vector2 at, float within)
+        {
+            Transform best = null;
+            float bestDistance = within;
+            foreach (var officer in FindObjectsByType<PoliceOfficer>(FindObjectsSortMode.None))
+            {
+                float distance = Vector2.Distance(officer.transform.position, at);
+                if (officer.isActiveAndEnabled && distance <= bestDistance)
+                {
+                    best = officer.transform;
+                    bestDistance = distance;
+                }
+            }
+
+            return best;
         }
 
         // ---------------------------------------------------------------- health insurance

@@ -20,7 +20,8 @@ namespace ColonQuest.World
         Cook,
         Wash,
         Reach,
-        SitEat
+        SitEat,
+        HandsUp
     }
 
     /// <summary>
@@ -117,6 +118,14 @@ namespace ColonQuest.World
                 {
                     float stretch = Mathf.Clamp01(t * 4f);
                     return new PoseAngles { ArmR = 68f * stretch, ElbowR = 18f * stretch, Lean = 6f * stretch };
+                }
+
+                case PersonPose.HandsUp:
+                {
+                    // Both arms go up beside the head, the elbows a little bent, with a small nervous shake.
+                    float raise = Mathf.Clamp01(t * 3f);
+                    float shake = Mathf.Sin(t * 9f) * 3f * raise;
+                    return new PoseAngles { ArmR = 150f * raise + shake, ElbowR = 25f * raise, ArmL = -150f * raise - shake, ElbowL = -25f * raise };
                 }
 
                 case PersonPose.Wash:
