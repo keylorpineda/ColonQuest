@@ -126,3 +126,66 @@ def test_build_npc_provider_routing() -> None:
     assert isinstance(
         build_npc_provider(open_weights_settings(), meta, configured), FallbackProvider
     )
+
+
+async def test_open_weights_chat_sends_tools_with_low_effort_and_headroom() -> None:
+    seen: dict[str, Any] = {}
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen["body"] = json.loads(request.content)
+        return httpx2.Response(200, json=completion('{"text": "Mae, a 36 meses sale tuanis."}'))
+
+    provider = OpenWeightsProvider(
+        open_weights_settings(),
+        http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(handler)),
+    )
+    tool = {"type": "function", "function": {"name": "quote_term", "parameters": {}}}
+    turn = await provider.chat(
+        model="muse-spark-1.3",
+        messages=[{"role": "user", "content": "¿Y a más meses?"}],
+        tools=[tool],
+        output=Line,
+        reasoning_effort="minimal",
+        max_tokens=2400,
+    )
+
+    assert turn.content is not None and "36 meses" in turn.content
+    assert turn.usage.provider == "open_weights"
+    assert seen["body"]["model"] == "muse-spark-open"
+    assert seen["body"]["tools"][0]["function"]["name"] == "quote_term"
+    assert seen["body"]["reasoning_effort"] == "low"
+    assert seen["body"]["max_tokens"] == 2400 + REASONING_HEADROOM_TOKENS
+
+
+async def test_fallback_provider_sends_a_failed_agent_step_to_meta() -> None:
+    from app.providers.base import ChatTurn
+
+    from .fakes import FakeToolProvider
+
+    def meta_turn() -> ChatTurn:
+        return ChatTurn(content='{"text": "Meta"}', tool_calls=[], usage=Usage("m"), latency_ms=1)
+
+    def down() -> ChatTurn:
+        raise ProviderUnavailableError("baseten down")
+
+    primary, meta = FakeToolProvider(down), FakeToolProvider(meta_turn)
+    turn = await FallbackProvider(primary, meta, timeout_s=1).chat(  # type: ignore[arg-type]
+        model="muse-spark-1.3", messages=[], tools=[], output=Line
+    )
+
+    assert turn.content == '{"text": "Meta"}'
+    assert meta.calls[0]["model"] == "muse-spark-1.3"
+
+
+async def test_spent_open_weights_budget_sends_npcs_to_meta() -> None:
+    class Spent:
+        async def exhausted(self) -> bool:
+            return True
+
+    primary, meta = FakeProvider(meta_answer()), FakeProvider(meta_answer())
+    router = FallbackProvider(primary, meta, timeout_s=1, budget=Spent())  # type: ignore[arg-type]
+    result = await router.structured(model="muse-spark-1.3", system="s", user="u", output=Line)
+
+    assert result.value.text == "desde Meta"
+    assert primary.calls == []
+    assert len(meta.calls) == 1

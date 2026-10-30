@@ -5,7 +5,9 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cost_guard import (
+    OPEN_WEIGHTS_PROVIDER,
     BudgetMode,
+    OpenWeightsBudget,
     budget_mode,
     budget_status,
     estimate_cost,
@@ -92,16 +94,54 @@ async def test_record_and_sum_daily_spend(db: AsyncSession) -> None:
     assert status.remaining_usd == Decimal("0.5")
 
 
-def test_open_weights_calls_do_not_spend_meta_budget() -> None:
+def test_open_weights_calls_are_priced_like_spark() -> None:
     usage = Usage(
         model="muse-spark-open", input_tokens=50_000, output_tokens=5_000, provider="open_weights"
     )
-    assert estimate_cost(usage) == Decimal(0)
+    # 50k x $1.25 + 5k x $4.25 per million
+    assert estimate_cost(usage) == Decimal("0.083750")
 
 
 @pytest.mark.anyio
-async def test_record_call_stores_the_answering_provider(db: AsyncSession) -> None:
-    usage = Usage(model="muse-spark-open", input_tokens=10, provider="open_weights")
-    call = await record_call(db, usage=usage, endpoint="negotiation", latency_ms=5, ok=True)
+async def test_each_provider_spends_its_own_budget(db: AsyncSession) -> None:
+    open_usage = Usage(model="muse-spark-open", input_tokens=800_000, provider="open_weights")
+    meta_usage = Usage(model="muse-spark-1.3", input_tokens=800_000)
+    call = await record_call(db, usage=open_usage, endpoint="negotiation", latency_ms=5, ok=True)
+    await record_call(db, usage=meta_usage, endpoint="event", latency_ms=5, ok=True)
+
     assert call.provider == "open_weights"
-    assert call.estimated_cost_usd == Decimal(0)
+    assert await spent_today(db) == Decimal(1)
+    assert await spent_today(db, provider=OPEN_WEIGHTS_PROVIDER) == Decimal(1)
+    status = await budget_status(db, budget_usd=1, provider=OPEN_WEIGHTS_PROVIDER)
+    assert status.mode == BudgetMode.FALLBACK_ONLY
+
+
+@pytest.mark.anyio
+async def test_open_weights_budget_is_cached_and_never_blocks_on_errors(
+    db: AsyncSession,
+) -> None:
+    from contextlib import asynccontextmanager
+
+    from sqlalchemy.exc import OperationalError
+
+    opened: list[int] = []
+
+    @asynccontextmanager
+    async def factory():  # type: ignore[no-untyped-def]
+        opened.append(1)
+        yield db
+
+    usage = Usage(model="muse-spark-open", input_tokens=3_000_000, provider="open_weights")
+    await record_call(db, usage=usage, endpoint="negotiation", latency_ms=5, ok=True)
+    budget = OpenWeightsBudget(factory, budget_usd=3, ttl_s=60)
+
+    assert await budget.exhausted()
+    assert await budget.exhausted()
+    assert len(opened) == 1  # second answer came from the cache
+
+    @asynccontextmanager
+    async def broken():  # type: ignore[no-untyped-def]
+        raise OperationalError("select", {}, Exception("neon asleep"))
+        yield db
+
+    assert not await OpenWeightsBudget(broken, budget_usd=3).exhausted()

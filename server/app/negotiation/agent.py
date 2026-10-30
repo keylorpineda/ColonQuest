@@ -28,7 +28,7 @@ from app.negotiation.service import (
     ordered,
 )
 from app.providers.base import ProviderError, ToolCallingProvider
-from app.schemas import NegotiationReply
+from app.schemas import KeyQuestion, NegotiationReply
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,9 @@ earnings. Call it before mentioning any other term, and quote its figures exactl
 earnings.
 - You may omit figures until asked, but never lie: if the player asks for the total cost, the \
 interest or the insurance, give the exact figure for the term you are offering.
-- Use at most 3 tool calls, then answer with the JSON only."""
+- Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
+{"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \
+"dealStatus": "open" | "accepted" | "walked_away"}"""
 )
 
 
@@ -64,9 +66,10 @@ class SellerAgent:
         offer: Offer,
         player_text: str,
         history: Sequence[PreviousTurn] = (),
+        habits: Sequence[KeyQuestion] = (),
     ) -> NegotiationOutcome:
         if not self._settings.seller_agent:
-            return await self._base.reply(ledger, session_id, offer, player_text, history)
+            return await self._base.reply(ledger, session_id, offer, player_text, history, habits)
         model = select_text_model(
             self._settings.game_master_model, await ledger.budget_mode(), self._settings
         )
@@ -78,7 +81,7 @@ class SellerAgent:
             endpoint=ENDPOINT,
             model=model,
             system=AGENT_SYSTEM_PROMPT,
-            user=build_user_prompt(offer, history, player_text),
+            user=build_user_prompt(offer, history, player_text, habits),
             output=SellerTurn,
             tools=SELLER_TOOLS,
             context=ToolContext(offer=offer),
@@ -94,7 +97,7 @@ class SellerAgent:
             return self._base.fallback(offer, player_text)
         except ProviderError as error:
             logger.warning("seller agent failed (%s); using the base negotiator", error)
-            return await self._base.reply(ledger, session_id, offer, player_text, history)
+            return await self._base.reply(ledger, session_id, offer, player_text, history, habits)
 
         turn = result.value
         bad = invalid_amounts(turn.npc_reply, offer, quotable_amounts(result.tool_results))

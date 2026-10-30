@@ -294,7 +294,10 @@ partida de 3 meses cuesta unos $0.04 de Meta; un turno de negociación en Basete
 - Límite por sesión: máximo de llamadas por partida y por IP.
 - Caché de respuestas idénticas.
 - En desarrollo, `GAME_MASTER_MODEL=muse-spark-1.3-contributor`.
-- El gasto de Baseten todavía no tiene tope propio (pendiente: `OPEN_WEIGHTS_DAILY_BUDGET_USD`).
+- El gasto de Baseten tiene tope propio: `OPEN_WEIGHTS_DAILY_BUDGET_USD` (3 por defecto). Al llegar,
+  los personajes pasan a la API de Meta hasta la medianoche UTC. `/api/health` muestra ambos presupuestos.
+- `GET /api/ping` responde sin tocar Neon ni los modelos: es el que usa UptimeRobot para mantener
+  despierto Render.
 - `MAX_CALLS_PER_CLIENT_PER_DAY` es 200 por IP; el día del piloto subirlo (todo el colegio sale por una IP).
 
 ## Base de datos (Neon)

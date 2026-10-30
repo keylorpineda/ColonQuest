@@ -11,7 +11,7 @@
 
 From Costa Rica to the world. A 2D financial-literacy game for Costa Rican students, built by the
 DoWhile Team for the Meta Global AI Developer Hackathon 2026 (Indie track). Every money decision
-becomes a story: you decide, Muse Wonder narrates, the C# engine computes the exact colones, and
+becomes a story: you decide, Muse Spark narrates, the C# engine computes the exact colones, and
 you negotiate by voice. The AI tells the story; the engine keeps the books.
 
 ### The problem
@@ -28,7 +28,7 @@ smiling at you. That is the skill Colón Quest trains. The game teaches players 
 ### How a month plays
 
 Your salary arrives with CCSS and income tax already deducted. You decide what to pay, save or
-borrow. Muse Wonder writes one event built for your situation and the C# engine applies it in
+borrow. Muse Spark writes one event built for your situation and the C# engine applies it in
 whole colones. When a seller shows up, you negotiate out loud: the real price, rate, insurance and
 commission only come out if you ask.
 
@@ -45,10 +45,15 @@ commission only come out if you ask.
 
 | Model | Role |
 | --- | --- |
-| Muse Wonder | Game master and the voices of the characters |
-| Muse Spark | Season plan, year-end summary, Class Mode reports |
+| Muse Spark | Live game master: the monthly event, with tools; Class Mode reports |
+| Muse Wonder | Plans your year in the background, writes the year-end summary and the offline event bank |
+| Muse Spark Open (Baseten) | The sellers: commission tactics with tools and memory of what you asked |
 | Muse Voice Transcribe | You negotiate out loud; typing always works too |
-| Muse Image | Pixel-art portraits, pre-generated and cached |
+| Muse Image | Portraits, event scenes and the year card art, pre-generated and without text |
+
+Each role follows measured latency: only Spark answers inside the game's 8 s every time, so the
+slow writer, Wonder, only runs where you are not waiting. See
+[ADR 0004](docs/adr/0004-model-roles.md).
 
 ### Agents
 
@@ -65,8 +70,8 @@ Behind feature flags, see [ADR 0003](docs/adr/0003-agentic-game-master.md).
 
 A Unity 2D client (WebGL and desktop, C# finance engine) talks JSON with a FastAPI backend
 (Pydantic v2 contracts, cost guard, agents). The backend calls the Meta Model API, stores
-sessions and decisions in Neon Postgres, and can optionally run the characters on open-weight
-models on Baseten or Modal.
+sessions and decisions in Neon Postgres, and runs the sellers on Muse Spark Open in Baseten,
+falling back to Meta if it fails or runs out of its own daily budget.
 
 - No amount, rate or balance ever comes from a model.
 - Money is an integer number of colones.

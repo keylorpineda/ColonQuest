@@ -40,6 +40,17 @@ less reliable.
   result (its earnings never are), otherwise a scripted reply is served. Steps are recorded as
   `negotiation_agent`; provider errors use the single-call negotiator, timeouts the scripted
   reply, and `X-Reply-Source: agent` marks agent replies.
+- **Seller on open weights** (Oct 29): with `NPC_PROVIDER=open_weights` the agent steps run on
+  Muse Spark Open in Baseten (`OpenWeightsProvider.chat`, `reasoning_effort: low` plus 3 072
+  tokens of headroom); any failing or late step goes to Meta through `FallbackProvider.chat`.
+  Baseten does not enforce the JSON schema when tools are present, so the prompt spells out the
+  three keys of the final answer.
+- **Seller memory**: each turn also receives `playerHabits`, the key questions the player asked
+  other sellers in the same session (`negotiations.key_questions_asked`), so the seller changes
+  tactic ("ya sé que vos preguntás por el seguro"). The figure guard is unchanged.
+- Measured on QA (Oct 29, 5 turns, 2 offers): 3.3 to 5.3 s per turn, 8 Baseten steps of 1.5 to
+  2.5 s, `quote_term` used to push 60 months; one invented amount was caught by the guard and
+  served the scripted reply.
 - Budget and per-session/IP limits are checked before the agent starts; at 80 % of the daily
   budget the agent runs on Spark, at 100 % it never runs.
 
