@@ -11,7 +11,7 @@
 
 De Costa Rica para el mundo. Un juego 2D de educación financiera para estudiantes de Costa Rica,
 hecho por DoWhile Team para el Meta Global AI Developer Hackathon 2026 (track Indie). Cada
-decisión de plata se vuelve una historia: vos decidís, Muse Wonder narra, el motor en C# calcula
+decisión de plata se vuelve una historia: vos decidís, Muse Spark narra, el motor en C# calcula
 los colones exactos y negociás con la voz. La IA cuenta la historia; el motor lleva las cuentas.
 
 ### El problema
@@ -29,7 +29,7 @@ cuatro trampas:
 ### Cómo se juega un mes
 
 Te llega el salario con el rebajo de la CCSS y la renta. Decidís qué pagar, ahorrar o pedir
-prestado. Muse Wonder escribe un evento hecho para tu situación y el motor en C# lo aplica en
+prestado. Muse Spark escribe un evento hecho para tu situación y el motor en C# lo aplica en
 colones enteros. Cuando aparece un vendedor, negociás en voz alta: el precio, la tasa, el seguro y
 la comisión reales solo salen si preguntás.
 
@@ -46,10 +46,15 @@ la comisión reales solo salen si preguntás.
 
 | Modelo | Rol |
 | --- | --- |
-| Muse Wonder | Game master y la voz de los personajes |
-| Muse Spark | Plan de temporada, resumen del año y reportes del Modo Clase |
+| Muse Spark | Game master en vivo: el evento de cada mes, con herramientas; reportes del Modo Clase |
+| Muse Wonder | Planifica tu año en segundo plano, escribe el resumen del año y el banco de eventos |
+| Muse Spark Open (Baseten) | Los vendedores: tácticas de comisión con herramientas y memoria de lo que preguntaste |
 | Muse Voice Transcribe | Negociás en voz alta; escribir siempre sirve |
-| Muse Image | Retratos en pixel art, pre-generados y en caché |
+| Muse Image | Retratos, escenas de los eventos y la postal del año, pre-generados y sin texto |
+
+Cada rol sale de latencias medidas: solo Spark responde siempre dentro de los 8 s del juego, así
+que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver
+[ADR 0004](docs/adr/0004-model-roles.md).
 
 ### Agentes
 
@@ -66,8 +71,8 @@ inglés).
 
 Un cliente Unity 2D (WebGL y escritorio, motor financiero en C#) se comunica por JSON con un
 backend FastAPI (contratos Pydantic v2, control de costos, agentes). El backend llama a la API de
-modelos de Meta, guarda sesiones y decisiones en Neon Postgres y puede correr los personajes en
-modelos abiertos en Baseten o Modal.
+modelos de Meta, guarda sesiones y decisiones en Neon Postgres y corre los vendedores en Muse
+Spark Open en Baseten, con respaldo en Meta si falla o se acaba su presupuesto diario.
 
 - Ningún monto, tasa ni saldo sale de un modelo.
 - La plata es un número entero de colones.
