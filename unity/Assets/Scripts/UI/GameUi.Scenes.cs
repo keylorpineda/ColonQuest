@@ -19,8 +19,11 @@ namespace ColonQuest.UI
 
         private void OnSpoke(string speaker, string text)
         {
-            subtitles.Show(string.IsNullOrEmpty(speaker) ? string.Empty : Loc.T(speaker), Loc.T(text));
+            ShowSpeech(sceneStation, string.IsNullOrEmpty(speaker) ? string.Empty : Loc.T(speaker), Loc.T(text));
         }
+
+        /// <summary>The station whose scene plays now: the lines said in it belong to that place.</summary>
+        private Station sceneStation;
 
         /// <summary>Plays the scene of the station, and runs the original action when the scene says so. Without a scene the action runs at once.</summary>
         private void Interact(Station station)
@@ -29,6 +32,8 @@ namespace ColonQuest.UI
             {
                 return;
             }
+
+            sceneStation = station;
 
             var scene = SceneFor(station, () => InteractNow(station));
             if (scene == null || !scene.Play())
@@ -135,7 +140,14 @@ namespace ColonQuest.UI
                 case StationType.Pyramid:
                 case StationType.Soda:
                 case StationType.Coop:
-                    return session.Loop.CanDoTask(station.Type) ? TalkScene(station, then) : null;
+                    if (!session.Loop.CanDoTask(station.Type))
+                    {
+                        return null;
+                    }
+
+                    // The game master starts writing now, so the greeting hides most of the wait.
+                    session.PrefetchTask(station.Type);
+                    return TalkScene(station, then);
                 default:
                     return null;
             }
