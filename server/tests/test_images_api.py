@@ -1,7 +1,9 @@
+import io
 from collections.abc import AsyncIterator
 
 import httpx2
 import pytest
+from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,7 +12,13 @@ from app.config import Settings
 from app.cost_guard import BudgetMode
 from app.db import CachedImage, ModelCall
 from app.db.session import get_session
-from app.images.service import FALLBACK_PNG, ImageService, build_image_prompt
+from app.images.service import (
+    FALLBACK_PNG,
+    MAX_IMAGE_SIDE,
+    ImageService,
+    build_image_prompt,
+    shrink_image,
+)
 from app.main import create_app
 from app.providers.base import GeneratedImage, ProviderUnavailableError, Usage
 
@@ -154,3 +162,25 @@ async def test_get_image_does_not_cache_fallback_when_provider_fails(
 async def test_get_image_rejects_invalid_key(client: httpx2.AsyncClient) -> None:
     response = await client.get("/api/images/INVALID-KEY!")
     assert response.status_code == 422
+
+
+def _png(side: int) -> bytes:
+    output = io.BytesIO()
+    Image.new("RGB", (side, side), (200, 120, 40)).save(output, format="PNG")
+    return output.getvalue()
+
+
+def test_shrink_image_downscales_large_model_output() -> None:
+    data, media_type = shrink_image(_png(1600), "image/png")
+
+    with Image.open(io.BytesIO(data)) as image:
+        assert image.size == (MAX_IMAGE_SIDE, MAX_IMAGE_SIDE)
+        assert image.mode == "P"
+    assert media_type == "image/png"
+
+
+def test_shrink_image_keeps_small_paletted_or_unreadable_data() -> None:
+    small, _ = shrink_image(_png(64), "image/png")
+
+    assert shrink_image(small, "image/png") == (small, "image/png")
+    assert shrink_image(b"not an image", "image/webp") == (b"not an image", "image/webp")
