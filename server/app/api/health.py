@@ -21,13 +21,14 @@ def budget_info(status: BudgetStatus) -> BudgetInfo:
     )
 
 
-@router.get("/ping", response_model=PingResponse)
+# UptimeRobot checks with HEAD by default; a GET-only route answers it with 405 Method Not Allowed.
+@router.api_route("/ping", methods=["GET", "HEAD"], response_model=PingResponse)
 async def ping() -> PingResponse:
     """Keep-alive for UptimeRobot: wakes Render without touching Neon or any model."""
     return PingResponse(status="ok")
 
 
-@router.get("/health", response_model=HealthResponse)
+@router.api_route("/health", methods=["GET", "HEAD"], response_model=HealthResponse)
 async def get_health(db: OptionalDbSession, settings: AppSettings) -> HealthResponse:
     """Always answers 200 so uptime checks see the process; the body says what is degraded."""
     if db is None:
