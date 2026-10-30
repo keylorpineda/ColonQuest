@@ -74,7 +74,8 @@ namespace ColonQuest.UI
             var text = new StringBuilder();
             text.AppendLine(Loc.T("Un oficial te para y te pide los papeles: alguien llamó a la policía porque estás dentro de una casa que no es tuya."));
             text.AppendLine();
-            text.Append(Loc.F("Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", Money.Format(MarketAssumptions.TrespassFine), MarketAssumptions.JailDaysLost));
+            text.AppendLine(Loc.F("Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", Money.Format(MarketAssumptions.TrespassFine), MarketAssumptions.JailDaysLost));
+            text.Append(Loc.F("Te quedas en la celda {0}. Puedes esperar a cumplir la condena o pagar la fianza.", JailSentence.Clock(JailSentence.TermSeconds(session.Loop.Arrests))));
 
             var options = new List<ModalOption>
             {
@@ -86,6 +87,8 @@ namespace ColonQuest.UI
                     {
                         if (session.Arrest())
                         {
+                            // The term depends on how many times the player was taken away before this one.
+                            StartSentence(JailSentence.TermSeconds(session.Loop.Arrests - 1));
                             SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
                         }
                     }

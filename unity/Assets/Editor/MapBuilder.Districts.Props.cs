@@ -261,6 +261,8 @@ namespace ColonQuest.EditorTools
 
         private static void BuildMarketStations(Transform parent)
         {
+            // The shore of the beach: a swim once a month, if the swimsuit was bought.
+            BuildStation(parent, "Station_Beach", StationType.Beach, "Darse un chapuzón en el mar", new Vector2(-12f, -25.6f));
             // The real estate agency, the farm, the car agency, the police station and the hospital are entered by their doors.
             Doorway(parent, new Vector2(RealEstateSpot.x, 33.2f), SceneNames.Inmobiliaria);
             BuildSpawnPoint(parent, SpawnIds.TownFromInmobiliaria, new Vector2(RealEstateSpot.x, 31.6f));

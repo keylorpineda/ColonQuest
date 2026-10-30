@@ -19,6 +19,13 @@ namespace ColonQuest.World
         /// <summary>Where the last house door of the town left the player, so the shared house interior leads back to the right door.</summary>
         public static string RememberedReturn { get; private set; } = string.Empty;
 
+        /// <summary>True while the player serves a sentence: no door of the cell opens.</summary>
+        public static bool Locked { get; set; }
+
+        public static string LockedThought { get; set; } = string.Empty;
+
+        private static float nextLockedThought;
+
         /// <summary>How close to the entry direction the walk must be (1 is straight on, 0 is sideways).</summary>
         private const float MinimumAlignment = 0.5f;
 
@@ -76,6 +83,17 @@ namespace ColonQuest.World
         {
             if (!other.CompareTag(Station.PlayerTag))
             {
+                return;
+            }
+
+            if (Locked)
+            {
+                if (Time.time >= nextLockedThought && !string.IsNullOrEmpty(LockedThought))
+                {
+                    nextLockedThought = Time.time + 6f;
+                    Thoughts.Say(LockedThought);
+                }
+
                 return;
             }
 

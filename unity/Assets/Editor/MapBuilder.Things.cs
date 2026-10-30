@@ -15,9 +15,7 @@ namespace ColonQuest.EditorTools
             BuildThing(things, "Bed", "Acostarte un rato", new Vector2(-5.1f, 3.85f), new Vector2(2.3f, 2.4f),
                 "Te tirás un rato en la cama. Dormir bien también es plata: cansado se compra por impulso.",
                 "Mañana hay que trabajar. Ponés la alarma y pensás en lo que te queda: {cash} en efectivo.");
-            BuildThing(things, "Wardrobe", "Abrir el ropero", new Vector2(-7.6f, 2.3f), new Vector2(0.9f, 2.2f),
-                "Hay ropa que casi no usás y todavía la estás pagando a cuotas. Antes de comprar más, revisá lo que ya tenés.",
-                "Una camisa para la entrevista, una para el fin de semana. Suficiente.");
+            BuildStation(things, "Station_Wardrobe", StationType.Wardrobe, "Abrir el ropero", new Vector2(-7.6f, 1.0f));
             BuildThing(things, "Shower", "Bañarte", new Vector2(0.8f, 4.35f), new Vector2(1.35f, 1.45f),
                 "Agua caliente con la ducha eléctrica. Baños cortos, recibo de luz más bajito.");
             BuildThing(things, "Sink", "Lavarte las manos", new Vector2(-1.5f, 2.4f), new Vector2(0.6f, 0.9f),

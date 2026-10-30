@@ -32,7 +32,13 @@ namespace ColonQuest.World
         Farm,
 
         /// <summary>The reception of the hospital, where the health insurance is taken out. Not a task.</summary>
-        HealthDesk
+        HealthDesk,
+
+        /// <summary>The wardrobe at home, where the swimsuit is bought. Not a task.</summary>
+        Wardrobe,
+
+        /// <summary>The shore of the beach: a swim once a month, with the swimsuit. Not a task.</summary>
+        Beach
     }
 
     /// <summary>

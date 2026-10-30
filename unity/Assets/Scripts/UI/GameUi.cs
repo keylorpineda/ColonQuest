@@ -78,6 +78,7 @@ namespace ColonQuest.UI
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
             BuildIncidents();
+            BuildCell();
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
@@ -236,6 +237,7 @@ namespace ColonQuest.UI
             }
 
             TickIncidents();
+            TickCell();
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
 
             if (pause.IsOpen)
@@ -362,6 +364,8 @@ namespace ColonQuest.UI
                 case StationType.CarDealer:
                 case StationType.Farm:
                 case StationType.HealthDesk:
+                case StationType.Wardrobe:
+                case StationType.Beach:
                     return "[E]  " + station.DisplayName;
                 default:
                     if (loop.CanDoTask(station.Type))
@@ -402,6 +406,12 @@ namespace ColonQuest.UI
                 case StationType.HealthDesk:
                     ShowHealthDesk();
                     break;
+                case StationType.Wardrobe:
+                    ShowWardrobe();
+                    break;
+                case StationType.Beach:
+                    ShowBeach();
+                    break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
                     {
@@ -416,6 +426,7 @@ namespace ColonQuest.UI
 
         private void CloseWindows()
         {
+            ResetSentence();
             modal.Hide();
             phone.Close();
             negotiationPanel.Hide();

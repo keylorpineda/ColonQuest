@@ -399,6 +399,41 @@ namespace ColonQuest.Game
             return true;
         }
 
+        /// <summary>The player pays the bail and leaves the cell.</summary>
+        public bool PayBail(long cost)
+        {
+            if (Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.PayBail(cost));
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool BuySwimsuit()
+        {
+            return Apply(Loop.BuySwimsuit());
+        }
+
+        public bool Swim()
+        {
+            return Apply(Loop.Swim());
+        }
+
+        private bool Apply(ChoiceOutcome outcome)
+        {
+            if (outcome == null || Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(outcome);
+            Changed?.Invoke();
+            return true;
+        }
+
         /// <summary>An officer fines the player for crossing on red. Nothing else changes.</summary>
         public bool FineRedLight()
         {
