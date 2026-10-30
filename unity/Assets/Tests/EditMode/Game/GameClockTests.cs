@@ -97,6 +97,7 @@ namespace ColonQuest.Game.Tests
         {
             var loop = new GameLoop();
             int mood = loop.State.Wellbeing;
+            loop.ClockIn();
 
             Assert.IsNotNull(loop.Sleep(), "the first night rests");
             Assert.AreEqual(2, loop.Clock.Day);

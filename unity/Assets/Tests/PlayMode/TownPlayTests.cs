@@ -251,6 +251,8 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(13, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the car agency, the police station, the hospital, the real estate agency, the farm and every free house");
             Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
             Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
+            Assert.AreEqual(StationType.Work, GameObject.Find("Station_Work").GetComponent<Station>().Type);
+            Assert.IsNotNull(GameObject.Find("TimeClock"), "the time clock hangs on the wall of the soda");
         }
 
         [UnityTest]
