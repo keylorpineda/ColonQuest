@@ -94,6 +94,9 @@ namespace ColonQuest.UI
             BuildIncidents();
             BuildCell();
 
+            // A new game can create the overlay from the menu, which has its own screen.
+            canvas.enabled = SceneManager.GetActiveScene().name != SceneNames.Menu;
+
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
             session.NegotiationUpdated += OnNegotiationChanged;
@@ -214,6 +217,7 @@ namespace ColonQuest.UI
             canvas.enabled = scene.name != SceneNames.Menu;
             HideSpeech();
             usedStations.Clear();
+            TryStartOpening(scene);
             BindStations();
         }
 
@@ -395,6 +399,13 @@ namespace ColonQuest.UI
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OpenPause();
+                return;
+            }
+
+            if (openingPlaying)
+            {
+                promptCard.SetActive(true);
+                promptText.text = Loc.T(SkipHint);
                 return;
             }
 

@@ -412,7 +412,7 @@ namespace ColonQuest.UI
             Vector2 me = Here(station);
             Vector2 seller = PersonAt("Vendedor", Here(station, 0f, 2.4f));
             return new Interaction().WalkTo(me).Face(seller)
-                .NpcPose("Vendedor", PersonPose.Wave, 1.6f).Say("Kevin", "¡Hola, mae! Venga, le enseño lo que tengo.")
+                .NpcPose("Vendedor", PersonPose.Wave, 1.6f).Say("Kevin", PlayerProfile.HasName ? Loc.F("¡Hola, {0}! Venga, le enseño lo que tengo.", PlayerProfile.Name) : "¡Hola, mae! Venga, le enseño lo que tengo.")
                 .Wait(1.2f).Sound(SoundEffectKind.Swish).Fly("paper", seller, me + new Vector2(0f, 0.3f), 0.8f)
                 .Pose(PersonPose.Read, 1.4f).Sound(SoundEffectKind.Scribble)
                 .Apply(then);
@@ -474,7 +474,7 @@ namespace ColonQuest.UI
                 case StationType.Lender:
                     who = "Prestamista";
                     speaker = "El prestamista";
-                    line = "Tranquilo, amigo. Plata rápida, sin papeleo ni preguntas.";
+                    line = PlayerProfile.Pick("Tranquilo, amigo. Plata rápida, sin papeleo ni preguntas.", "Tranquila, amiga. Plata rápida, sin papeleo ni preguntas.");
                     break;
                 case StationType.Pyramid:
                     who = "Promotor";
@@ -484,7 +484,7 @@ namespace ColonQuest.UI
                 case StationType.Coop:
                     who = "AsesoraCoop";
                     speaker = "La asesora";
-                    line = "Bienvenido a la cooperativa. Veamos cómo cuidar sus ahorros.";
+                    line = PlayerProfile.Pick("Bienvenido a la cooperativa. Veamos cómo cuidar sus ahorros.", "Bienvenida a la cooperativa. Veamos cómo cuidar sus ahorros.");
                     break;
                 default:
                     who = "DonaLucia";

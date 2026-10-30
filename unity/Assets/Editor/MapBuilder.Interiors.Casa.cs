@@ -14,6 +14,7 @@ namespace ColonQuest.EditorTools
         private const float BedroomRight = -2.0f;
         private const float BathroomRight = 1.6f;
         private const string HouseWallFace = "#E9DDC9";
+        private const string OpeningMother = "Mama";
 
         private static void BuildHouseLayout(InteriorParts parts, Room room)
         {
@@ -65,6 +66,12 @@ namespace ColonQuest.EditorTools
             var wardrobe = IL(parts.Props, "Wardrobe");
             Solid(wardrobe, "Wardrobe", rounded, -7.6f, 2.3f, 0.9f, 2.2f, "#7A4F2A");
             BuildWardrobeInside(wardrobe);
+
+            // The player's mother, only there in the opening scene.
+            BuildNpc(parts.People, OpeningMother, new Vector2(-4.0f, 1.7f), new Look
+            {
+                Skin = "#5FA38C", SkinTone = "#D9A47A", HairColor = "#555A66", Hair = HairStyle.Bun, Pants = "#6B5B50", Face = Expression.Warm
+            }, false).gameObject.AddComponent<OpeningActor>();
 
             Rug(IL(parts.Floor, "BedroomRug"), -5.1f, 1.85f, 2.2f, 0.9f, "#B98E6A", "#8E6A4C");
             Window(IL(parts.Labels, "BedroomWindow"), -5.1f, 5.6f, 1.4f);
