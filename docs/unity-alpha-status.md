@@ -11,10 +11,12 @@ interface (`MainMenu`, `UiKit`): a cartoon sky with drifting clouds and bobbing 
 | Button | What it does |
 | --- | --- |
 | Modo historia | Starts a new life (`GameSession.StartNewGame`, or the first run when no session exists yet) and loads `Town` |
-| Jugar online | Only shows "Disponible en la versión completa"; nothing else happens |
+| Jugar online | Only shows "Disponible en la versión completa" and what the online mode does and does not send; nothing else happens |
 | Ajustes | Sound on or off and the volume in steps of 10 %. Applied to `AudioDirector` at once and kept in PlayerPrefs (`GameSettings`) |
 | Créditos | DoWhile Team (Keylor and Jefferson, the same credit) and the Meta tools the client uses: Muse Wonder, Muse Spark, Muse Voice Transcribe |
 | Salir | `Application.Quit`. Not shown in the browser build |
+
+The menu is drawn in layers that move a little with the mouse; every button grows and lights its border under the cursor and taps when pressed. The title, loading and credit lines show `BuildInfo.Label` ("Alpha 0.1.16") and "Design by DoWhile Team". Starting a story and coming back to the menu go through `LoadingScreen`.
 
 In the town, Esc opens the pause window (not while the game master is answering, a window is open or the phone
 is up): Reanudar, Ajustes and Volver al menú. Time stops while it is up. Going back to the menu takes two
@@ -31,6 +33,12 @@ flow has PlayMode tests in `MenuPlayTests.cs` (`MenuPlayTests` and `PausePlayTes
 | Neighbor's house (`Vecino`, the house next to the rental sign) | Not the player's house. The owner counts down (9 s) and, if the player is still inside, calls the police: an officer comes in and goes to the player. A fine exists only when an officer reaches the player and stops them (no officer, no fine; leaving before he arrives costs nothing). Teaches that a fine costs money and time |
 | Police station (`Carcel`, east end of the avenue) | Counter, judge and four cells. After an arrest: a fine (cash, then card), two days of the month lost and a lower mood |
 | Street crosswalks (plaza, south street, east street) | Each has a pedestrian light (9 s green, 11 s red) and a police officer standing nearby. Crossing on red only raises the offense; a fine (illustrative, in `MarketAssumptions`) exists only when the officer reaches the player. No jail and no lost days. Teaches that a small fine is still money |
+| Real estate agency (`Inmobiliaria`) and the farm (`Finca`) | Both have an inside now. The agency has a wall of photographs and an agent who talks (a face and typed text); the farm has stalls, hay and Don Beto. The windows are the ones the stations used to open outside. A house with a sign is not sold at its door: the player thinks of going to the agency |
+| Every other house | Enterable. They share the neighbor's interior, and the door the player came in by is the one they leave through (`Door.RememberedReturn`) |
+| Cell and bail | An arrest is a real-time term in the cell (5, 10 or 15 minutes by how many arrests so far). The door stays locked; the bail (each minute left costs `BailPerMinute`) opens it. Pure rules in `JailSentence` |
+| Swimsuit and the sea | The wardrobe at home sells a swimsuit; with it, the beach gives one swim a month that lifts the mood. Without it the water only brings a thought |
+| Car hit and arrest | The hit throws the player, spins and leaves stars over them (`HitAnimation`); the arrest flashes the police lights with a siren (`ScreenEffects`) |
+| Subtitles and thoughts | Everyday objects and people speak as a line at the bottom (`SubtitleBar`); the player's own thoughts (map edge, water, houses on the market, a locked door) use it too |
 | Hospital (`Hospital` and `HospitalArriba`, north avenue between the car agency and the river) | Two floors: reception and emergency ward below, consulting rooms and lab above. A car that runs the player over (once a month at most) sends them here: a bill, one day lost and a lower mood. The emergency fund pays first, then cash, then the card |
 | Health insurance | Taken out at the hospital reception, generic (no institution is named). A monthly premium; with it the patient pays a share of the bill instead of all of it |
 | Collectors' car | A black car with tinted windows and loud music patrols the main street now and then. When the player is in arrears (an informal loan, or a card at 90 % of its limit) and ends up in front of it, it stops and offers three choices: pay, negotiate (half now, the rest as a new informal loan with a surcharge) or ignore (late fee and a lower mood) |
@@ -104,6 +112,9 @@ them with a warning. Money for these purchases moves only in `FinanceEngine` (`H
   so a person has to open `Assets/Scenes/Town.unity` and judge them. The amounts are constants in
   `MapBuilder.Realism.cs` and `DayCycle.cs`.
 - The `₡` sign in the built-in UI font and the text layout of the windows.
+- Everything of the last round (menu, loading screen, subtitles, interiors, cell, hit and arrest animations, step sounds, the system fonts, the backend images and the year postcard): written without compiling or running anything.
+- The pictures: the portraits (`npc_don_rafa_mecanico`, `npc_kevin_vendedor`, `npc_dona_marta_vendedora`, `npc_prestamista_gota_a_gota`, `npc_amigo_piramide`), the scenes of the events (`imageKey`) and the three postcards (`card_year_*`, chosen by the debt at the end, behind the end window) are asked for with the names that `server/scripts/pregenerate_images.py` produces. Nobody has seen them on screen.
+- Builds now point to `https://colon-quest-api.onrender.com/api`; the editor and the tests keep the local backend. The browser build needs its host in `ALLOWED_ORIGINS`.
 - Frame rate in a browser. The town has thousands of sprite renderers; the download is small but the draw
   cost is unmeasured.
 - The deployed backend URL. `ApiConfig` still points to `http://localhost:8000/api`.

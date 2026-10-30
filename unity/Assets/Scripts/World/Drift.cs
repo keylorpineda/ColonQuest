@@ -8,10 +8,26 @@ namespace ColonQuest.World
         [SerializeField] private Vector2 velocity = new Vector2(0.4f, 0.05f);
         [SerializeField] private Vector2 halfRange = new Vector2(45f, 28f);
 
+        [SerializeField] private bool laneWrap;
+        [SerializeField] private float laneMinX;
+        [SerializeField] private float laneMaxX;
+
         public void Configure(Vector2 speed, Vector2 range)
         {
             velocity = speed;
             halfRange = range;
+        }
+
+        /// <summary>
+        /// A car on its lane: it wraps around only beyond both ends of the walkable map, so it leaves the street out of
+        /// sight instead of vanishing where the player can see it.
+        /// </summary>
+        public void ConfigureLane(float speedX, float minX, float maxX)
+        {
+            velocity = new Vector2(speedX, 0f);
+            laneWrap = true;
+            laneMinX = minX;
+            laneMaxX = maxX;
         }
 
         private void Update()
@@ -19,6 +35,21 @@ namespace ColonQuest.World
             Vector3 position = transform.localPosition;
             position.x += velocity.x * Time.deltaTime;
             position.y += velocity.y * Time.deltaTime;
+
+            if (laneWrap)
+            {
+                if (position.x > laneMaxX)
+                {
+                    position.x = laneMinX;
+                }
+                else if (position.x < laneMinX)
+                {
+                    position.x = laneMaxX;
+                }
+
+                transform.localPosition = position;
+                return;
+            }
 
             if (position.x > halfRange.x)
             {

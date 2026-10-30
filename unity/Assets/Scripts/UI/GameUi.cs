@@ -24,6 +24,8 @@ namespace ColonQuest.UI
         /// <summary>How many times each everyday object was used, so its lines rotate.</summary>
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
+        private SubtitleBar subtitles;
+        private ScreenEffects effects;
         private NegotiationPanel negotiationPanel;
         private PhoneUi phone;
         private PauseMenu pause;
@@ -40,6 +42,7 @@ namespace ColonQuest.UI
         private GameObject promptCard;
         private Text promptText;
         private GameObject loadingCard;
+        private Text loadingText;
 
         private const float BarWidth = 190f;
 
@@ -70,10 +73,16 @@ namespace ColonQuest.UI
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
+            subtitles = new SubtitleBar(canvas.transform);
+            effects = new ScreenEffects(canvas.transform);
+            Thoughts.Said += OnThought;
+            Interaction.Spoke += OnSpoke;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
+            negotiationPanel.SignContract = PlayContract;
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
             BuildIncidents();
+            BuildCell();
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
@@ -99,6 +108,8 @@ namespace ColonQuest.UI
             }
 
             ReleaseIncidents();
+            Thoughts.Said -= OnThought;
+            Interaction.Spoke -= OnSpoke;
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -177,7 +188,7 @@ namespace ColonQuest.UI
         {
             var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(640f, 120f), new Vector2(0.5f, 0.5f), Vector2.zero);
             loadingCard = card.parent.gameObject;
-            UiKit.Label(card, "El game master está pensando...", 34, UiKit.Ink, new Vector2(580f, 80f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+            loadingText = UiKit.Label(card, string.Empty, 34, UiKit.Ink, new Vector2(580f, 80f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             loadingCard.SetActive(false);
         }
 
@@ -187,6 +198,7 @@ namespace ColonQuest.UI
         {
             // The overlay lives across scenes, but the main menu has its own screen.
             canvas.enabled = scene.name != SceneNames.Menu;
+            subtitles.Hide();
             BindStations();
         }
 
@@ -230,6 +242,9 @@ namespace ColonQuest.UI
             }
 
             TickIncidents();
+            TickCell();
+            effects.Tick(Time.unscaledDeltaTime);
+            subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
 
             if (pause.IsOpen)
             {
@@ -276,6 +291,14 @@ namespace ColonQuest.UI
 
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
+            if (loadingCard.activeSelf)
+            {
+                // The wait for the summary of the year says what is being made, with dots that come and go.
+                string wait = Loc.T(session.Finishing ? "Armando tu año" : "El game master está pensando");
+                loadingText.text = wait + new string('.', 1 + (int)(Time.unscaledTime * 2.5f) % 3);
+            }
+
+            RemoteImages.Prefetch();
 
             modal.Tick(Time.unscaledDeltaTime);
             if (open)
@@ -298,9 +321,9 @@ namespace ColonQuest.UI
                 return;
             }
 
-            if (!session.Busy && Input.GetKeyDown(KeyCode.P))
+            if (!session.Busy && !Interaction.Playing && Input.GetKeyDown(KeyCode.P))
             {
-                phone.Open();
+                OpenPhone();
                 return;
             }
 
@@ -311,7 +334,7 @@ namespace ColonQuest.UI
             }
 
             var station = Nearby;
-            string text = station != null && !session.Busy ? PromptFor(station) : null;
+            string text = station != null && !session.Busy && !Interaction.Playing ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
             if (text != null)
             {
@@ -347,6 +370,8 @@ namespace ColonQuest.UI
                 case StationType.CarDealer:
                 case StationType.Farm:
                 case StationType.HealthDesk:
+                case StationType.Wardrobe:
+                case StationType.Beach:
                     return "[E]  " + station.DisplayName;
                 default:
                     if (loop.CanDoTask(station.Type))
@@ -358,7 +383,8 @@ namespace ColonQuest.UI
             }
         }
 
-        private void Interact(Station station)
+        /// <summary>What the station does once its scene is over (see GameUi.Scenes.cs): opens its window or starts its task.</summary>
+        private void InteractNow(Station station)
         {
             switch (station.Type)
             {
@@ -387,6 +413,12 @@ namespace ColonQuest.UI
                 case StationType.HealthDesk:
                     ShowHealthDesk();
                     break;
+                case StationType.Wardrobe:
+                    ShowWardrobe();
+                    break;
+                case StationType.Beach:
+                    ShowBeach();
+                    break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
                     {
@@ -401,6 +433,7 @@ namespace ColonQuest.UI
 
         private void CloseWindows()
         {
+            ResetSentence();
             modal.Hide();
             phone.Close();
             negotiationPanel.Hide();
@@ -473,6 +506,7 @@ namespace ColonQuest.UI
                 who = (who.Length > 0 ? who + "  ·  " : string.Empty) + Loc.T("evento local");
             }
 
+            modal.Backdrop = RemoteImages.Get(gameEvent.ImageKey);
             AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
             modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
         }
@@ -604,7 +638,45 @@ namespace ColonQuest.UI
             {
                 walker.Greet(player.transform.position, 8f);
             }
-            modal.Show(station.DisplayName, null, line, new[] { Continue(null) }, station.DisplayName);
+
+            // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
+            bool person = station.name == "Thing_Talk";
+            subtitles.Show(person ? Loc.T(PersonName(station)) : string.Empty, line);
+        }
+
+        /// <summary>The name that goes before what a person says: the one of the character, or a plain word for a passer-by.</summary>
+        private static string PersonName(Station station)
+        {
+            var root = station.transform.parent;
+            string name = root != null ? root.name : string.Empty;
+            if (string.IsNullOrEmpty(name) || name.StartsWith("Peaton"))
+            {
+                return "Vecino";
+            }
+
+            if (name == "Estafador")
+            {
+                return "El del puesto";
+            }
+
+            // "DonBeto" is shown as "Don Beto".
+            var spaced = new StringBuilder();
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (i > 0 && char.IsUpper(name[i]) && char.IsLower(name[i - 1]))
+                {
+                    spaced.Append(' ');
+                }
+
+                spaced.Append(name[i]);
+            }
+
+            return spaced.ToString();
+        }
+
+        private void OnThought(string spanish)
+        {
+            subtitles.Show(string.Empty, Loc.T(spanish));
         }
 
         private void ShowStatement()
@@ -636,6 +708,7 @@ namespace ColonQuest.UI
         private void ShowEnd(SessionSummary summary)
         {
             phone.Close();
+            modal.Backdrop = RemoteImages.Get(PostcardKeys.For(summary.TotalDebt));
             var text = new StringBuilder();
             text.AppendLine(Loc.T(summary.Narrative));
             text.AppendLine();
@@ -690,13 +763,13 @@ namespace ColonQuest.UI
         {
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
-            SceneManager.LoadScene(SceneNames.Menu);
+            LoadingScreen.Load(SceneNames.Menu);
         }
 
         private void Restart()
         {
             session.StartNewGame();
-            SceneManager.LoadScene(SceneNames.Town);
+            LoadingScreen.Load(SceneNames.Town);
         }
 
         private static ModalOption Continue(System.Action then)

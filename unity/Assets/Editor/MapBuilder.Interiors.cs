@@ -34,6 +34,8 @@ namespace ColonQuest.EditorTools
             BuildInterior(SceneNames.Hospital);
             BuildInterior(SceneNames.HospitalArriba);
             BuildInterior(SceneNames.Vecino);
+            BuildInterior(SceneNames.Finca);
+            BuildInterior(SceneNames.Inmobiliaria);
         }
 
         private static Room RoomFor(string sceneName)
@@ -54,6 +56,10 @@ namespace ColonQuest.EditorTools
                     return new Room { Name = "HospitalArriba", Center = Vector2.zero, Size = MapLayout.HospitalArribaSize, Color = GamePalette.Hex("#DCEBF5") };
                 case SceneNames.Vecino:
                     return new Room { Name = "Vecino", Center = Vector2.zero, Size = MapLayout.VecinoSize, Color = GamePalette.Hex("#CFA97A") };
+                case SceneNames.Finca:
+                    return new Room { Name = "Finca", Center = Vector2.zero, Size = MapLayout.FincaSize, Color = GamePalette.Hex("#B98C5A") };
+                case SceneNames.Inmobiliaria:
+                    return new Room { Name = "Inmobiliaria", Center = Vector2.zero, Size = MapLayout.InmobiliariaSize, Color = GamePalette.Hex("#D9E6EA") };
                 default:
                     return new Room { Name = "Banco", Center = Vector2.zero, Size = MapLayout.BancoSize, Color = GamePalette.FloorBank };
             }
@@ -78,6 +84,10 @@ namespace ColonQuest.EditorTools
                     return MapLayout.HospitalArribaMat;
                 case SceneNames.Vecino:
                     return MapLayout.VecinoMat;
+                case SceneNames.Finca:
+                    return MapLayout.FincaMat;
+                case SceneNames.Inmobiliaria:
+                    return MapLayout.InmobiliariaMat;
                 default:
                     return MapLayout.BancoMat;
             }
@@ -101,6 +111,10 @@ namespace ColonQuest.EditorTools
                     return SpawnIds.HospitalFromAbove;
                 case SceneNames.Vecino:
                     return SpawnIds.TownFromVecino;
+                case SceneNames.Finca:
+                    return SpawnIds.TownFromFinca;
+                case SceneNames.Inmobiliaria:
+                    return SpawnIds.TownFromInmobiliaria;
                 default:
                     return SpawnIds.TownFromBanco;
             }
@@ -154,6 +168,12 @@ namespace ColonQuest.EditorTools
                     break;
                 case SceneNames.Vecino:
                     BuildNeighborLayout(layout, room);
+                    break;
+                case SceneNames.Finca:
+                    BuildFarmLayout(layout, room);
+                    break;
+                case SceneNames.Inmobiliaria:
+                    BuildRealEstateLayout(layout, room);
                     break;
                 default:
                     BuildBankLayout(layout, room);
@@ -219,7 +239,13 @@ namespace ColonQuest.EditorTools
             trigger.transform.SetParent(parent, false);
             trigger.transform.localPosition = position;
             trigger.AddComponent<BoxCollider2D>().size = new Vector2(1.6f, 0.8f);
-            trigger.AddComponent<Door>().Configure(exitScene, townSpawn);
+            var door = trigger.AddComponent<Door>();
+            door.Configure(exitScene, townSpawn);
+            if (townSpawn == SpawnIds.TownFromVecino)
+            {
+                door.RememberReturn();
+            }
+
             trigger.GetComponent<BoxCollider2D>().isTrigger = true;
         }
 

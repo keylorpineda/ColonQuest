@@ -86,7 +86,7 @@ namespace ColonQuest.EditorTools
         /// <summary>The menu is the first scene, then the town; the interiors follow. Only scenes that exist are listed.</summary>
         private static void UpdateBuildSettings()
         {
-            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino };
+            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino, SceneNames.Finca, SceneNames.Inmobiliaria };
             var list = new System.Collections.Generic.List<EditorBuildSettingsScene>();
             foreach (var name in names)
             {

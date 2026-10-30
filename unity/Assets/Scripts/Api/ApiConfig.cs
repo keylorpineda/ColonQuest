@@ -10,6 +10,15 @@ namespace ColonQuest.Api
         /// <summary>Local backend started with <c>uv run uvicorn app.main:app --reload</c>.</summary>
         public const string LocalUrl = "http://localhost:8000/api";
 
+        /// <summary>The deployed backend. The editor and the tests keep the local one; every build uses this one.</summary>
+        public const string ProductionUrl = "https://colon-quest-api.onrender.com/api";
+
+        /// <summary>The year summary is written by a bigger model, so it gets longer; after this the game writes its own.</summary>
+        public const float SummaryTimeoutSeconds = 25f;
+
+        /// <summary>A picture is generated once, the first time it is asked for, and then served from the cache.</summary>
+        public const float ImageTimeoutSeconds = 30f;
+
         /// <summary>The game master has this long before the game plays a local event instead.</summary>
         public const float EventTimeoutSeconds = 8f;
 
@@ -18,7 +27,13 @@ namespace ColonQuest.Api
         /// <summary>A spoken turn uploads the clip and waits for transcription plus the seller's answer.</summary>
         public const float VoiceTimeoutSeconds = 20f;
 
+#if UNITY_EDITOR
         public string BaseUrl = LocalUrl;
+#else
+        public string BaseUrl = ProductionUrl;
+#endif
+        public float SummaryTimeout = SummaryTimeoutSeconds;
+        public float ImageTimeout = ImageTimeoutSeconds;
         public float EventTimeout = EventTimeoutSeconds;
         public float Timeout = DefaultTimeoutSeconds;
         public float VoiceTimeout = VoiceTimeoutSeconds;

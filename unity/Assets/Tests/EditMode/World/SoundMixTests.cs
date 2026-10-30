@@ -32,6 +32,7 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(MusicTrack.Store, SoundMix.Compute(SceneNames.Tienda, Vector2.zero).Track);
             Assert.AreEqual(MusicTrack.Bank, SoundMix.Compute(SceneNames.Banco, Vector2.zero).Track);
             Assert.AreEqual(MusicTrack.House, SoundMix.Compute(SceneNames.Casa, Vector2.zero).Track);
+            Assert.AreEqual(MusicTrack.Menu, SoundMix.Compute(SceneNames.Menu, Vector2.zero).Track);
         }
 
         [Test]

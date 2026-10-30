@@ -261,23 +261,54 @@ namespace ColonQuest.EditorTools
 
         private static void BuildMarketStations(Transform parent)
         {
-            BuildStation(parent, "Station_RealEstate", StationType.RealEstate, "Ver las casas de la inmobiliaria", RealEstateSpot);
-            // The car agency, the police station and the hospital are entered by their doors; the neighbor's house too.
+            // The shore of the beach: a swim once a month, if the swimsuit was bought.
+            BuildStation(parent, "Station_Beach", StationType.Beach, "Darse un chapuzón en el mar", new Vector2(-12f, -25.6f));
+            // The real estate agency, the farm, the car agency, the police station and the hospital are entered by their doors.
+            Doorway(parent, new Vector2(RealEstateSpot.x, 33.2f), SceneNames.Inmobiliaria);
+            BuildSpawnPoint(parent, SpawnIds.TownFromInmobiliaria, new Vector2(RealEstateSpot.x, 31.6f));
+            Doorway(parent, new Vector2(FarmSpot.x, 6.2f), SceneNames.Finca);
+            BuildSpawnPoint(parent, SpawnIds.TownFromFinca, FarmSpot);
             Doorway(parent, new Vector2(CarDealerSpot.x, 33.2f), SceneNames.Agencia);
             Doorway(parent, new Vector2(PoliceX, 33.2f), SceneNames.Carcel);
             Doorway(parent, new Vector2(HospitalX, HospitalY + 0.2f), SceneNames.Hospital);
-            Doorway(parent, new Vector2(-8.5f, -7.8f), SceneNames.Vecino);
+
+            // Every house that is not on the market can be entered: they all lead to the same neighbor's interior, and the
+            // door the player came in by is the one they come out of. The four houses with a sign are only for sale or rent.
+            BuildHouseDoor(parent, "Casa_Vecina_A", -40.25f, 6f);
+            BuildHouseDoor(parent, "Casa_Vecina_C", -32.5f, -8f);
+            BuildHouseDoor(parent, "Casa_Almendros_3", -23f, 33f);
+            BuildHouseDoor(parent, "Casa_Almendros_4", 38f, 33f);
+            BuildHouseDoor(parent, "Casa_Almendros_5", 46f, 33f);
             BuildSpawnPoint(parent, SpawnIds.TownFromAgencia, new Vector2(CarDealerSpot.x, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromComisaria, new Vector2(PoliceX, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 31.6f));
-            BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-8.5f, -9.2f));
-            BuildStation(parent, "Station_Farm", StationType.Farm, "Hablar de invertir en la finca", FarmSpot);
+            BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-32.5f, -9.2f));
 
             // A house with a sign opens just that house. The first two signs are in the original town.
             BuildListingStation(parent, "casa_vecina_b", "Ver la casa en venta", new Vector2(-38.2f, -9.5f));
             BuildListingStation(parent, "casa_vecina_d", "Ver la casa en alquiler", new Vector2(-5.7f, -9.5f));
             BuildListingStation(parent, "casa_almendros_1", "Ver la casa en venta", new Vector2(-36.6f, 30.9f));
             BuildListingStation(parent, "casa_almendros_2", "Ver la casa en alquiler", new Vector2(-28.6f, 30.9f));
+
+            // Knocking at the door of those houses is answered by the player's own thought.
+            BuildListingStation(parent, "casa_vecina_b", "Tocar la puerta", new Vector2(-40.25f, -8.9f));
+            BuildListingStation(parent, "casa_vecina_d", "Tocar la puerta", new Vector2(-8.5f, -8.9f));
+            BuildListingStation(parent, "casa_almendros_1", "Tocar la puerta", new Vector2(-39f, 32f));
+            BuildListingStation(parent, "casa_almendros_2", "Tocar la puerta", new Vector2(-31f, 32f));
+        }
+
+        /// <summary>The door of a house that is not for sale: it leads inside, and back out to the spot in front of this very door.</summary>
+        private static void BuildHouseDoor(Transform parent, string house, float x, float yBottom)
+        {
+            string spawn = "Town_From_" + house;
+            var go = new GameObject("Door_" + house);
+            go.transform.SetParent(parent, false);
+            go.transform.position = new Vector2(x, yBottom + 0.2f);
+            var trigger = go.AddComponent<BoxCollider2D>();
+            trigger.size = new Vector2(1.3f, 1.0f);
+            trigger.isTrigger = true;
+            go.AddComponent<Door>().ConfigureHouse(SceneNames.Vecino, SpawnIds.FromTown, Vector2.up, spawn);
+            BuildSpawnPoint(parent, spawn, new Vector2(x, yBottom - 1.2f));
         }
 
         /// <summary>A zone in front of a house sign. The listing it opens is named in the station's first line.</summary>
@@ -296,8 +327,7 @@ namespace ColonQuest.EditorTools
 
         private static void BuildMarketPeople(Transform parent)
         {
-            BuildNpc(parent, "AgenteInmobiliaria", new Vector2(-10.3f, 31.3f), new Look { Skin = "#4DA3FF", Extra = Accessory.Tie, ExtraColor = "#2A7F8C" }, true);
-            BuildNpc(parent, "DonBeto", new Vector2(56.5f, 4.85f), new Look { Skin = "#7FB069", Extra = Accessory.Cap, ExtraColor = "#8B5A3C" }, true);
+            // The agent and Don Beto now wait inside their own places.
 
             BuildPedestrian(parent, "Peaton_J", new Vector2(-44f, 31.6f), new Vector2(-21f, 31.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
             BuildPedestrian(parent, "Peaton_K", new Vector2(36f, 31.6f), new Vector2(62f, 31.6f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.1f);

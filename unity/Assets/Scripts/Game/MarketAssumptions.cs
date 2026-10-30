@@ -227,6 +227,26 @@ namespace ColonQuest.Game
 
         public const int RedLightWellbeingLoss = 3;
 
+        /// <summary>The swimsuit of the wardrobe, in colones.</summary>
+        public const long SwimsuitPrice = 18_000L;
+
+        /// <summary>What a swim in the sea does to the mood, once a month.</summary>
+        public const int SwimWellbeing = 5;
+
+        /// <summary>What a night in the own bed does to the mood, once a month.</summary>
+        public const int RestWellbeing = 3;
+
+        /// <summary>The mood lost at the end of a month in which the player never slept in the own bed.</summary>
+        public const int SkippedSleepWellbeingLoss = 2;
+
+        /// <summary>What cooking at home saves against eating out, in colones, once a month.</summary>
+        public const long HomeCookingSaving = 6_000L;
+
+        public const int CookWellbeing = 1;
+
+        /// <summary>The bail asks this for each minute that is left of the term in the cell, in colones.</summary>
+        public const long BailPerMinute = 8_000L;
+
         /// <summary>Days of the month lost to the night in jail and the hearing.</summary>
         public const int JailDaysLost = 2;
 

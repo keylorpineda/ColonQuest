@@ -102,5 +102,15 @@ namespace ColonQuest.World.Tests
             Assert.Greater(PersonMotion.HeadTilt(-2f), 0f);
             Assert.AreEqual(9f, PersonMotion.HeadTilt(-50f), 0.0001f);
         }
+
+        [Test]
+        public void ElbowAngle_BendsWhileWavingAndIsZeroOutside()
+        {
+            Assert.AreEqual(0f, PersonMotion.ElbowAngle(-0.1f), 0.0001f);
+            Assert.AreEqual(0f, PersonMotion.ElbowAngle(PersonMotion.WaveDuration + 0.1f), 0.0001f);
+            Assert.Greater(PersonMotion.ElbowAngle(1f), 25f, "bent while the arm is raised");
+            Assert.LessOrEqual(PersonMotion.ElbowAngle(1f), 48.01f);
+            Assert.Less(PersonMotion.ElbowAngle(0.05f), PersonMotion.ElbowAngle(1f), "it bends as the arm lifts");
+        }
     }
 }

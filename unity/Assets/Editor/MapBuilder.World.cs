@@ -344,15 +344,20 @@ namespace ColonQuest.EditorTools
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
 
-            // The river, with a gap for each bridge.
+            // The river, open only over the decks of the bridges: the two streets, the avenue and the beach path.
+            // The water between the railings and the deck is water, so it blocks like the rest of the river.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
-            RiverWall(parent, riverX, riverWidth, 6f, 24f);
-            RiverWall(parent, riverX, riverWidth, NorthSidewalkY, MapLayout.WorldNorthEdgeY);
-            RiverWall(parent, riverX, riverWidth, -8f, -2f);
-            RiverWall(parent, riverX, riverWidth, shore, -19.8f);
+            RiverWall(parent, riverX, riverWidth, shore, -19.15f);
+            RiverWall(parent, riverX, riverWidth, -17.45f, -14f);
+            RiverWall(parent, riverX, riverWidth, -10f, 0f);
+            RiverWall(parent, riverX, riverWidth, 4f, MapLayout.AvenueY - 2f);
+            RiverWall(parent, riverX, riverWidth, MapLayout.AvenueY + 2f, MapLayout.WorldNorthEdgeY);
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
+
+            // The pond of the park: the player walks around it.
+            Wall(parent, "Pond", new Vector2(19.5f, -5.9f), new Vector2(5.4f, 2.4f));
         }
 
         private static void RiverWall(Transform parent, float x, float width, float yMin, float yMax)
@@ -517,8 +522,6 @@ namespace ColonQuest.EditorTools
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
 
-            Car(parent, shadows, -33f, 3.05f, "#7B5BA8");
-            Car(parent, shadows, -27f, -13.05f, "#F1F4FF");
             foreach (float x in new[] { -41f, -33f, -26f })
             {
                 Lamp(parent, x, 4.5f);
@@ -698,6 +701,18 @@ namespace ColonQuest.EditorTools
             Shape(visual, "Horn", roundedSmall, new Vector2(0.82f, 0.5f), new Vector2(0.1f, 0.2f), GamePalette.Hex("#F2E3B0"), OrderPlayer + 2);
             Shape(visual, "Leg", roundedSmall, new Vector2(-0.5f, -0.52f), new Vector2(0.2f, 0.3f), GamePalette.Outline, OrderPlayer);
             Shape(visual, "Leg", roundedSmall, new Vector2(0.45f, -0.52f), new Vector2(0.2f, 0.3f), GamePalette.Outline, OrderPlayer);
+
+            // The rest of the animal: a shaded belly, an udder, a tail with its tuft, ears, nostrils, a second horn and a bell.
+            Shape(visual, "BodyShade", rounded, new Vector2(0f, -0.24f), new Vector2(1.4f, 0.26f), GamePalette.Shade(hide, 0.86f), OrderPlayer + 2);
+            Shape(visual, "Udder", roundedSmall, new Vector2(-0.12f, -0.45f), new Vector2(0.3f, 0.14f), GamePalette.Hex("#F4A6B8"), OrderPlayer);
+            Shape(visual, "Tail", roundedSmall, new Vector2(-0.9f, 0.05f), new Vector2(0.07f, 0.52f), GamePalette.Outline, OrderPlayer);
+            Shape(visual, "TailTuft", circle, new Vector2(-0.9f, -0.24f), new Vector2(0.17f, 0.2f), spot, OrderPlayer + 1);
+            Shape(visual, "Ear", roundedSmall, new Vector2(0.68f, 0.42f), new Vector2(0.2f, 0.11f), GamePalette.Shade(hide, 0.9f), OrderPlayer + 2);
+            Shape(visual, "Horn", roundedSmall, new Vector2(1.08f, 0.5f), new Vector2(0.1f, 0.2f), GamePalette.Hex("#F2E3B0"), OrderPlayer + 2);
+            Shape(visual, "Nostril", circle, new Vector2(1.24f, 0.05f), Vector2.one * 0.04f, GamePalette.Outline, OrderPlayer + 3);
+            Shape(visual, "Nostril", circle, new Vector2(1.24f, -0.05f), Vector2.one * 0.04f, GamePalette.Outline, OrderPlayer + 3);
+            Shape(visual, "Bell", circle, new Vector2(0.78f, -0.2f), Vector2.one * 0.14f, GamePalette.Hex("#FFD23F"), OrderPlayer + 3);
+            Shape(visual, "BodyShine", roundedSmall, new Vector2(-0.1f, 0.3f), new Vector2(0.6f, 0.06f), GamePalette.White, OrderPlayer + 3);
 
             cow.AddComponent<Patrol>().Configure(from, to, speed, 2.5f);
         }

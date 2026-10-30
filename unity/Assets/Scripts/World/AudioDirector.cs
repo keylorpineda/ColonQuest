@@ -85,6 +85,89 @@ namespace ColonQuest.World
             instance = go.AddComponent<AudioDirector>();
         }
 
+        private readonly Dictionary<string, AudioClip> stepClips = new Dictionary<string, AudioClip>();
+        private AudioClip clickClip;
+        private AudioSource effectSource;
+
+        /// <summary>A footstep on this ground. The clips are made the first time they are needed and kept.</summary>
+        public static void Step(SurfaceKind kind, int variant)
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            string key = kind + "_" + variant % 3;
+            if (!instance.stepClips.TryGetValue(key, out var clip))
+            {
+                clip = ProceduralSound.Step(kind, variant);
+                instance.stepClips[key] = clip;
+            }
+
+            instance.Effects().PlayOneShot(clip, 0.45f * instance.Level);
+        }
+
+        /// <summary>The tap of any button.</summary>
+        public static void Click()
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            if (instance.clickClip == null)
+            {
+                instance.clickClip = ProceduralSound.Click();
+            }
+
+            instance.Effects().PlayOneShot(instance.clickClip, 0.6f * instance.Level);
+        }
+
+        private readonly Dictionary<SoundEffectKind, AudioClip> effectClips = new Dictionary<SoundEffectKind, AudioClip>();
+
+        /// <summary>A big moment: the hit of a car, the police siren, the door of the cell.</summary>
+        public static void Effect(SoundEffectKind kind)
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            if (!instance.effectClips.TryGetValue(kind, out var clip))
+            {
+                clip = ProceduralSound.Effect(kind);
+                instance.effectClips[kind] = clip;
+            }
+
+            instance.Effects().PlayOneShot(clip, 0.8f * instance.Level);
+        }
+
+        /// <summary>A very soft tap when the mouse reaches a button.</summary>
+        public static void Tick()
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            if (instance.clickClip == null)
+            {
+                instance.clickClip = ProceduralSound.Click();
+            }
+
+            instance.Effects().PlayOneShot(instance.clickClip, 0.16f * instance.Level);
+        }
+
+        private AudioSource Effects()
+        {
+            if (effectSource == null)
+            {
+                effectSource = Source("Effects", false);
+            }
+
+            return effectSource;
+        }
+
         /// <summary>Someone talks: a quick babble of syllables, with a pitch that belongs to the speaker.</summary>
         public static void Talk(string text, string speaker)
         {
@@ -103,8 +186,9 @@ namespace ColonQuest.World
             }
 
             instance = this;
+            gameObject.AddComponent<FullscreenKeys>();
             Apply(GameSettings.Current);
-            foreach (MusicTrack track in new[] { MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
+            foreach (MusicTrack track in new[] { MusicTrack.Menu, MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
             {
                 music[track] = Source("Music_" + track, true);
             }
@@ -143,6 +227,8 @@ namespace ColonQuest.World
         /// <summary>Makes the clips one per frame so the game never stalls, the tune of the town first.</summary>
         private IEnumerator Prepare()
         {
+            Play(music[MusicTrack.Menu], ProceduralSound.Music(MusicTrack.Menu));
+            yield return null;
             Play(music[MusicTrack.Town], ProceduralSound.Music(MusicTrack.Town));
             yield return null;
             Play(sea, ProceduralSound.Sea());
@@ -316,17 +402,17 @@ namespace ColonQuest.World
             }
 
             hash &= 0x7fffffff;
-            float basePitch = 0.8f + (hash % 100) / 100f * 0.55f;
+            float basePitch = 0.95f + (hash % 100) / 100f * 0.5f;
             // About one syllable for every three letters, so the babble lasts as long as the text takes to appear.
-            int count = Mathf.Clamp(text.Length / 3, 3, 70);
+            int count = Mathf.Clamp(text.Length / 4, 3, 36);
             var random = new System.Random(hash + text.Length);
-            voiceSource.volume = 0.6f * Level;
+            voiceSource.volume = 0.22f * Level;
 
             for (int i = 0; i < count; i++)
             {
                 voiceSource.pitch = basePitch * (0.9f + (float)random.NextDouble() * 0.3f);
                 voiceSource.PlayOneShot(syllables[random.Next(syllables.Length)]);
-                yield return new WaitForSecondsRealtime(i % 5 == 4 ? 0.1f : 0.07f);
+                yield return new WaitForSecondsRealtime(i % 5 == 4 ? 0.16f : 0.1f);
             }
 
             talking = null;

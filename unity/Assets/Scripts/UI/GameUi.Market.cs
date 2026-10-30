@@ -51,7 +51,10 @@ namespace ColonQuest.UI
             var listing = id != null ? MarketAssumptions.FindHome(id) : null;
             if (listing != null)
             {
-                ShowHomeDetail(listing, false);
+                // A house on the market is not sold at its door: the player thinks of calling the agency.
+                Thoughts.Say(listing.ForSale
+                    ? "Esta casa está en venta. Para comprarla tendría que ir a la inmobiliaria."
+                    : "Esta casa está en alquiler. Para alquilarla tendría que ir a la inmobiliaria.");
             }
             else
             {
@@ -69,6 +72,8 @@ namespace ColonQuest.UI
         private void ShowHomeCatalog()
         {
             var text = new StringBuilder();
+            text.AppendLine(Loc.T("Buenas, bienvenido. Mire, estas son las casas que tengo hoy."));
+            text.AppendLine();
             text.AppendLine(Loc.T("Elige una casa para ver lo que cuesta de verdad, no solo el precio del letrero."));
             text.AppendLine();
             text.AppendLine(Loc.F("Tus gastos de vida ({0} al mes) ya cubren donde vives hoy. Una casa nueva se suma a eso.", Money.Format(GameRules.LivingExpenses)));
@@ -90,7 +95,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", index + 1)));
-            modal.Show(Loc.T("Inmobiliaria"), Loc.T("Casas en venta y en alquiler"), text.ToString(), options, null, MarketFont, MarketBodyHeight);
+            modal.Show(Loc.T("Inmobiliaria"), Loc.T("Casas en venta y en alquiler"), text.ToString(), options, "Marcela", MarketFont, MarketBodyHeight);
         }
 
         private void ShowHomeDetail(HomeListing home, bool fromCatalog)
@@ -197,6 +202,8 @@ namespace ColonQuest.UI
         private void ShowFarm()
         {
             var text = new StringBuilder();
+            text.AppendLine(Loc.T("Buenas, pase adelante. Aquí la plata trabaja, pero despacio."));
+            text.AppendLine();
             text.AppendLine(Loc.T("Una finca no es una cuenta de ahorros. La plata entra hoy y no sale hasta la cosecha o la venta, y puede salir menos de lo que entró."));
             text.AppendLine();
             text.AppendLine(Loc.F("Tienes {0} en efectivo. Nunca se invierte con la tarjeta.", Money.Format(session.State.Cash)));
@@ -218,7 +225,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", index + 1)));
-            modal.Show(Loc.T("Finca San Isidro"), Loc.T("Café y ganado"), text.ToString(), options, null, MarketFont, MarketBodyHeight);
+            modal.Show(Loc.T("Finca San Isidro"), Loc.T("Café y ganado"), text.ToString(), options, "Don Beto", MarketFont, MarketBodyHeight);
         }
 
         private static string WaitText(FarmOption option)

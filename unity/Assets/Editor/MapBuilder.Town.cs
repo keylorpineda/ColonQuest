@@ -262,7 +262,7 @@ namespace ColonQuest.EditorTools
             // Cars in the same lane share a speed, so none catches up with the one ahead.
             Car(parent, shadows, -21f, 0.95f, "#E8505B", 2.4f);
             Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
-            Car(parent, shadows, -14f, 3.05f, "#FFD23F", -2.0f);
+            // The north lane of the main street belongs to the collectors' car, so no other car shares it.
             Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
             Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
             Car(parent, shadows, -18f, -13.05f, "#FF8A3D", 2.6f);
@@ -334,6 +334,14 @@ namespace ColonQuest.EditorTools
 
             table.gameObject.AddComponent<BoxCollider2D>().offset = new Vector2(0f, 0.3f);
             table.GetComponent<BoxCollider2D>().size = new Vector2(2.5f, 0.6f);
+
+            // The man of the stand, behind the table: the player can talk to him, and what he promises is the lesson.
+            var seller = BuildNpc(parent, "Estafador", new Vector2(7f, -4.7f), new Look { Skin = "#C98B5C", Extra = Accessory.Tie, ExtraColor = "#2E7D4F" }, true);
+            BuildThing(seller, "Talk", "Hablar con el del puesto", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "Triplicá tu plata en un mes. Solo traé efectivo y no le contés a nadie.",
+                "Es seguro, es seguro. Papeles no tengo, pero confiá en mí.",
+                "Con los {cash} que tenés hoy, mañana tendrías el triple. Eso me dijeron mis clientes.",
+                "Nadie puede garantizar 300% en un mes. Un negocio así se llama esquema piramidal: gana el que entra primero.");
         }
 
         private static void BuildDoorsAndStations(Transform parent)
@@ -385,6 +393,8 @@ namespace ColonQuest.EditorTools
             BuildPedestrian(parent, "Peaton_C", new Vector2(-10f, -1.0f), new Vector2(10f, -1.0f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
             BuildPedestrian(parent, "Peaton_D", new Vector2(17.5f, -3.5f), new Vector2(22f, -3.5f), new Look { Skin = "#FFD23F", Extra = Accessory.None }, 0.9f);
             BuildPedestrian(parent, "Peaton_E", new Vector2(-3f, 5.5f), new Vector2(3f, 5.5f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, 1.0f);
+            BuildPedestrian(parent, "Estudiante", new Vector2(-22f, -9.0f), new Vector2(-12f, -9.0f), new Look { Skin = "#C0392B" }, 1.1f);
+            BuildPedestrian(parent, "Repartidor", new Vector2(10f, 5.2f), new Vector2(24f, 5.2f), new Look { Skin = "#F39C12" }, 1.5f);
         }
 
         /// <summary>Soft dark patches that drift across the town, as if clouds were passing overhead.</summary>

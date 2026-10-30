@@ -110,12 +110,42 @@ namespace ColonQuest.EditorTools
         private static void BuildMotorbike(InteriorParts parts)
         {
             var moto = IL(parts.Props, "Motorbike");
-            Solid(moto, "Platform", rounded, 7.4f, 1.6f, 2.4f, 1.4f, "#3A3F52");
-            Deco(moto, "Wheel", circle, 6.75f, 1.55f, 0.6f, 0.6f, "#1D2238", 1f, 8);
-            Deco(moto, "Wheel", circle, 8.05f, 1.55f, 0.6f, 0.6f, "#1D2238", 1f, 8);
-            Deco(moto, "Body", rounded, 7.4f, 1.75f, 1.2f, 0.45f, "#E8505B", 1f, 9);
-            Deco(moto, "Seat", roundedSmall, 7.2f, 1.95f, 0.6f, 0.18f, "#2A3040", 1f, 10);
-            Deco(moto, "Handlebar", roundedSmall, 7.95f, 2.05f, 0.08f, 0.45f, "#9AA3B8", 1f, 10);
+            Solid(moto, "Platform", rounded, 7.4f, 1.6f, 2.6f, 1.5f, "#3A3F52");
+            Deco(moto, "PlatformTop", rounded, 7.4f, 1.6f, 2.4f, 1.3f, "#4A5068", 1f, 8);
+            Deco(moto, "Shadow", roundedSmall, 7.4f, 1.2f, 2.1f, 0.2f, "#000000", 0.35f, 9);
+
+            // Two wheels with a tire, a rim, a hub and spokes.
+            foreach (float wx in new[] { 6.65f, 8.2f })
+            {
+                Deco(moto, "Tire", circle, wx, 1.6f, 0.82f, 0.82f, "#1D2238", 1f, 10);
+                Deco(moto, "Rim", circle, wx, 1.6f, 0.56f, 0.56f, "#C9D2E3", 1f, 11);
+                Deco(moto, "RimInner", circle, wx, 1.6f, 0.46f, 0.46f, "#2A3040", 1f, 12);
+                Deco(moto, "SpokeH", roundedSmall, wx, 1.6f, 0.44f, 0.035f, "#C9D2E3", 1f, 13);
+                Deco(moto, "SpokeV", roundedSmall, wx, 1.6f, 0.035f, 0.44f, "#C9D2E3", 1f, 13);
+                Deco(moto, "Hub", circle, wx, 1.6f, 0.14f, 0.14f, "#9AA3B8", 1f, 14);
+            }
+
+            // Frame, engine, exhaust, tank, seat, tail, fork, handlebar, mirror, headlight and brake light.
+            Deco(moto, "Exhaust", roundedSmall, 7.0f, 1.42f, 0.95f, 0.12f, "#9AA3B8", 1f, 12);
+            Deco(moto, "Frame", roundedSmall, 7.4f, 1.85f, 1.1f, 0.1f, "#2A3040", 1f, 12);
+            Deco(moto, "Engine", rounded, 7.4f, 1.68f, 0.52f, 0.4f, "#6B7285", 1f, 13);
+            foreach (float fx in new[] { 7.25f, 7.4f, 7.55f })
+            {
+                Deco(moto, "Fin", roundedSmall, fx, 1.68f, 0.03f, 0.3f, "#4A5068", 1f, 14);
+            }
+
+            Deco(moto, "Tank", rounded, 7.65f, 2.05f, 0.66f, 0.34f, "#E8505B", 1f, 14);
+            Deco(moto, "TankShine", roundedSmall, 7.7f, 2.15f, 0.34f, 0.06f, "#FF9AA2", 1f, 15);
+            Deco(moto, "Seat", roundedSmall, 7.05f, 2.03f, 0.7f, 0.18f, "#2A3040", 1f, 15);
+            Deco(moto, "Tail", roundedSmall, 6.62f, 1.98f, 0.42f, 0.2f, "#E8505B", 1f, 14);
+            Deco(moto, "BrakeLight", circle, 6.4f, 1.98f, 0.1f, 0.1f, "#FF3B3B", 1f, 15);
+            Deco(moto, "Fork", roundedSmall, 8.08f, 1.9f, 0.07f, 0.7f, "#C9D2E3", 1f, 13);
+            Deco(moto, "Handlebar", roundedSmall, 8.0f, 2.28f, 0.34f, 0.07f, "#2A3040", 1f, 15);
+            Deco(moto, "Grip", circle, 8.18f, 2.28f, 0.1f, 0.1f, "#1D2238", 1f, 16);
+            Deco(moto, "MirrorStem", roundedSmall, 7.96f, 2.4f, 0.03f, 0.2f, "#9AA3B8", 1f, 15);
+            Deco(moto, "Mirror", circle, 7.96f, 2.52f, 0.14f, 0.14f, "#C9D2E3", 1f, 16);
+            Deco(moto, "Headlight", circle, 8.34f, 2.08f, 0.22f, 0.22f, "#FFF1A8", 1f, 16);
+            Deco(moto, "HeadlightGlow", circle, 8.34f, 2.08f, 0.5f, 0.5f, "#FFF1A8", 0.25f, 15);
             WallPlate(parts.Labels, "MOTO 125 CC", new Vector2(7.4f, 2.7f), 1.8f, "#1D4F8C", GamePalette.White, 0.024f);
         }
 

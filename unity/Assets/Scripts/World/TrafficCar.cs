@@ -17,10 +17,14 @@ namespace ColonQuest.World
         /// <summary>Raised when a moving car runs into the player. The overlay decides what that costs.</summary>
         public static event Action PlayerHit;
 
+        /// <summary>Where the car that hit the player was at that moment, so the player is thrown the right way.</summary>
+        public static Vector2 LastHitFrom { get; private set; }
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.collider.CompareTag(Station.PlayerTag))
             {
+                LastHitFrom = transform.position;
                 PlayerHit?.Invoke();
             }
         }

@@ -5,10 +5,34 @@ namespace ColonQuest.World
     public enum MusicTrack
     {
         None,
+        Menu,
         Town,
         Store,
         Bank,
         House
+    }
+
+    /// <summary>One-off effects: the big moments (a hit, the siren, the door of the cell) and the small sounds of the animated interactions.</summary>
+    public enum SoundEffectKind
+    {
+        Thud,
+        Siren,
+        Slam,
+        Bills,
+        Printer,
+        Stamp,
+        Sizzle,
+        Water,
+        Beep,
+        Keys,
+        Chime,
+        Alarm,
+        Coin,
+        Scribble,
+        Knock,
+        Splash,
+        Munch,
+        Swish
     }
 
     /// <summary>How loud each layer of the soundscape should be at one spot. All values are 0 to 1.</summary>
@@ -53,6 +77,10 @@ namespace ColonQuest.World
                     return new SoundLevels { Track = MusicTrack.House, Music = 0.2f };
                 case SceneNames.Agencia:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.3f, Crowd = 0.15f };
+                case SceneNames.Inmobiliaria:
+                    return new SoundLevels { Track = MusicTrack.Store, Music = 0.22f, Crowd = 0.1f };
+                case SceneNames.Finca:
+                    return new SoundLevels { Track = MusicTrack.House, Music = 0.16f };
                 case SceneNames.Carcel:
                     return new SoundLevels { Track = MusicTrack.Bank, Music = 0.06f, Crowd = 0.3f };
                 case SceneNames.Hospital:
@@ -61,7 +89,8 @@ namespace ColonQuest.World
                 case SceneNames.Town:
                     return Town(position);
                 default:
-                    return new SoundLevels { Track = MusicTrack.Town, Music = 0.3f };
+                    // The title screen has a tune of its own, so it does not carry on into the town.
+                    return new SoundLevels { Track = MusicTrack.Menu, Music = 0.3f };
             }
         }
 

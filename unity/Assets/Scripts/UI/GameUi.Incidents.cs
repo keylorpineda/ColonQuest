@@ -74,7 +74,8 @@ namespace ColonQuest.UI
             var text = new StringBuilder();
             text.AppendLine(Loc.T("Un oficial te para y te pide los papeles: alguien llamó a la policía porque estás dentro de una casa que no es tuya."));
             text.AppendLine();
-            text.Append(Loc.F("Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", Money.Format(MarketAssumptions.TrespassFine), MarketAssumptions.JailDaysLost));
+            text.AppendLine(Loc.F("Te pone una multa de {0}, te lleva a la comisaría y pierdes {1} días del mes.", Money.Format(MarketAssumptions.TrespassFine), MarketAssumptions.JailDaysLost));
+            text.Append(Loc.F("Te quedas en la celda {0}. Puedes esperar a cumplir la condena o pagar la fianza.", JailSentence.Clock(JailSentence.TermSeconds(session.Loop.Arrests))));
 
             var options = new List<ModalOption>
             {
@@ -86,7 +87,9 @@ namespace ColonQuest.UI
                     {
                         if (session.Arrest())
                         {
-                            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+                            // The term depends on how many times the player was taken away before this one.
+                            StartSentence(JailSentence.TermSeconds(session.Loop.Arrests - 1));
+                            StartCoroutine(ArrestSequence());
                         }
                     }
                 }
@@ -127,12 +130,38 @@ namespace ColonQuest.UI
         private void OnPlayerHit()
         {
             // A window that is open (an officer's fine, for one) is not interrupted by a car that goes by.
-            if (SceneTransition.IsBusy || modal.IsOpen || !session.Hospitalize())
+            if (SceneTransition.IsBusy || modal.IsOpen || HitAnimation.Playing || session.Loop.HurtThisMonth)
             {
                 return;
             }
 
-            SceneTransition.Go(SceneNames.Hospital, SpawnIds.HospitalBed);
+            var player = GameObject.FindWithTag(Station.PlayerTag);
+            effects.Flash(new Color(1f, 1f, 1f, 0.8f), 0.5f);
+            HitAnimation.Play(player != null ? player.transform : null, TrafficCar.LastHitFrom, () =>
+            {
+                if (session.Hospitalize())
+                {
+                    SceneTransition.Go(SceneNames.Hospital, SpawnIds.HospitalBed);
+                }
+            });
+        }
+
+        /// <summary>The arrest: the police lights flash over the screen with the siren, and then the cell door closes behind the player.</summary>
+        private System.Collections.IEnumerator ArrestSequence()
+        {
+            PlayerController.Frozen = true;
+            AudioDirector.Effect(SoundEffectKind.Siren);
+            effects.Siren(2.2f);
+            yield return new WaitForSecondsRealtime(2.2f);
+            PlayerController.Frozen = false;
+            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+            while (SceneTransition.IsBusy)
+            {
+                yield return null;
+            }
+
+            AudioDirector.Effect(SoundEffectKind.Slam);
+            effects.Flash(new Color(0f, 0f, 0f, 0.7f), 0.6f);
         }
 
         // ---------------------------------------------------------------- health insurance

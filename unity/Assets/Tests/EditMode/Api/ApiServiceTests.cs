@@ -278,6 +278,45 @@ namespace ColonQuest.Api.Tests
         }
 
         [Test]
+        public void Image_ReturnsTheBytesOfARealPicture()
+        {
+            ApiResult<byte[]> result = null;
+            transport.Replies.Enqueue(new HttpResponseData { StatusCode = 200, Bytes = new byte[] { 1, 2, 3 } });
+
+            Run(service.RequestImage("npc_don_rafa", r => result = r));
+
+            Assert.IsTrue(result.Ok);
+            Assert.AreEqual(3, result.Value.Length);
+            Assert.AreEqual("http://test/api/images/npc_don_rafa", transport.Requests[0].Url);
+            Assert.AreEqual(ApiConfig.ImageTimeoutSeconds, transport.Requests[0].TimeoutSeconds);
+        }
+
+        [Test]
+        public void Image_TheStandInPictureIsAFailure()
+        {
+            ApiResult<byte[]> result = null;
+            var reply = new HttpResponseData { StatusCode = 200, Bytes = new byte[] { 1 } };
+            reply.Headers["x-image-source"] = "fallback";
+            transport.Replies.Enqueue(reply);
+
+            Run(service.RequestImage("npc_kevin", r => result = r));
+
+            Assert.IsFalse(result.Ok);
+        }
+
+        [Test]
+        public void Summary_WaitsLongerThanAnOrdinaryCall()
+        {
+            StartSession();
+            transport.Replies.Enqueue(FakeTransport.Status(500));
+
+            Run(service.RequestSummary(State(12), r => { }));
+
+            Assert.AreEqual(ApiConfig.SummaryTimeoutSeconds, transport.Requests[1].TimeoutSeconds);
+            Assert.Greater(transport.Requests[1].TimeoutSeconds, ApiConfig.DefaultTimeoutSeconds);
+        }
+
+        [Test]
         public void Summary_MapsTheNarrativeAndTheSource()
         {
             StartSession();

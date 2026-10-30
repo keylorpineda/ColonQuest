@@ -58,6 +58,21 @@ namespace ColonQuest.World
             return raised + Mathf.Sin((seconds - lift) * 9f * Mathf.PI) * 18f;
         }
 
+        /// <summary>
+        /// The extra bend of the elbow of the waving arm, in degrees: it follows the lift and the lowering of the
+        /// wave, reaches about 40 degrees and shakes a little. Outside of the greeting it returns 0.
+        /// </summary>
+        public static float ElbowAngle(float seconds)
+        {
+            if (!IsWaving(seconds))
+            {
+                return 0f;
+            }
+
+            float lifted = Mathf.Clamp01(WaveAngle(seconds) / 150f);
+            return lifted * (40f + Mathf.Sin(seconds * 9f * Mathf.PI) * 8f);
+        }
+
         public static bool IsWaving(float seconds)
         {
             return seconds >= 0f && seconds <= WaveDuration;

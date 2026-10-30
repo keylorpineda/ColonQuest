@@ -164,8 +164,38 @@ namespace ColonQuest.Api
             }
 
             HttpResponseData response = null;
-            yield return transport.Send(Post($"sessions/{SessionId}/summary", JsonUtility.ToJson(ApiMapper.ToDto(finalState)), config.Timeout), r => response = r);
+            yield return transport.Send(Post($"sessions/{SessionId}/summary", JsonUtility.ToJson(ApiMapper.ToDto(finalState)), config.SummaryTimeout), r => response = r);
             done(Parse<SessionSummaryDto, SessionSummary>(response, ApiMapper.FromDto));
+        }
+
+        /// <summary>A portrait or a scene by key. The backend answers with a stand-in picture when it cannot make the real one; that is a failure here.</summary>
+        public IEnumerator RequestImage(string key, Action<ApiResult<byte[]>> done)
+        {
+            HttpResponseData response = null;
+            var request = new HttpRequestData { Method = "GET", Url = config.Url("images/" + key), TimeoutSeconds = config.ImageTimeout };
+            yield return transport.Send(request, r => response = r);
+            if (!response.IsSuccess)
+            {
+                done(Failure<byte[]>(response));
+                yield break;
+            }
+
+            foreach (var header in response.Headers)
+            {
+                if (string.Equals(header.Key, "X-Image-Source", StringComparison.OrdinalIgnoreCase) && header.Value == "fallback")
+                {
+                    done(ApiResult<byte[]>.Failure("stand-in picture", response.StatusCode));
+                    yield break;
+                }
+            }
+
+            if (response.Bytes == null || response.Bytes.Length == 0)
+            {
+                done(ApiResult<byte[]>.Failure("empty picture", response.StatusCode));
+                yield break;
+            }
+
+            done(ApiResult<byte[]>.Success(response.Bytes, ResultSource.Remote, response.StatusCode));
         }
 
         public IEnumerator CheckHealth(Action<ApiResult<HealthStatus>> done)

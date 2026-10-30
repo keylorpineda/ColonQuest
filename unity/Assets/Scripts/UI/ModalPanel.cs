@@ -114,10 +114,25 @@ namespace ColonQuest.UI
         /// <param name="speaker">When set, the window talks: the text types itself and a face in this name's color speaks it.</param>
         /// <param name="bodyFontSize">Smaller than the default for windows that carry a lot of figures.</param>
         /// <param name="maxBodyHeight">Zero keeps the default; a bigger value leaves room for a longer text.</param>
+        /// <summary>A picture drawn faintly behind the next window (the scene of an event, the postcard). It is used once.</summary>
+        public Sprite Backdrop { get; set; }
+
         public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null, int bodyFontSize = 32, float maxBodyHeight = 0f)
         {
             Clear();
             options.AddRange(choices);
+            if (Backdrop != null)
+            {
+                var back = UiKit.Fill(root.transform, "Backdrop", new Color(1f, 1f, 1f, 0.55f), Vector2.zero, new Vector2(0.5f, 0.5f), Vector2.zero);
+                back.rectTransform.anchorMin = Vector2.zero;
+                back.rectTransform.anchorMax = Vector2.one;
+                back.rectTransform.offsetMin = Vector2.zero;
+                back.rectTransform.offsetMax = Vector2.zero;
+                back.sprite = Backdrop;
+                back.raycastTarget = false;
+                Backdrop = null;
+            }
+
             revealText = null;
             mouth = null;
             talkClock = 0f;

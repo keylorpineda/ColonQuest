@@ -68,6 +68,11 @@ namespace ColonQuest.Api
             return StartCoroutine(Service.RequestSummary(finalState, done));
         }
 
+        public Coroutine RequestImage(string key, Action<ApiResult<byte[]>> done)
+        {
+            return StartCoroutine(Service.RequestImage(key, done));
+        }
+
         public Coroutine CheckHealth(Action<ApiResult<HealthStatus>> done)
         {
             return StartCoroutine(Service.CheckHealth(done));

@@ -25,6 +25,9 @@ namespace ColonQuest.Game
         public StationType CurrentStation { get; private set; }
         public SessionSummary Summary { get; private set; }
 
+        /// <summary>True while the summary of the year is being written, so the screen can say so.</summary>
+        public bool Finishing { get; private set; }
+
         private const int MaxNegotiationText = 300;
 
         /// <summary>Shown in the text box when a spoken turn could not be understood.</summary>
@@ -396,6 +399,51 @@ namespace ColonQuest.Game
             return true;
         }
 
+        /// <summary>The player pays the bail and leaves the cell.</summary>
+        public bool PayBail(long cost)
+        {
+            if (Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.PayBail(cost));
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool BuySwimsuit()
+        {
+            return Apply(Loop.BuySwimsuit());
+        }
+
+        public bool Swim()
+        {
+            return Apply(Loop.Swim());
+        }
+
+        public bool Rest()
+        {
+            return Apply(Loop.Rest());
+        }
+
+        public bool Cook()
+        {
+            return Apply(Loop.Cook());
+        }
+
+        private bool Apply(ChoiceOutcome outcome)
+        {
+            if (outcome == null || Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(outcome);
+            Changed?.Invoke();
+            return true;
+        }
+
         /// <summary>An officer fines the player for crossing on red. Nothing else changes.</summary>
         public bool FineRedLight()
         {
@@ -553,10 +601,12 @@ namespace ColonQuest.Game
             }
 
             Busy = true;
+            Finishing = true;
             Changed?.Invoke();
             ApiClient.Instance.RequestSummary(State.Clone(), result =>
             {
                 Busy = false;
+                Finishing = false;
                 Summary = result.Ok ? result.Value : LocalSummary();
                 Finished?.Invoke(Summary);
                 Changed?.Invoke();

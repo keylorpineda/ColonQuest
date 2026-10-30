@@ -71,6 +71,11 @@ namespace ColonQuest.Game
             Holdings = new Holdings();
             LastRunningCosts = 0L;
             HurtThisMonth = false;
+            Arrests = 0;
+            HasSwimsuit = false;
+            SwamThisMonth = false;
+            SleptThisMonth = false;
+            CookedThisMonth = false;
             doneStations.Clear();
         }
 
@@ -79,7 +84,7 @@ namespace ColonQuest.Game
         {
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
                 && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm
-                && type != StationType.HealthDesk;
+                && type != StationType.HealthDesk && type != StationType.Wardrobe && type != StationType.Beach;
         }
 
         public bool CanDoTask(StationType type)
@@ -97,6 +102,18 @@ namespace ColonQuest.Game
         /// <summary>True once the player has been run over this month; it happens once a month at most.</summary>
         public bool HurtThisMonth { get; private set; }
 
+        /// <summary>How many times the police took the player away in this run. Each one is a longer stay in the cell.</summary>
+        public int Arrests { get; private set; }
+
+        public bool HasSwimsuit { get; private set; }
+
+        public bool SwamThisMonth { get; private set; }
+
+        /// <summary>True once the player slept in the bed this month. Skipping it costs a little mood when the month closes.</summary>
+        public bool SleptThisMonth { get; private set; }
+
+        public bool CookedThisMonth { get; private set; }
+
         /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): they count as tasks not done.</summary>
         public void LoseTasks(int days)
         {
@@ -111,8 +128,83 @@ namespace ColonQuest.Game
             FinanceEngine.ChargeFine(State, MarketAssumptions.TrespassFine);
             FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.JailWellbeingLoss);
             LoseTasks(MarketAssumptions.JailDaysLost);
+            Arrests++;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Te arrestaron por entrar a una casa ajena"));
+        }
+
+        /// <summary>The bail for what is left of the term: it is paid from cash, or from the card when there is not enough.</summary>
+        public ChoiceOutcome PayBail(long cost)
+        {
+            var before = State.Clone();
+            FinanceEngine.ChargeFine(State, cost);
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Pagaste la fianza"));
+        }
+
+        /// <summary>The swimsuit is paid in cash. Null when the cash is not enough.</summary>
+        public ChoiceOutcome BuySwimsuit()
+        {
+            if (HasSwimsuit)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            if (!FinanceEngine.TrySpendCash(State, MarketAssumptions.SwimsuitPrice))
+            {
+                return null;
+            }
+
+            HasSwimsuit = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Compraste un bañador"));
+        }
+
+        /// <summary>A swim in the sea: free, and good for the mood. Once a month.</summary>
+        public ChoiceOutcome Swim()
+        {
+            if (!HasSwimsuit || SwamThisMonth)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.SwimWellbeing);
+            SwamThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Te diste un chapuzón en el mar"));
+        }
+
+        /// <summary>A night in the own bed: free, a little rest for the mood. Once a month.</summary>
+        public ChoiceOutcome Rest()
+        {
+            if (SleptThisMonth)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.RestWellbeing);
+            SleptThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Dormiste en tu cama"));
+        }
+
+        /// <summary>Cooking at home instead of eating out: a small saving and a little better mood. Once a month.</summary>
+        public ChoiceOutcome Cook()
+        {
+            if (CookedThisMonth)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            FinanceEngine.CreditCash(State, MarketAssumptions.HomeCookingSaving);
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.CookWellbeing);
+            CookedThisMonth = true;
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Cocinaste en casa"));
         }
 
         /// <summary>An officer saw the player cross on red: a fine and a little stress, no jail and no lost days.</summary>
@@ -290,6 +382,11 @@ namespace ColonQuest.Game
         public MonthlyTickReport CloseMonth()
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
+            if (!SleptThisMonth)
+            {
+                FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
+            }
+
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
                 FixedLivingExpensesColones = GameRules.LivingExpenses + LastRunningCosts
@@ -298,6 +395,9 @@ namespace ColonQuest.Game
             MonthsPlayed++;
             TasksDone = 0;
             HurtThisMonth = false;
+            SwamThisMonth = false;
+            SleptThisMonth = false;
+            CookedThisMonth = false;
             doneStations.Clear();
             return report;
         }
