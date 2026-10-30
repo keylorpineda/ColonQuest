@@ -61,6 +61,15 @@ namespace ColonQuest.World
 
         public int Count => steps.Count;
 
+        /// <summary>Skips the rest of the scene that plays now, as the Space key does. The apply steps still run.</summary>
+        public static void SkipCurrent()
+        {
+            if (InteractionRunner.Current != null)
+            {
+                InteractionRunner.Current.SkipAll();
+            }
+        }
+
         /// <summary>How many seconds the steps that wait add up to, without counting the walk.</summary>
         public float WaitSeconds
         {
@@ -268,8 +277,16 @@ namespace ColonQuest.World
 
             private bool skip;
 
+            public static InteractionRunner Current { get; private set; }
+
+            public void SkipAll()
+            {
+                skip = true;
+            }
+
             public IEnumerator Run(List<Step> script, GameObject player, Action finished)
             {
+                Current = this;
                 SetPlaying(true);
                 PlayerController.Frozen = true;
 
@@ -424,6 +441,7 @@ namespace ColonQuest.World
                     InteractionProps.ClearOverlay();
                     PlayerController.Frozen = false;
                     SetPlaying(false);
+                    Current = null;
                 }
 
                 finished?.Invoke();
