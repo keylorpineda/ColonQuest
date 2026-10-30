@@ -534,6 +534,16 @@
             "title": "Database",
             "type": "string"
           },
+          "openWeightsBudget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BudgetInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "status": {
             "const": "ok",
             "title": "Status",
@@ -728,6 +738,21 @@
           "role"
         ],
         "title": "Npc",
+        "type": "object"
+      },
+      "PingResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "PingResponse",
         "type": "object"
       },
       "PlayerState": {
@@ -1130,6 +1155,28 @@
         "summary": "Get Image",
         "tags": [
           "images"
+        ]
+      }
+    },
+    "/api/ping": {
+      "get": {
+        "description": "Keep-alive for UptimeRobot: wakes Render without touching Neon or any model.",
+        "operationId": "ping_api_ping_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ping",
+        "tags": [
+          "health"
         ]
       }
     },
