@@ -31,6 +31,16 @@ namespace ColonQuest.World
             visual = target;
         }
 
+        /// <summary>Turns the player to face left (-1) or right (1), for the animated scenes.</summary>
+        public void Face(int sign)
+        {
+            facing = sign >= 0 ? 1 : -1;
+            if (visual != null)
+            {
+                visual.localScale = new Vector3(facing, 1f, 1f);
+            }
+        }
+
         private Vector2 nudge;
         private float nudgeUntil;
 
