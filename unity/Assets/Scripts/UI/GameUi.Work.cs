@@ -13,7 +13,7 @@ namespace ColonQuest.UI
     /// </summary>
     public sealed partial class GameUi
     {
-        private const string Boss = "Doña Marta";
+        private const string Boss = "Doña Lucía";
         private const int ArrowSize = 48;
 
         private GameObject workGuide;
