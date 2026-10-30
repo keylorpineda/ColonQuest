@@ -22,6 +22,7 @@ namespace ColonQuest.UI
             Sinpe,
             Bank,
             Bills,
+            Goals,
             Search,
             Calculator,
             Blocks,
@@ -218,6 +219,7 @@ namespace ColonQuest.UI
                 case App.Sinpe: BuildSinpe(); break;
                 case App.Bank: BuildBank(); break;
                 case App.Bills: BuildBills(); break;
+                case App.Goals: BuildGoals(); break;
                 case App.Search: BuildSearch(); break;
                 case App.Calculator: BuildCalculator(); break;
                 case App.Blocks: BuildBlocks(); break;
@@ -369,6 +371,7 @@ namespace ColonQuest.UI
             text.AppendLine(Loc.F("SINPE enviado en esta partida: {0}", Money.Format(session.SinpeSent)));
             text.Append(Loc.F("Lo que tenés menos lo que debés: {0}", Money.Format(GameRules.NetWorth(state))));
             Label(text.ToString(), 26, UiKit.Ink, InnerWidth, new Vector2(0f, -64f));
+            AddBankMoves();
         }
 
         // ---------------------------------------------------------------- search

@@ -588,6 +588,18 @@ namespace ColonQuest.UI
 
             negotiationPanel.Refresh();
             RefreshPowerCut();
+            CelebrateGoals();
+        }
+
+        /// <summary>A goal reached gets its sound, its confetti and a line, once.</summary>
+        private void CelebrateGoals()
+        {
+            foreach (var goal in session.Loop.Goals.TakeNewlyDone(session.State, session.Holdings))
+            {
+                AudioDirector.Effect(SoundEffectKind.Chime);
+                Confetti.Burst(canvas.transform);
+                subtitles.Show(string.Empty, Loc.F("¡Meta cumplida: {0}!", Loc.T(PhoneUi.TitleOf(goal.Kind))));
+            }
         }
 
         // ---------------------------------------------------------------- windows
@@ -839,7 +851,13 @@ namespace ColonQuest.UI
             text.AppendLine();
             text.AppendLine(Loc.F("Decisiones tomadas: {0}", summary.Decisions));
             text.AppendLine(Loc.F("Lo que debes: {0}", Money.Format(summary.TotalDebt)));
-            text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(summary.NetWorth)));
+            text.AppendLine(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(summary.NetWorth)));
+            text.AppendLine();
+            text.AppendLine(Loc.T("Tus notas"));
+            foreach (var line in ReportCard.Build(session.State, session.Loop.Holdings, session.Loop.Bills))
+            {
+                text.AppendLine($"{Loc.T(line.Concept)}  <b>{line.Grade}</b>");
+            }
 
             var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
             if (assets.Count == 0)
