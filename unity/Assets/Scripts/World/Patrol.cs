@@ -15,6 +15,7 @@ namespace ColonQuest.World
 
         private Transform visual;
         private PlayerAnimator animator;
+        private Collider2D talkCollider;
         private Vector2 target;
         private float waitUntil;
         private float chatUntil;
@@ -48,10 +49,32 @@ namespace ColonQuest.World
                 animator = bob.GetComponent<PlayerAnimator>();
                 visual = bob.Find("Visual");
             }
+
+            var talk = transform.Find("Talk");
+            if (talk != null)
+            {
+                talkCollider = talk.GetComponent<Collider2D>();
+            }
         }
 
         private void Update()
         {
+            bool night = DayTint.IsNight;
+            if (visual != null && visual.gameObject.activeSelf == night)
+            {
+                visual.gameObject.SetActive(!night);
+                if (talkCollider != null)
+                {
+                    talkCollider.enabled = !night;
+                }
+            }
+
+            if (night)
+            {
+                SetWalking(0f);
+                return;
+            }
+
             if (Time.time < waitUntil || Time.time < chatUntil)
             {
                 SetWalking(0f);

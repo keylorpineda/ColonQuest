@@ -12,15 +12,19 @@ namespace ColonQuest.World
         [SerializeField] private float amplitude = 0.2f;
         [SerializeField] private float speed = 3f;
         [SerializeField] private float seed;
+        [SerializeField] private bool nightOnly;
 
         private SpriteRenderer spriteRenderer;
         private Color baseColor;
 
-        public void Configure(float flickerAmplitude, float flickerSpeed, float noiseSeed)
+        public bool NightOnly => nightOnly;
+
+        public void Configure(float flickerAmplitude, float flickerSpeed, float noiseSeed, bool isNightOnly = false)
         {
             amplitude = flickerAmplitude;
             speed = flickerSpeed;
             seed = noiseSeed;
+            nightOnly = isNightOnly;
         }
 
         private void Awake()
@@ -31,6 +35,17 @@ namespace ColonQuest.World
 
         private void Update()
         {
+            if (nightOnly)
+            {
+                if (!DayTint.IsNight)
+                {
+                    Color offColor = baseColor;
+                    offColor.a = 0f;
+                    spriteRenderer.color = offColor;
+                    return;
+                }
+            }
+
             float noise = Mathf.PerlinNoise(Time.time * speed, seed);
             Color color = baseColor;
             color.a = Mathf.Clamp01(baseColor.a * Mathf.Lerp(1f - amplitude, 1f + amplitude, noise));

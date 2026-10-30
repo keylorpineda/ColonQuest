@@ -79,6 +79,8 @@ namespace ColonQuest.Game
         public string characterName = string.Empty;
         public bool female;
         public string savedAt = string.Empty;
+        public string sessionId = string.Empty;
+        public bool isFinished;
         public RunSnapshot run = new RunSnapshot();
 
         public int Month => run.monthsPlayed + 1;
@@ -88,11 +90,18 @@ namespace ColonQuest.Game
         public int Wellbeing => run.state.wellbeing;
 
         /// <summary>True once the last month was closed: the run can be looked at, not played on.</summary>
-        public bool Finished => run.monthsPlayed >= GameRules.MonthsToPlay;
+        public bool Finished => isFinished || run.monthsPlayed >= GameRules.MonthsToPlay;
 
-        public static SaveSlot From(string name, GameLoop loop, DateTime now)
+        public static SaveSlot From(string name, GameLoop loop, DateTime now, string sessionId = "")
         {
-            return new SaveSlot { name = name, savedAt = now.ToString("o", CultureInfo.InvariantCulture), run = loop.Snapshot() };
+            return new SaveSlot
+            {
+                name = name,
+                savedAt = now.ToString("o", CultureInfo.InvariantCulture),
+                run = loop.Snapshot(),
+                sessionId = sessionId ?? string.Empty,
+                isFinished = loop.IsFinished || loop.MonthsPlayed >= GameRules.MonthsToPlay
+            };
         }
 
         /// <summary>The date of the last game in the player's local time, short: "30/10 14:05".</summary>

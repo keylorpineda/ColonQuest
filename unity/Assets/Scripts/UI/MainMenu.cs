@@ -149,6 +149,11 @@ namespace ColonQuest.UI
             credits.SetActive(false);
             slots.SetActive(false);
             newGame.SetActive(false);
+            if (finishedReport != null)
+            {
+                finishedReport.SetActive(false);
+            }
+
             settings.Hide();
         }
 

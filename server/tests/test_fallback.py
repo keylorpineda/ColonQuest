@@ -26,8 +26,8 @@ STATE = PlayerState.model_validate(
 def test_catalog_size_and_unique_ids() -> None:
     events = load_fallback_events()
     hand_written = [event for event in events if not event.event_id.startswith("evt_bank_")]
-    assert 15 <= len(hand_written) <= 20
-    assert len(events) <= 60
+    assert 15 <= len(hand_written) <= 25
+    assert len(events) <= 65
     ids = [event.event_id for event in events]
     assert len(ids) == len(set(ids))
     titles = [event.title for event in events]

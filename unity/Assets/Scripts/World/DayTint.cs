@@ -9,6 +9,9 @@ namespace ColonQuest.World
         /// <summary>Set by the game session; the town reads it when it loads or while it is open.</summary>
         public static float Progress;
 
+        /// <summary>True during night hours (18:00 to 06:00), updated by the active session.</summary>
+        public static bool IsNight;
+
         private SpriteRenderer spriteRenderer;
 
         private void Awake()

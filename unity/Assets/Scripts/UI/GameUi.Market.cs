@@ -154,6 +154,18 @@ namespace ColonQuest.UI
             text.AppendLine();
             text.Append(Loc.T(MarketAssumptions.ShortDisclaimer));
 
+            options.Add(new ModalOption
+            {
+                Label = $"{options.Count + 1}.  " + Loc.T("Recorrer el interior"),
+                Color = GameUiColors.Blue,
+                OnPress = () =>
+                {
+                    modal.Hide();
+                    Door.SetRememberedReturn("Town_From_" + home.Id);
+                    SceneTransition.Go(SceneNames.Casa, SpawnIds.FromTown);
+                }
+            });
+
             string backLabel = $"{options.Count + 1}.  " + Loc.T(fromCatalog ? "Volver a las casas" : "Salir");
             options.Add(Back(backLabel, fromCatalog ? (System.Action) ShowHomeCatalog : null));
             modal.Show(Loc.T(home.Name), HomeTag(home), text.ToString(), options, null, MarketFont, MarketBodyHeight);

@@ -272,7 +272,7 @@ namespace ColonQuest.EditorTools
             Shape(root, "Post", roundedSmall, new Vector2(0f, 0.9f), new Vector2(0.14f, 1.8f), GamePalette.Hex("#4A5370"), 1);
             Shape(root, "Head_Outline", circle, new Vector2(0f, 1.95f), Vector2.one * 0.52f, GamePalette.Outline, 2);
             Shape(root, "Head", circle, new Vector2(0f, 1.95f), Vector2.one * 0.38f, GamePalette.Hex("#FFE08A"), 3);
-            Flickering(Glow(root, "Glow", new Vector2(0f, 1.8f), 3.6f, "#FFD98A", 0.2f, 20), 0.12f, 1.3f, x * 3.1f);
+            Flickering(Glow(root, "Glow", new Vector2(0f, 1.8f), 3.6f, "#FFD98A", 0.2f, 20), 0.12f, 1.3f, x * 3.1f, true);
 
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.15f;

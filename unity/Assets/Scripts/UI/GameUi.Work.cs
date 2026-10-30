@@ -23,7 +23,11 @@ namespace ColonQuest.UI
         private Station workStation;
         private GameObject homeDoor;
 
-        private const string HomeDoorName = "Door_" + SceneNames.Cuarto;
+        private string CurrentHomeScene => (session != null && session.Loop != null && session.Loop.Holdings != null && session.Loop.Holdings.Home != null)
+            ? SceneNames.Casa
+            : SceneNames.Cuarto;
+
+        private string HomeDoorName => "Door_" + CurrentHomeScene;
 
         private void BuildWorkGuide()
         {
@@ -84,7 +88,15 @@ namespace ColonQuest.UI
             }
 
             bool late = JobRecord.IsLate(clock.Minutes);
-            GameObject target = toWork ? (workStation != null ? workStation.gameObject : null) : homeDoor;
+            string homeScene = CurrentHomeScene;
+            if (homeDoor == null)
+            {
+                homeDoor = GameObject.Find("Door_" + homeScene);
+            }
+
+            GameObject target = toWork
+                ? (workStation != null ? workStation.gameObject : GameObject.Find("Door_" + SceneNames.Soda))
+                : homeDoor;
             var hero = GameObject.FindWithTag(Station.PlayerTag);
             if (target == null || hero == null)
             {
@@ -95,8 +107,9 @@ namespace ColonQuest.UI
                 }
                 else
                 {
-                    bool inRoom = SceneManager.GetActiveScene().name == SceneNames.Cuarto;
-                    workGuideText.text = Loc.T(inRoom ? "Ya es tarde: acostate a dormir" : "Ya es tarde: andá a tu cuarto");
+                    bool inHome = SceneManager.GetActiveScene().name == homeScene;
+                    string dest = homeScene == SceneNames.Casa ? "casa" : "cuarto";
+                    workGuideText.text = Loc.T(inHome ? "Ya es tarde: acostate a dormir" : "Ya es tarde: andá a tu " + dest);
                 }
 
                 return;
@@ -105,9 +118,15 @@ namespace ColonQuest.UI
             Vector2 direction = (Vector2)target.transform.position - (Vector2)hero.transform.position;
             workArrow.gameObject.SetActive(true);
             workArrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);
-            workGuideText.text = toWork
-                ? Loc.T(late ? "¡Vas tarde al trabajo!" : "Al trabajo: entrás a las 7:00")
-                : Loc.T("Ya es tarde: andá a tu cuarto");
+            if (toWork)
+            {
+                workGuideText.text = Loc.T(late ? "¡Vas tarde al trabajo!" : "Al trabajo: entrás a las 7:00");
+            }
+            else
+            {
+                string dest = homeScene == SceneNames.Casa ? "casa" : "cuarto";
+                workGuideText.text = Loc.T("Ya es tarde: andá a tu " + dest);
+            }
         }
 
         private string WorkPrompt()

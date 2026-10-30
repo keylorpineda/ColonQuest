@@ -561,7 +561,7 @@ namespace ColonQuest.EditorTools
 
                 var root = Root(lamps, "PorchLight", new Vector2(b.DoorX, b.YBottom + 2.2f), b.YBottom - 0.05f);
                 Part(root, roundedSmall, Vector2.zero, new Vector2(0.3f, 0.2f), "#4A5166", 0);
-                Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.1f), Vector2.one * 1.3f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, b.DoorX);
+                Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.1f), Vector2.one * 1.3f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, b.DoorX, true);
             }
 
             // A number plate on the door of every home.

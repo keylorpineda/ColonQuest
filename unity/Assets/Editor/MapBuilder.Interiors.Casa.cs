@@ -217,6 +217,17 @@ namespace ColonQuest.EditorTools
             Solid(desk, "DeskChair", circle, -6.4f, -4.45f, 0.55f, 0.55f, "#3B6FB6");
             BuildStation(parts.Stations, "Station_Home", StationType.Home, "Casa", new Vector2(-6.4f, -3.9f));
 
+            // The pet (zaguatico) resting by the living room
+            var pet = IL(parts.Props, "Pet");
+            Deco(pet, "Cushion", rounded, 6.2f, -1.8f, 1.3f, 1.0f, "#A0522D", 1f, 7);
+            Deco(pet, "Inner", circle, 6.2f, -1.8f, 1.0f, 0.8f, "#D2B48C", 1f, 8);
+            Deco(pet, "Body", circle, 6.2f, -1.75f, 0.7f, 0.5f, "#C68B59", 1f, 9);
+            Deco(pet, "Head", circle, 6.48f, -1.65f, 0.38f, 0.34f, "#A66D3B", 1f, 10);
+            Deco(pet, "Ear", circle, 6.55f, -1.55f, 0.15f, 0.2f, "#7D4E27", 1f, 11);
+            Deco(pet, "Tail", roundedSmall, 5.82f, -1.75f, 0.28f, 0.1f, "#C68B59", 1f, 9);
+            BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
+                "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
+
             // By the front door: shoes, coats and a plant.
             var entry = IL(parts.Props, "Entry");
             Solid(entry, "ShoeRack", rounded, 1.9f, -5.5f, 1.3f, 0.5f, "#8B5A3C");

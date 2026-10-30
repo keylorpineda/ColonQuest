@@ -264,11 +264,11 @@ namespace ColonQuest.EditorTools
             // The shore of the beach: a swim once a month, if the swimsuit was bought.
             BuildStation(parent, "Station_Beach", StationType.Beach, "Darse un chapuzón en el mar", new Vector2(-12f, -25.6f));
             // The real estate agency, the farm, the car agency, the police station and the hospital are entered by their doors.
-            Doorway(parent, new Vector2(RealEstateSpot.x, 33.2f), SceneNames.Inmobiliaria);
+            Doorway(parent, new Vector2(RealEstateSpot.x, 33.2f), SceneNames.Inmobiliaria, true);
             BuildSpawnPoint(parent, SpawnIds.TownFromInmobiliaria, new Vector2(RealEstateSpot.x, 31.6f));
-            Doorway(parent, new Vector2(FarmSpot.x, 6.2f), SceneNames.Finca);
+            Doorway(parent, new Vector2(FarmSpot.x, 6.2f), SceneNames.Finca, true);
             BuildSpawnPoint(parent, SpawnIds.TownFromFinca, FarmSpot);
-            Doorway(parent, new Vector2(CarDealerSpot.x, 33.2f), SceneNames.Agencia);
+            Doorway(parent, new Vector2(CarDealerSpot.x, 33.2f), SceneNames.Agencia, true);
             Doorway(parent, new Vector2(PoliceX, 33.2f), SceneNames.Carcel);
             Doorway(parent, new Vector2(HospitalX, HospitalY + 0.2f), SceneNames.Hospital);
 
@@ -297,11 +297,24 @@ namespace ColonQuest.EditorTools
             BuildListingStation(parent, "casa_almendros_1", "Ver la casa en venta", new Vector2(-36.6f, 30.9f));
             BuildListingStation(parent, "casa_almendros_2", "Ver la casa en alquiler", new Vector2(-28.6f, 30.9f));
 
-            // Knocking at the door of those houses is answered by the player's own thought.
-            BuildListingStation(parent, "casa_vecina_b", "Tocar la puerta", new Vector2(-40.25f, -8.9f));
-            BuildListingStation(parent, "casa_vecina_d", "Tocar la puerta", new Vector2(-8.5f, -8.9f));
-            BuildListingStation(parent, "casa_almendros_1", "Tocar la puerta", new Vector2(-39f, 32f));
-            BuildListingStation(parent, "casa_almendros_2", "Tocar la puerta", new Vector2(-31f, 32f));
+            // Listed houses have walkthrough doors that lead into their house interior.
+            BuildListingHouseDoor(parent, "casa_vecina_b", -40.25f, -9.1f);
+            BuildListingHouseDoor(parent, "casa_vecina_d", -8.5f, -9.1f);
+            BuildListingHouseDoor(parent, "casa_almendros_1", -39f, 31.8f);
+            BuildListingHouseDoor(parent, "casa_almendros_2", -31f, 31.8f);
+        }
+
+        private static void BuildListingHouseDoor(Transform parent, string listingId, float x, float yBottom)
+        {
+            string spawn = "Town_From_" + listingId;
+            var go = new GameObject("Door_" + listingId);
+            go.transform.SetParent(parent, false);
+            go.transform.position = new Vector2(x, yBottom + 0.2f);
+            var trigger = go.AddComponent<BoxCollider2D>();
+            trigger.size = new Vector2(1.3f, 1.0f);
+            trigger.isTrigger = true;
+            go.AddComponent<Door>().ConfigureHouse(SceneNames.Casa, SpawnIds.FromTown, Vector2.up, spawn);
+            BuildSpawnPoint(parent, spawn, new Vector2(x, yBottom - 1.2f));
         }
 
         /// <summary>The door of a house that is not for sale: it leads inside, and back out to the spot in front of this very door.</summary>

@@ -95,7 +95,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => GameLoop.IsTaskStation(s.Type));
-            Assert.AreEqual(6, tasks.Count(), "the districts add places to spend, not tasks of the month");
+            Assert.AreEqual(5, tasks.Count(), "five street stations; soda is an interior");
         }
 
         [UnityTest]

@@ -636,6 +636,160 @@
         }
       ],
       "teachingConcept": "compound_interest"
+    },
+    {
+      "eventId": "evt_tanda_trabajo",
+      "type": "offer",
+      "title": "Tanda quincenal en la soda",
+      "narrative": "Los compañeros de la soda organizan una tanda quincenal de ₡20 000 para ayudarse entre todos. Podés entrar a la tanda o guardar esa plata en tu cuenta de ahorro.",
+      "npc": {
+        "id": "dona_lucia",
+        "name": "Doña Lucía",
+        "role": "cook"
+      },
+      "imageKey": "scene_soda",
+      "choices": [
+        {
+          "id": "join_tanda",
+          "label": "Entrar a la tanda",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 20000,
+              "source": "cash"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 3
+            }
+          ]
+        },
+        {
+          "id": "save_bank",
+          "label": "Ahorrarlo en el banco",
+          "effects": [
+            {
+              "kind": "savings_change",
+              "amount": 20000
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 2
+            }
+          ]
+        },
+        {
+          "id": "pass",
+          "label": "Paso esta vez",
+          "effects": []
+        }
+      ],
+      "teachingConcept": "budget"
+    },
+    {
+      "eventId": "evt_rifa_comunal",
+      "type": "offer",
+      "title": "Rifa comunal de barrio",
+      "narrative": "En el barrio están vendiendo números para la rifa parroquial de una canasta de víveres a ₡10 000 el número. El vecino te ofrece comprar para apoyar la comunidad.",
+      "npc": {
+        "id": "vecino_don_chepe",
+        "name": "Don Chepe",
+        "role": "neighbor"
+      },
+      "imageKey": "scene_esquina_barrio",
+      "choices": [
+        {
+          "id": "buy_two",
+          "label": "Comprar dos números (₡20 000)",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 20000,
+              "source": "cash"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 4
+            }
+          ]
+        },
+        {
+          "id": "buy_one",
+          "label": "Comprar un número (₡10 000)",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 10000,
+              "source": "cash"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 2
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Agradecer y no comprar",
+          "effects": []
+        }
+      ],
+      "teachingConcept": "budget"
+    },
+    {
+      "eventId": "evt_black_friday_celular",
+      "type": "offer",
+      "title": "Viernes Negro: Celular a cuotas",
+      "narrative": "Llegó el Viernes Negro y en la tienda anuncian el último celular a 'solamente ₡18 000 por mes'. Al contado cuesta ₡250 000, pero a cuotas terminás pagando casi el doble.",
+      "npc": {
+        "id": "vendedor_tienda",
+        "name": "Vendedor",
+        "role": "salesperson"
+      },
+      "imageKey": "scene_tienda_celulares",
+      "choices": [
+        {
+          "id": "buy_cash",
+          "label": "Comprar de contado si hay plata",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 250000,
+              "source": "cash"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 8
+            }
+          ]
+        },
+        {
+          "id": "buy_installments",
+          "label": "Sacarlo a cuotas",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 18000,
+              "source": "credit_card"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 4
+            }
+          ]
+        },
+        {
+          "id": "keep_current",
+          "label": "Seguir con el celular actual",
+          "effects": [
+            {
+              "kind": "wellbeing_change",
+              "amount": 2
+            }
+          ]
+        }
+      ],
+      "teachingConcept": "installments_total_cost"
     }
   ]
 }

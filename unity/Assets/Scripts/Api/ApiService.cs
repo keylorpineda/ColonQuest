@@ -29,6 +29,11 @@ namespace ColonQuest.Api
 
         public bool HasSession => !string.IsNullOrEmpty(SessionId);
 
+        public void RestoreSession(string sessionId)
+        {
+            SessionId = sessionId ?? string.Empty;
+        }
+
         public IEnumerator CreateSession(string classCode, Action<ApiResult<string>> done)
         {
             string body = string.IsNullOrEmpty(classCode) ? "{}" : "{\"classCode\":\"" + Escape(classCode) + "\"}";
