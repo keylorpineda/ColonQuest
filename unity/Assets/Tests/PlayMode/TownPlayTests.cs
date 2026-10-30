@@ -253,6 +253,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
             Assert.AreEqual(StationType.Work, GameObject.Find("Station_Work").GetComponent<Station>().Type);
             Assert.IsNotNull(GameObject.Find("TimeClock"), "the time clock hangs on the wall of the soda");
+            Assert.AreEqual(StationType.Courses, GameObject.Find("Station_Courses").GetComponent<Station>().Type);
         }
 
         [UnityTest]
