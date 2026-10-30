@@ -25,9 +25,26 @@ STATE = PlayerState.model_validate(
 
 def test_catalog_size_and_unique_ids() -> None:
     events = load_fallback_events()
-    assert 15 <= len(events) <= 20
+    hand_written = [event for event in events if not event.event_id.startswith("evt_bank_")]
+    assert 15 <= len(hand_written) <= 20
+    assert len(events) <= 60
     ids = [event.event_id for event in events]
     assert len(ids) == len(set(ids))
+    titles = [event.title for event in events]
+    assert len(titles) == len(set(titles))
+
+
+def test_event_bank_fits_any_month_and_uses_cached_scenes() -> None:
+    import re
+
+    events = load_fallback_events()
+    bank = [event for event in events if event.event_id.startswith("evt_bank_")]
+    # The scenes of the hand-written events are the ones pregenerate_images.py caches.
+    scenes = {event.image_key for event in events if event not in bank}
+    december = re.compile(r"aguinaldo|marchamo|diciembre|navidad", re.IGNORECASE)
+    for event in bank:
+        assert not december.search(event.title + event.narrative), event.event_id
+        assert event.image_key in scenes - {"scene_navidad"}, event.event_id
 
 
 def test_catalog_covers_every_teaching_concept() -> None:
