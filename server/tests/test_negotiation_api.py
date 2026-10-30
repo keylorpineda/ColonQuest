@@ -74,6 +74,27 @@ async def test_turns_are_stored_and_fed_back(
     assert rows[1].key_questions_asked == ["insurance"]
 
 
+async def test_seller_remembers_questions_asked_to_other_sellers(
+    client: httpx2.AsyncClient, provider: FakeProvider
+) -> None:
+    provider.steps += [
+        seller("Diay, el seguro es ₡3 500 al mes.", ["insurance_fee"]),
+        seller("Mae, esta pantalla es una ganga.", []),
+        seller("Solo ₡19 600 al mes, mae.", ["monthly_payment"]),
+    ]
+    session_id = (await client.post("/api/sessions", json={})).json()["sessionId"]
+    url = f"/api/sessions/{session_id}/negotiation"
+
+    await client.post(url, json={"offerId": "celular_gama_alta", "text": "¿Cuánto es el seguro?"})
+    await client.post(url, json={"offerId": "pantalla_65", "text": "Hola"})
+    await client.post(url, json={"offerId": "celular_gama_alta", "text": "¿Y la cuota?"})
+
+    assert "playerHabits" not in provider.calls[0]["user"]
+    assert '"playerHabits":{"askedOtherSellers":["insurance"]}' in provider.calls[1]["user"]
+    # Questions asked in this same offer are already in its conversation, not in the habits.
+    assert "playerHabits" not in provider.calls[2]["user"]
+
+
 async def test_unknown_offer_and_session(client: httpx2.AsyncClient) -> None:
     session_id = (await client.post("/api/sessions", json={})).json()["sessionId"]
     unknown_offer = await client.post(

@@ -16,6 +16,7 @@ from fastapi import (
     status,
 )
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import AppSettings, DbSession
 from app.api.sessions import get_active_session
@@ -26,7 +27,7 @@ from app.negotiation.audio import MAX_BYTES, AudioError, normalize_wav
 from app.negotiation.seller_sheet import get_offer
 from app.negotiation.service import NegotiationResponder, PreviousTurn
 from app.providers.base import ProviderError, Transcriber, Usage
-from app.schemas import NegotiationReply
+from app.schemas import KeyQuestion, NegotiationReply
 from app.schemas.api import NegotiationRequest
 
 router = APIRouter(prefix="/sessions", tags=["negotiation"])
@@ -46,6 +47,19 @@ def get_transcriber(request: Request) -> Transcriber:
 
 NegotiatorDep = Annotated[NegotiationResponder, Depends(get_negotiator)]
 TranscriberDep = Annotated[Transcriber, Depends(get_transcriber)]
+
+
+async def player_habits(
+    db: AsyncSession, session_id: uuid.UUID, offer_id: str
+) -> list[KeyQuestion]:
+    """Key questions the player asked other sellers in this session: the seller's memory."""
+    rows = await db.scalars(
+        select(Negotiation.key_questions_asked).where(
+            Negotiation.session_id == session_id, Negotiation.offer_id != offer_id
+        )
+    )
+    asked = {question for questions in rows for question in questions}
+    return [question for question in KeyQuestion if question.value in asked]
 
 
 async def run_turn(
@@ -70,9 +84,10 @@ async def run_turn(
         )
     ).all()
     history = [PreviousTurn(player=row.transcript, seller=row.npc_reply) for row in previous]
+    habits = await player_habits(db, session_id, offer_id)
 
     ledger = DbLedger(db, settings, game_session.client_hash)
-    outcome = await negotiator.reply(ledger, session_id, offer, player_text, history)
+    outcome = await negotiator.reply(ledger, session_id, offer, player_text, history, habits)
     reply = outcome.reply
     db.add(
         Negotiation(
