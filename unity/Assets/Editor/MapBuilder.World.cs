@@ -746,7 +746,25 @@ namespace ColonQuest.EditorTools
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
             TimeClock(parent, 15.2f, -23.6f);
+            CoursesBoard(parent, 0f, 5.2f);
             Bench(parent, shadows, 17.8f, -23.2f);
+        }
+
+        /// <summary>A board on two posts with the courses of the INA and the UNA, on the sidewalk between the bank and the store.</summary>
+        private static void CoursesBoard(Transform parent, float x, float y)
+        {
+            var root = Root(parent, "CoursesBoard", new Vector2(x, y), y);
+            foreach (float post in new[] { -0.75f, 0.75f })
+            {
+                Shape(root, "Post_Outline", roundedSmall, new Vector2(post, 0.6f), new Vector2(0.2f, 1.3f), GamePalette.Outline, 0);
+                Shape(root, "Post", roundedSmall, new Vector2(post, 0.6f), new Vector2(0.1f, 1.2f), GamePalette.Hex("#8B5A3C"), 1);
+            }
+
+            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 1.25f), new Vector2(2.2f, 1.06f), GamePalette.Outline, 2);
+            Shape(root, "Board", roundedSmall, new Vector2(0f, 1.25f), new Vector2(2.06f, 0.92f), GamePalette.Hex("#1D4F8C"), 3);
+            Shape(root, "Paper", square, new Vector2(-0.5f, 1.1f), new Vector2(0.6f, 0.36f), GamePalette.Hex("#F8F5E8"), 4);
+            Shape(root, "Paper", square, new Vector2(0.5f, 1.1f), new Vector2(0.6f, 0.36f), GamePalette.Hex("#FFE9A8"), 4);
+            Label(root, "CURSOS", new Vector2(0f, 1.5f), GamePalette.White, 0.03f, TextAnchor.MiddleCenter);
         }
 
         /// <summary>The time clock of the first job, on the wall of the soda.</summary>
