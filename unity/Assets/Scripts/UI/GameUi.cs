@@ -76,6 +76,7 @@ namespace ColonQuest.UI
             subtitles = new SubtitleBar(canvas.transform);
             effects = new ScreenEffects(canvas.transform);
             Thoughts.Said += OnThought;
+            Interaction.Spoke += OnSpoke;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
@@ -107,6 +108,7 @@ namespace ColonQuest.UI
 
             ReleaseIncidents();
             Thoughts.Said -= OnThought;
+            Interaction.Spoke -= OnSpoke;
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -331,7 +333,7 @@ namespace ColonQuest.UI
             }
 
             var station = Nearby;
-            string text = station != null && !session.Busy ? PromptFor(station) : null;
+            string text = station != null && !session.Busy && !Interaction.Playing ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
             if (text != null)
             {
@@ -380,7 +382,8 @@ namespace ColonQuest.UI
             }
         }
 
-        private void Interact(Station station)
+        /// <summary>What the station does once its scene is over (see GameUi.Scenes.cs): opens its window or starts its task.</summary>
+        private void InteractNow(Station station)
         {
             switch (station.Type)
             {

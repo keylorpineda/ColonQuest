@@ -652,6 +652,32 @@ namespace ColonQuest.World
             { "Keylor Pineda: backend, IA y motor financiero", "Keylor Pineda: backend, AI and financial engine" },
             { "Jefferson Abarca: Unity, arte y flujo del juego", "Jefferson Abarca: Unity, art and game flow" },
             { "Hecho para el Meta Global AI Developer Hackathon", "Made for the Meta Global AI Developer Hackathon" },
+
+            // ---- animated interactions
+            { "Cajera", "Teller" },
+            { "El prestamista", "The lender" },
+            { "La asesora", "The advisor" },
+            { "La agente", "The agent" },
+            { "La recepción", "The reception desk" },
+            { "Buenas. ¿Viene a cerrar el mes?", "Hi there. Here to close out the month?" },
+            { "Llene este formulario y firme aquí, por favor.", "Fill out this form and sign here, please." },
+            { "Le muestro las casas. Si le gusta una, firmamos y le doy las llaves.", "Let me show you the houses. If you like one, we sign and I give you the keys." },
+            { "Mire qué carro tan bonito. Con una prima se lo lleva hoy mismo.", "Look at this beautiful car. With a down payment you drive it home today." },
+            { "La tierra da, pero hay que saber cuándo sembrar y cuándo esperar.", "The land gives, but you have to know when to plant and when to wait." },
+            { "Un baño caliente y a seguir con las cuentas.", "A hot shower and back to the numbers." },
+            { "Pedí un deseo: llegar a fin de mes con ahorro.", "I made a wish: to reach the end of the month with savings." },
+            { "Ya es tarde. Toca dormir.", "It is late. Time to sleep." },
+            { "Dormí rico. Amanecí con ganas de arreglar mis cuentas.", "I slept great. I woke up ready to fix my accounts." },
+            { "Cocinar en casa sale más barato que comer afuera.", "Cooking at home is cheaper than eating out." },
+            { "¡Hola, mae! Venga, le enseño lo que tengo.", "Hey, dude! Come on, let me show you what I have." },
+            { "¡Pase, mae! Déjeme ver qué tiene su carro.", "Come in, dude! Let me see what is wrong with your car." },
+            { "Buenas, mi amor. ¿Qué se le ofrece hoy?", "Hello, dear. What can I get you today?" },
+            { "Tranquilo, amigo. Plata rápida, sin papeleo ni preguntas.", "Easy, friend. Fast cash, no paperwork and no questions." },
+            { "¡Mae, tengo el negocio de su vida! Triplica su plata en un mes.", "Dude, I have the deal of your life! It triples your money in a month." },
+            { "Bienvenido a la cooperativa. Veamos cómo cuidar sus ahorros.", "Welcome to the co-op. Let us see how to look after your savings." },
+            { "¡Siéntese, mae! Hoy hay casado y fresco de mora.", "Sit down, dude! Today there is casado (the classic plate) and blackberry juice." },
+            { "Dormiste en tu cama", "You slept in your own bed" },
+            { "Cocinaste en casa", "You cooked at home" },
         };
     }
 }
