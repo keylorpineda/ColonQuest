@@ -49,6 +49,35 @@ namespace ColonQuest.Api
             return dto;
         }
 
+        /// <summary>The way back from <see cref="ToDto(PlayerState)"/>: a saved game is stored in this same shape.</summary>
+        public static PlayerState FromDto(PlayerStateDto dto)
+        {
+            var card = dto.creditCard ?? new CreditCardDto();
+            var state = new PlayerState
+            {
+                Month = dto.month,
+                SalaryNet = dto.salaryNet,
+                Cash = dto.cash,
+                Savings = dto.savings,
+                EmergencyFund = dto.emergencyFund,
+                Wellbeing = dto.wellbeing,
+                CreditCard = new CreditCard(card.balance, card.limit, (decimal)card.monthlyRatePct, (decimal)card.minPaymentPct)
+            };
+
+            foreach (var installment in dto.installments ?? new List<InstallmentDto>())
+            {
+                state.Installments.Add(new Installment(installment.item, installment.monthly, installment.monthsLeft));
+            }
+
+            foreach (var loan in dto.informalLoans ?? new List<InformalLoanDto>())
+            {
+                state.InformalLoans.Add(new InformalLoan(loan.lender, loan.balance, (decimal)loan.monthlyRatePct));
+            }
+
+            state.History.AddRange(dto.history ?? new List<string>());
+            return state;
+        }
+
         public static DecisionRequestDto ToDto(int month, string eventId, TeachingConcept concept, string choiceId, PlayerState stateAfter)
         {
             return new DecisionRequestDto

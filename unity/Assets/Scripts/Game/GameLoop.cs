@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ColonQuest.Api;
 using ColonQuest.Finance;
 using ColonQuest.World;
 
@@ -81,6 +82,61 @@ namespace ColonQuest.Game
             CookedThisMonth = false;
             Clock = new GameClock();
             doneStations.Clear();
+        }
+
+        /// <summary>The run as a saved game writes it (see <see cref="SaveSlots"/>).</summary>
+        public RunSnapshot Snapshot()
+        {
+            var snapshot = new RunSnapshot
+            {
+                state = ApiMapper.ToDto(State),
+                holdings = HoldingsSaving.ToSnapshot(Holdings),
+                monthsPlayed = MonthsPlayed,
+                tasksDone = TasksDone,
+                decisions = Decisions,
+                arrests = Arrests,
+                hurtThisMonth = HurtThisMonth,
+                hasSwimsuit = HasSwimsuit,
+                swamThisMonth = SwamThisMonth,
+                sleptThisMonth = SleptThisMonth,
+                cookedThisMonth = CookedThisMonth,
+                day = Clock.Day,
+                minutes = Clock.Minutes
+            };
+
+            foreach (var station in doneStations)
+            {
+                snapshot.doneStations.Add((int)station);
+            }
+
+            return snapshot;
+        }
+
+        /// <summary>Goes on with a saved run: the same finances, belongings, month, week and hour.</summary>
+        public void Restore(RunSnapshot snapshot)
+        {
+            NewGame();
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            State = snapshot.state != null ? ApiMapper.FromDto(snapshot.state) : GameRules.NewPlayer();
+            Holdings = HoldingsSaving.FromSnapshot(snapshot.holdings);
+            MonthsPlayed = Math.Max(0, snapshot.monthsPlayed);
+            TasksDone = Math.Max(0, Math.Min(GameRules.TasksPerMonth, snapshot.tasksDone));
+            Decisions = Math.Max(0, snapshot.decisions);
+            Arrests = Math.Max(0, snapshot.arrests);
+            HurtThisMonth = snapshot.hurtThisMonth;
+            HasSwimsuit = snapshot.hasSwimsuit;
+            SwamThisMonth = snapshot.swamThisMonth;
+            SleptThisMonth = snapshot.sleptThisMonth;
+            CookedThisMonth = snapshot.cookedThisMonth;
+            Clock.Restore(snapshot.day, snapshot.minutes);
+            foreach (int station in snapshot.doneStations ?? new List<int>())
+            {
+                doneStations.Add((StationType)station);
+            }
         }
 
         /// <summary>The bank, the house and the market places are not tasks; every other place offers one event per month.</summary>

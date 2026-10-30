@@ -84,6 +84,16 @@ namespace ColonQuest.Game
             endReported = false;
         }
 
+        /// <summary>Puts the clock back where a saved game left it, inside the limits of a day and a month.</summary>
+        public void Restore(int day, float minutes)
+        {
+            Day = Math.Max(1, Math.Min(GameRules.DaysPerMonth, day));
+            Minutes = Math.Max(StartMinutes, Math.Min(EndMinutes, minutes));
+
+            // A game saved right at the end of the day reports it again, or the clock would stay stuck there.
+            endReported = false;
+        }
+
         private static float Clamp01(float value)
         {
             return value < 0f ? 0f : (value > 1f ? 1f : value);
