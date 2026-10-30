@@ -17,6 +17,9 @@ namespace ColonQuest.Finance
         public int MonthsWorkedInYear { get; set; } = 12;
         public long DecemberMarchamoColones { get; set; }
         public bool AdvanceMonthNumber { get; set; } = true;
+
+        /// <summary>What comes off the salary for being late or missing work. See <see cref="FinanceEngine.CalculateDockedPay"/>.</summary>
+        public long SalaryDockedColones { get; set; }
     }
 
     /// <summary>
@@ -34,6 +37,7 @@ namespace ColonQuest.Finance
         public long EmergencyFundContributed { get; }
         public long EndingCash { get; }
         public long EndingCardBalance { get; }
+        public long SalaryDocked { get; }
 
         public MonthlyTickReport(
             int monthProcessed,
@@ -45,7 +49,8 @@ namespace ColonQuest.Finance
             long informalLoanInterestAccrued,
             long emergencyFundContributed,
             long endingCash,
-            long endingCardBalance)
+            long endingCardBalance,
+            long salaryDocked = 0L)
         {
             MonthProcessed = monthProcessed;
             SalaryCredited = salaryCredited;
@@ -57,11 +62,38 @@ namespace ColonQuest.Finance
             EmergencyFundContributed = emergencyFundContributed;
             EndingCash = endingCash;
             EndingCardBalance = endingCardBalance;
+            SalaryDocked = salaryDocked;
         }
     }
 
     public static partial class FinanceEngine
     {
+        /// <summary>A month of pay counts 30 days, as Costa Rican payroll does.</summary>
+        private const int PayrollDaysPerMonth = 30;
+
+        /// <summary>A missed day of the story stands for a whole week, a quarter of the month.</summary>
+        private const int PayrollWeeksPerMonth = 4;
+
+        /// <summary>
+        /// The pay lost in a month: one day for each late arrival that is docked and one week for each week missed. Never more
+        /// than the salary itself.
+        /// </summary>
+        public static long CalculateDockedPay(long salaryNetColones, int dockedLateDays, int missedWeeks)
+        {
+            if (salaryNetColones < 0L || salaryNetColones > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(
+                    nameof(salaryNetColones),
+                    "Net salary must be between 0 and MaxColones.");
+            if (dockedLateDays < 0)
+                throw new ArgumentOutOfRangeException(nameof(dockedLateDays), "Docked days cannot be negative.");
+            if (missedWeeks < 0)
+                throw new ArgumentOutOfRangeException(nameof(missedWeeks), "Missed weeks cannot be negative.");
+
+            long docked = salaryNetColones / PayrollDaysPerMonth * dockedLateDays
+                + salaryNetColones / PayrollWeeksPerMonth * missedWeeks;
+            return Math.Min(salaryNetColones, docked);
+        }
+
         /// <summary>
         /// Transfers up to <paramref name="requestedColones"/> from available cash into the player's
         /// emergency fund. Cash never becomes negative.
@@ -122,7 +154,8 @@ namespace ColonQuest.Finance
             int monthProcessed = state.Month;
 
             // 1. Salary
-            long salaryCredited = state.SalaryNet;
+            long salaryDocked = Math.Max(0L, Math.Min(state.SalaryNet, opts.SalaryDockedColones));
+            long salaryCredited = state.SalaryNet - salaryDocked;
             state.Cash = ContractLimits.ClampColones(state.Cash + salaryCredited);
 
             // 2. December aguinaldo
@@ -183,7 +216,8 @@ namespace ColonQuest.Finance
                 informalInterest,
                 emergencyContributed,
                 state.Cash,
-                state.CreditCard.Balance);
+                state.CreditCard.Balance,
+                salaryDocked);
         }
     }
 }
