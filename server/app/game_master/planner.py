@@ -40,7 +40,7 @@ for Costa Rican high-school students. Each month later gets one event built arou
 - Put the concepts most relevant to the player's situation early (a maxed-out card means \
 minimum_payment and compound_interest; informal loans mean informal_lending; large savings mean \
 pyramid_scheme).
-- Month 12 is December: aguinaldo and marchamo, type one of {", ".join(sorted(DECEMBER_TYPES))}.
+- Month 12 is December: aguinaldo and holidays, type one of {", ".join(sorted(DECEMBER_TYPES))}.
 - teachingConcept is one of: {_values(TeachingConcept)}
 - eventType is one of: {_values(EventType)}
 - theme: a short idea for the month in Costa Rican Spanish, at most 80 characters, no amounts.

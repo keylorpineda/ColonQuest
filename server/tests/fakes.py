@@ -14,8 +14,8 @@ from app.schemas import GameEvent
 MODEL_EVENT: dict[str, Any] = {
     "eventId": "evt_llanta_ponchada",
     "type": "emergency",
-    "title": "Llanta ponchada",
-    "narrative": "Se te ponchó la llanta camino al cole.",
+    "title": "Se rompió el bulto",
+    "narrative": "Se te rompió el bulto camino al brete.",
     "choices": [
         {
             "id": "fix",

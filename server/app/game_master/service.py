@@ -14,6 +14,7 @@ from typing import Protocol
 
 from app.config import Settings
 from app.cost_guard import BudgetMode, select_text_model
+from app.game_master.facts import assumes_a_vehicle
 from app.game_master.fallback import pick_fallback_event
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
@@ -103,7 +104,9 @@ class GameMaster:
 
         try:
             async with asyncio.timeout(self._settings.model_timeout_s):
-                event, adjustments = await self._ask_model(ledger, session_id, model, user_prompt)
+                event, adjustments = await self._ask_model(
+                    ledger, session_id, model, user_prompt, context
+                )
         except TimeoutError:
             await self._record_failure(ledger, session_id, model, started=None)
             return self._fallback(context, FallbackReason.TIMEOUT)
@@ -120,7 +123,12 @@ class GameMaster:
         )
 
     async def _ask_model(
-        self, ledger: Ledger, session_id: uuid.UUID, model: str, user_prompt: str
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        model: str,
+        user_prompt: str,
+        context: PromptContext,
     ) -> tuple[GameEvent, list[str]]:
         for attempt in range(1, MAX_ATTEMPTS + 1):
             started = time.perf_counter()
@@ -150,6 +158,11 @@ class GameMaster:
                 session_id=session_id,
             )
             event, adjustments = clamp_event(result.value)
+            if assumes_a_vehicle(event, context.state):
+                if attempt == MAX_ATTEMPTS:
+                    raise ProviderResponseError("the event assumes a vehicle the player lacks")
+                logger.warning("game master assumed a vehicle the player lacks, retrying")
+                continue
             if adjustments:
                 logger.info("clamped game master event: %s", adjustments)
             return event, adjustments
