@@ -34,6 +34,7 @@ jobs:
     outputs:
       server: ${{ steps.filter.outputs.server }}
       unity: ${{ steps.filter.outputs.unity }}
+      web: ${{ steps.filter.outputs.web }}
       workflows: ${{ steps.filter.outputs.workflows }}
       unity-project: ${{ steps.unity.outputs.exists }}
     steps:
@@ -50,6 +51,11 @@ jobs:
             unity:
               - 'unity/**'
               - 'shared/**'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
               - '.github/workflows/ci.yml'
             workflows:
               - '.github/workflows/**'
@@ -246,6 +252,27 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Unity EditMode results
 
+  web-build-check:
+    name: Web / build check
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version comes from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Only checks that the lockfile installs; publishing is manual (pnpm webgl:deploy).
+      - name: Install with the frozen lockfile
+        run: pnpm install --frozen-lockfile
+
   workflows-lint:
     name: Workflows / actionlint
     needs: changes
@@ -264,7 +291,8 @@ jobs:
   # count as success; any failure or cancellation blocks the merge.
   ci-passed:
     name: CI passed
-    needs: [changes, server-lint, server-types, server-test, engine-test, unity-test, workflows-lint]
+    needs:
+      [changes, server-lint, server-types, server-test, engine-test, unity-test, web-build-check, workflows-lint]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 2
