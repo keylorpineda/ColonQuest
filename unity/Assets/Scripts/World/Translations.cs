@@ -686,6 +686,11 @@ namespace ColonQuest.World
             { "Bienvenido a la cooperativa. Veamos cómo cuidar sus ahorros.", "Welcome to the co-op. Let us see how to look after your savings." },
             { "¡Siéntese, mae! Hoy hay casado y fresco de mora.", "Sit down, dude! Today there is casado (the classic plate) and blackberry juice." },
             { "Dormiste en tu cama", "You slept in your own bed" },
+            { "Semana {0}", "Week {0}" },
+            { "Te quedaste dormido fuera de la cama", "You fell asleep away from your bed" },
+            { "Última semana del mes: toca ir al banco a cobrar el salario.", "Last week of the month: time to collect the salary at the bank." },
+            { "Se me hizo tardísimo... ya no aguanto el sueño.", "It got so late... I can't stay awake." },
+            { "Amanecí todo torcido. Mejor dormir en la cama la próxima vez.", "I woke up all stiff. Better sleep in the bed next time." },
             { "Cocinaste en casa", "You cooked at home" },
         };
     }

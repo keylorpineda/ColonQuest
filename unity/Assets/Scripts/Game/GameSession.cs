@@ -89,7 +89,8 @@ namespace ColonQuest.Game
 
         private void Update()
         {
-            DayTint.Progress = DayCycle.ProgressOf(Loop.MonthsPlayed, Loop.TasksDone, GameRules.MonthsToPlay, GameRules.TasksPerMonth);
+            // The light follows the hour of the day: morning, noon, golden afternoon and dusk before bed.
+            DayTint.Progress = Loop.Clock.DayProgress;
         }
 
         private void OnDestroy()
@@ -493,6 +494,39 @@ namespace ColonQuest.Game
         public bool Rest()
         {
             return Apply(Loop.Rest());
+        }
+
+        /// <summary>
+        /// Moves the clock on by real seconds while the player is free. Returns true the moment the day ends, when the
+        /// player has to sleep. Nothing moves while the run is over or a request is in flight.
+        /// </summary>
+        public bool TickClock(float realSeconds)
+        {
+            if (Busy || Loop.IsFinished)
+            {
+                return false;
+            }
+
+            return Loop.Clock.Advance(realSeconds, GameRules.SecondsPerGameHour);
+        }
+
+        /// <summary>A night in the bed. The once-a-month rest shows its outcome; the other nights only move the clock.</summary>
+        public void Sleep()
+        {
+            var outcome = Loop.Sleep();
+            if (outcome == null || !Apply(outcome))
+            {
+                Changed?.Invoke();
+            }
+        }
+
+        /// <summary>The day ended away from the bed.</summary>
+        public void FallAsleep()
+        {
+            if (!Apply(Loop.FallAsleep()))
+            {
+                Changed?.Invoke();
+            }
         }
 
         public bool Cook()

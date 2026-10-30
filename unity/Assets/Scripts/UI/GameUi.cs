@@ -33,6 +33,7 @@ namespace ColonQuest.UI
         private int spokenTurns;
 
         private Text monthText;
+        private Text clockText;
         private Text tasksText;
         private Text cashText;
         private Text savingsText;
@@ -164,8 +165,11 @@ namespace ColonQuest.UI
             var topLeft = new Vector2(0f, 1f);
             var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
-            monthText = UiKit.Label(card, string.Empty, 36, UiKit.Ink, new Vector2(260f, 44f), topLeft, new Vector2(22f, -14f));
-            tasksText = UiKit.Label(card, string.Empty, 26, GameUiColors.Muted, new Vector2(170f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -14f), TextAnchor.MiddleRight);
+            // Top line: the month and its week on the left, the hour on the right. The tasks go on the bottom line.
+            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -14f));
+            monthText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -14f), TextAnchor.MiddleRight);
+            tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(190f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -276f), TextAnchor.MiddleRight);
 
             cashText = Row(card, "Efectivo", 1);
             savingsText = Row(card, "Ahorros", 2);
@@ -369,6 +373,19 @@ namespace ColonQuest.UI
                 return;
             }
 
+            // The clock runs only while the player is free: no window, no scene, no wait for the server.
+            if (!session.Busy && !Interaction.Playing && !SceneTransition.IsBusy && session.TickClock(Time.deltaTime))
+            {
+                FallAsleepScene();
+                return;
+            }
+
+            string time = session.Loop.Clock.Time;
+            if (clockText.text != time)
+            {
+                clockText.text = time;
+            }
+
             if (!session.Busy && !Interaction.Playing && Input.GetKeyDown(KeyCode.P))
             {
                 OpenPhone();
@@ -524,7 +541,9 @@ namespace ColonQuest.UI
             var state = session.State;
             var loop = session.Loop;
             WalkWatch.HasSwimsuit = loop.HasSwimsuit;
-            monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay);
+            monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay)
+                + "  ·  " + Loc.F("Semana {0}", loop.Clock.Day);
+            clockText.text = loop.Clock.Time;
             tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
             cashText.text = Money.Format(state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
