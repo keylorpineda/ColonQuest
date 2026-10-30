@@ -8,6 +8,7 @@ namespace ColonQuest.World
         public const string Menu = "Menu";
         public const string Town = "Town";
         public const string Casa = "Casa";
+        public const string Cuarto = "Cuarto";
         public const string Tienda = "Tienda";
         public const string Banco = "Banco";
         public const string Agencia = "Agencia";
@@ -32,6 +33,7 @@ namespace ColonQuest.World
 
         // In the town, in front of each building door.
         public const string TownFromCasa = "Town_FromCasa";
+        public const string TownFromCuarto = "Town_FromCuarto";
         public const string TownFromFinca = "Town_FromFinca";
         public const string TownFromInmobiliaria = "Town_FromInmobiliaria";
         public const string TownFromTienda = "Town_FromTienda";
@@ -97,6 +99,8 @@ namespace ColonQuest.World
         public static readonly Vector2 TiendaSize = new Vector2(18f, 12.6f);
         public static readonly Vector2 BancoSize = new Vector2(24f, 16.8f);
         public static readonly Vector2 CasaMat = new Vector2(0f, -5f);
+        public static readonly Vector2 CuartoSize = new Vector2(10f, 7.5f);
+        public static readonly Vector2 CuartoMat = new Vector2(0f, -2.75f);
         public static readonly Vector2 TiendaMat = new Vector2(0f, -5.3f);
         public static readonly Vector2 BancoMat = new Vector2(0f, -7.4f);
 

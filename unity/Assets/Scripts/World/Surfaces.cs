@@ -41,6 +41,7 @@ namespace ColonQuest.World
             switch (scene)
             {
                 case SceneNames.Casa:
+                case SceneNames.Cuarto:
                 case SceneNames.Vecino:
                 case SceneNames.Finca:
                     return SurfaceKind.Wood;

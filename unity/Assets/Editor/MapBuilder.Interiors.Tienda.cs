@@ -19,6 +19,7 @@ namespace ColonQuest.EditorTools
             BuildWhiteGoods(parts);
             BuildPhoneTables(parts);
             BuildMotorbike(parts);
+            BuildFurnitureCorner(parts);
             BuildCreditDesk(parts);
             BuildCheckout(parts);
 
@@ -147,6 +148,19 @@ namespace ColonQuest.EditorTools
             Deco(moto, "Headlight", circle, 8.34f, 2.08f, 0.22f, 0.22f, "#FFF1A8", 1f, 16);
             Deco(moto, "HeadlightGlow", circle, 8.34f, 2.08f, 0.5f, 0.5f, "#FFF1A8", 0.25f, 15);
             WallPlate(parts.Labels, "MOTO 125 CC", new Vector2(7.4f, 2.7f), 1.8f, "#1D4F8C", GamePalette.White, 0.024f);
+        }
+
+        /// <summary>A little bed and a little table against the back wall, for the furniture of the player's room.</summary>
+        private static void BuildFurnitureCorner(InteriorParts parts)
+        {
+            var corner = IL(parts.Props, "FurnitureCorner");
+            Solid(corner, "Platform", rounded, 0.45f, 4.85f, 2.2f, 1.1f, "#8B5A3C");
+            Deco(corner, "Mattress", rounded, 0.0f, 4.85f, 0.85f, 0.95f, "#F2EDE1", 1f, 8);
+            Deco(corner, "Blanket", rounded, 0.0f, 4.65f, 0.85f, 0.55f, "#5B7FC4", 1f, 9);
+            Deco(corner, "Table", rounded, 1.0f, 4.85f, 0.75f, 0.55f, "#C99A62", 1f, 8);
+            Deco(corner, "Chair", roundedSmall, 1.0f, 4.45f, 0.3f, 0.25f, "#B07A45", 1f, 8);
+            WallPlate(parts.Labels, "MUEBLES", new Vector2(0.45f, 4.1f), 1.3f, "#1D4F8C", GamePalette.White, 0.024f);
+            BuildStation(parts.Stations, "Station_Furniture", StationType.Furniture, "Ver los muebles", new Vector2(0.45f, 3.3f));
         }
 
         /// <summary>The seller's desk, where the installment plans are signed. The negotiation starts here.</summary>
