@@ -107,7 +107,79 @@ namespace ColonQuest.UI
                 return;
             }
 
-            StartStory(slot, Loc.F("Partida {0}", slot + 1));
+            ShowNewGame(slot);
+        }
+
+        // ---------------------------------------------------------------- the new game
+
+        private GameObject newGame;
+        private InputField nameBox;
+        private InputField runBox;
+        private Image manButton;
+        private Image womanButton;
+        private int newGameSlot;
+        private bool newGameFemale;
+
+        private void BuildNewGame()
+        {
+            newGame = UiKit.Overlay(root, "NewGame");
+            var center = new Vector2(0.5f, 0.5f);
+            var top = new Vector2(0.5f, 1f);
+            var card = UiKit.Card(newGame.transform, "Card", UiKit.Paper, new Vector2(960f, 760f), center, Vector2.zero);
+
+            var title = UiKit.Label(card, "Nueva vida", 60, UiKit.Ink, new Vector2(860f, 76f), top, new Vector2(0f, -26f), TextAnchor.MiddleCenter);
+            title.font = UiKit.TitleFont;
+            Divider(card, -112f, 800f);
+
+            UiKit.Label(card, "¿Cómo te llamás?", 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -132f));
+            nameBox = UiKit.TextBox(card, "NameBox", "Tu nombre", new Vector2(760f, 80f), top, new Vector2(0f, -180f), PlayerProfile.MaxNameLength);
+
+            float y = -280f;
+            var man = UiKit.MakeButton(card, "Hombre", NotChosen, new Vector2(370f, 84f), top, new Vector2(-195f, y), () => ChooseGender(false));
+            var woman = UiKit.MakeButton(card, "Mujer", NotChosen, new Vector2(370f, 84f), top, new Vector2(195f, y), () => ChooseGender(true));
+            manButton = man.transform.Find("Body").GetComponent<Image>();
+            womanButton = woman.transform.Find("Body").GetComponent<Image>();
+
+            UiKit.Label(card, "¿Cómo se llama la partida?", 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -384f));
+            runBox = UiKit.TextBox(card, "RunBox", "Si la dejás vacía, lleva tu nombre", new Vector2(760f, 80f), top, new Vector2(0f, -432f), PlayerProfile.MaxNameLength);
+
+            var bottom = new Vector2(0.5f, 0f);
+            UiKit.MakeButton(card, "Volver", GameUiColors.Pink, new Vector2(300f, 84f), bottom, new Vector2(-170f, 40f), BackToSlots);
+            UiKit.MakeButton(card, "Empezar", GameUiColors.Green, new Vector2(300f, 84f), bottom, new Vector2(170f, 40f), ConfirmNewGame);
+            newGame.SetActive(false);
+        }
+
+        private static readonly Color NotChosen = GamePalette.Hex("#D8DCE6");
+
+        private void ShowNewGame(int slot)
+        {
+            newGameSlot = slot;
+            nameBox.text = string.Empty;
+            runBox.text = string.Empty;
+            ChooseGender(false);
+            slots.SetActive(false);
+            newGame.SetActive(true);
+            nameBox.ActivateInputField();
+        }
+
+        private void ChooseGender(bool female)
+        {
+            newGameFemale = female;
+            manButton.color = female ? NotChosen : GameUiColors.Yellow;
+            womanButton.color = female ? GameUiColors.Yellow : NotChosen;
+        }
+
+        private void BackToSlots()
+        {
+            newGame.SetActive(false);
+            ShowSlots();
+        }
+
+        private void ConfirmNewGame()
+        {
+            string name = PlayerProfile.CleanName(nameBox.text);
+            string run = string.IsNullOrWhiteSpace(runBox.text) ? name : PlayerProfile.CleanName(runBox.text);
+            StartStory(newGameSlot, run, name, newGameFemale);
         }
 
         private void DeleteSlot(int slot)
