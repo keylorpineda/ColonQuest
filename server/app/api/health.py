@@ -1,6 +1,6 @@
 """Health check and ping: service status, database reachability and remaining daily budgets."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.deps import AppSettings, OptionalDbSession
@@ -21,14 +21,22 @@ def budget_info(status: BudgetStatus) -> BudgetInfo:
     )
 
 
-# UptimeRobot checks with HEAD by default; a GET-only route answers it with 405 Method Not Allowed.
-@router.api_route("/ping", methods=["GET", "HEAD"], response_model=PingResponse)
+@router.get("/ping", response_model=PingResponse)
 async def ping() -> PingResponse:
     """Keep-alive for UptimeRobot: wakes Render without touching Neon or any model."""
     return PingResponse(status="ok")
 
 
-@router.api_route("/health", methods=["GET", "HEAD"], response_model=HealthResponse)
+# UptimeRobot checks with HEAD by default and a GET-only route answers 405 Method Not Allowed.
+# Separate HEAD routes stay out of the OpenAPI contract (one operation per path) and never touch
+# Neon or the models, so a monitor can keep Render awake for free.
+@router.head("/ping", include_in_schema=False)
+@router.head("/health", include_in_schema=False)
+async def head_check() -> Response:
+    return Response(status_code=200)
+
+
+@router.get("/health", response_model=HealthResponse)
 async def get_health(db: OptionalDbSession, settings: AppSettings) -> HealthResponse:
     """Always answers 200 so uptime checks see the process; the body says what is degraded."""
     if db is None:
