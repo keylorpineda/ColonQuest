@@ -357,7 +357,8 @@ namespace ColonQuest.World
         private void Birds(float level, float dt)
         {
             nextBirds -= dt;
-            if (nextBirds > 0f || level < 0.3f || birds[0] == null)
+            // The clips are made one per frame at the start, so wait for the last one.
+            if (nextBirds > 0f || level < 0.3f || birds[birds.Length - 1] == null)
             {
                 return;
             }
