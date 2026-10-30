@@ -8,10 +8,10 @@ namespace ColonQuest.Api.Tests
     public sealed class FallbackEventsTests
     {
         [Test]
-        public void Catalog_HasTheSeventeenEventsOfTheServer()
+        public void Catalog_HasTheEighteenEventsOfTheServer()
         {
             // Resources/fallback_events.json is a copy of the server catalog; every event must survive validation.
-            Assert.AreEqual(17, FallbackEvents.Catalog.Count);
+            Assert.AreEqual(18, FallbackEvents.Catalog.Count);
         }
 
         [Test]
