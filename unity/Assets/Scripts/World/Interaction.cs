@@ -31,6 +31,9 @@ namespace ColonQuest.World
             Swing,
             Reveal,
             NpcWalk,
+            HoldProp,
+            ReleaseProp,
+            WaitUntil,
             Apply
         }
 
@@ -49,6 +52,7 @@ namespace ColonQuest.World
             public bool HasFront;
             public Vector2 Front;
             public Action Action;
+            public Func<bool> Condition;
         }
 
         private readonly List<Step> steps = new List<Step>();
@@ -225,6 +229,24 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.Reveal, Name = objectName, Through = visible });
         }
 
+        /// <summary>An object appears in the player's right hand and stays there until it is released or the scene ends. It does not wait.</summary>
+        public Interaction HoldProp(string prop)
+        {
+            return Add(new Step { Kind = Kind.HoldProp, Name = prop });
+        }
+
+        /// <summary>What the player's hand holds goes away. It does not wait.</summary>
+        public Interaction ReleaseProp()
+        {
+            return Add(new Step { Kind = Kind.ReleaseProp });
+        }
+
+        /// <summary>The scene holds until the condition is true, say while a window is up. Skipping does not cut it short.</summary>
+        public Interaction WaitUntil(Func<bool> condition)
+        {
+            return Add(new Step { Kind = Kind.WaitUntil, Condition = condition });
+        }
+
         /// <summary>The moment the game changes. It runs even if the player skips the scene.</summary>
         public Interaction Apply(Action action)
         {
@@ -297,6 +319,7 @@ namespace ColonQuest.World
                 var animator = bob != null ? bob.GetComponent<PlayerAnimator>() : null;
                 bool through = false;
                 Vector2 entry = Vector2.zero;
+                GameObject held = null;
 
                 try
                 {
@@ -397,6 +420,35 @@ namespace ColonQuest.World
                                 StartCoroutine(NpcWalk(step.Name, step.Point, skip ? 0f : step.Seconds));
                                 break;
 
+                            case Kind.HoldProp:
+                                if (held != null)
+                                {
+                                    Destroy(held);
+                                }
+
+                                var hand = RightHand(player);
+                                held = hand != null ? InteractionProps.InHand(step.Name, hand) : null;
+                                break;
+
+                            case Kind.ReleaseProp:
+                                if (held != null)
+                                {
+                                    Destroy(held);
+                                    held = null;
+                                }
+
+                                break;
+
+                            case Kind.WaitUntil:
+                                while (step.Condition != null && !step.Condition())
+                                {
+                                    yield return null;
+                                }
+
+                                // A key pressed meanwhile belonged to the window, not to this scene.
+                                skip = false;
+                                break;
+
                             case Kind.Apply:
                                 step.Action?.Invoke();
                                 break;
@@ -438,6 +490,11 @@ namespace ColonQuest.World
                         animator.SetPose(PersonPose.None);
                     }
 
+                    if (held != null)
+                    {
+                        Destroy(held);
+                    }
+
                     InteractionProps.ClearOverlay();
                     PlayerController.Frozen = false;
                     SetPlaying(false);
@@ -446,6 +503,20 @@ namespace ColonQuest.World
 
                 finished?.Invoke();
                 Destroy(gameObject);
+            }
+
+            /// <summary>The hand at the end of the right forearm of the look the player wears now.</summary>
+            private static Transform RightHand(GameObject player)
+            {
+                foreach (var part in player.GetComponentsInChildren<Transform>())
+                {
+                    if (part.name == "Hand" && part.parent != null && part.parent.name == "ArmRElbow")
+                    {
+                        return part;
+                    }
+                }
+
+                return null;
             }
 
             private void CheckSkip()

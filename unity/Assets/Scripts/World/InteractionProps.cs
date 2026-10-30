@@ -176,6 +176,14 @@ namespace ColonQuest.World
             prop.AddComponent<PropMover>().Begin(from, to, Mathf.Max(0.1f, seconds), 0f, true, 0.06f);
         }
 
+        /// <summary>An object that stays in a hand until it is let go: it follows the hand and stays upright as the arm turns.</summary>
+        public static GameObject InHand(string kind, Transform hand)
+        {
+            var prop = Make(kind, hand.position);
+            prop.AddComponent<PropInHand>().Begin(hand);
+            return prop;
+        }
+
         /// <summary>White puffs that rise and fade, one every little while.</summary>
         public static void Steam(Vector2 at, float seconds)
         {
@@ -325,6 +333,31 @@ namespace ColonQuest.World
             {
                 Destroy(gameObject);
             }
+        }
+    }
+
+    /// <summary>Keeps a prop in a hand. It runs after the poses of the frame, so it never lags behind the arm.</summary>
+    internal sealed class PropInHand : MonoBehaviour
+    {
+        private static readonly Vector3 Grip = new Vector3(0f, 0.09f, 0f);
+
+        private Transform hand;
+
+        public void Begin(Transform target)
+        {
+            hand = target;
+            transform.position = hand.position + Grip;
+        }
+
+        private void LateUpdate()
+        {
+            if (hand == null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            transform.position = hand.position + Grip;
         }
     }
 
