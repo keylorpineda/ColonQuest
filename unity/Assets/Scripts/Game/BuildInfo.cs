@@ -6,7 +6,7 @@ namespace ColonQuest.Game
     /// </summary>
     public static class BuildInfo
     {
-        public const int Build = 15;
+        public const int Build = 16;
 
         public const string Stage = "Alpha";
 
