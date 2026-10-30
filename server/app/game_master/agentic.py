@@ -12,7 +12,7 @@ from app.agents.loop import AgentRequest, run_tool_loop
 from app.agents.tools import ToolContext
 from app.config import Settings
 from app.cost_guard import select_text_model
-from app.game_master.facts import assumes_a_vehicle
+from app.game_master.facts import assumes_missing_thing
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
 from app.game_master.prompt import SYSTEM_PROMPT, PromptContext, build_user_prompt
@@ -89,9 +89,9 @@ class AgenticGameMaster:
             return await self._base.next_event(ledger, session_id, context)
 
         event, adjustments = clamp_event(result.value)
-        if assumes_a_vehicle(event, context.state):
+        if assumes_missing_thing(event, context.state):
             # The player already waited for the agent: no time for another model call.
-            logger.warning("agentic game master assumed a vehicle; serving a fallback event")
+            logger.warning("agentic game master assumed a missing thing; serving a fallback event")
             return self._base.fallback_event(context, FallbackReason.INVALID_RESPONSE)
         logger.info("agentic event after %s steps, tools=%s", result.steps, result.tools_used)
         return EventOutcome(

@@ -14,7 +14,7 @@ from typing import Protocol
 
 from app.config import Settings
 from app.cost_guard import BudgetMode, select_text_model
-from app.game_master.facts import assumes_a_vehicle
+from app.game_master.facts import assumes_missing_thing
 from app.game_master.fallback import pick_fallback_event
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
@@ -158,10 +158,10 @@ class GameMaster:
                 session_id=session_id,
             )
             event, adjustments = clamp_event(result.value)
-            if assumes_a_vehicle(event, context.state):
+            if assumes_missing_thing(event, context.state):
                 if attempt == MAX_ATTEMPTS:
-                    raise ProviderResponseError("the event assumes a vehicle the player lacks")
-                logger.warning("game master assumed a vehicle the player lacks, retrying")
+                    raise ProviderResponseError("the event assumes something the player lacks")
+                logger.warning("game master assumed something the player lacks, retrying")
                 continue
             if adjustments:
                 logger.info("clamped game master event: %s", adjustments)

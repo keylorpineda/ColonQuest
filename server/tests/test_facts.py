@@ -4,8 +4,13 @@ from typing import Any
 
 import pytest
 
-from app.game_master.facts import assumes_a_vehicle, owns_vehicle
-from app.game_master.fallback import VEHICLE_EVENT_IDS, pick_fallback_event
+from app.game_master.facts import (
+    assumes_a_vehicle,
+    assumes_missing_thing,
+    owns_fridge,
+    owns_vehicle,
+)
+from app.game_master.fallback import FRIDGE_EVENT_IDS, VEHICLE_EVENT_IDS, pick_fallback_event
 from app.game_master.prompt import PromptContext, state_signals
 from app.schemas import GameEvent, PlayerState
 
@@ -68,6 +73,29 @@ def test_an_expense_for_a_vehicle_needs_one() -> None:
 def test_other_events_may_mention_a_vehicle(event_type: str) -> None:
     event = GameEvent.model_validate(event_about("Un señor en moto te busca.", event_type))
     assert not assumes_a_vehicle(event, player())
+
+
+def test_a_fridge_is_needed_for_an_event_about_it() -> None:
+    event = GameEvent.model_validate(event_about("La refri amaneció tibia."))
+    assert assumes_missing_thing(event, player())
+
+    bought = player(history=["bought_furniture_fridge"])
+    assert owns_fridge(bought)
+    assert not assumes_missing_thing(event, bought)
+
+
+def test_a_washing_machine_is_never_assumed() -> None:
+    event = GameEvent.model_validate(event_about("Se te dañó la lavadora."))
+    assert assumes_missing_thing(event, player(history=["bought_furniture_fridge"]))
+
+
+def test_fallback_skips_a_fridge_without_one() -> None:
+    picks = {pick_fallback_event(player()).event_id for _ in range(400)}
+    assert not picks & FRIDGE_EVENT_IDS
+
+    bought = player(history=["bought_furniture_fridge"])
+    picks = {pick_fallback_event(bought).event_id for _ in range(800)}
+    assert picks & FRIDGE_EVENT_IDS
 
 
 def test_fallback_skips_vehicles_without_one() -> None:

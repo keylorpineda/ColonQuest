@@ -397,8 +397,8 @@
   {
     "eventId": "evt_bank_lavadora_cuotas",
     "type": "expense",
-    "title": "La lavadora quiere despegar",
-    "narrative": "Tu lavadora centrifuga como si fuera a despegar y en la tienda ves una en ₡120 000 de contado o en cuotas de ₡9 000 por 18 meses, sin prima y con entrega hoy mismo, mae.",
+    "title": "Lavar a mano cansa",
+    "narrative": "Ya te cansaste de lavar a mano y en la tienda ves una lavadora en ₡120 000 de contado o en cuotas de ₡9 000 por 18 meses, sin prima y con entrega hoy mismo, mae.",
     "npc": {"id": "vendedor_randall", "name": "Don Randall", "role": "vendedor de electrodomésticos"},
     "imageKey": "scene_tienda_electro",
     "choices": [

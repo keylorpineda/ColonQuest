@@ -51,6 +51,7 @@ def test_state_signals() -> None:
         "monthlyInstallments": 25000,
         "hasInformalLoans": False,
         "hasVehicle": False,
+        "hasFridge": False,
         "isDecember": True,
         "lowCash": True,
     }
