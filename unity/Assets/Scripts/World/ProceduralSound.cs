@@ -442,6 +442,8 @@ namespace ColonQuest.World
                     return 1.2f;
                 case SoundEffectKind.Coin:
                     return 0.5f;
+                case SoundEffectKind.Cuffs:
+                    return 0.5f;
                 case SoundEffectKind.Scribble:
                     return 0.6f;
                 case SoundEffectKind.Knock:
@@ -556,6 +558,17 @@ namespace ColonQuest.World
                     {
                         float on = (t * 6f) % 1f < 0.5f ? 1f : 0f;
                         buffer[i] = Mathf.Sin((float)TwoPi * 1050f * t) * 0.5f * on * fadeOut;
+                        break;
+                    }
+
+                    case SoundEffectKind.Cuffs:
+                    {
+                        // The ratchet of the handcuffs: quick metal clicks that ring a little, then the lock.
+                        float local = t % 0.07f;
+                        float clicks = t < 0.28f ? Mathf.Exp(-90f * local) : 0f;
+                        float lockClick = t > 0.36f ? Mathf.Exp(-40f * (t - 0.36f)) : 0f;
+                        float ring = Mathf.Sin((float)TwoPi * 2600f * t) * 0.6f + Mathf.Sin((float)TwoPi * 3900f * t) * 0.3f;
+                        buffer[i] = (ring + highpassed * 0.5f) * (clicks + lockClick) * 0.5f;
                         break;
                     }
 

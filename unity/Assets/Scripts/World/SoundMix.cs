@@ -32,7 +32,8 @@ namespace ColonQuest.World
         Knock,
         Splash,
         Munch,
-        Swish
+        Swish,
+        Cuffs
     }
 
     /// <summary>How loud each layer of the soundscape should be at one spot. All values are 0 to 1.</summary>

@@ -30,6 +30,7 @@ namespace ColonQuest.World
             Wobble,
             Swing,
             Reveal,
+            NpcWalk,
             Apply
         }
 
@@ -186,6 +187,12 @@ namespace ColonQuest.World
         public Interaction NpcPose(string person, PersonPose pose, float seconds)
         {
             return Add(new Step { Kind = Kind.NpcPose, Name = person, Pose = pose, Seconds = seconds });
+        }
+
+        /// <summary>Walks another person (found by the name of its object) to a point in some seconds, legs moving. It does not wait.</summary>
+        public Interaction NpcWalk(string person, Vector2 to, float seconds)
+        {
+            return Add(new Step { Kind = Kind.NpcWalk, Name = person, Point = to, Seconds = seconds });
         }
 
         /// <summary>Makes an object (found by name) shake for some seconds: a counter, a door. It does not wait.</summary>
@@ -369,6 +376,10 @@ namespace ColonQuest.World
                                 SetVisible(step.Name, step.Through);
                                 break;
 
+                            case Kind.NpcWalk:
+                                StartCoroutine(NpcWalk(step.Name, step.Point, skip ? 0f : step.Seconds));
+                                break;
+
                             case Kind.Apply:
                                 step.Action?.Invoke();
                                 break;
@@ -534,6 +545,43 @@ namespace ColonQuest.World
                 if (hinge != null)
                 {
                     hinge.transform.localScale = goal;
+                }
+            }
+
+            private static IEnumerator NpcWalk(string person, Vector2 to, float seconds)
+            {
+                var actor = GameObject.Find(person);
+                if (actor == null)
+                {
+                    yield break;
+                }
+
+                var bob = actor.transform.Find("Bob");
+                var animator = bob != null ? bob.GetComponent<PlayerAnimator>() : null;
+                Vector2 from = actor.transform.position;
+                for (float t = 0f; t < seconds; t += Time.deltaTime)
+                {
+                    if (actor == null)
+                    {
+                        yield break;
+                    }
+
+                    if (animator != null)
+                    {
+                        animator.SetSpeed01(1f);
+                    }
+
+                    actor.transform.position = Vector2.Lerp(from, to, t / seconds);
+                    yield return null;
+                }
+
+                if (actor != null)
+                {
+                    actor.transform.position = to;
+                    if (animator != null)
+                    {
+                        animator.SetSpeed01(0f);
+                    }
                 }
             }
 

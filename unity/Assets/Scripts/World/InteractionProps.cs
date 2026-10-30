@@ -143,6 +143,21 @@ namespace ColonQuest.World
                     Piece(t, true, new Vector2(-0.07f, 0f), new Vector2(0.1f, 0.1f), new Color(1f, 0.82f, 0.25f), 0f, 0);
                     Piece(t, false, new Vector2(0.04f, 0f), new Vector2(0.14f, 0.03f), new Color(1f, 0.82f, 0.25f), 0f, 0);
                     break;
+                case "cuffs":
+                {
+                    // Two steel rings joined by a short chain.
+                    var steel = new Color(0.78f, 0.8f, 0.86f);
+                    var hole = new Color(0.16f, 0.18f, 0.25f);
+                    foreach (float x in new[] { -0.09f, 0.09f })
+                    {
+                        Piece(t, true, new Vector2(x, 0f), new Vector2(0.15f, 0.15f), steel, 0f, 0);
+                        Piece(t, true, new Vector2(x, 0f), new Vector2(0.08f, 0.08f), hole, 0f, 1);
+                    }
+
+                    Piece(t, false, Vector2.zero, new Vector2(0.06f, 0.025f), steel, 0f, 2);
+                    break;
+                }
+
                 case "drop":
                     Piece(t, true, Vector2.zero, new Vector2(0.06f, 0.09f), new Color(0.55f, 0.8f, 1f, 0.85f), 0f, 0);
                     break;
