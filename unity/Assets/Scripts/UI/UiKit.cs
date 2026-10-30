@@ -35,17 +35,87 @@ namespace ColonQuest.UI
             }
         }
 
+        private static Font titleFont;
+
+        /// <summary>
+        /// The font of the whole interface: a rounder one of the computer when it has it, and the built-in one in the browser,
+        /// where there are no fonts of the system.
+        /// </summary>
         public static Font Font
         {
             get
             {
                 if (font == null)
                 {
-                    font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                    font = SystemFont(new[] { "Trebuchet MS", "Segoe UI", "Verdana" });
                 }
 
                 return font;
             }
+        }
+
+        /// <summary>A heavier font for the name of the game and the big titles.</summary>
+        public static Font TitleFont
+        {
+            get
+            {
+                if (titleFont == null)
+                {
+                    titleFont = SystemFont(new[] { "Segoe UI Black", "Arial Black", "Impact", "Trebuchet MS" });
+                }
+
+                return titleFont;
+            }
+        }
+
+        private static Font SystemFont(string[] names)
+        {
+            if (Application.platform != RuntimePlatform.WebGLPlayer)
+            {
+                try
+                {
+                    var found = Font.CreateDynamicFontFromOSFont(names, 32);
+                    if (found != null)
+                    {
+                        return found;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    // No system fonts here: the built-in one below does the job.
+                }
+            }
+
+            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        private static Sprite disc;
+
+        /// <summary>A white circle, tinted per use. Drawn as it is, not sliced, so it can be any size.</summary>
+        public static Sprite Disc
+        {
+            get
+            {
+                if (disc == null)
+                {
+                    disc = MakeRounded(128, 64);
+                    disc = Sprite.Create(disc.texture, new Rect(0, 0, 128, 128), new Vector2(0.5f, 0.5f), 100f);
+                }
+
+                return disc;
+            }
+        }
+
+        /// <summary>A circle of this diameter.</summary>
+        public static Image Round(Transform parent, string name, Color color, float diameter, Vector2 anchor, Vector2 position)
+        {
+            var rect = Rect(parent, name, new Vector2(diameter, diameter), anchor, position);
+            var image = rect.gameObject.AddComponent<Image>();
+            image.sprite = Disc;
+            image.type = Image.Type.Simple;
+            image.color = color;
+            image.raycastTarget = false;
+            return image;
         }
 
         private static Sprite MakeRounded(int size, int radius)
@@ -134,6 +204,7 @@ namespace ColonQuest.UI
 
             var button = outline.gameObject.AddComponent<Button>();
             button.targetGraphic = body;
+            outline.gameObject.AddComponent<ButtonHover>().Bind(outline);
             var colors = button.colors;
             colors.normalColor = Color.white;
             colors.highlightedColor = new Color(1.12f, 1.12f, 1.12f, 1f);

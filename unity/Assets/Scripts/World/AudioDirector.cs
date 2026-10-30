@@ -123,6 +123,22 @@ namespace ColonQuest.World
             instance.Effects().PlayOneShot(instance.clickClip, 0.6f * instance.Level);
         }
 
+        /// <summary>A very soft tap when the mouse reaches a button.</summary>
+        public static void Tick()
+        {
+            if (instance == null || instance.muted)
+            {
+                return;
+            }
+
+            if (instance.clickClip == null)
+            {
+                instance.clickClip = ProceduralSound.Click();
+            }
+
+            instance.Effects().PlayOneShot(instance.clickClip, 0.16f * instance.Level);
+        }
+
         private AudioSource Effects()
         {
             if (effectSource == null)

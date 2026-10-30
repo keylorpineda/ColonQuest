@@ -756,13 +756,13 @@ namespace ColonQuest.UI
         {
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
-            SceneManager.LoadScene(SceneNames.Menu);
+            LoadingScreen.Load(SceneNames.Menu);
         }
 
         private void Restart()
         {
             session.StartNewGame();
-            SceneManager.LoadScene(SceneNames.Town);
+            LoadingScreen.Load(SceneNames.Town);
         }
 
         private static ModalOption Continue(System.Action then)

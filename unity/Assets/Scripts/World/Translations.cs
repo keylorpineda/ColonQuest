@@ -641,6 +641,17 @@ namespace ColonQuest.World
             { "Pagar fianza", "Pay bail" },
             { "Pagar fianza  {0}", "Pay bail  {0}" },
             { "Te quedas en la celda {0}. Puedes esperar a cumplir la condena o pagar la fianza.", "You stay in the cell for {0}. You can wait out the sentence or pay the bail." },
+            { "Cargando", "Loading" },
+            { "Antes de comprar a cuotas, pregunta cuánto pagas en total.", "Before buying on installments, ask how much you pay in total." },
+            { "Pagar solo el mínimo de la tarjeta es la forma más cara de deber.", "Paying only the card minimum is the most expensive way to owe." },
+            { "Un fondo de emergencia te evita pedir plata a quien te cobra de más.", "An emergency fund keeps you from borrowing from someone who charges too much." },
+            { "Si te prometen triplicar tu plata en un mes, desconfía.", "If they promise to triple your money in a month, be suspicious." },
+            { "El game master y los vendedores usan inteligencia artificial en la nube.", "The game master and the sellers use artificial intelligence in the cloud." },
+            { "Si no hay conexión, el juego sigue con eventos y vendedores locales.", "If there is no connection, the game goes on with local events and sellers." },
+            { "No pedimos tu nombre ni datos personales: solo se guardan tus decisiones de juego.", "We do not ask for your name or personal data: only your game decisions are saved." },
+            { "Keylor Pineda: backend, IA y motor financiero", "Keylor Pineda: backend, AI and financial engine" },
+            { "Jefferson Abarca: Unity, arte y flujo del juego", "Jefferson Abarca: Unity, art and game flow" },
+            { "Hecho para el Meta Global AI Developer Hackathon", "Made for the Meta Global AI Developer Hackathon" },
         };
     }
 }
