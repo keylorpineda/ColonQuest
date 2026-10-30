@@ -106,7 +106,16 @@ namespace ColonQuest.World
                     RememberedReturn = returnSpawn;
                 }
 
-                SceneTransition.Go(targetScene, ResolveSpawn(useRememberedReturn, RememberedReturn, targetSpawn));
+                string spawn = ResolveSpawn(useRememberedReturn, RememberedReturn, targetSpawn);
+                var elevator = GetComponent<Elevator>();
+                if (elevator != null)
+                {
+                    // The elevator plays its ride first and changes the floor at the end of it.
+                    elevator.Ride(targetScene, spawn);
+                    return;
+                }
+
+                SceneTransition.Go(targetScene, spawn);
             }
         }
     }
