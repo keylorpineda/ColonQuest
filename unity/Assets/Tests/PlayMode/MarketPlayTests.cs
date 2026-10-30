@@ -47,8 +47,8 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(1, GameObject.FindObjectsByType<Transform>(FindObjectsSortMode.None).Count(t => t.name == "FincaSanIsidro"));
 
             var homes = Stations(StationType.RealEstate);
-            Assert.AreEqual(5, homes.Length, "the agency and four house signs");
-            Assert.AreEqual(1, homes.Count(s => s.Lines.Length == 0), "only the agency lists every house");
+            Assert.GreaterOrEqual(homes.Length, 4, "every house for sale or rent has a sign in the street");
+            Assert.AreEqual(0, homes.Count(s => s.Lines.Length == 0), "the agent's desk is inside the agency now, so every sign names one listing");
             foreach (var home in homes.Where(s => s.Lines.Length > 0))
             {
                 Assert.IsNotNull(MarketAssumptions.FindHome(home.Lines[0]), home.name + " names a listing that exists");
@@ -56,7 +56,9 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(0, Stations(StationType.CarDealer).Length, "the agency's desk is inside the building now");
             Assert.AreEqual(1, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Count(d => d.TargetScene == SceneNames.Agencia), "one door into the agency");
-            Assert.AreEqual(1, Stations(StationType.Farm).Length);
+            Assert.AreEqual(0, Stations(StationType.Farm).Length, "the farm desk is inside the Finca scene now");
+            Assert.AreEqual(1, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Count(d => d.TargetScene == SceneNames.Finca), "one door into the farm");
+            Assert.AreEqual(1, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Count(d => d.TargetScene == SceneNames.Inmobiliaria), "one door into the real estate agency");
         }
 
         [UnityTest]
@@ -97,17 +99,12 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Station_FiresWhenThePlayerWalksIntoTheFarm()
+        public IEnumerator Farm_IsReachedThroughItsDoorInTheTown()
         {
-            var farm = Stations(StationType.Farm)[0];
-            Station entered = null;
-            farm.PlayerEntered += s => entered = s;
+            yield return null;
 
-            Teleport(farm.transform.position);
-            yield return new WaitForFixedUpdate();
-            yield return new WaitForFixedUpdate();
-
-            Assert.AreSame(farm, entered);
+            var doors = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Where(d => d.TargetScene == SceneNames.Finca).ToArray();
+            Assert.AreEqual(1, doors.Length);
         }
 
         // ---------------------------------------------------------------- getting there
