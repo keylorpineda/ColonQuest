@@ -150,6 +150,9 @@ namespace ColonQuest.Api.Tests
         {
             var state = new PlayerState
             {
+                CharacterName = "Keylor",
+                Week = 2,
+                JobPosition = "Helper",
                 Month = 3,
                 SalaryNet = 450000L,
                 Cash = 120000L,
@@ -162,12 +165,20 @@ namespace ColonQuest.Api.Tests
 
             string json = JsonUtility.ToJson(ApiMapper.ToDto(state));
 
+            StringAssert.Contains("\"characterName\":\"Keylor\"", json);
+            StringAssert.Contains("\"week\":2", json);
+            StringAssert.Contains("\"jobPosition\":\"Helper\"", json);
             StringAssert.Contains("\"salaryNet\":450000", json);
             StringAssert.Contains("\"emergencyFund\":0", json);
             StringAssert.Contains("\"monthsLeft\":33", json);
             StringAssert.Contains("\"monthlyRatePct\":3.5", json);
             StringAssert.Contains("\"history\":[\"paid_minimum_only\"]", json);
             StringAssert.DoesNotContain("450000.", json);
+
+            var recovered = ApiMapper.FromDto(JsonUtility.FromJson<PlayerStateDto>(json));
+            Assert.AreEqual("Keylor", recovered.CharacterName);
+            Assert.AreEqual(2, recovered.Week);
+            Assert.AreEqual("Helper", recovered.JobPosition);
         }
 
         [Test]

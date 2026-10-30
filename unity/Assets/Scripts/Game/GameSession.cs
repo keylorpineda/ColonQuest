@@ -72,6 +72,21 @@ namespace ColonQuest.Game
 
         public PlayerState State => Loop.State;
 
+        public PlayerState CurrentPlayerState()
+        {
+            var clone = State.Clone();
+            clone.CharacterName = RunName;
+            if (Loop != null && Loop.Clock != null)
+            {
+                clone.Week = Loop.Clock.Day;
+            }
+            if (Loop != null && Loop.Job != null)
+            {
+                clone.JobPosition = Loop.Job.Current.ToString();
+            }
+            return clone;
+        }
+
         public static GameSession Create()
         {
             if (Instance != null)
@@ -220,7 +235,7 @@ namespace ColonQuest.Game
             prefetchStation = station;
             prefetched = null;
             int generation = prefetchGeneration;
-            ApiClient.Instance.RequestEvent(State.Clone(), result =>
+            ApiClient.Instance.RequestEvent(CurrentPlayerState(), result =>
             {
                 if (generation != prefetchGeneration)
                 {
@@ -279,7 +294,7 @@ namespace ColonQuest.Game
             }
 
             prefetched = null;
-            ApiClient.Instance.RequestEvent(State.Clone(), deliver);
+            ApiClient.Instance.RequestEvent(CurrentPlayerState(), deliver);
         }
 
         public void Choose(string choiceId)
@@ -306,7 +321,7 @@ namespace ColonQuest.Game
             }
 
             CurrentEvent = null;
-            ApiClient.Instance.RecordDecision(month, gameEvent, choiceId, State.Clone(), result =>
+            ApiClient.Instance.RecordDecision(month, gameEvent, choiceId, CurrentPlayerState(), result =>
             {
                 if (!result.Ok)
                 {
@@ -893,7 +908,7 @@ namespace ColonQuest.Game
             Busy = true;
             Finishing = true;
             Changed?.Invoke();
-            ApiClient.Instance.RequestSummary(State.Clone(), result =>
+            ApiClient.Instance.RequestSummary(CurrentPlayerState(), result =>
             {
                 Busy = false;
                 Finishing = false;

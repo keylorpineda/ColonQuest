@@ -45,6 +45,7 @@ namespace ColonQuest.Finance
         Inflation,
         ExchangeRate,
         PayrollDeductions,
+        InvestInYourself,
     }
 
     [Serializable]

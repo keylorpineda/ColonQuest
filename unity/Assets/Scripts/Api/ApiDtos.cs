@@ -36,6 +36,9 @@ namespace ColonQuest.Api
     [Serializable]
     public sealed class PlayerStateDto
     {
+        public string characterName = string.Empty;
+        public int week = 1;
+        public string jobPosition = string.Empty;
         public int month;
         public long salaryNet;
         public long cash;

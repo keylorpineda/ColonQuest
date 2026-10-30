@@ -501,6 +501,41 @@
       "teachingConcept": "payroll_deductions"
     },
     {
+      "eventId": "evt_curso_capacitacion",
+      "type": "offer",
+      "title": "Capacitación laboral",
+      "narrative": "En el instituto técnico abrieron un curso nocturno de servicio al cliente y cocina por ₡30 000. Doña Lucía dice que estudiar abre puertas a un mejor puesto.",
+      "npc": {
+        "id": "jefa_dona_lucia",
+        "name": "Doña Lucía",
+        "role": "boss"
+      },
+      "imageKey": "scene_soda",
+      "choices": [
+        {
+          "id": "enroll",
+          "label": "Matricular el curso",
+          "effects": [
+            {
+              "kind": "expense",
+              "amount": 30000,
+              "source": "cash"
+            },
+            {
+              "kind": "wellbeing_change",
+              "amount": 5
+            }
+          ]
+        },
+        {
+          "id": "skip",
+          "label": "No matricular por ahora",
+          "effects": []
+        }
+      ],
+      "teachingConcept": "invest_in_yourself"
+    },
+    {
       "eventId": "evt_trabajo_extra",
       "type": "income",
       "title": "Un brete extra",
