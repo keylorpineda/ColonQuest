@@ -129,6 +129,31 @@ namespace ColonQuest.Game.Tests
             StringAssert.Contains("/10", slot.SavedAtLabel);
         }
 
+        [TestCase("  Ana  ", "Ana")]
+        [TestCase("Ana   María", "Ana María")]
+        [TestCase("<b>Ana</b>", "bAna/b")]
+        [TestCase("{0}", "0")]
+        [TestCase("", PlayerProfile.DefaultName)]
+        [TestCase("   ", PlayerProfile.DefaultName)]
+        [TestCase(null, PlayerProfile.DefaultName)]
+        [TestCase("Un nombre larguísimo de verdad", "Un nombre largu")]
+        public void CleanName_IsSafeToShow(string typed, string expected)
+        {
+            string clean = PlayerProfile.CleanName(typed);
+            StringAssert.StartsWith(expected, clean);
+            Assert.LessOrEqual(clean.Length, PlayerProfile.MaxNameLength);
+        }
+
+        [Test]
+        public void Pick_FollowsTheGender()
+        {
+            PlayerProfile.Set("Ana", true);
+            Assert.AreEqual("dormida", PlayerProfile.Pick("dormido", "dormida"));
+            PlayerProfile.Reset();
+            Assert.AreEqual("dormido", PlayerProfile.Pick("dormido", "dormida"));
+            Assert.IsFalse(PlayerProfile.HasName);
+        }
+
         [Test]
         public void Summary_KnowsAFinishedYear()
         {
