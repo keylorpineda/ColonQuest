@@ -10,6 +10,8 @@ namespace ColonQuest.World
         public Transform Head;
         public Transform ArmL;
         public Transform ArmR;
+        public Transform ElbowL;
+        public Transform ElbowR;
         public Transform LegL;
         public Transform LegR;
         public Transform PupilL;
@@ -17,6 +19,9 @@ namespace ColonQuest.World
         public Transform LidL;
         public Transform LidR;
         public Transform Mouth;
+
+        /// <summary>The height of the mouth while it is closed. A smile needs more than a flat bar.</summary>
+        public float MouthRest = 0.25f;
     }
 
     /// <summary>
@@ -46,6 +51,10 @@ namespace ColonQuest.World
         private Vector3 pupilLRest;
         private Vector3 pupilRRest;
         private Vector3 headRest;
+        private float armLRest;
+        private float armRRest;
+        private float elbowLRest;
+        private float elbowRRest;
         private float phase;
         private float moving;
         private float externalSpeed;
@@ -101,6 +110,10 @@ namespace ColonQuest.World
                 pupilLRest = rig.PupilL.localPosition;
                 pupilRRest = rig.PupilR.localPosition;
                 headRest = rig.Head.localPosition;
+                armLRest = RestAngle(rig.ArmL);
+                armRRest = RestAngle(rig.ArmR);
+                elbowLRest = RestAngle(rig.ElbowL);
+                elbowRRest = RestAngle(rig.ElbowR);
             }
 
             nextBlink = Time.time + PersonMotion.NextBlinkDelay(Random.value);
@@ -139,20 +152,31 @@ namespace ColonQuest.World
             float armLeft = PersonMotion.ArmAngle(phase, moving, true) - sway;
             float armRight = PersonMotion.ArmAngle(phase, moving, false) + sway;
 
-            // The greeting and the speech gestures take over an arm.
+            float elbowLeft = 0f;
+            float elbowRight = 0f;
+
+            // The greeting and the speech gestures take over an arm. The angles add to the arm's resting pose.
             float sinceWave = time - waveStarted;
             if (PersonMotion.IsWaving(sinceWave))
             {
-                armRight = PersonMotion.WaveAngle(sinceWave);
+                armRight = PersonMotion.WaveAngle(sinceWave) * 0.85f;
+                elbowRight = PersonMotion.ElbowAngle(sinceWave);
             }
             else if (talking)
             {
                 armRight = 18f + Mathf.Sin(time * 4.5f) * 16f;
                 armLeft = -(8f + Mathf.Sin(time * 3.3f + 1f) * 10f);
+                elbowRight = 20f + Mathf.Sin(time * 4.5f + 0.8f) * 14f;
+                elbowLeft = -(10f + Mathf.Sin(time * 3.3f + 1.6f) * 8f);
             }
 
-            rig.ArmL.localRotation = Z(armLeft);
-            rig.ArmR.localRotation = Z(armRight);
+            rig.ArmL.localRotation = Z(armLRest + armLeft);
+            rig.ArmR.localRotation = Z(armRRest + armRight);
+            if (rig.ElbowL != null && rig.ElbowR != null)
+            {
+                rig.ElbowL.localRotation = Z(elbowLRest + elbowLeft);
+                rig.ElbowR.localRotation = Z(elbowRRest + elbowRight);
+            }
 
             // Torso: breathing, and a small lean with every step.
             float breath = 1f + Mathf.Sin(time * 2f) * 0.018f;
@@ -191,7 +215,7 @@ namespace ColonQuest.World
                     if (distance < LookRadius)
                     {
                         // The visual can be mirrored, so the offset is turned into its own space.
-                        Vector2 look = PersonMotion.PupilOffset(toPlayer, 0.028f);
+                        Vector2 look = PersonMotion.PupilOffset(toPlayer, 0.012f);
                         pupilGoal = new Vector2(look.x * side, look.y);
                         tiltGoal = PersonMotion.HeadTilt(toPlayer.x) * side;
                     }
@@ -222,6 +246,8 @@ namespace ColonQuest.World
             // A smile while greeting, a moving mouth while talking.
             bool greeting = PersonMotion.IsWaving(time - waveStarted);
             float open = PersonMotion.MouthOpen(time, talking);
+            float rest = Mathf.Clamp(rig.MouthRest, 0.25f, 1f);
+            open = Mathf.Lerp(rest, 1f, (open - 0.25f) / 0.75f);
             rig.Mouth.localScale = new Vector3(greeting ? 1.5f : 1f, greeting ? Mathf.Max(open, 0.6f) : open, 1f);
         }
 
@@ -235,6 +261,12 @@ namespace ColonQuest.World
             nextPlayerSearch = Time.time + 0.5f;
             var found = GameObject.FindWithTag("Player");
             player = found != null ? found.transform : null;
+        }
+
+        /// <summary>The Z rotation a part was built with, between -180 and 180 degrees.</summary>
+        private static float RestAngle(Transform part)
+        {
+            return part != null ? Mathf.DeltaAngle(0f, part.localEulerAngles.z) : 0f;
         }
 
         private static Quaternion Z(float degrees)
