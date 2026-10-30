@@ -745,7 +745,19 @@ namespace ColonQuest.EditorTools
                 XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Window,
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
+            TimeClock(parent, 15.2f, -23.6f);
             Bench(parent, shadows, 17.8f, -23.2f);
+        }
+
+        /// <summary>The time clock of the first job, on the wall of the soda.</summary>
+        private static void TimeClock(Transform parent, float x, float y)
+        {
+            var root = Root(parent, "TimeClock", new Vector2(x, y), -24.05f);
+            Shape(root, "Box_Outline", roundedSmall, Vector2.zero, new Vector2(0.86f, 1.06f), GamePalette.Outline, 0);
+            Shape(root, "Box", roundedSmall, Vector2.zero, new Vector2(0.72f, 0.92f), GamePalette.Hex("#D7DCE2"), 1);
+            Shape(root, "Face", roundedSmall, new Vector2(0f, 0.17f), new Vector2(0.48f, 0.34f), GamePalette.Hex("#F8F5E8"), 2);
+            Shape(root, "Hand", roundedSmall, new Vector2(0.05f, 0.2f), new Vector2(0.2f, 0.05f), GamePalette.Outline, 3);
+            Shape(root, "Slot", roundedSmall, new Vector2(0f, -0.25f), new Vector2(0.46f, 0.1f), GamePalette.Outline, 2);
         }
 
         private static void Palm(Transform parent, Transform shadows, float x, float y, float scale)
