@@ -65,6 +65,11 @@ namespace ColonQuest.EditorTools
             {
                 Part2(visual, "Skirt", rounded, new Vector2(0f, -0.26f * height), new Vector2(0.42f * width, 0.26f), pants, OrderPlayer + 2);
             }
+            else
+            {
+                // The hips: they join the two legs under the round bottom of the shirt, so no gap opens at the waist.
+                Part2(visual, "Hips", rounded, new Vector2(0f, -0.24f * height), new Vector2(0.42f * width, 0.12f), pants, OrderPlayer + 2);
+            }
 
             var torso = new GameObject("Torso").transform;
             torso.SetParent(visual, false);
@@ -75,7 +80,8 @@ namespace ColonQuest.EditorTools
             Shape(torso, "TorsoShade", rounded, new Vector2(0.03f, -0.15f * height), new Vector2(0.5f * width - 0.08f, 0.16f), GamePalette.Shade(shirt, 0.84f), OrderPlayer + 8);
             Shape(torso, "TorsoLight", roundedSmall, new Vector2(-0.16f * width, 0.04f), new Vector2(0.07f, 0.3f * height), GamePalette.Shade(shirt, 1.15f), OrderPlayer + 8);
             Shape(torso, "Collar", roundedSmall, new Vector2(0f, 0.215f * height), new Vector2(0.2f, 0.07f), GamePalette.Shade(shirt, 0.78f), OrderPlayer + 9);
-            Shape(visual, "Neck", roundedSmall, new Vector2(0f, TorsoY + 0.25f * height), new Vector2(0.12f, 0.09f), GamePalette.Shade(skin, 0.84f), OrderPlayer + 8);
+            // The neck belongs to the torso, so it leans with it; the animator moves the head along (see PlayerAnimator).
+            Shape(torso, "Neck", roundedSmall, new Vector2(0f, 0.25f * height), new Vector2(0.12f, 0.09f), GamePalette.Shade(skin, 0.84f), OrderPlayer + 8);
             rig.Torso = torso;
 
             // The arms hang from the torso, so they follow its breathing and its lean.
@@ -131,8 +137,11 @@ namespace ColonQuest.EditorTools
             elbow.localPosition = new Vector3(0f, -length, 0f);
             elbow.localRotation = Quaternion.Euler(0f, 0f, -side * ElbowRestDegrees);
 
+            // The forearm starts right at the elbow and a round cap closes it there: turning around the elbow keeps it
+            // inside the sleeve instead of a corner poking out of its side.
             var forearm = look.LongSleeve ? shirt : skin;
-            Part2(elbow, "Forearm", roundedSmall, new Vector2(0f, -length * 0.5f), new Vector2(0.1f, length + 0.06f), forearm, OrderPlayer + 3);
+            Part2(elbow, "Forearm", roundedSmall, new Vector2(0f, -length * 0.5f), new Vector2(0.1f, length), forearm, OrderPlayer + 3);
+            Part2(elbow, "Joint", circle, Vector2.zero, Vector2.one * 0.1f, forearm, OrderPlayer + 3);
             Part2(elbow, "Hand", circle, new Vector2(0f, -(length + 0.03f)), Vector2.one * 0.12f, skin, OrderPlayer + 5);
             if (!look.LongSleeve)
             {
@@ -166,10 +175,12 @@ namespace ColonQuest.EditorTools
             Part2(head, "Face", circle, new Vector2(0f, 0.2f), new Vector2(0.5f * h, 0.46f), skin, OrderPlayer + 11);
             if (look.SquareJaw)
             {
-                Shape(head, "JawCover", rounded, new Vector2(0f, 0.07f), new Vector2(0.4f * h, 0.2f), skin, OrderPlayer + 13);
+                // As wide as the jaw, so the outline of the round face does not cross it; the jaw keeps its own outline.
+                Shape(head, "JawCover", rounded, new Vector2(0f, 0.06f), new Vector2(0.44f * h, 0.2f), skin, OrderPlayer + 13);
             }
 
-            Shape(head, "JawShade", circle, new Vector2(0f, 0f), new Vector2(0.32f * h, 0.08f), GamePalette.Shade(skin, 0.9f), OrderPlayer + 13);
+            // A soft shade over the chin, kept inside the face so it never covers the dark edge of the chin.
+            Shape(head, "JawShade", circle, new Vector2(0f, 0.045f), new Vector2(0.26f * h, 0.05f), GamePalette.Shade(skin, 0.9f), OrderPlayer + 13);
 
             rig.PupilL = Eye(head, -0.1f * h, look, skin, ink, out rig.LidL);
             rig.PupilR = Eye(head, 0.1f * h, look, skin, ink, out rig.LidR);

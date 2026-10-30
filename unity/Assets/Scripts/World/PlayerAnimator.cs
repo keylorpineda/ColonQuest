@@ -64,6 +64,7 @@ namespace ColonQuest.World
         private float lastGreet = -100f;
         private float nextPlayerSearch;
         private float headTilt;
+        private float torsoLean;
         private Vector2 pupilShift;
         private bool talking;
         private PersonPose pose;
@@ -228,7 +229,8 @@ namespace ColonQuest.World
             // Torso: breathing, and a small lean with every step.
             float breath = 1f + Mathf.Sin(time * 2f) * 0.018f;
             rig.Torso.localScale = new Vector3(1f / breath, breath, 1f);
-            rig.Torso.localRotation = Z(Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight);
+            torsoLean = Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight;
+            rig.Torso.localRotation = Z(torsoLean);
 
             SetHandsInFront(poseWeight > 0.5f && PersonPoses.HandsInFront(shownPose));
             AnimateFace(time);
@@ -325,8 +327,12 @@ namespace ColonQuest.World
 
             rig.PupilL.localPosition = pupilLRest + (Vector3)pupilShift;
             rig.PupilR.localPosition = pupilRRest + (Vector3)pupilShift;
-            rig.Head.localRotation = Z(headTilt);
-            rig.Head.localPosition = headRest + new Vector3(0f, Mathf.Abs(Mathf.Sin(phase * 2f)) * 0.012f * moving + Mathf.Sin(time * 2f) * 0.006f, 0f);
+            // The head sits on the neck, which leans with the torso: it turns around the torso's pivot by the same angle,
+            // so no gap or step opens under the chin.
+            Vector3 torsoPivot = rig.Torso.localPosition;
+            Vector3 onNeck = torsoPivot + Z(torsoLean) * (headRest - torsoPivot);
+            rig.Head.localRotation = Z(headTilt + torsoLean);
+            rig.Head.localPosition = onNeck + new Vector3(0f, Mathf.Abs(Mathf.Sin(phase * 2f)) * 0.012f * moving + Mathf.Sin(time * 2f) * 0.006f, 0f);
 
             // A smile while greeting, a moving mouth while talking.
             bool greeting = PersonMotion.IsWaving(time - waveStarted);
