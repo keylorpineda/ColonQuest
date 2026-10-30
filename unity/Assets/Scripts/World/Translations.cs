@@ -617,6 +617,12 @@ namespace ColonQuest.World
             { "Pantalla completa: no", "Full screen: off" },
             { "Armando tu año", "Putting your year together" },
             { "El game master está pensando", "The game master is thinking" },
+            { "Esta casa está en venta. Para comprarla tendría que ir a la inmobiliaria.", "This house is for sale. To buy it I would have to go to the real estate agency." },
+            { "Esta casa está en alquiler. Para alquilarla tendría que ir a la inmobiliaria.", "This house is for rent. To rent it I would have to go to the real estate agency." },
+            { "Tocar la puerta", "Knock on the door" },
+            { "Hablar con la agente y ver las casas", "Talk to the agent and see the houses" },
+            { "Buenas, bienvenido. Mire, estas son las casas que tengo hoy.", "Hello, welcome. Look, these are the houses I have today." },
+            { "Buenas, pase adelante. Aquí la plata trabaja, pero despacio.", "Hello, come in. Here the money works, but slowly." },
         };
     }
 }

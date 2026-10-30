@@ -13,6 +13,11 @@ namespace ColonQuest.World
         [SerializeField] private string targetScene;
         [SerializeField] private string targetSpawn;
         [SerializeField] private Vector2 entryDirection;
+        [SerializeField] private string returnSpawn;
+        [SerializeField] private bool useRememberedReturn;
+
+        /// <summary>Where the last house door of the town left the player, so the shared house interior leads back to the right door.</summary>
+        public static string RememberedReturn { get; private set; } = string.Empty;
 
         /// <summary>How close to the entry direction the walk must be (1 is straight on, 0 is sideways).</summary>
         private const float MinimumAlignment = 0.5f;
@@ -30,6 +35,25 @@ namespace ColonQuest.World
         {
             Configure(scene, spawn);
             entryDirection = direction.normalized;
+        }
+
+        /// <summary>A door of the town that goes inside a house: it remembers the spot in front of it for the way out.</summary>
+        public void ConfigureHouse(string scene, string spawn, Vector2 direction, string outsideSpawn)
+        {
+            Configure(scene, spawn, direction);
+            returnSpawn = outsideSpawn;
+        }
+
+        /// <summary>The mat of the shared house: it leads to the door the player came in by.</summary>
+        public void RememberReturn()
+        {
+            useRememberedReturn = true;
+        }
+
+        /// <summary>The spawn a door leads to. A mat that remembers uses the last house door; without one it uses its own.</summary>
+        public static string ResolveSpawn(bool remember, string remembered, string own)
+        {
+            return remember && !string.IsNullOrEmpty(remembered) ? remembered : own;
         }
 
         /// <summary>True when walking with this velocity goes through the door. A door with no direction takes any step.</summary>
@@ -59,7 +83,12 @@ namespace ColonQuest.World
             Vector2 velocity = body != null ? body.linearVelocity : Vector2.zero;
             if (AllowsEntry(entryDirection, velocity))
             {
-                SceneTransition.Go(targetScene, targetSpawn);
+                if (!string.IsNullOrEmpty(returnSpawn))
+                {
+                    RememberedReturn = returnSpawn;
+                }
+
+                SceneTransition.Go(targetScene, ResolveSpawn(useRememberedReturn, RememberedReturn, targetSpawn));
             }
         }
     }
