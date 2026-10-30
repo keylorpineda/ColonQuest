@@ -22,10 +22,14 @@ less reliable.
   single-call game master; a **timeout serves a hand-written event directly** (deviation from
   CLAUDE.md, which says "use the base version") so a player never waits for a second model call
   after the full agent budget.
-- **Season planner** (`SEASON_PLANNER`, `app/game_master/planner.py`): on the first event of a
-  session Muse Spark drafts a 12-month plan (`sessions.season_plan`, JSONB). The schema enforces
-  months 1 to 12 in order, at least 8 distinct concepts and December as aguinaldo or year-end
-  expenses; any failure stores the deterministic `default_plan`, ordered by the player's profile.
+- **Season planner** (`SEASON_PLANNER`, `app/game_master/planner.py`): the first event of a
+  session stores the deterministic `default_plan`, ordered by the player's profile, and answers
+  at once. A FastAPI background task, with its own database session, then asks Muse Wonder
+  (`PLANNER_MODEL`, `PLANNER_TIMEOUT_S` = 30 s) for a 12-month plan (`sessions.season_plan`,
+  JSONB); if it validates and the stored plan is still the default one, it replaces it from
+  month 2. Measured on Oct 29: 6.2 to 16.7 s and about $0.015 per plan, none of it on the
+  player's request. The schema enforces months 1 to 12 in order, at least 8 distinct concepts and
+  December as aguinaldo or year-end expenses; any failure keeps the default plan.
   Each later event adjusts the plan without a model call: when the last decision left the player
   with more debt than the one before, that concept is reinforced in the next free month (never
   December, never twice). The month's slot reaches the game master as `plannedFocus`.
