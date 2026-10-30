@@ -48,6 +48,15 @@ namespace ColonQuest.UI
 
         private readonly List<Station> inside = new List<Station>();
 
+        /// <summary>Places used since the player walked into them; they come back once the player leaves.</summary>
+        private readonly HashSet<Station> usedStations = new HashSet<Station>();
+
+        /// <summary>The place whose person is speaking in the subtitle, or null for a thought or nobody.</summary>
+        private Station speakingStation;
+
+        /// <summary>Past this distance from the person who talks, the line goes away even if the trigger missed it.</summary>
+        private const float SpeechRadius = 3.5f;
+
         private static GameUi current;
 
         public static GameUi Create(GameSession gameSession)
@@ -186,9 +195,10 @@ namespace ColonQuest.UI
 
         private void BuildLoading()
         {
-            var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(640f, 120f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            // A small pill in the top right corner: the wait never covers the player or the middle of the town.
+            var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(440f, 64f), new Vector2(1f, 1f), new Vector2(-24f, -24f));
             loadingCard = card.parent.gameObject;
-            loadingText = UiKit.Label(card, string.Empty, 34, UiKit.Ink, new Vector2(580f, 80f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+            loadingText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(410f, 50f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             loadingCard.SetActive(false);
         }
 
@@ -198,7 +208,8 @@ namespace ColonQuest.UI
         {
             // The overlay lives across scenes, but the main menu has its own screen.
             canvas.enabled = scene.name != SceneNames.Menu;
-            subtitles.Hide();
+            HideSpeech();
+            usedStations.Clear();
             BindStations();
         }
 
@@ -221,6 +232,42 @@ namespace ColonQuest.UI
         private void OnStationExited(Station station)
         {
             inside.Remove(station);
+
+            // Walking away is what makes a place usable again, and it ends the conversation with whoever is there.
+            usedStations.Remove(station);
+            if (station == speakingStation)
+            {
+                HideSpeech();
+            }
+        }
+
+        /// <summary>Remembers who is talking, so the line goes away when the player leaves them. Thoughts follow the player.</summary>
+        private void ShowSpeech(Station station, string speaker, string text)
+        {
+            speakingStation = string.IsNullOrEmpty(speaker) ? null : station;
+            subtitles.Show(speaker, text);
+        }
+
+        private void HideSpeech()
+        {
+            speakingStation = null;
+            subtitles.Hide();
+        }
+
+        /// <summary>Backup for a speaker the trigger misses (the player walked through it fast): too far means the talk is over.</summary>
+        private void TickSpeech()
+        {
+            if (speakingStation == null || !subtitles.IsVisible)
+            {
+                speakingStation = null;
+                return;
+            }
+
+            var player = GameObject.FindWithTag(Station.PlayerTag);
+            if (player != null && Vector2.Distance(player.transform.position, speakingStation.transform.position) > SpeechRadius)
+            {
+                HideSpeech();
+            }
         }
 
         private Station Nearby
@@ -245,6 +292,7 @@ namespace ColonQuest.UI
             TickCell();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
+            TickSpeech();
 
             if (pause.IsOpen)
             {
@@ -333,14 +381,16 @@ namespace ColonQuest.UI
                 return;
             }
 
+            // A place used once waits until the player walks away and comes back, so E cannot repeat it on the spot.
             var station = Nearby;
-            string text = station != null && !session.Busy && !Interaction.Playing ? PromptFor(station) : null;
+            string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
             if (text != null)
             {
                 promptText.text = PromptText(text);
                 if (Input.GetKeyDown(KeyCode.E))
                 {
+                    usedStations.Add(station);
                     Interact(station);
                 }
             }
@@ -642,7 +692,7 @@ namespace ColonQuest.UI
 
             // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
             bool person = station.name == "Thing_Talk";
-            subtitles.Show(person ? Loc.T(PersonName(station)) : string.Empty, line);
+            ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, line);
         }
 
         /// <summary>The name that goes before what a person says: the one of the character, or a plain word for a passer-by.</summary>
@@ -677,7 +727,7 @@ namespace ColonQuest.UI
 
         private void OnThought(string spanish)
         {
-            subtitles.Show(string.Empty, Loc.T(spanish));
+            ShowSpeech(null, string.Empty, Loc.T(spanish));
         }
 
         private void ShowStatement()
