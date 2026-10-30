@@ -119,14 +119,19 @@ namespace ColonQuest.World
             maxX = eastX;
         }
 
+        private float currentSpeed;
+
         private void OnEnable()
         {
             patrol = new CollectorPatrol(25f, 40f);
             Instance = this;
+            currentSpeed = speed;
+            Traffic.Register(transform);
         }
 
         private void OnDisable()
         {
+            Traffic.Unregister(transform);
             if (Instance == this)
             {
                 Instance = null;
@@ -150,7 +155,10 @@ namespace ColonQuest.World
 
             if (patrol.Current == CollectorPatrol.Mode.Driving || patrol.Current == CollectorPatrol.Mode.Cooling)
             {
-                SetX(transform.position.x + speed * dt);
+                // It obeys the lights like any car; it only breaks the flow when it stops in front of the player.
+                float target = CarRules.TargetSpeed(speed, Traffic.RoomAhead(transform, 1));
+                currentSpeed = CarRules.NextSpeed(currentSpeed, target, dt);
+                SetX(transform.position.x + currentSpeed * dt);
 
                 if (player != null && patrol.TryStop(Armed, transform.position, player.position))
                 {

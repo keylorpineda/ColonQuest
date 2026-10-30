@@ -30,11 +30,38 @@ namespace ColonQuest.World
             laneMaxX = maxX;
         }
 
+        private float laneSpeed;
+
+        private void OnEnable()
+        {
+            if (laneWrap)
+            {
+                laneSpeed = Mathf.Abs(velocity.x);
+                Traffic.Register(transform);
+            }
+        }
+
+        private void OnDisable()
+        {
+            Traffic.Unregister(transform);
+        }
+
         private void Update()
         {
             Vector3 position = transform.localPosition;
-            position.x += velocity.x * Time.deltaTime;
-            position.y += velocity.y * Time.deltaTime;
+            if (laneWrap)
+            {
+                // A car: it slows down for the lights and the car ahead (see CarRules), then wraps around the map.
+                int direction = velocity.x >= 0f ? 1 : -1;
+                float target = CarRules.TargetSpeed(Mathf.Abs(velocity.x), Traffic.RoomAhead(transform, direction));
+                laneSpeed = CarRules.NextSpeed(laneSpeed, target, Time.deltaTime);
+                position.x += direction * laneSpeed * Time.deltaTime;
+            }
+            else
+            {
+                position.x += velocity.x * Time.deltaTime;
+                position.y += velocity.y * Time.deltaTime;
+            }
 
             if (laneWrap)
             {

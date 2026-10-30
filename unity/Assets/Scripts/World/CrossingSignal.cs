@@ -60,6 +60,19 @@ namespace ColonQuest.World
         /// <summary>True while the pedestrian light of this crosswalk is green.</summary>
         public bool WalkLight => CrossingClock.IsWalk(Time.time, phase);
 
+        /// <summary>The crosswalks of the scene, for the cars that stop at them.</summary>
+        public static IReadOnlyList<CrossingSignal> All => all;
+
+        public float ZoneMinX => zoneCenter.x - zoneSize.x * 0.5f;
+
+        public float ZoneMaxX => zoneCenter.x + zoneSize.x * 0.5f;
+
+        /// <summary>True when a lane at this height runs over this crosswalk.</summary>
+        public bool CoversLane(float y)
+        {
+            return y >= zoneCenter.y - zoneSize.y * 0.5f && y <= zoneCenter.y + zoneSize.y * 0.5f;
+        }
+
         public void Configure(Vector2 center, Vector2 size, float lightPhase, SpriteRenderer walk, SpriteRenderer wait)
         {
             zoneCenter = center;
