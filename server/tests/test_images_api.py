@@ -49,6 +49,13 @@ def test_build_image_prompt_distinguishes_portraits_and_scenes() -> None:
     assert "Costa Rican everyday life" in other_prompt
 
 
+def test_build_image_prompt_keeps_year_cards_free_of_text() -> None:
+    prompt = build_image_prompt("card_year_heavy_debt")
+
+    assert "no text, no numbers, no letters" in prompt
+    assert "empty wallet" in prompt
+
+
 async def test_image_service_falls_back_when_budget_exhausted() -> None:
     settings = Settings(_env_file=None)  # type: ignore[call-arg]
     generator = FakeImageGenerator()

@@ -16,6 +16,13 @@ STYLE_PROMPT = (
     "16-bit pixel art in a warm Costa Rican palette, limited 32-color palette, "
     "crisp pixel outlines, no text or watermarks, consistent top-down RPG framing"
 )
+# Unity draws the year's figures on top of the card, so the illustration must stay blank.
+CARD_STYLE_SUFFIX = "no text, no numbers, no letters, leave the upper third empty for an overlay"
+CARD_SUBJECTS = {
+    "card_year_debt_free": "a young Costa Rican celebrating at a sunny viewpoint over the valley",
+    "card_year_some_debt": "a young Costa Rican walking home at dusk, calm but thoughtful",
+    "card_year_heavy_debt": "a young Costa Rican under a rainy sky looking at an empty wallet",
+}
 
 # 1x1 transparent PNG so Unity's texture loader never fails when budget or credentials are absent.
 FALLBACK_PNG: bytes = base64.b64decode(
@@ -34,6 +41,9 @@ class ImageOutcome:
 def build_image_prompt(key: str) -> str:
     """Build a consistent pixel-art prompt from an imageKey identifier."""
     words = key.replace("_", " ").strip()
+    if key.startswith("card_"):
+        subject = CARD_SUBJECTS.get(key, f"postcard illustration of {words}")
+        return f"{STYLE_PROMPT}, {CARD_STYLE_SUFFIX}. Subject: {subject}."
     if key.startswith(("npc_", "portrait_")):
         subject = f"character bust portrait of {words} in a Costa Rican neighborhood"
     elif key.startswith("scene_"):
