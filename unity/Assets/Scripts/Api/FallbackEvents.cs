@@ -16,6 +16,9 @@ namespace ColonQuest.Api
     {
         private const string ResourceName = "fallback_events";
 
+        /// <summary>The events that need something to drive, the same ones the server holds back.</summary>
+        private static readonly HashSet<string> VehicleEvents = new HashSet<string> { "evt_moto_dañada", "evt_marchamo" };
+
         private static List<GameEvent> catalog;
 
         public static IReadOnlyList<GameEvent> Catalog
@@ -68,11 +71,11 @@ namespace ColonQuest.Api
         /// <summary>
         /// Picks the event for this month: the one that fits the player's situation when there is one
         /// (a maxed out card calls the lender, big savings call the pyramid), otherwise the next
-        /// event in the catalog that was not played yet.
+        /// event in the catalog that was not played yet. Events about a vehicle are only for a player who has one.
         /// </summary>
         public static GameEvent Next(PlayerState state, ISet<string> seen)
         {
-            var events = Catalog;
+            var events = Fitting(state);
             seen = seen ?? new HashSet<string>();
 
             var preferred = Preferred(state);
@@ -100,6 +103,25 @@ namespace ColonQuest.Api
             return events[start];
         }
 
+        private static IReadOnlyList<GameEvent> Fitting(PlayerState state)
+        {
+            if (FinanceEngine.OwnsVehicle(state))
+            {
+                return Catalog;
+            }
+
+            var fitting = new List<GameEvent>();
+            foreach (var candidate in Catalog)
+            {
+                if (!VehicleEvents.Contains(candidate.EventId))
+                {
+                    fitting.Add(candidate);
+                }
+            }
+
+            return fitting;
+        }
+
         private static TeachingConcept? Preferred(PlayerState state)
         {
             if (state.CreditCard != null && state.CreditCard.Limit > 0 && state.CreditCard.Balance * 10L >= state.CreditCard.Limit * 7L)
@@ -120,10 +142,10 @@ namespace ColonQuest.Api
         {
             return new GameEvent
             {
-                EventId = "evt_marchamo",
+                EventId = "evt_recibo_luz",
                 Type = EventType.Expense,
-                Title = "Toca pagar el marchamo",
-                Narrative = "Llegó el recibo del marchamo y hay que pagarlo antes de que se venza.",
+                Title = "Llegó el recibo de la luz",
+                Narrative = "Llegó el recibo de la luz y hay que pagarlo antes de que se venza.",
                 TeachingConcept = TeachingConcept.Budget,
                 Choices = new List<Choice>
                 {

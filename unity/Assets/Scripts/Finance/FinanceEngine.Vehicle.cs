@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace ColonQuest.Finance
 {
@@ -105,6 +106,27 @@ namespace ColonQuest.Finance
                 plan.InsuranceMonthly,
                 plan.Commission);
             return new CarQuote(plan, financing);
+        }
+
+        /// <summary>
+        /// True when the player has something to drive: a car leaves its mark in the history, and a car or a motorbike bought
+        /// in installments stays in the installments. Events about repairs or the marchamo are only for this player.
+        /// </summary>
+        public static bool OwnsVehicle(PlayerState state)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+
+            if (state.History.Contains("bought_car"))
+                return true;
+
+            foreach (var installment in state.Installments)
+            {
+                if (Regex.IsMatch(installment.Item, @"\b(moto|motos|carro|carros)\b", RegexOptions.IgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
