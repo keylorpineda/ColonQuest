@@ -46,6 +46,8 @@ All times are wall-clock from the backend, single requests from Costa Rica.
 | Year-end summary | Meta, Spark `minimal` | 1.7 to 3.2 s | OK (failed before: 700-token budget) |
 | Class Mode report | Meta, Spark `minimal` | 2.2 to 2.7 s | OK |
 | Image 512×512 | Meta, Muse Image | 13.8 to 17.4 s | OK with a 30 s timeout (was always cut at 8 s) |
+| Year-end summary (Oct 29) | Meta, Wonder `minimal`, 25 s timeout | 5.2 to 7.6 s | OK, about $0.008 per summary |
+| Season planner (Oct 29) | Meta, Wonder `minimal`, background task | 6.2 to 16.7 s | OK, about $0.015 per plan; the first event answers without waiting |
 
 ### Baseten (Muse Spark Open, `meta-models/muse-spark-open-1026`)
 
@@ -73,7 +75,7 @@ credits; all the tests on Oct 28 cost under $0.15.
 | Model | Role | Why | Status |
 | --- | --- | --- | --- |
 | **Muse Spark 1.3** | Live game master (monthly event, agentic game master with tools), Class Mode report, Meta fallback for the sellers | The only Meta text model that answers inside Unity's 8 s every time (3.0 to 4.4 s with `minimal`) | Done, live on Render |
-| **Muse Wonder** | Plans the player's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the player is not waiting, or once offline | *Pending* |
+| **Muse Wonder** | Plans the player's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the player is not waiting, or once offline | Year-end summary (5.2 to 7.6 s) and background season plan (6.2 to 16.7 s) done on Oct 29; event bank *pending* |
 | **Muse Spark Open** (Baseten) | The sellers: tactics to earn commission, exact figures through tools, memory of what the player asked during the run | Fastest option (about 2 s), paid by Baseten credits instead of Meta, and the central piece for the Open Weights prize | Dialogue done and live; tactics and memory *pending* |
 | **Muse Image** | NPC portraits, event scenes and the illustration of the shareable year card | 14 to 17 s per image rules out live use, so images are pre-generated and cached. The year card is an illustration **without text**: the code draws the figures on top, because no amount may come from a model and image models misdraw digits | *Pending* |
 | **Voice Transcribe** | The player's voice when negotiating | 0.7 to 1.5 s and almost free; typing always works as a fallback | Done |
