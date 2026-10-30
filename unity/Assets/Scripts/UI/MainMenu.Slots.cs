@@ -114,6 +114,7 @@ namespace ColonQuest.UI
 
         private GameObject newGame;
         private InputField nameBox;
+        private Text nameQuestion;
         private InputField runBox;
         private Image manButton;
         private Image womanButton;
@@ -131,8 +132,10 @@ namespace ColonQuest.UI
             title.font = UiKit.TitleFont;
             Divider(card, -112f, 800f);
 
-            UiKit.Label(card, "¿Cómo te llamás?", 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -132f));
+            nameQuestion = UiKit.Label(card, NameQuestion, 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -132f));
+            nameQuestion.name = "NameQuestion";
             nameBox = UiKit.TextBox(card, "NameBox", "Tu nombre", new Vector2(760f, 80f), top, new Vector2(0f, -180f), PlayerProfile.MaxNameLength);
+            nameBox.onValueChanged.AddListener(_ => AskForName(false));
 
             float y = -280f;
             var man = UiKit.MakeButton(card, "Hombre", NotChosen, new Vector2(370f, 84f), top, new Vector2(-195f, y), () => ChooseGender(false));
@@ -150,12 +153,22 @@ namespace ColonQuest.UI
         }
 
         private static readonly Color NotChosen = GamePalette.Hex("#D8DCE6");
+        private const string NameQuestion = "¿Cómo te llamás?";
+        private const string NameMissing = "Escribí tu nombre para empezar.";
+
+        /// <summary>The line above the name box asks for the name again, in red, until something is typed.</summary>
+        private void AskForName(bool missing)
+        {
+            nameQuestion.text = Loc.T(missing ? NameMissing : NameQuestion);
+            nameQuestion.color = missing ? GameUiColors.Loss : UiKit.Ink;
+        }
 
         private void ShowNewGame(int slot)
         {
             newGameSlot = slot;
             nameBox.text = string.Empty;
             runBox.text = string.Empty;
+            AskForName(false);
             ChooseGender(false);
             slots.SetActive(false);
             newGame.SetActive(true);
@@ -177,6 +190,13 @@ namespace ColonQuest.UI
 
         private void ConfirmNewGame()
         {
+            if (!PlayerProfile.IsUsableName(nameBox.text))
+            {
+                AskForName(true);
+                nameBox.ActivateInputField();
+                return;
+            }
+
             string name = PlayerProfile.CleanName(nameBox.text);
             string run = string.IsNullOrWhiteSpace(runBox.text) ? name : PlayerProfile.CleanName(runBox.text);
             StartStory(newGameSlot, run, name, newGameFemale);
