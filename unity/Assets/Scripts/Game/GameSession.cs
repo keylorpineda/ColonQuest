@@ -81,10 +81,63 @@ namespace ColonQuest.Game
             return go.AddComponent<GameSession>();
         }
 
+        /// <summary>The three saved games of story mode. The tests swap the store for one in memory.</summary>
+        public static SaveSlots Slots { get; set; } = new SaveSlots(new PrefsSaveStore());
+
+        /// <summary>The slot this run is saved in, or -1 for a run that is not saved (the tests, a quick start).</summary>
+        public int ActiveSlot { get; private set; } = -1;
+
+        /// <summary>The name of the saved game.</summary>
+        public string RunName { get; private set; } = string.Empty;
+
         private void Awake()
         {
             Instance = this;
             StartNewGame();
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
+        }
+
+        /// <summary>Going back to the main menu saves the run, so nothing played is lost.</summary>
+        private void OnSceneChanged(UnityEngine.SceneManagement.Scene from, UnityEngine.SceneManagement.Scene to)
+        {
+            if (to.name == SceneNames.Menu)
+            {
+                SaveNow();
+            }
+        }
+
+        /// <summary>Ties the run that just started to a slot and writes it there at once.</summary>
+        public void AssignSlot(int slot, string runName)
+        {
+            ActiveSlot = slot;
+            RunName = runName ?? string.Empty;
+            SaveNow();
+        }
+
+        /// <summary>Goes on with a saved game. False when the slot is empty or cannot be read.</summary>
+        public bool ContinueGame(int slot)
+        {
+            var saved = Slots.Load(slot);
+            if (saved == null)
+            {
+                return false;
+            }
+
+            StartNewGame();
+            Loop.Restore(saved.run);
+            ActiveSlot = slot;
+            RunName = saved.name;
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>Writes the run in its slot. A run without a slot is not saved.</summary>
+        public void SaveNow()
+        {
+            if (ActiveSlot >= 0)
+            {
+                Slots.Save(ActiveSlot, SaveSlot.From(RunName, Loop, DateTime.UtcNow));
+            }
         }
 
         private void Update()
@@ -95,6 +148,7 @@ namespace ColonQuest.Game
 
         private void OnDestroy()
         {
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= OnSceneChanged;
             if (Instance == this)
             {
                 Instance = null;
@@ -104,6 +158,8 @@ namespace ColonQuest.Game
         public void StartNewGame()
         {
             Loop.NewGame();
+            ActiveSlot = -1;
+            RunName = string.Empty;
             CasinoNet = 0L;
             SinpeSent = 0L;
             Busy = false;
@@ -518,6 +574,9 @@ namespace ColonQuest.Game
             {
                 Changed?.Invoke();
             }
+
+            // A night is the moment the game is saved, as in the bed of any story game.
+            SaveNow();
         }
 
         /// <summary>The day ended away from the bed.</summary>
@@ -527,6 +586,8 @@ namespace ColonQuest.Game
             {
                 Changed?.Invoke();
             }
+
+            SaveNow();
         }
 
         public bool Cook()
