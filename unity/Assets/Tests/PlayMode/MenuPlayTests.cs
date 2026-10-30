@@ -32,6 +32,13 @@ namespace ColonQuest.World.PlayModeTests
         public void RestoreSettings()
         {
             ResetSettings();
+
+            // The session outlives the test: without a slot it cannot write in the real saved games later.
+            if (GameSession.Instance != null)
+            {
+                GameSession.Instance.StartNewGame();
+            }
+
             GameSession.Slots = realSlots;
         }
 
