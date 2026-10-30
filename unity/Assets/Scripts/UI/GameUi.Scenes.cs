@@ -50,13 +50,17 @@ namespace ColonQuest.UI
             return hero != null ? (Vector2)hero.transform.position : Vector2.zero;
         }
 
-        /// <summary>The phone (SINPE, messages): the player takes it out and taps on it before the screen opens.</summary>
+        /// <summary>
+        /// The phone: the hand goes to the pocket, brings it up and holds it while the screen is open; when it closes, the phone
+        /// goes back to the pocket.
+        /// </summary>
         private void OpenPhone()
         {
-            Vector2 me = HeroAt();
-            var scene = new Interaction().Pose(PersonPose.Type, 1.1f).Sound(SoundEffectKind.Keys)
-                .Fly("phone", me + new Vector2(0.25f, 0.1f), me + new Vector2(0.25f, 0.55f), 0.5f)
-                .Wait(0.3f).Sound(SoundEffectKind.Chime).Apply(() => phone.Open());
+            var scene = new Interaction().Pose(PersonPose.Pocket, 0.28f).Sound(SoundEffectKind.Swish).HoldProp("phone")
+                .Pose(PersonPose.Type, 0.5f).Sound(SoundEffectKind.Keys).Wait(0.12f).Sound(SoundEffectKind.Chime)
+                .Apply(() => phone.Open())
+                .WaitUntil(() => !phone.IsOpen)
+                .Pose(PersonPose.Pocket, 0.25f).ReleaseProp().Sound(SoundEffectKind.Swish).Pose(PersonPose.None, 0.1f);
             if (!scene.Play())
             {
                 phone.Open();
