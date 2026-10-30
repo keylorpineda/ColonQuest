@@ -52,6 +52,8 @@ services:
         value: "open_weights"
       - key: OPEN_WEIGHTS_TIMEOUT_S
         value: "5"
+      - key: OPEN_WEIGHTS_DAILY_BUDGET_USD
+        value: "3"  # Baseten credits; at this spend the NPCs switch to Meta until midnight UTC
       - key: OPEN_WEIGHTS_BASE_URL
         value: "https://inference.baseten.co/v1"
       - key: OPEN_WEIGHTS_NPC_MODEL
