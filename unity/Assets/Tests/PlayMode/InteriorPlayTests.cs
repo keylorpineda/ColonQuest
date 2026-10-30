@@ -229,4 +229,53 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(4.3f, Body.position.y, 0.6f);
         }
     }
+
+    /// <summary>Plays the Soda El Muelle interior: diner tables, counter with Doña Lucía, kitchen and time clock.</summary>
+    public sealed class SodaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Soda;
+
+        [UnityTest]
+        public IEnumerator Player_AppearsInFrontOfTheDoormat()
+        {
+            yield return null;
+
+            Assert.AreEqual(0f, Body.position.x, 0.5f);
+            Assert.AreEqual(MapLayout.SodaMat.y + 1.3f, Body.position.y, 0.5f);
+        }
+
+        [UnityTest]
+        public IEnumerator DonaLucia_WorksBehindTheCounter()
+        {
+            var lucia = GameObject.Find("DonaLucia");
+            var counter = GameObject.Find("DinerCounter");
+            yield return null;
+
+            Assert.IsNotNull(lucia);
+            Assert.IsNotNull(counter);
+            Assert.Greater(lucia.transform.position.y, counter.transform.position.y);
+        }
+
+        [UnityTest]
+        public IEnumerator Soda_HasWorkClockAndCustomerStation()
+        {
+            yield return null;
+
+            Assert.IsNotNull(GameObject.Find("Station_Soda"), "soda customer station exists");
+            Assert.IsNotNull(GameObject.Find("Station_Work"), "employee time punch clock station exists");
+            Assert.IsNotNull(GameObject.Find("TimeClock"), "wall time clock visual exists");
+        }
+
+        [UnityTest]
+        public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheSoda()
+        {
+            Teleport(MapLayout.SodaMat);
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
+            Assert.AreEqual(12.5f, Body.position.x, 0.6f);
+            Assert.AreEqual(-25.5f, Body.position.y, 0.6f);
+        }
+    }
 }

@@ -52,6 +52,7 @@ namespace ColonQuest.EditorTools
             BuildSpawnPoint(map, SpawnIds.TownFromCasa, new Vector2(-19.5f, 4.3f));
             BuildSpawnPoint(map, SpawnIds.TownFromBanco, new Vector2(-8.5f, 4.3f));
             BuildSpawnPoint(map, SpawnIds.TownFromTienda, new Vector2(8.5f, 4.3f));
+            BuildSpawnPoint(map, SpawnIds.TownFromSoda, new Vector2(12.5f, -25.5f));
 
             var player = BuildPlayer(new Vector2(0f, 2f), true);
             BuildCamera(MapLayout.TownCameraSize, GrassColor, new Vector2(0f, 2f))
@@ -348,8 +349,9 @@ namespace ColonQuest.EditorTools
         {
             // Walking up into a building door goes inside.
             Doorway(parent, new Vector2(-19.5f, 5.7f), SceneNames.Casa);
-            Doorway(parent, new Vector2(-8.5f, 5.7f), SceneNames.Banco);
-            Doorway(parent, new Vector2(8.5f, 5.7f), SceneNames.Tienda);
+            Doorway(parent, new Vector2(-8.5f, 5.7f), SceneNames.Banco, true);
+            Doorway(parent, new Vector2(8.5f, 5.7f), SceneNames.Tienda, true);
+            Doorway(parent, new Vector2(12.5f, -24.3f), SceneNames.Soda, true);
 
             // Out in the street the stations lie on the ground, in front of each place.
             currentLayer = LayerFloor;
@@ -358,13 +360,11 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f));
             BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
             BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
-            BuildStation(parent, "Station_Soda", StationType.Soda, "Soda El Muelle", new Vector2(12.5f, -25.1f));
-            BuildStation(parent, "Station_Work", StationType.Work, "Reloj marcador de la soda", new Vector2(15.2f, -25.1f));
             BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(0f, 4.6f));
             currentLayer = LayerWorld;
         }
 
-        private static void Doorway(Transform parent, Vector2 position, string targetScene)
+        private static void Doorway(Transform parent, Vector2 position, string targetScene, bool closesAtNight = false)
         {
             var go = new GameObject("Door_" + targetScene);
             go.transform.SetParent(parent, false);
@@ -373,7 +373,21 @@ namespace ColonQuest.EditorTools
             var trigger = go.AddComponent<BoxCollider2D>();
             trigger.size = new Vector2(1.3f, 1.0f);
             trigger.isTrigger = true;
-            go.AddComponent<Door>().Configure(targetScene, SpawnIds.FromTown, Vector2.up);
+            var door = go.AddComponent<Door>();
+            door.Configure(targetScene, SpawnIds.FromTown, Vector2.up);
+            door.SetClosesAtNight(closesAtNight);
+
+            if (closesAtNight)
+            {
+                var sign = new GameObject("ClosedSign");
+                sign.transform.SetParent(go.transform, false);
+                sign.transform.localPosition = new Vector2(0f, 1.3f);
+                Shape(sign.transform, "SignPlate", roundedSmall, Vector2.zero, new Vector2(1.1f, 0.45f), GamePalette.Hex("#B22222"), 15);
+                Shape(sign.transform, "SignBorder", roundedSmall, Vector2.zero, new Vector2(1.18f, 0.53f), GamePalette.Outline, 14);
+                Label(sign.transform, "CERRADO", Vector2.zero, GamePalette.White, 0.026f, TextAnchor.MiddleCenter);
+                door.AttachClosedSign(sign);
+                sign.SetActive(false);
+            }
         }
 
         private static void BuildPeople(Transform parent)
@@ -384,7 +398,6 @@ namespace ColonQuest.EditorTools
             BuildNpc(parent, "Promotor", new Vector2(9.0f, -5.7f), new Look { Skin = "#2EAA55", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, true);
 
             BuildNpc(parent, "AsesoraCoop", new Vector2(-29.6f, 4.85f), new Look { Skin = "#2E8B57", Extra = Accessory.Vest, ExtraColor = "#F1F4FF" }, true);
-            BuildNpc(parent, "DonaLucia", new Vector2(14.3f, -25.0f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#00A8A8" }, true);
 
             BuildPedestrian(parent, "Peaton_F", new Vector2(-25f, -17.8f), new Vector2(38.5f, -17.8f), new Look { Skin = "#4DA3FF", Extra = Accessory.Cap, ExtraColor = "#FFD23F" }, 1.3f);
             BuildPedestrian(parent, "Peaton_G", new Vector2(-46f, 5.2f), new Vector2(-39.5f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);

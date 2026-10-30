@@ -73,6 +73,11 @@ namespace ColonQuest.Api
             return StartCoroutine(Service.RequestImage(key, done));
         }
 
+        public void RestoreSession(string sessionId)
+        {
+            Service.RestoreSession(sessionId);
+        }
+
         public Coroutine CheckHealth(Action<ApiResult<HealthStatus>> done)
         {
             return StartCoroutine(Service.CheckHealth(done));

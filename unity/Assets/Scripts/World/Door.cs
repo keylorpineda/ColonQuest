@@ -15,9 +15,32 @@ namespace ColonQuest.World
         [SerializeField] private Vector2 entryDirection;
         [SerializeField] private string returnSpawn;
         [SerializeField] private bool useRememberedReturn;
+        [SerializeField] private bool closesAtNight;
+        [SerializeField] private GameObject closedSign;
 
         /// <summary>Where the last house door of the town left the player, so the shared house interior leads back to the right door.</summary>
-        public static string RememberedReturn { get; private set; } = string.Empty;
+        public static string RememberedReturn { get; set; } = string.Empty;
+
+        public static void SetRememberedReturn(string spawn)
+        {
+            RememberedReturn = spawn ?? string.Empty;
+        }
+
+        public bool ClosesAtNight => closesAtNight;
+
+        public void SetClosesAtNight(bool value)
+        {
+            closesAtNight = value;
+        }
+
+        public void AttachClosedSign(GameObject sign)
+        {
+            closedSign = sign;
+            if (closedSign != null)
+            {
+                closedSign.SetActive(false);
+            }
+        }
 
         /// <summary>True while the player serves a sentence: no door of the cell opens.</summary>
         public static bool Locked { get; set; }
@@ -79,10 +102,33 @@ namespace ColonQuest.World
             GetComponent<BoxCollider2D>().isTrigger = true;
         }
 
+        private void Update()
+        {
+            if (closedSign != null)
+            {
+                bool night = closesAtNight && DayTint.IsNight;
+                if (closedSign.activeSelf != night)
+                {
+                    closedSign.SetActive(night);
+                }
+            }
+        }
+
         private void OnTriggerStay2D(Collider2D other)
         {
             if (!other.CompareTag(Station.PlayerTag))
             {
+                return;
+            }
+
+            if (closesAtNight && DayTint.IsNight)
+            {
+                if (Time.time >= nextLockedThought)
+                {
+                    nextLockedThought = Time.time + 3f;
+                    Thoughts.Say(Loc.T("Está cerrado. Abrimos a las 06:00."));
+                }
+
                 return;
             }
 

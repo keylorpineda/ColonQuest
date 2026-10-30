@@ -37,6 +37,7 @@ namespace ColonQuest.EditorTools
             BuildInterior(SceneNames.Vecino);
             BuildInterior(SceneNames.Finca);
             BuildInterior(SceneNames.Inmobiliaria);
+            BuildInterior(SceneNames.Soda);
         }
 
         private static Room RoomFor(string sceneName)
@@ -63,6 +64,8 @@ namespace ColonQuest.EditorTools
                     return new Room { Name = "Finca", Center = Vector2.zero, Size = MapLayout.FincaSize, Color = GamePalette.Hex("#B98C5A") };
                 case SceneNames.Inmobiliaria:
                     return new Room { Name = "Inmobiliaria", Center = Vector2.zero, Size = MapLayout.InmobiliariaSize, Color = GamePalette.Hex("#D9E6EA") };
+                case SceneNames.Soda:
+                    return new Room { Name = "Soda", Center = Vector2.zero, Size = MapLayout.SodaSize, Color = GamePalette.Hex("#F7E5C8") };
                 default:
                     return new Room { Name = "Banco", Center = Vector2.zero, Size = MapLayout.BancoSize, Color = GamePalette.FloorBank };
             }
@@ -93,6 +96,8 @@ namespace ColonQuest.EditorTools
                     return MapLayout.FincaMat;
                 case SceneNames.Inmobiliaria:
                     return MapLayout.InmobiliariaMat;
+                case SceneNames.Soda:
+                    return MapLayout.SodaMat;
                 default:
                     return MapLayout.BancoMat;
             }
@@ -122,6 +127,8 @@ namespace ColonQuest.EditorTools
                     return SpawnIds.TownFromFinca;
                 case SceneNames.Inmobiliaria:
                     return SpawnIds.TownFromInmobiliaria;
+                case SceneNames.Soda:
+                    return SpawnIds.TownFromSoda;
                 default:
                     return SpawnIds.TownFromBanco;
             }
@@ -188,6 +195,9 @@ namespace ColonQuest.EditorTools
                     break;
                 case SceneNames.Inmobiliaria:
                     BuildRealEstateLayout(layout, room);
+                    break;
+                case SceneNames.Soda:
+                    BuildSodaLayout(layout, room);
                     break;
                 default:
                     BuildBankLayout(layout, room);
@@ -265,7 +275,7 @@ namespace ColonQuest.EditorTools
             trigger.AddComponent<BoxCollider2D>().size = new Vector2(1.6f, 0.8f);
             var door = trigger.AddComponent<Door>();
             door.Configure(exitScene, townSpawn);
-            if (townSpawn == SpawnIds.TownFromVecino)
+            if (townSpawn == SpawnIds.TownFromVecino || townSpawn == SpawnIds.TownFromCasa)
             {
                 door.RememberReturn();
             }

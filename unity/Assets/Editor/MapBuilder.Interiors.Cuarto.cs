@@ -49,6 +49,17 @@ namespace ColonQuest.EditorTools
             Deco(box, "Bill", roundedSmall, 4.05f, -2.7f, 0.4f, 0.3f, "#FFF1A8", 1f, 8);
             BuildStation(parts.Stations, "Station_Home", StationType.Home, "Casa", new Vector2(3.0f, -2.5f));
 
+            // The pet (zaguatico) on its warm cushion
+            var pet = IL(parts.Props, "Pet");
+            Deco(pet, "Cushion", rounded, 2.2f, 1.8f, 1.2f, 0.9f, "#A0522D", 1f, 7);
+            Deco(pet, "Inner", circle, 2.2f, 1.8f, 0.9f, 0.7f, "#D2B48C", 1f, 8);
+            Deco(pet, "Body", circle, 2.2f, 1.85f, 0.65f, 0.45f, "#C68B59", 1f, 9);
+            Deco(pet, "Head", circle, 2.45f, 1.95f, 0.35f, 0.32f, "#A66D3B", 1f, 10);
+            Deco(pet, "Ear", circle, 2.52f, 2.05f, 0.14f, 0.18f, "#7D4E27", 1f, 11);
+            Deco(pet, "Tail", roundedSmall, 1.85f, 1.85f, 0.25f, 0.1f, "#C68B59", 1f, 9);
+            BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(2.2f, 1.8f), new Vector2(1.2f, 1.0f),
+                "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
+
             BuildRoomFurniture(parts);
         }
 

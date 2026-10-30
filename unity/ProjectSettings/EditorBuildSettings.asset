@@ -44,5 +44,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Inmobiliaria.unity
     guid: d5874c485ff1d0946887611eb2b26289
+  - enabled: 1
+    path: Assets/Scenes/Soda.unity
+    guid: fc5b896744b1bb440a3634c03f238219
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

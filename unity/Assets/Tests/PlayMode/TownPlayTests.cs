@@ -247,12 +247,10 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => GameLoop.IsTaskStation(s.Type));
-            Assert.AreEqual(6, tasks.Count(), "six street stations; SINPE is a phone alert, everyday objects and the agencies are not tasks");
-            Assert.AreEqual(13, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the car agency, the police station, the hospital, the real estate agency, the farm and every free house");
+            Assert.AreEqual(5, tasks.Count(), "five street stations; SINPE is a phone alert, everyday objects and the agencies are not tasks, and soda is an interior");
+            Assert.AreEqual(18, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the soda, the car agency, the police station, the hospital, the real estate agency, the farm, and all residential/market houses");
             Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
-            Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
-            Assert.AreEqual(StationType.Work, GameObject.Find("Station_Work").GetComponent<Station>().Type);
-            Assert.IsNotNull(GameObject.Find("TimeClock"), "the time clock hangs on the wall of the soda");
+            Assert.IsNotNull(GameObject.Find("Door_Soda"), "the soda has its own entrance door");
             Assert.AreEqual(StationType.Courses, GameObject.Find("Station_Courses").GetComponent<Station>().Type);
         }
 

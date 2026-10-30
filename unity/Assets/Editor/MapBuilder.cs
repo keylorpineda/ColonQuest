@@ -86,7 +86,7 @@ namespace ColonQuest.EditorTools
         /// <summary>The menu is the first scene, then the town; the interiors follow. Only scenes that exist are listed.</summary>
         private static void UpdateBuildSettings()
         {
-            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Cuarto, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino, SceneNames.Finca, SceneNames.Inmobiliaria };
+            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Cuarto, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino, SceneNames.Finca, SceneNames.Inmobiliaria, SceneNames.Soda };
             var list = new System.Collections.Generic.List<EditorBuildSettingsScene>();
             foreach (var name in names)
             {
@@ -287,9 +287,9 @@ namespace ColonQuest.EditorTools
             return Shape(parent, name, softCircle, center, Vector2.one * size, color, order);
         }
 
-        private static void Flickering(SpriteRenderer target, float amplitude, float speed, float seed)
+        private static void Flickering(SpriteRenderer target, float amplitude, float speed, float seed, bool nightOnly = false)
         {
-            target.gameObject.AddComponent<Flicker>().Configure(amplitude, speed, seed);
+            target.gameObject.AddComponent<Flicker>().Configure(amplitude, speed, seed, nightOnly);
         }
 
         private static Transform ParallaxGroup(Transform parent, string name, float factor)

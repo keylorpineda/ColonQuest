@@ -159,6 +159,11 @@ namespace ColonQuest.Game
             ActiveSlot = slot;
             RunName = saved.name;
             PlayerProfile.Set(saved.characterName, saved.female);
+            if (!string.IsNullOrEmpty(saved.sessionId) && ApiClient.Instance != null)
+            {
+                ApiClient.Instance.RestoreSession(saved.sessionId);
+            }
+
             Changed?.Invoke();
             return true;
         }
@@ -168,7 +173,8 @@ namespace ColonQuest.Game
         {
             if (ActiveSlot >= 0)
             {
-                var slot = SaveSlot.From(RunName, Loop, DateTime.UtcNow);
+                string sessionId = ApiClient.Instance != null && ApiClient.Instance.Service != null ? ApiClient.Instance.Service.SessionId : string.Empty;
+                var slot = SaveSlot.From(RunName, Loop, DateTime.UtcNow, sessionId);
                 slot.characterName = PlayerProfile.Name;
                 slot.female = PlayerProfile.Female;
                 Slots.Save(ActiveSlot, slot);
@@ -179,6 +185,7 @@ namespace ColonQuest.Game
         {
             // The light follows the hour of the day: morning, noon, golden afternoon and dusk before bed.
             DayTint.Progress = Loop.Clock.DayProgress;
+            DayTint.IsNight = Loop.Clock.IsNight;
         }
 
         private void OnDestroy()

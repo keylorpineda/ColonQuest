@@ -429,7 +429,7 @@ namespace ColonQuest.UI
             if (text != null)
             {
                 promptText.text = PromptText(text);
-                if (Input.GetKeyDown(KeyCode.E))
+                if (Input.GetKeyDown(KeyCode.E) && text.StartsWith("[E]  "))
                 {
                     usedStations.Add(station);
                     Interact(station);
@@ -470,11 +470,17 @@ namespace ColonQuest.UI
                 case StationType.Beach:
                     return "[E]  " + station.DisplayName;
                 case StationType.Furniture:
-                case StationType.Courses:
                     return "[E]  " + station.DisplayName;
+                case StationType.Courses:
+                    return loop.Clock.IsNight ? Loc.T("Está cerrado. Abrimos a las 06:00.") : "[E]  " + station.DisplayName;
                 case StationType.Work:
                     return WorkPrompt();
                 default:
+                    if (loop.Clock.IsNight)
+                    {
+                        return Loc.T("Está cerrado. Abrimos a las 06:00.");
+                    }
+
                     if (loop.CanDoTask(station.Type))
                     {
                         return "[E]  " + station.DisplayName;
@@ -803,6 +809,11 @@ namespace ColonQuest.UI
         /// <summary>Everyday objects only talk: they never move money, that is the finance engine's job.</summary>
         private void ShowThing(Station station)
         {
+            if (station.name == "Thing_Pet" && session != null && session.State != null)
+            {
+                session.State.Wellbeing = Mathf.Clamp(session.State.Wellbeing + 2, 0, 100);
+            }
+
             string cut = CutLine(station);
             if (cut != null)
             {

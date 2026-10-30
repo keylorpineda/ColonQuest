@@ -742,10 +742,9 @@ namespace ColonQuest.EditorTools
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "SodaElMuelle", Sign = "SODA EL MUELLE", Roof = "#00A8A8", Wall = "#FFF1C9",
-                XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Window,
+                XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Door,
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
-            TimeClock(parent, 15.2f, -23.6f);
             CoursesBoard(parent, 0f, 5.2f);
             Bench(parent, shadows, 17.8f, -23.2f);
         }
