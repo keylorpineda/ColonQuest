@@ -344,15 +344,20 @@ namespace ColonQuest.EditorTools
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
 
-            // The river, with a gap for each bridge.
+            // The river, open only over the decks of the bridges: the two streets, the avenue and the beach path.
+            // The water between the railings and the deck is water, so it blocks like the rest of the river.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
-            RiverWall(parent, riverX, riverWidth, 6f, 24f);
-            RiverWall(parent, riverX, riverWidth, NorthSidewalkY, MapLayout.WorldNorthEdgeY);
-            RiverWall(parent, riverX, riverWidth, -8f, -2f);
-            RiverWall(parent, riverX, riverWidth, shore, -19.8f);
+            RiverWall(parent, riverX, riverWidth, shore, -19.15f);
+            RiverWall(parent, riverX, riverWidth, -17.45f, -14f);
+            RiverWall(parent, riverX, riverWidth, -10f, 0f);
+            RiverWall(parent, riverX, riverWidth, 4f, MapLayout.AvenueY - 2f);
+            RiverWall(parent, riverX, riverWidth, MapLayout.AvenueY + 2f, MapLayout.WorldNorthEdgeY);
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
+
+            // The pond of the park: the player walks around it.
+            Wall(parent, "Pond", new Vector2(19.5f, -5.9f), new Vector2(5.4f, 2.4f));
         }
 
         private static void RiverWall(Transform parent, float x, float width, float yMin, float yMax)
