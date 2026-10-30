@@ -38,13 +38,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.game_master = AgenticGameMaster(
         GameMaster(provider, settings, cache), provider, settings
     )
-    # NPC dialogue may run on open weights (Baseten/Modal) with automatic fallback to Meta.
-    # The seller agent (SELLER_AGENT) wraps it and uses Meta's tool calling.
-    app.state.negotiator = SellerAgent(
-        Negotiator(build_npc_provider(settings, provider, open_weights), settings),
-        provider,
-        settings,
-    )
+    # NPC dialogue and the seller agent (SELLER_AGENT) run on open weights (Baseten) when
+    # NPC_PROVIDER=open_weights, with automatic fallback to Meta on every call.
+    npc_provider = build_npc_provider(settings, provider, open_weights)
+    app.state.negotiator = SellerAgent(Negotiator(npc_provider, settings), npc_provider, settings)
     # Only consulted when SEASON_PLANNER is on (see app.api.events.get_season_planner).
     app.state.season_planner = SeasonPlanner(provider, settings)
     app.state.summary_writer = SummaryWriter(provider, settings)
