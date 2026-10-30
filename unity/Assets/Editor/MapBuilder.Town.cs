@@ -393,6 +393,8 @@ namespace ColonQuest.EditorTools
             BuildPedestrian(parent, "Peaton_C", new Vector2(-10f, -1.0f), new Vector2(10f, -1.0f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
             BuildPedestrian(parent, "Peaton_D", new Vector2(17.5f, -3.5f), new Vector2(22f, -3.5f), new Look { Skin = "#FFD23F", Extra = Accessory.None }, 0.9f);
             BuildPedestrian(parent, "Peaton_E", new Vector2(-3f, 5.5f), new Vector2(3f, 5.5f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, 1.0f);
+            BuildPedestrian(parent, "Estudiante", new Vector2(-22f, -9.0f), new Vector2(-12f, -9.0f), new Look { Skin = "#C0392B" }, 1.1f);
+            BuildPedestrian(parent, "Repartidor", new Vector2(10f, 5.2f), new Vector2(24f, 5.2f), new Look { Skin = "#F39C12" }, 1.5f);
         }
 
         /// <summary>Soft dark patches that drift across the town, as if clouds were passing overhead.</summary>
