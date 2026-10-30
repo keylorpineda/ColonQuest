@@ -222,6 +222,9 @@ namespace ColonQuest.UI
                 case "Thing_Bed":
                     return BedScene(station, then);
 
+                case "Thing_CellCot":
+                    return CellCotScene(station, then);
+
                 case "Thing_Stove":
                     return StoveScene(station, then);
 
@@ -353,6 +356,28 @@ namespace ColonQuest.UI
                 .Sound(SoundEffectKind.Alarm).Wait(1.1f)
                 .Pose(PersonPose.None, 0.3f).Fade(Dawn, 1f)
                 .Say(string.Empty, lastWeek ? LastWeekThought : (missedWork ? MissedWorkThought : "Dormí rico. Amanecí con ganas de arreglar mis cuentas."));
+        }
+
+        private Interaction CellCotScene(Station station, Action then)
+        {
+            if (session.Loop.JailDaysRemaining <= 0)
+            {
+                return new Interaction().Say(string.Empty, Loc.T(SentenceDoneThought));
+            }
+
+            Vector2 cot = Here(station);
+            int remainingAfter = Math.Max(0, session.Loop.JailDaysRemaining - 1);
+            string thought = remainingAfter > 0
+                ? Loc.F("Dormí en la litera. Me quedan {0} {1} de condena.", remainingAfter, remainingAfter == 1 ? Loc.T("día") : Loc.T("días"))
+                : Loc.T(SentenceDoneThought);
+
+            return new Interaction().WalkInto(cot).Say(string.Empty, Loc.T("Toca descansar en la celda..."))
+                .Pose(PersonPose.Sleep, 0.8f).Zzz(cot + new Vector2(0.2f, 0.5f), 2.5f)
+                .Fade(Night, 1.2f).Wait(1.2f)
+                .Apply(() => session.SleepInJail())
+                .Sound(SoundEffectKind.Alarm).Wait(0.8f)
+                .Pose(PersonPose.None, 0.3f).Fade(Dawn, 1f)
+                .Say(string.Empty, thought);
         }
 
         public const string LastWeekThought = "Última semana del mes: llegaron los recibos y toca ir al banco a cobrar el salario.";

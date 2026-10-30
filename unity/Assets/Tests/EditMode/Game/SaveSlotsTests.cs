@@ -102,6 +102,7 @@ namespace ColonQuest.Game.Tests
             var loop = new GameLoop();
             var gameEvent = new GameEvent { Choices = { new Choice { Id = "a" }, new Choice { Id = "b" } } };
             loop.Choose(gameEvent, "a", StationType.Garage);
+            loop.Sleep();
 
             var back = new GameLoop();
             back.Restore(loop.Snapshot());

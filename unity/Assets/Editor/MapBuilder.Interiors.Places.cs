@@ -215,6 +215,11 @@ namespace ColonQuest.EditorTools
                 Solid(bed, "Bunk", rounded, x - 0.9f, 4.9f, 1.6f, 0.9f, "#8E97AD");
                 Deco(bed, "Blanket", roundedSmall, x - 0.9f, 4.95f, 1.3f, 0.5f, "#C0504D", 1f, 8);
                 Solid(bed, "Toilet", roundedSmall, x + 1.4f, 5.6f, 0.5f, 0.5f, "#E3E9F2");
+
+                if (i == 0)
+                {
+                    BuildThing(parts.Stations, "CellCot", "Dormir en la litera", new Vector2(x - 0.9f, 4.3f), new Vector2(1.8f, 1.2f));
+                }
             }
 
             WallPlate(parts.Labels, "CELDAS", new Vector2(0f, 6.1f), 1.6f, "#2A3345", GamePalette.White, 0.028f);

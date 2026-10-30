@@ -50,6 +50,12 @@ namespace ColonQuest.Game
         public int TasksDone { get; private set; }
         public int Decisions { get; private set; }
 
+        /// <summary>Tasks completed today: at most 1 task event per day is allowed.</summary>
+        public int TasksToday { get; private set; }
+
+        /// <summary>Remaining days of jail sentence to serve.</summary>
+        public int JailDaysRemaining { get; private set; }
+
         /// <summary>The week of the month and the hour of the day.</summary>
         public GameClock Clock { get; private set; } = new GameClock();
 
@@ -90,6 +96,8 @@ namespace ColonQuest.Game
             State = GameRules.NewPlayer();
             MonthsPlayed = 0;
             TasksDone = 0;
+            TasksToday = 0;
+            JailDaysRemaining = 0;
             Decisions = 0;
             Holdings = new Holdings();
             LastRunningCosts = 0L;
@@ -117,6 +125,8 @@ namespace ColonQuest.Game
                 holdings = HoldingsSaving.ToSnapshot(Holdings),
                 monthsPlayed = MonthsPlayed,
                 tasksDone = TasksDone,
+                tasksToday = TasksToday,
+                jailDaysRemaining = JailDaysRemaining,
                 decisions = Decisions,
                 arrests = Arrests,
                 hurtThisMonth = HurtThisMonth,
@@ -178,6 +188,8 @@ namespace ColonQuest.Game
             Holdings = HoldingsSaving.FromSnapshot(snapshot.holdings);
             MonthsPlayed = Math.Max(0, snapshot.monthsPlayed);
             TasksDone = Math.Max(0, Math.Min(GameRules.TasksPerMonth, snapshot.tasksDone));
+            TasksToday = Math.Max(0, snapshot.tasksToday);
+            JailDaysRemaining = Math.Max(0, snapshot.jailDaysRemaining);
             Decisions = Math.Max(0, snapshot.decisions);
             Arrests = Math.Max(0, snapshot.arrests);
             HurtThisMonth = snapshot.hurtThisMonth;
@@ -236,7 +248,7 @@ namespace ColonQuest.Game
 
         public bool CanDoTask(StationType type)
         {
-            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && !doneStations.Contains(type);
+            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && TasksToday < 1 && !Clock.IsLastDay && !doneStations.Contains(type);
         }
 
         public bool AlreadyDid(StationType type)
@@ -274,7 +286,8 @@ namespace ColonQuest.Game
             var before = State.Clone();
             FinanceEngine.ChargeFine(State, MarketAssumptions.TrespassFine);
             FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.JailWellbeingLoss);
-            LoseTasks(MarketAssumptions.JailDaysLost);
+            JailDaysRemaining = JailSentence.TermDays(Arrests);
+            LoseTasks(JailDaysRemaining);
             Arrests++;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Te arrestaron por entrar a una casa ajena"));
@@ -285,8 +298,23 @@ namespace ColonQuest.Game
         {
             var before = State.Clone();
             FinanceEngine.ChargeFine(State, cost);
+            JailDaysRemaining = 0;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Pagaste la fianza"));
+        }
+
+        /// <summary>Serves one day of the sentence by sleeping on the cell cot.</summary>
+        public ChoiceOutcome SleepInJail()
+        {
+            var before = State.Clone();
+            if (JailDaysRemaining > 0)
+            {
+                JailDaysRemaining--;
+            }
+
+            NextMorning();
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Cumpliste un día de condena en la celda"));
         }
 
         /// <summary>The swimsuit is paid in cash. Null when the cash is not enough.</summary>
@@ -396,6 +424,7 @@ namespace ColonQuest.Game
         private void NextMorning()
         {
             Courses.AttendedToday = false;
+            TasksToday = 0;
             int previousDay = Clock.Day;
             if (Clock.SleepToMorning())
             {
@@ -633,6 +662,7 @@ namespace ColonQuest.Game
             {
                 doneStations.Add(station);
                 TasksDone++;
+                TasksToday++;
             }
 
             Decisions++;
@@ -754,31 +784,36 @@ namespace ColonQuest.Game
         }
 
         /// <summary>Pays the salary and runs the month: installments, the card cycle, interest and living expenses.</summary>
-        public MonthlyTickReport CloseMonth()
+        public MonthlyTickReport CloseMonth(bool dockRemainingShifts = false)
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
             LastRoomRent = Holdings.Home == null ? MarketAssumptions.RoomRent : 0L;
-            if (!SleptThisMonth)
-            {
-                FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
-            }
 
-            // The week in course counts only once its morning is over: closing the month early is not an absence.
+            // The week in course counts once its morning is over: closing the month early in the morning is not an absence for today.
             if (Clock.Hour >= GameRules.WorkEndHour)
             {
                 EndWorkingDay();
             }
 
+            int missedShifts = Job.MissedThisMonth;
+            if (dockRemainingShifts && Clock.Day < GameRules.DaysPerMonth)
+            {
+                int unplayedDays = GameRules.DaysPerMonth - Clock.Day;
+                int todayUnworked = !Job.WorkedToday ? 1 : 0;
+                missedShifts += unplayedDays + todayUnworked;
+            }
+
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
                 FixedLivingExpensesColones = GameRules.LivingExpenses + LastRoomRent + LastRunningCosts,
-                SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, Job.MissedThisMonth),
+                SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, missedShifts),
                 SalaryAlreadyPaidColones = QuincenaPaidThisMonth
             });
 
             QuincenaPaidThisMonth = 0L;
             MonthsPlayed++;
             TasksDone = 0;
+            TasksToday = 0;
             HurtThisMonth = false;
             SwamThisMonth = false;
             SleptThisMonth = false;

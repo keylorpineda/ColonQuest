@@ -32,16 +32,55 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void TermDays_GrowsFromOneToThreeGameDays()
+        {
+            Assert.AreEqual(1, JailSentence.TermDays(0));
+            Assert.AreEqual(2, JailSentence.TermDays(1));
+            Assert.AreEqual(3, JailSentence.TermDays(2));
+            Assert.AreEqual(3, JailSentence.TermDays(5));
+        }
+
+        [Test]
+        public void BailCostDays_ChargesFortyThousandPerRemainingDay()
+        {
+            Assert.AreEqual(40_000L, JailSentence.BailCostDays(1));
+            Assert.AreEqual(80_000L, JailSentence.BailCostDays(2));
+            Assert.AreEqual(120_000L, JailSentence.BailCostDays(3));
+            Assert.AreEqual(0L, JailSentence.BailCostDays(0));
+            Assert.AreEqual(0L, JailSentence.BailCostDays(-1));
+        }
+
+        [Test]
         public void Arrest_CountsAndBailCharges()
         {
             var loop = new GameLoop();
             loop.ArrestPlayer();
             Assert.AreEqual(1, loop.Arrests);
+            Assert.AreEqual(1, loop.JailDaysRemaining);
 
             long before = loop.State.Cash + loop.State.CreditCard.Balance * -1L;
             loop.PayBail(40_000L);
             long after = loop.State.Cash + loop.State.CreditCard.Balance * -1L;
             Assert.AreEqual(40_000L, before - after);
+            Assert.AreEqual(0, loop.JailDaysRemaining);
+        }
+
+        [Test]
+        public void Arrest_SleepingOnCotServesDayAndAdvancesMorning()
+        {
+            var loop = new GameLoop();
+            loop.ArrestPlayer(); // 1st arrest = 1 day
+            loop.ArrestPlayer(); // 2nd arrest = 2 days
+            Assert.AreEqual(2, loop.JailDaysRemaining);
+
+            int day = loop.Clock.Day;
+            loop.SleepInJail();
+            Assert.AreEqual(1, loop.JailDaysRemaining);
+            Assert.AreEqual(day + 1, loop.Clock.Day);
+
+            loop.SleepInJail();
+            Assert.AreEqual(0, loop.JailDaysRemaining);
+            Assert.AreEqual(day + 2, loop.Clock.Day);
         }
 
         [Test]

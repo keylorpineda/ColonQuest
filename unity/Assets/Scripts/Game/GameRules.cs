@@ -24,8 +24,13 @@ namespace ColonQuest.Game
         /// <summary>From this hour the evening begins: the town gets darker.</summary>
         public const int NightHour = 18;
 
-        /// <summary>Real seconds for one hour of the game: a day of 16 hours lasts about 4 minutes.</summary>
-        public const float SecondsPerGameHour = 15f;
+        /// <summary>Real seconds for one hour of the game: a day of 16 hours lasts about 4 minutes in normal speed.</summary>
+        public const float NormalSecondsPerGameHour = 15f;
+
+        /// <summary>Real seconds for one hour in fast speed mode (for demos and judges, ~1.3 min per day).</summary>
+        public const float FastSecondsPerGameHour = 5f;
+
+        public const float SecondsPerGameHour = NormalSecondsPerGameHour;
 
         /// <summary>The shift of the first job: it starts at this hour, with some minutes of grace, and lasts the morning.</summary>
         public const int WorkStartHour = 7;

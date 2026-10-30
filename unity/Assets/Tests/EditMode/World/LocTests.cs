@@ -129,6 +129,31 @@ namespace ColonQuest.World.Tests
             Assert.IsFalse(old.SoundOn);
             Assert.AreEqual(0.5f, old.Volume, 0.0001f);
             Assert.AreEqual(GameLanguage.Spanish, old.Language);
+            Assert.AreEqual(TimeSpeed.Normal, old.Speed);
+            Assert.AreEqual(15f, old.SecondsPerGameHour);
+        }
+
+        [Test]
+        public void Settings_SpeedFastIsSerializedAndParsed()
+        {
+            var settings = new GameSettings { Speed = TimeSpeed.Fast };
+            Assert.AreEqual("1;1.00;fast", settings.Serialize());
+            Assert.AreEqual(5f, settings.SecondsPerGameHour);
+
+            var parsed = GameSettings.Parse(settings.Serialize());
+            Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
+            Assert.AreEqual(5f, parsed.SecondsPerGameHour);
+        }
+
+        [Test]
+        public void Settings_SpeedFastWithEnglish()
+        {
+            var settings = new GameSettings { Language = GameLanguage.English, Speed = TimeSpeed.Fast };
+            Assert.AreEqual("1;1.00;en;fast", settings.Serialize());
+
+            var parsed = GameSettings.Parse(settings.Serialize());
+            Assert.AreEqual(GameLanguage.English, parsed.Language);
+            Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
         }
     }
 }

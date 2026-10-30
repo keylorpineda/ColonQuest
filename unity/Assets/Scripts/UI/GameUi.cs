@@ -454,6 +454,11 @@ namespace ColonQuest.UI
                 case StationType.Home:
                     return "[E]  Revisar tu estado de cuenta";
                 case StationType.Thing:
+                    if (station.name == "Thing_CellCot")
+                    {
+                        return loop.JailDaysRemaining > 0 ? "[E]  " + Loc.T(station.DisplayName) : string.Empty;
+                    }
+
                     return "[E]  " + station.DisplayName;
                 case StationType.Atm:
                     return "[E]  Consultar tu saldo en el cajero";
@@ -475,7 +480,22 @@ namespace ColonQuest.UI
                         return "[E]  " + station.DisplayName;
                     }
 
-                    return loop.AllTasksDone ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar." : Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
+                    if (loop.AllTasksDone)
+                    {
+                        return Loc.T("Ya hiciste tus tareas del mes. Ve al banco a cobrar.");
+                    }
+
+                    if (loop.Clock.IsLastDay)
+                    {
+                        return Loc.T("Hoy es día de pago. Ve al banco a cobrar.");
+                    }
+
+                    if (loop.TasksToday >= 1)
+                    {
+                        return Loc.T("Ya resolviste el pendiente de hoy. Descansa hasta mañana.");
+                    }
+
+                    return Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
             }
         }
 
@@ -694,14 +714,27 @@ namespace ColonQuest.UI
 
         private void AskCloseMonth()
         {
-            string body = session.Loop.AllTasksDone
-                ? "Cobras tu salario y se pagan las cuotas, la tarjeta y los gastos del mes."
-                : Loc.F("Todavía te faltan tareas este mes ({0} de {1}). Si cierras ahora, te pierdes esas decisiones.", session.Loop.TasksDone, GameRules.TasksPerMonth);
-
-            modal.Show("Banco", "Cierre de mes", body, new[]
+            var text = new StringBuilder();
+            if (session.Loop.AllTasksDone)
             {
-                new ModalOption { Label = "1.  Cobrar y cerrar el mes", Color = GameUiColors.Green, OnPress = () => session.CloseMonth() },
-                new ModalOption { Label = "2.  Todavía no", Color = GameUiColors.Pink, OnPress = null }
+                text.AppendLine(Loc.T("Cobras tu salario y se pagan las cuotas, la tarjeta y los gastos del mes."));
+            }
+            else
+            {
+                text.AppendLine(Loc.F("Todavía te faltan tareas este mes ({0} de {1}). Si cierras ahora, te pierdes esas decisiones.", session.Loop.TasksDone, GameRules.TasksPerMonth));
+            }
+
+            if (session.Loop.Clock.Day < GameRules.DaysPerMonth)
+            {
+                int remainingShifts = GameRules.DaysPerMonth - session.Loop.Clock.Day + (!session.Loop.Job.WorkedToday && session.Loop.Clock.Hour >= GameRules.WorkStartHour ? 1 : 0);
+                text.AppendLine();
+                text.Append(Loc.F("Aviso: el mes aún no termina (semana {0} de {1}). Se te rebajarán {2} turnos de trabajo no laborados.", session.Loop.Clock.Day, GameRules.DaysPerMonth, remainingShifts));
+            }
+
+            modal.Show(Loc.T("Banco"), Loc.T("Cierre de mes"), text.ToString(), new[]
+            {
+                new ModalOption { Label = Loc.T("1.  Cobrar y cerrar el mes"), Color = GameUiColors.Green, OnPress = () => session.CloseMonth() },
+                new ModalOption { Label = Loc.T("2.  Todavía no"), Color = GameUiColors.Pink, OnPress = null }
             });
         }
 

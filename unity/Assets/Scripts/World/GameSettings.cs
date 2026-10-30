@@ -40,8 +40,14 @@ namespace ColonQuest.World
         }
     }
 
+    public enum TimeSpeed
+    {
+        Normal,
+        Fast
+    }
+
     /// <summary>
-    /// What the player can change in the settings: sound on or off and the volume. It is plain data with
+    /// What the player can change in the settings: sound on or off, the volume and clock speed. It is plain data with
     /// a text form (<c>"1;0.8"</c>) so it can be stored anywhere and tested without Unity.
     /// </summary>
     public sealed class GameSettings
@@ -73,6 +79,12 @@ namespace ColonQuest.World
         /// <summary>The language of the text. Spanish unless the player chose English.</summary>
         public GameLanguage Language { get; set; } = GameLanguage.Spanish;
 
+        /// <summary>Clock progression speed: normal (15s/h) or fast (5s/h, for judging and demos).</summary>
+        public TimeSpeed Speed { get; set; } = TimeSpeed.Normal;
+
+        /// <summary>Real seconds elapsed for one in-game hour.</summary>
+        public float SecondsPerGameHour => Speed == TimeSpeed.Fast ? 5f : 15f;
+
         /// <summary>From 0 to 1. Any value outside that range is brought back into it.</summary>
         public float Volume
         {
@@ -103,7 +115,17 @@ namespace ColonQuest.World
         public string Serialize()
         {
             string text = (SoundOn ? "1" : "0") + ";" + volume.ToString("0.00", CultureInfo.InvariantCulture);
-            return Language == GameLanguage.English ? text + ";en" : text;
+            if (Language == GameLanguage.English)
+            {
+                text += ";en";
+            }
+
+            if (Speed == TimeSpeed.Fast)
+            {
+                text += ";fast";
+            }
+
+            return text;
         }
 
         /// <summary>Reads the text form. Anything that does not parse gives the default for that part.</summary>
@@ -126,9 +148,16 @@ namespace ColonQuest.World
                 settings.Volume = parsed;
             }
 
-            if (parts.Length > 2 && parts[2] == "en")
+            for (int i = 2; i < parts.Length; i++)
             {
-                settings.Language = GameLanguage.English;
+                if (parts[i] == "en")
+                {
+                    settings.Language = GameLanguage.English;
+                }
+                else if (parts[i] == "fast")
+                {
+                    settings.Speed = TimeSpeed.Fast;
+                }
             }
 
             return settings;

@@ -20,30 +20,26 @@ namespace ColonQuest.UI
         private GameObject cellCard;
         private Text cellText;
         private Button bailButton;
-        private float sentenceLeft;
-        private int bailShownMinutes = -1;
 
         private void BuildCell()
         {
             var card = UiKit.Card(canvas.transform, "Cell", UiKit.Paper, new Vector2(620f, 200f), new Vector2(0.5f, 1f), new Vector2(0f, -150f));
             cellCard = card.parent.gameObject;
-            cellText = UiKit.Label(card, string.Empty, 40, UiKit.Ink, new Vector2(560f, 60f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), TextAnchor.MiddleCenter);
+            cellText = UiKit.Label(card, string.Empty, 36, UiKit.Ink, new Vector2(560f, 60f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), TextAnchor.MiddleCenter);
             bailButton = UiKit.MakeButton(card, "Pagar fianza", GameUiColors.Yellow, new Vector2(520f, 76f), new Vector2(0.5f, 0f), new Vector2(0f, 26f), PayBail);
             cellCard.SetActive(false);
         }
 
-        /// <summary>The player is in the cell: the door stays locked until the term is served or the bail is paid.</summary>
-        private void StartSentence(int seconds)
+        /// <summary>The player is in the cell: the door stays locked until the term in game days is served or the bail is paid.</summary>
+        private void StartSentence(int days)
         {
-            sentenceLeft = seconds;
-            bailShownMinutes = -1;
             Door.Locked = true;
             Door.LockedThought = LockedThought;
+            CellGate.Lock(true);
         }
 
         private void ResetSentence()
         {
-            sentenceLeft = 0f;
             Door.Locked = false;
             CellGate.Unlock(true);
             if (cellCard != null)
@@ -54,47 +50,35 @@ namespace ColonQuest.UI
 
         private void TickCell()
         {
-            if (sentenceLeft <= 0f)
+            int days = session.Loop.JailDaysRemaining;
+            if (days <= 0)
             {
+                if (Door.Locked)
+                {
+                    ResetSentence();
+                    subtitles.Show(string.Empty, Loc.T(SentenceDoneThought));
+                }
+
                 return;
             }
 
             bool atTheStation = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == SceneNames.Carcel;
-            if (!pause.IsOpen)
-            {
-                sentenceLeft -= Time.unscaledDeltaTime;
-            }
-
-            if (sentenceLeft <= 0f)
-            {
-                sentenceLeft = 0f;
-                Door.Locked = false;
-                CellGate.Unlock(true);
-                cellCard.SetActive(false);
-                subtitles.Show(string.Empty, Loc.T(SentenceDoneThought));
-                return;
-            }
-
             cellCard.SetActive(atTheStation && !modal.IsOpen);
-            int seconds = Mathf.CeilToInt(sentenceLeft);
-            cellText.text = Loc.F("Condena: {0}", JailSentence.Clock(seconds));
+            cellText.text = Loc.F("Condena restante: {0} {1}", days, days == 1 ? Loc.T("día") : Loc.T("días"));
 
-            int minutes = (seconds + 59) / 60;
-            if (minutes != bailShownMinutes)
-            {
-                bailShownMinutes = minutes;
-                UiKit.SetLabel(bailButton, Loc.F("Pagar fianza  {0}", Money.Format(JailSentence.BailCost(seconds))));
-            }
+            long cost = JailSentence.BailCostDays(days);
+            UiKit.SetLabel(bailButton, Loc.F("Pagar fianza  {0}", Money.Format(cost)));
         }
 
         private void PayBail()
         {
-            if (sentenceLeft <= 0f)
+            int days = session.Loop.JailDaysRemaining;
+            if (days <= 0)
             {
                 return;
             }
 
-            long cost = JailSentence.BailCost(Mathf.CeilToInt(sentenceLeft));
+            long cost = JailSentence.BailCostDays(days);
             if (session.PayBail(cost))
             {
                 ResetSentence();
