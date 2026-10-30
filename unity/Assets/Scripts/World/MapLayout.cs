@@ -15,6 +15,8 @@ namespace ColonQuest.World
         public const string Hospital = "Hospital";
         public const string HospitalArriba = "HospitalArriba";
         public const string Vecino = "Vecino";
+        public const string Finca = "Finca";
+        public const string Inmobiliaria = "Inmobiliaria";
     }
 
     /// <summary>
@@ -30,6 +32,8 @@ namespace ColonQuest.World
 
         // In the town, in front of each building door.
         public const string TownFromCasa = "Town_FromCasa";
+        public const string TownFromFinca = "Town_FromFinca";
+        public const string TownFromInmobiliaria = "Town_FromInmobiliaria";
         public const string TownFromTienda = "Town_FromTienda";
         public const string TownFromBanco = "Town_FromBanco";
         public const string TownFromAgencia = "Town_FromAgencia";
@@ -106,5 +110,9 @@ namespace ColonQuest.World
         public static readonly Vector2 HospitalArribaMat = new Vector2(-8f, -5f);
         public static readonly Vector2 VecinoSize = new Vector2(16.5f, 12f);
         public static readonly Vector2 VecinoMat = new Vector2(0f, -5f);
+        public static readonly Vector2 FincaSize = new Vector2(22f, 14f);
+        public static readonly Vector2 FincaMat = new Vector2(0f, -6f);
+        public static readonly Vector2 InmobiliariaSize = new Vector2(20f, 12f);
+        public static readonly Vector2 InmobiliariaMat = new Vector2(0f, -5f);
     }
 }

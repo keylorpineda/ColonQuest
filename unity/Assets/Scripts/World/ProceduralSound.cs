@@ -208,9 +208,9 @@ namespace ColonQuest.World
             for (int i = 0; i < length && start + i < buffer.Length; i++)
             {
                 float t = i / (float)length;
-                float envelope = Mathf.Sin(Mathf.PI * t);
+                float envelope = Mathf.Pow(Mathf.Sin(Mathf.PI * t), 2f);
                 float value = 0f;
-                for (int h = 1; h <= 8; h++)
+                for (int h = 1; h <= 5; h++)
                 {
                     float frequency = f0 * h;
                     float gain = Resonance(frequency, formantA, 160f) + 0.6f * Resonance(frequency, formantB, 300f);
@@ -334,14 +334,14 @@ namespace ColonQuest.World
             return ToClip("Birds" + variant, buffer, 0.5f);
         }
 
-        /// <summary>One syllable of someone talking: a short buzz with a vowel shape, played at different pitches.</summary>
+        /// <summary>One syllable of someone talking: a soft, round hum with a vowel shape, played at different pitches.</summary>
         public static AudioClip Syllable(int variant)
         {
-            const float seconds = 0.11f;
+            const float seconds = 0.12f;
             int length = Mathf.RoundToInt(seconds * Rate);
             var buffer = new float[length];
-            float f0 = 150f + variant * 18f;
-            float formantA = 350f + variant * 70f;
+            float f0 = 210f + variant * 22f;
+            float formantA = 420f + variant * 60f;
             double phase = 0.0;
 
             for (int i = 0; i < length; i++)
@@ -358,7 +358,74 @@ namespace ColonQuest.World
                 phase += TwoPi * f0 * (1f + 0.15f * (0.5f - t)) / Rate;
             }
 
-            return ToClip("Syllable" + variant, buffer, 0.5f);
+            return ToClip("Syllable" + variant, buffer, 0.35f);
+        }
+
+        private struct StepSound
+        {
+            public float Seconds;
+            public float Decay;
+            public float Tone;
+            public float ToneAmount;
+            public float NoiseAmount;
+            public float Smooth;
+        }
+
+        /// <summary>One footstep, a short tap that belongs to the ground: hard and bright on tile, hollow on wood, a soft hiss on sand.</summary>
+        public static AudioClip Step(SurfaceKind kind, int variant)
+        {
+            StepSound s;
+            switch (kind)
+            {
+                case SurfaceKind.Sidewalk:
+                    s = new StepSound { Seconds = 0.07f, Decay = 85f, Tone = 1500f, ToneAmount = 0.5f, NoiseAmount = 0.6f, Smooth = 0.6f };
+                    break;
+                case SurfaceKind.Road:
+                    s = new StepSound { Seconds = 0.08f, Decay = 65f, Tone = 800f, ToneAmount = 0.45f, NoiseAmount = 0.55f, Smooth = 0.4f };
+                    break;
+                case SurfaceKind.Sand:
+                    s = new StepSound { Seconds = 0.13f, Decay = 22f, Tone = 0f, ToneAmount = 0f, NoiseAmount = 1f, Smooth = 0.9f };
+                    break;
+                case SurfaceKind.Wood:
+                    s = new StepSound { Seconds = 0.11f, Decay = 45f, Tone = 190f, ToneAmount = 0.9f, NoiseAmount = 0.25f, Smooth = 0.3f };
+                    break;
+                case SurfaceKind.Tile:
+                    s = new StepSound { Seconds = 0.07f, Decay = 110f, Tone = 2400f, ToneAmount = 0.55f, NoiseAmount = 0.45f, Smooth = 0.85f };
+                    break;
+                default:
+                    s = new StepSound { Seconds = 0.09f, Decay = 38f, Tone = 120f, ToneAmount = 0.3f, NoiseAmount = 0.8f, Smooth = 0.2f };
+                    break;
+            }
+
+            int length = Mathf.RoundToInt(s.Seconds * Rate);
+            var buffer = new float[length];
+            var random = new System.Random((int)kind * 101 + variant % 3);
+            float tone = s.Tone * (1f + 0.07f * (variant % 3));
+            float lowpassed = 0f;
+            for (int i = 0; i < length; i++)
+            {
+                float t = i / (float)Rate;
+                float envelope = Mathf.Exp(-s.Decay * t);
+                lowpassed += ((float)random.NextDouble() * 2f - 1f - lowpassed) * s.Smooth;
+                buffer[i] = (s.ToneAmount * Mathf.Sin((float)TwoPi * tone * t) + s.NoiseAmount * lowpassed) * envelope;
+            }
+
+            return ToClip("Step_" + kind + variant % 3, buffer, 0.35f);
+        }
+
+        /// <summary>The tap of a button: two quick tones that rise a little.</summary>
+        public static AudioClip Click()
+        {
+            int length = Mathf.RoundToInt(0.06f * Rate);
+            var buffer = new float[length];
+            for (int i = 0; i < length; i++)
+            {
+                float t = i / (float)Rate;
+                float envelope = Mathf.Exp(-60f * t);
+                buffer[i] = (Mathf.Sin((float)TwoPi * 880f * t) + 0.6f * Mathf.Sin((float)TwoPi * 1320f * t)) * envelope;
+            }
+
+            return ToClip("Click", buffer, 0.3f);
         }
     }
 }

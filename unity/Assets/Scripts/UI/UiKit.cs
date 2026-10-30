@@ -145,7 +145,11 @@ namespace ColonQuest.UI
             label.name = "Text";
             if (onClick != null)
             {
-                button.onClick.AddListener(() => onClick());
+                button.onClick.AddListener(() =>
+                {
+                    AudioDirector.Click();
+                    onClick();
+                });
             }
 
             return button;

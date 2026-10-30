@@ -24,6 +24,7 @@ namespace ColonQuest.UI
         /// <summary>How many times each everyday object was used, so its lines rotate.</summary>
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
+        private SubtitleBar subtitles;
         private NegotiationPanel negotiationPanel;
         private PhoneUi phone;
         private PauseMenu pause;
@@ -70,6 +71,8 @@ namespace ColonQuest.UI
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
+            subtitles = new SubtitleBar(canvas.transform);
+            Thoughts.Said += OnThought;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
@@ -99,6 +102,7 @@ namespace ColonQuest.UI
             }
 
             ReleaseIncidents();
+            Thoughts.Said -= OnThought;
             Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -187,6 +191,7 @@ namespace ColonQuest.UI
         {
             // The overlay lives across scenes, but the main menu has its own screen.
             canvas.enabled = scene.name != SceneNames.Menu;
+            subtitles.Hide();
             BindStations();
         }
 
@@ -230,6 +235,7 @@ namespace ColonQuest.UI
             }
 
             TickIncidents();
+            subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
 
             if (pause.IsOpen)
             {
@@ -604,7 +610,45 @@ namespace ColonQuest.UI
             {
                 walker.Greet(player.transform.position, 8f);
             }
-            modal.Show(station.DisplayName, null, line, new[] { Continue(null) }, station.DisplayName);
+
+            // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
+            bool person = station.name == "Thing_Talk";
+            subtitles.Show(person ? Loc.T(PersonName(station)) : string.Empty, line);
+        }
+
+        /// <summary>The name that goes before what a person says: the one of the character, or a plain word for a passer-by.</summary>
+        private static string PersonName(Station station)
+        {
+            var root = station.transform.parent;
+            string name = root != null ? root.name : string.Empty;
+            if (string.IsNullOrEmpty(name) || name.StartsWith("Peaton"))
+            {
+                return "Vecino";
+            }
+
+            if (name == "Estafador")
+            {
+                return "El del puesto";
+            }
+
+            // "DonBeto" is shown as "Don Beto".
+            var spaced = new StringBuilder();
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (i > 0 && char.IsUpper(name[i]) && char.IsLower(name[i - 1]))
+                {
+                    spaced.Append(' ');
+                }
+
+                spaced.Append(name[i]);
+            }
+
+            return spaced.ToString();
+        }
+
+        private void OnThought(string spanish)
+        {
+            subtitles.Show(string.Empty, Loc.T(spanish));
         }
 
         private void ShowStatement()

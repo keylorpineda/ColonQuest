@@ -28,9 +28,23 @@ namespace ColonQuest.World
             visual = target;
         }
 
+        private Vector2 nudge;
+        private float nudgeUntil;
+
+        /// <summary>Walks the player a few steps in a direction, as if they had turned around by themselves.</summary>
+        public void Nudge(Vector2 direction, float seconds)
+        {
+            nudge = direction.normalized;
+            nudgeUntil = Time.time + seconds;
+        }
+
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
+            if (GetComponent<WalkWatch>() == null)
+            {
+                gameObject.AddComponent<WalkWatch>();
+            }
         }
 
         private void Update()
@@ -38,6 +52,11 @@ namespace ColonQuest.World
             input = InputEnabled && !Blocked
                 ? new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
                 : Vector2.zero;
+
+            if (Time.time < nudgeUntil && InputEnabled && !Blocked)
+            {
+                input = nudge;
+            }
 
             facing = MovementMath.FacingSign(input.x, facing);
             if (visual != null)

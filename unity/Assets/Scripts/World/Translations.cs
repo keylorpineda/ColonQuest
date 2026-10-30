@@ -609,6 +609,10 @@ namespace ColonQuest.World
             { "Es seguro, es seguro. Papeles no tengo, pero confiá en mí.", "It's safe, it's safe. I have no papers, but trust me." },
             { "Con los {cash} que tenés hoy, mañana tendrías el triple. Eso me dijeron mis clientes.", "With the {cash} you have today, tomorrow you would have triple. That's what my clients told me." },
             { "Nadie puede garantizar 300% en un mes. Un negocio así se llama esquema piramidal: gana el que entra primero.", "Nobody can guarantee 300% in a month. A deal like that is a pyramid scheme: whoever gets in first wins." },
+            { "No debería alejarme tanto del pueblo.", "I shouldn't wander off this far from town." },
+            { "Mejor me compro un bañador antes de meterme al agua.", "I'd better buy a swimsuit before getting in the water." },
+            { "Vecino", "Neighbor" },
+            { "El del puesto", "The stand guy" },
         };
     }
 }
