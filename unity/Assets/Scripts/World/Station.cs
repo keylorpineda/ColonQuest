@@ -44,7 +44,10 @@ namespace ColonQuest.World
         Work,
 
         /// <summary>The furniture corner of the store: cash down or in installments. Not a task.</summary>
-        Furniture
+        Furniture,
+
+        /// <summary>The board of courses: classes that cost money and afternoons. Not a task.</summary>
+        Courses
     }
 
     /// <summary>

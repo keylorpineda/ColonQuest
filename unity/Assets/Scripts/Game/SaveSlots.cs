@@ -58,6 +58,10 @@ namespace ColonQuest.Game
         public List<long> billAmounts = new List<long>();
         public List<int> billMonthsLate = new List<int>();
         public bool billsArrived;
+        public int punctualDays;
+        public int jobPosition;
+        public List<int> courseAfternoons = new List<int>();
+        public bool attendedToday;
         public List<int> goalKinds = new List<int>();
         public List<long> goalTargets = new List<long>();
         public List<long> goalStarts = new List<long>();

@@ -62,6 +62,9 @@ namespace ColonQuest.Game
         /// <summary>The bills of the home that are waiting to be paid.</summary>
         public BillBook Bills { get; private set; } = new BillBook();
 
+        /// <summary>The afternoons attended of each course.</summary>
+        public CourseBook Courses { get; private set; } = new CourseBook();
+
         /// <summary>The goals the phone proposed at the start of the run.</summary>
         public GoalBook Goals { get; private set; } = new GoalBook();
 
@@ -96,6 +99,7 @@ namespace ColonQuest.Game
             Clock = new GameClock();
             Job = new JobRecord();
             Bills = new BillBook();
+            Courses = new CourseBook();
             Goals = GoalBook.Propose(State);
             doneStations.Clear();
         }
@@ -122,8 +126,16 @@ namespace ColonQuest.Game
                 latesThisMonth = Job.LatesThisMonth,
                 missedThisMonth = Job.MissedThisMonth,
                 workedToday = Job.WorkedToday,
-                billsArrived = Bills.ArrivedThisMonth
+                billsArrived = Bills.ArrivedThisMonth,
+                punctualDays = Job.PunctualDays,
+                jobPosition = (int)Job.Position,
+                attendedToday = Courses.AttendedToday
             };
+
+            foreach (var course in Career.Courses)
+            {
+                snapshot.courseAfternoons.Add(Courses.Attended(course.Kind));
+            }
 
             foreach (var goal in Goals.Goals)
             {
@@ -169,7 +181,13 @@ namespace ColonQuest.Game
             SleptThisMonth = snapshot.sleptThisMonth;
             CookedThisMonth = snapshot.cookedThisMonth;
             Clock.Restore(snapshot.day, snapshot.minutes);
-            Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday);
+            Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday, snapshot.punctualDays, (JobPosition)snapshot.jobPosition);
+            Courses.AttendedToday = snapshot.attendedToday;
+            int courses = Math.Min(Career.Courses.Count, snapshot.courseAfternoons?.Count ?? 0);
+            for (int i = 0; i < courses; i++)
+            {
+                Courses.Restore((CourseKind)i, snapshot.courseAfternoons[i]);
+            }
             RestoreGoals(snapshot);
             Bills.RestoreArrived(snapshot.billsArrived);
             int bills = Math.Min(snapshot.billKinds?.Count ?? 0, Math.Min(snapshot.billAmounts?.Count ?? 0, snapshot.billMonthsLate?.Count ?? 0));
@@ -207,7 +225,7 @@ namespace ColonQuest.Game
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
                 && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm
                 && type != StationType.HealthDesk && type != StationType.Wardrobe && type != StationType.Beach
-                && type != StationType.Work && type != StationType.Furniture;
+                && type != StationType.Work && type != StationType.Furniture && type != StationType.Courses;
         }
 
         public bool CanDoTask(StationType type)
@@ -354,6 +372,7 @@ namespace ColonQuest.Game
         /// <summary>Only a night that starts a new week closes the working day: the last week waits at the bank.</summary>
         private void NextMorning()
         {
+            Courses.AttendedToday = false;
             if (Clock.SleepToMorning())
             {
                 EndWorkingDay();
@@ -362,6 +381,77 @@ namespace ColonQuest.Game
                     Bills.Arrive(BillAmount);
                 }
             }
+        }
+
+        /// <summary>Why this class cannot be taken now, or None.</summary>
+        public ClassRefusal CheckClass(CourseKind kind)
+        {
+            if (Courses.Done(kind))
+            {
+                return ClassRefusal.AlreadyDone;
+            }
+
+            if (Clock.Hour < Career.AfternoonStartHour || Clock.Hour >= Career.AfternoonEndHour)
+            {
+                return ClassRefusal.OutsideTheAfternoon;
+            }
+
+            if (Courses.AttendedToday)
+            {
+                return ClassRefusal.AlreadyToday;
+            }
+
+            return !Courses.Enrolled(kind) && State.Cash < Career.Course(kind).Price ? ClassRefusal.NotEnoughCash : ClassRefusal.None;
+        }
+
+        /// <summary>Goes to a class: the course is paid when enrolling, and the class takes the afternoon.</summary>
+        public bool TakeClass(CourseKind kind)
+        {
+            if (CheckClass(kind) != ClassRefusal.None)
+            {
+                return false;
+            }
+
+            if (!Courses.Enrolled(kind) && !FinanceEngine.TrySpendCash(State, Career.Course(kind).Price))
+            {
+                return false;
+            }
+
+            Courses.Attend(kind);
+            Clock.SkipTo(Clock.Minutes + Career.ClassMinutes);
+            State.RecordHistory("took_course");
+            Decisions++;
+            return true;
+        }
+
+        /// <summary>True when the days on time and the course of the next position are done.</summary>
+        public bool CanBePromoted
+        {
+            get
+            {
+                if (Job.Position >= Career.TopPosition)
+                {
+                    return false;
+                }
+
+                var next = Job.Position + 1;
+                return Job.PunctualDays >= Career.PunctualDaysFor(next) && Courses.Done(Career.CourseFor(next));
+            }
+        }
+
+        /// <summary>Moves up one position: the new net salary comes from the finance engine, with its legal deductions.</summary>
+        public bool Promote()
+        {
+            if (!CanBePromoted)
+            {
+                return false;
+            }
+
+            Job.MoveUp();
+            State.SalaryNet = FinanceEngine.CalculateNetSalary(Career.GrossSalary(Job.Position));
+            FinanceEngine.ChangeWellbeing(State, MarketAssumptions.PromotionWellbeing);
+            State.RecordHistory("promoted");
+            return true;
         }
 
         private long BillAmount(BillKind kind)
@@ -668,6 +758,7 @@ namespace ColonQuest.Game
             }
 
             Job.StartMonth();
+            Courses.AttendedToday = false;
             Clock.StartMonth();
             doneStations.Clear();
             return report;
