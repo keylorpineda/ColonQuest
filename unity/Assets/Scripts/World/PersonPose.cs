@@ -19,7 +19,8 @@ namespace ColonQuest.World
         Read,
         Cook,
         Wash,
-        Reach
+        Reach,
+        SitEat
     }
 
     /// <summary>
@@ -45,6 +46,12 @@ namespace ColonQuest.World
     /// </summary>
     public static class PersonPoses
     {
+        /// <summary>How far a seated body sinks onto the seat. The seat point already puts the player on it.</summary>
+        public const float SeatDrop = -0.04f;
+
+        /// <summary>How far the legs turn out while sitting.</summary>
+        public const float SeatLegs = 6f;
+
         public static PoseAngles Evaluate(PersonPose pose, float seconds)
         {
             float t = Mathf.Max(0f, seconds);
@@ -54,12 +61,19 @@ namespace ColonQuest.World
                     return new PoseAngles { Roll = 90f, Drop = -0.3f, ArmL = 6f, ArmR = -6f, Lean = Mathf.Sin(t * 1.6f) * 1.5f };
 
                 case PersonPose.Sit:
-                    return new PoseAngles { Drop = -0.2f, LegL = -26f, LegR = 26f, ArmL = 18f, ArmR = -18f, ElbowL = 10f, ElbowR = -10f };
+                    // Seen from the front, a seated person keeps the legs down; spreading them read as a split.
+                    return new PoseAngles { Drop = SeatDrop, LegL = -SeatLegs, LegR = SeatLegs, ArmL = 18f, ArmR = -18f, ElbowL = 10f, ElbowR = -10f };
 
                 case PersonPose.Eat:
                 {
                     float lift = (Mathf.Sin(t * 3f) + 1f) * 0.5f;
-                    return new PoseAngles { Drop = -0.2f, LegL = -26f, LegR = 26f, ArmR = -12f, ElbowR = -55f - 45f * lift, ArmL = 20f, ElbowL = 25f, Lean = 3f * lift };
+                    return new PoseAngles { ArmR = -12f, ElbowR = -55f - 45f * lift, ArmL = 20f, ElbowL = 25f, Lean = 3f * lift };
+                }
+
+                case PersonPose.SitEat:
+                {
+                    float lift = (Mathf.Sin(t * 3f) + 1f) * 0.5f;
+                    return new PoseAngles { Drop = SeatDrop, LegL = -SeatLegs, LegR = SeatLegs, ArmR = -12f, ElbowR = -55f - 45f * lift, ArmL = 20f, ElbowL = 25f, Lean = 3f * lift };
                 }
 
                 case PersonPose.Type:
@@ -94,7 +108,7 @@ namespace ColonQuest.World
                     return new PoseAngles { ArmR = 95f + Mathf.Sin(t * 4f) * 65f, ArmL = -(95f + Mathf.Sin(t * 4f + Mathf.PI) * 65f), Drop = -0.22f, Lean = Mathf.Sin(t * 2f) * 4f };
 
                 case PersonPose.Read:
-                    return new PoseAngles { ArmR = -20f, ElbowR = -64f, ArmL = 20f, ElbowL = 64f, Drop = -0.2f, LegL = -26f, LegR = 26f, Lean = 3f };
+                    return new PoseAngles { ArmR = -20f, ElbowR = -64f, ArmL = 20f, ElbowL = 64f, Lean = 3f };
 
                 case PersonPose.Cook:
                     return new PoseAngles { ArmR = -14f + Mathf.Sin(t * 6f) * 14f, ElbowR = -56f + Mathf.Sin(t * 6f + 1f) * 10f, ArmL = 14f, ElbowL = 20f, Lean = 3f };
@@ -116,7 +130,29 @@ namespace ColonQuest.World
         /// <summary>True when the pose changes the height or the angle of the whole body, so the walk animation must give way.</summary>
         public static bool MovesBody(PersonPose pose)
         {
-            return pose == PersonPose.Sleep || pose == PersonPose.Sit || pose == PersonPose.Eat || pose == PersonPose.Read || pose == PersonPose.Swim;
+            return pose == PersonPose.Sleep || pose == PersonPose.Sit || pose == PersonPose.SitEat || pose == PersonPose.Swim;
+        }
+
+        /// <summary>
+        /// True when the pose brings the hands to the chest or the mouth. The forearms and hands are drawn under the torso
+        /// at rest, so for these poses the animator draws them over it; otherwise the hands vanish behind the shirt.
+        /// </summary>
+        public static bool HandsInFront(PersonPose pose)
+        {
+            switch (pose)
+            {
+                case PersonPose.Eat:
+                case PersonPose.SitEat:
+                case PersonPose.Read:
+                case PersonPose.Type:
+                case PersonPose.Count:
+                case PersonPose.Sign:
+                case PersonPose.Wash:
+                case PersonPose.Cook:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
