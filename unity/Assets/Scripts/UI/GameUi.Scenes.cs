@@ -1,4 +1,5 @@
 using System;
+using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
@@ -469,7 +470,7 @@ namespace ColonQuest.UI
                 case StationType.Garage:
                     who = "DonRafa";
                     speaker = "Don Rafa";
-                    line = "¡Pase, mae! Déjeme ver qué tiene su carro.";
+                    line = FinanceEngine.OwnsVehicle(session.State) ? "¡Pase, mae! Déjeme ver qué tiene su carro." : "¡Pase, mae! Vea qué chunches tengo por aquí.";
                     break;
                 case StationType.Grocery:
                     who = "DonaMarta";

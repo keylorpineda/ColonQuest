@@ -680,6 +680,8 @@ namespace ColonQuest.World
             { "Cocinar en casa sale más barato que comer afuera.", "Cooking at home is cheaper than eating out." },
             { "¡Hola, mae! Venga, le enseño lo que tengo.", "Hey, dude! Come on, let me show you what I have." },
             { "¡Pase, mae! Déjeme ver qué tiene su carro.", "Come in, dude! Let me see what is wrong with your car." },
+            { "¡Pase, mae! Vea qué chunches tengo por aquí.", "Come in, dude! Have a look at what I've got here." },
+            { "Escribí tu nombre para empezar.", "Type your name to start." },
             { "Buenas, mi amor. ¿Qué se le ofrece hoy?", "Hello, dear. What can I get you today?" },
             { "Tranquilo, amigo. Plata rápida, sin papeleo ni preguntas.", "Easy, friend. Fast cash, no paperwork and no questions." },
             { "¡Mae, tengo el negocio de su vida! Triplica su plata en un mes.", "Dude, I have the deal of your life! It triples your money in a month." },
