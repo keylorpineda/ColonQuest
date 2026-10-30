@@ -42,7 +42,7 @@ THEMES: dict[TeachingConcept, str] = {
     TeachingConcept.EXCHANGE_RATE: "Una compra en dólares y el tipo de cambio",
     TeachingConcept.PAYROLL_DEDUCTIONS: "Revisar la colilla: CCSS, renta y horas extra",
 }
-DECEMBER_THEME = "Aguinaldo, marchamo y gastos de fin de año"
+DECEMBER_THEME = "Aguinaldo y gastos de fin de año"
 
 
 class PlannedMonth(ContractModel):

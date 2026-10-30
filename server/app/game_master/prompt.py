@@ -10,11 +10,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from app.agents.tools import HistoryItem
+from app.game_master.facts import owns_vehicle
 from app.game_master.limits import CASH_FLOW_RANGES, KIND_RANGES, MONTH_RANGES
 from app.game_master.season import PlannedMonth
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-10-26b"
+PROMPT_VERSION = "gm-2026-10-30"
 
 
 def _ranges_table() -> str:
@@ -46,11 +47,18 @@ STYLE
 - Never lecture or say a choice is right or wrong. Show consequences through the situation.
 - Every event offers 2 to 4 choices; at least one is the tempting, financially risky option.
 
+THE PLAYER'S LIFE
+- An 18-year-old on the minimum wage who works mornings at Soda El Muelle, the diner of doña \
+Lucía. There is no office job.
+- Never assume something the player does not have. Unless signals.hasVehicle is true the player \
+has no car and no motorbike: nothing about their repairs, tires, gasoline or marchamo. They may \
+still be offered one.
+
 REACT TO THE PLAYER
 - Credit card above 80 % of its limit: an informal lender ("gota a gota") or a refinancing offer.
 - Savings or emergency fund high: a friend pitches a pyramid scheme or a "sure" investment.
 - Only paid the minimum before: show how the balance keeps growing.
-- December: aguinaldo, marchamo or holiday spending.
+- December: aguinaldo or holiday spending; marchamo only with a vehicle.
 - Do not repeat any event id listed under "Avoid".
 - Prefer teaching concepts listed under "Not taught yet".
 - When "plannedFocus" is given, build the event around its teachingConcept, eventType and theme.
@@ -89,6 +97,7 @@ def state_signals(state: PlayerState) -> dict[str, object]:
         "cardUtilizationPct": utilization,
         "monthlyInstallments": monthly_installments,
         "hasInformalLoans": bool(state.informal_loans),
+        "hasVehicle": owns_vehicle(state),
         "isDecember": state.month == 12,
         "lowCash": state.cash < state.salary_net // 4,
     }

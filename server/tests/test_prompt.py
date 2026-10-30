@@ -50,6 +50,7 @@ def test_state_signals() -> None:
         "cardUtilizationPct": 90,
         "monthlyInstallments": 25000,
         "hasInformalLoans": False,
+        "hasVehicle": False,
         "isDecember": True,
         "lowCash": True,
     }

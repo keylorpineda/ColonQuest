@@ -7,10 +7,12 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
+from app.game_master.facts import owns_vehicle
 from app.schemas import GameEvent, PlayerState, TeachingConcept
 
 FALLBACK_EVENTS_PATH = Path(__file__).with_name("fallback_events.json")
 DECEMBER_EVENT_IDS = frozenset({"evt_aguinaldo", "evt_marchamo"})
+VEHICLE_EVENT_IDS = frozenset({"evt_moto_dañada", "evt_marchamo"})
 
 _events_adapter = TypeAdapter(list[GameEvent])
 
@@ -31,10 +33,12 @@ def pick_fallback_event(
     """Pick a fallback that fits the month and avoids repeating recent events.
 
     December prefers aguinaldo and marchamo; otherwise events teaching concepts the player has
-    not seen yet come first.
+    not seen yet come first. Events about a vehicle are only for a player who has one.
     """
     rng = rng or random.Random()  # noqa: S311 - gameplay variety, not security
     events = load_fallback_events()
+    if not owns_vehicle(state):
+        events = tuple(event for event in events if event.event_id not in VEHICLE_EVENT_IDS)
     recent = set(recent_event_ids)
     fresh = [event for event in events if event.event_id not in recent] or list(events)
 
