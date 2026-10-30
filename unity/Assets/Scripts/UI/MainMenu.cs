@@ -17,6 +17,9 @@ namespace ColonQuest.UI
     public sealed class MainMenu : MonoBehaviour
     {
         private const float ReferenceWidth = 1920f;
+
+        /// <summary>The width of the bands that cross the whole screen: the scale follows the height, so a 21:9 screen is about 2520 wide.</summary>
+        private const float BackdropWidth = 3400f;
         private const float CloudWrap = 400f;
 
         private static readonly Color Cream = GamePalette.Hex("#F6F0D4");
@@ -195,8 +198,10 @@ namespace ColonQuest.UI
             var scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(ReferenceWidth, 1080f);
+            // The signs stack down the left side, so the height decides the scale: every sign fits in a wide or short
+            // window, and a wider screen only shows more of the beach.
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 1f;
 
             gameObject.AddComponent<GraphicRaycaster>();
             root = transform;
@@ -234,7 +239,7 @@ namespace ColonQuest.UI
             for (int i = 0; i < bands; i++)
             {
                 float t = i / (float)(bands - 1);
-                var band = UiKit.Fill(sky, "Sky" + i, Color.Lerp(top, horizon, t), new Vector2(2300f, 1100f / bands + 4f), new Vector2(0.5f, 1f), new Vector2(0f, 60f - i * (1100f / bands)));
+                var band = UiKit.Fill(sky, "Sky" + i, Color.Lerp(top, horizon, t), new Vector2(BackdropWidth, 1100f / bands + 4f), new Vector2(0.5f, 1f), new Vector2(0f, 60f - i * (1100f / bands)));
                 band.sprite = null;
             }
 
@@ -277,15 +282,15 @@ namespace ColonQuest.UI
             var mid = NewLayer("MidLayer", 26f);
             UiKit.Fill(mid, "Rock", GamePalette.Hex("#3C4259"), new Vector2(900f, 760f), bottom, new Vector2(620f, -240f));
             UiKit.Fill(mid, "RockLight", GamePalette.Hex("#4F5775"), new Vector2(520f, 600f), bottom, new Vector2(820f, -200f));
-            UiKit.Fill(mid, "Sea", GamePalette.Hex("#5BC0DE"), new Vector2(1300f, 360f), bottom, new Vector2(-420f, -150f));
-            UiKit.Fill(mid, "SeaDeep", GamePalette.Hex("#3EA5CF"), new Vector2(1300f, 150f), bottom, new Vector2(-420f, -190f));
+            UiKit.Fill(mid, "Sea", GamePalette.Hex("#5BC0DE"), new Vector2(2400f, 360f), bottom, new Vector2(-970f, -150f));
+            UiKit.Fill(mid, "SeaDeep", GamePalette.Hex("#3EA5CF"), new Vector2(2400f, 150f), bottom, new Vector2(-970f, -190f));
             for (int i = 0; i < 3; i++)
             {
                 var foam = UiKit.Fill(mid, "Foam" + i, new Color(1f, 1f, 1f, 0.5f - i * 0.12f), new Vector2(1000f - i * 220f, 28f - i * 6f), bottom, new Vector2(-480f, 140f - i * 52f));
                 waves.Add(foam.rectTransform);
             }
 
-            UiKit.Fill(mid, "Sand", GamePalette.Hex("#EBC77E"), new Vector2(1400f, 520f), bottom, new Vector2(560f, -260f));
+            UiKit.Fill(mid, "Sand", GamePalette.Hex("#EBC77E"), new Vector2(2400f, 520f), bottom, new Vector2(1060f, -260f));
             UiKit.Fill(mid, "SandLight", GamePalette.Hex("#F4D898"), new Vector2(900f, 300f), bottom, new Vector2(700f, -150f));
 
             // The town on the shore: two little houses with a bank between them, then the palms and the coins in front.
@@ -321,9 +326,9 @@ namespace ColonQuest.UI
             var shade = new Color(0.03f, 0.05f, 0.15f, 1f);
             for (int i = 0; i < 4; i++)
             {
-                var bar = UiKit.Fill(root, "ShadeBottom" + i, new Color(shade.r, shade.g, shade.b, 0.10f), new Vector2(2300f, 70f + i * 50f), bottom, Vector2.zero);
+                var bar = UiKit.Fill(root, "ShadeBottom" + i, new Color(shade.r, shade.g, shade.b, 0.10f), new Vector2(BackdropWidth, 70f + i * 50f), bottom, Vector2.zero);
                 bar.sprite = null;
-                var barTop = UiKit.Fill(root, "ShadeTop" + i, new Color(shade.r, shade.g, shade.b, 0.07f), new Vector2(2300f, 40f + i * 40f), new Vector2(0.5f, 1f), Vector2.zero);
+                var barTop = UiKit.Fill(root, "ShadeTop" + i, new Color(shade.r, shade.g, shade.b, 0.07f), new Vector2(BackdropWidth, 40f + i * 40f), new Vector2(0.5f, 1f), Vector2.zero);
                 barTop.sprite = null;
             }
         }
@@ -437,7 +442,7 @@ namespace ColonQuest.UI
                 button.transform.localRotation = Quaternion.Euler(0f, 0f, tilts[i]);
                 var label = button.transform.Find("Body/Text").GetComponent<Text>();
                 label.font = UiKit.TitleFont;
-                label.fontSize = i == 0 ? 36 : 32;
+                label.fontSize = i == 0 ? 44 : 38;
                 Slide((RectTransform)button.transform, 900f + i * 120f);
             }
         }
