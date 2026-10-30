@@ -277,7 +277,8 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Carcel, SceneManager.GetActiveScene().name);
             Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, session.State.Cash);
-            Assert.AreEqual(MarketAssumptions.JailDaysLost, session.Loop.TasksDone);
+            Assert.AreEqual(1, session.Loop.TasksDone);
+            Assert.AreEqual(1, session.Loop.JailDaysRemaining);
         }
     }
 

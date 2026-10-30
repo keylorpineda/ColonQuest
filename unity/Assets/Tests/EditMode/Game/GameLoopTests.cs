@@ -100,7 +100,12 @@ namespace ColonQuest.Game.Tests
             loop.Choose(Expense(), "cash", StationType.Garage);
 
             Assert.AreEqual(1, loop.TasksDone);
+            Assert.AreEqual(1, loop.TasksToday);
             Assert.IsFalse(loop.CanDoTask(StationType.Garage), "the same place once a month");
+            Assert.IsFalse(loop.CanDoTask(StationType.Store), "only one task per day");
+
+            loop.Sleep();
+            Assert.AreEqual(0, loop.TasksToday);
             Assert.IsTrue(loop.CanDoTask(StationType.Store));
         }
 
@@ -108,11 +113,55 @@ namespace ColonQuest.Game.Tests
         public void Tasks_StopAtTheLimitOfTheMonth()
         {
             loop.Choose(Expense(), "cash", StationType.Garage);
+            loop.Sleep();
             loop.Choose(Expense(), "cash", StationType.Store);
+            loop.Sleep();
             loop.Choose(Expense(), "cash", StationType.Kiosk);
 
             Assert.IsTrue(loop.AllTasksDone);
             Assert.IsFalse(loop.CanDoTask(StationType.Pyramid));
+        }
+
+        [Test]
+        public void Tasks_MaxOnePerDay_AndCannotDoOnPayday()
+        {
+            Assert.AreEqual(0, loop.TasksToday);
+            Assert.IsTrue(loop.CanDoTask(StationType.Garage));
+
+            loop.Choose(Expense(), "cash", StationType.Garage);
+            Assert.AreEqual(1, loop.TasksToday);
+            Assert.IsFalse(loop.CanDoTask(StationType.Store), "cannot do more than one task per day");
+
+            loop.Sleep(); // day 2
+            Assert.AreEqual(0, loop.TasksToday);
+            Assert.IsTrue(loop.CanDoTask(StationType.Store));
+
+            loop.Sleep(); // day 3
+            loop.Sleep(); // day 4 (payday)
+            Assert.IsTrue(loop.Clock.IsLastDay);
+            Assert.IsFalse(loop.CanDoTask(StationType.Store), "no tasks allowed on payday");
+        }
+
+        [Test]
+        public void CloseMonth_EarlyWithDockRemaining_DocksUnworkedShifts()
+        {
+            var fresh = new GameLoop();
+            long salary = fresh.State.SalaryNet;
+            var report = fresh.CloseMonth(dockRemainingShifts: true);
+            Assert.AreEqual(FinanceEngine.CalculateDockedPay(salary, 0, 4), report.SalaryDocked);
+        }
+
+        [Test]
+        public void FallAsleep_AppliesDailyWellbeingLoss()
+        {
+            var testLoop = new GameLoop();
+            testLoop.ClockIn();
+            testLoop.FinishShift();
+            int mood = testLoop.State.Wellbeing;
+            var outcome = testLoop.FallAsleep();
+            Assert.IsNotNull(outcome);
+            Assert.AreEqual(-MarketAssumptions.SkippedSleepWellbeingLoss, outcome.WellbeingDelta);
+            Assert.AreEqual(mood - MarketAssumptions.SkippedSleepWellbeingLoss, testLoop.State.Wellbeing);
         }
 
         [Test]

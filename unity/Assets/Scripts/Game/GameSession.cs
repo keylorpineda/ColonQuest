@@ -635,7 +635,7 @@ namespace ColonQuest.Game
                 return false;
             }
 
-            return Loop.Clock.Advance(realSeconds, GameRules.SecondsPerGameHour);
+            return Loop.Clock.Advance(realSeconds, GameSettings.Current.SecondsPerGameHour);
         }
 
         /// <summary>The player clocks in at work.</summary>
@@ -891,6 +891,19 @@ namespace ColonQuest.Game
             return true;
         }
 
+        /// <summary>The player sleeps on the cell cot to serve a day of their jail sentence.</summary>
+        public void SleepInJail()
+        {
+            if (Busy || Loop.IsFinished)
+            {
+                return;
+            }
+
+            var outcome = Loop.SleepInJail();
+            ChoiceApplied?.Invoke(outcome);
+            Changed?.Invoke();
+        }
+
         public void CloseMonth()
         {
             if (Busy || Loop.IsFinished)
@@ -898,7 +911,7 @@ namespace ColonQuest.Game
                 return;
             }
 
-            var report = Loop.CloseMonth();
+            var report = Loop.CloseMonth(dockRemainingShifts: true);
             MonthClosed?.Invoke(report);
             Changed?.Invoke();
         }

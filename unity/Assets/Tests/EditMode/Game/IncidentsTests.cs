@@ -17,7 +17,7 @@ namespace ColonQuest.Game.Tests
         // ---------------------------------------------------------------- the law
 
         [Test]
-        public void Arrest_ChargesTheFineLosesTwoDaysAndLowersTheMood()
+        public void Arrest_ChargesTheFineLosesDaysAndLowersTheMood()
         {
             var loop = Loop(500_000L);
             int mood = loop.State.Wellbeing;
@@ -26,7 +26,8 @@ namespace ColonQuest.Game.Tests
 
             Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, loop.State.Cash);
             Assert.AreEqual(-MarketAssumptions.TrespassFine, outcome.CashDelta);
-            Assert.AreEqual(MarketAssumptions.JailDaysLost, loop.TasksDone);
+            Assert.AreEqual(1, loop.JailDaysRemaining);
+            Assert.AreEqual(loop.JailDaysRemaining, loop.TasksDone);
             Assert.AreEqual(mood - MarketAssumptions.JailWellbeingLoss, loop.State.Wellbeing);
         }
 

@@ -321,6 +321,9 @@ namespace ColonQuest.Game
         /// <summary>The bail asks this for each minute that is left of the term in the cell, in colones.</summary>
         public const long BailPerMinute = 8_000L;
 
+        /// <summary>The bail asks this for each game day that is left of the sentence in the cell, in colones.</summary>
+        public const long BailPerDay = 40_000L;
+
         /// <summary>Days of the month lost to the night in jail and the hearing.</summary>
         public const int JailDaysLost = 2;
 

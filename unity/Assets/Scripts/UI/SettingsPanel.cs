@@ -19,6 +19,7 @@ namespace ColonQuest.UI
         private readonly Button soundButton;
         private readonly Button languageButton;
         private readonly Button screenButton;
+        private readonly Button speedButton;
         private readonly RectTransform volumeFill;
         private readonly Text volumeText;
 
@@ -26,24 +27,25 @@ namespace ColonQuest.UI
         {
             onBack = back;
             root = UiKit.Overlay(parent, "Settings");
-            var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, 800f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, 900f), new Vector2(0.5f, 0.5f), Vector2.zero);
             var top = new Vector2(0.5f, 1f);
 
             UiKit.Label(card, "Ajustes", 56, UiKit.Ink, new Vector2(CardWidth - 80f, 70f), top, new Vector2(0f, -30f), TextAnchor.MiddleCenter);
 
-            languageButton = UiKit.MakeButton(card, "Idioma", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -130f), ToggleLanguage);
-            soundButton = UiKit.MakeButton(card, "Sonido", GameUiColors.Green, new Vector2(520f, 84f), top, new Vector2(0f, -240f), ToggleSound);
+            languageButton = UiKit.MakeButton(card, "Idioma", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -115f), ToggleLanguage);
+            soundButton = UiKit.MakeButton(card, "Sonido", GameUiColors.Green, new Vector2(520f, 84f), top, new Vector2(0f, -210f), ToggleSound);
 
-            screenButton = UiKit.MakeButton(card, "Pantalla", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -350f), ToggleScreen);
+            screenButton = UiKit.MakeButton(card, "Pantalla", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -305f), ToggleScreen);
+            speedButton = UiKit.MakeButton(card, "Velocidad", GameUiColors.Blue, new Vector2(520f, 84f), top, new Vector2(0f, -400f), ToggleSpeed);
 
-            UiKit.Label(card, "Volumen", 34, GameUiColors.Muted, new Vector2(CardWidth - 80f, 44f), top, new Vector2(0f, -462f), TextAnchor.MiddleCenter);
-            UiKit.MakeButton(card, "-", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(-250f, -520f), () => ChangeVolume(-1));
-            UiKit.MakeButton(card, "+", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(250f, -520f), () => ChangeVolume(1));
+            UiKit.Label(card, "Volumen", 34, GameUiColors.Muted, new Vector2(CardWidth - 80f, 44f), top, new Vector2(0f, -505f), TextAnchor.MiddleCenter);
+            UiKit.MakeButton(card, "-", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(-250f, -555f), () => ChangeVolume(-1));
+            UiKit.MakeButton(card, "+", GameUiColors.Blue, new Vector2(84f, 84f), top, new Vector2(250f, -555f), () => ChangeVolume(1));
 
-            UiKit.Fill(card, "VolumeBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 30f), top, new Vector2(0f, -547f));
-            volumeFill = UiKit.Fill(card, "VolumeFill", GameUiColors.Gain, new Vector2(BarWidth, 30f), top, new Vector2(-BarWidth * 0.5f, -547f)).rectTransform;
+            UiKit.Fill(card, "VolumeBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 30f), top, new Vector2(0f, -578f));
+            volumeFill = UiKit.Fill(card, "VolumeFill", GameUiColors.Gain, new Vector2(BarWidth, 30f), top, new Vector2(-BarWidth * 0.5f, -578f)).rectTransform;
             volumeFill.pivot = new Vector2(0f, 1f);
-            volumeText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(200f, 40f), top, new Vector2(0f, -594f), TextAnchor.MiddleCenter);
+            volumeText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(200f, 40f), top, new Vector2(0f, -625f), TextAnchor.MiddleCenter);
 
             UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), Back);
 
@@ -91,6 +93,13 @@ namespace ColonQuest.UI
             Commit(settings);
         }
 
+        private void ToggleSpeed()
+        {
+            var settings = GameSettings.Current;
+            settings.Speed = settings.Speed == TimeSpeed.Normal ? TimeSpeed.Fast : TimeSpeed.Normal;
+            Commit(settings);
+        }
+
         private void ChangeVolume(int steps)
         {
             var settings = GameSettings.Current;
@@ -112,6 +121,7 @@ namespace ColonQuest.UI
             UiKit.SetLabel(languageButton, settings.Language == GameLanguage.English ? "Language: English" : "Idioma: Español");
             UiKit.SetLabel(soundButton, Loc.T(settings.SoundOn ? "Sonido: activado" : "Sonido: desactivado"));
             UiKit.SetLabel(screenButton, Loc.T(FullscreenKeys.IsFull ? "Pantalla completa: sí" : "Pantalla completa: no"));
+            UiKit.SetLabel(speedButton, Loc.T(settings.Speed == TimeSpeed.Fast ? "Velocidad: Rápida (5s)" : "Velocidad: Normal (15s)"));
             volumeFill.sizeDelta = new Vector2(BarWidth * settings.Volume, volumeFill.sizeDelta.y);
             volumeText.text = settings.VolumePercent + " %";
         }
