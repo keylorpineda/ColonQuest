@@ -27,7 +27,7 @@ namespace ColonQuest.UI
 
         private void BuildWorkGuide()
         {
-            var card = UiKit.Card(canvas.transform, "WorkGuide", UiKit.Paper, new Vector2(420f, 64f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
+            var card = UiKit.Card(canvas.transform, "WorkGuide", UiKit.Paper, new Vector2(520f, 64f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
             workGuide = card.parent.gameObject;
 
             workArrow = UiKit.Rect(card, "Arrow", new Vector2(40f, 40f), new Vector2(0f, 0.5f), new Vector2(36f, 0f));
@@ -39,7 +39,7 @@ namespace ColonQuest.UI
             image.color = UiKit.Ink;
             image.raycastTarget = false;
 
-            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(340f, 50f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f), TextAnchor.MiddleCenter);
+            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(440f, 50f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f), TextAnchor.MiddleCenter);
             workGuide.SetActive(false);
         }
 
@@ -132,7 +132,7 @@ namespace ColonQuest.UI
 
             Vector2 me = Here(station);
             Vector2 machine = Here(station, 0f, 1.5f);
-            return new Interaction().WalkTo(me).Face(machine)
+            var scene = new Interaction().WalkTo(me).Face(machine)
                 .Pose(PersonPose.Reach, 0.6f).Fly("card", me + new Vector2(0.2f, 0.4f), machine, 0.5f).Sound(SoundEffectKind.Beep)
                 .Wait(0.5f).Sound(SoundEffectKind.Chime)
                 .Say(Boss, BossLine(result)).Wait(2.6f)
@@ -140,8 +140,10 @@ namespace ColonQuest.UI
                 .Pose(PersonPose.Wash, 2.2f).Sound(SoundEffectKind.Water).Wait(2.2f)
                 .Pose(PersonPose.Handover, 1.2f).Fly("plate", me + new Vector2(0f, 0.3f), machine, 0.6f).Sound(SoundEffectKind.Coin).Wait(1.2f)
                 .Pose(PersonPose.None, 0.2f)
-                .Apply(then)
-                .Say(string.Empty, "Listo por hoy. Tengo el resto del día libre.");
+                .Apply(then);
+
+            // What counts is the state after clocking in: today may be the day that was missing.
+            return session.Loop.CanBePromoted ? AddPromotion(scene) : scene.Say(string.Empty, "Listo por hoy. Tengo el resto del día libre.");
         }
 
         private static string BossLine(ClockInResult result)

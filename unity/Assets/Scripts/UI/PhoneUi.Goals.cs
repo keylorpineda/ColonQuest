@@ -72,6 +72,32 @@ namespace ColonQuest.UI
                 });
                 y -= 160f;
             }
+
+            AddCareerCard(y);
+        }
+
+        /// <summary>The position at work and what the next one asks for.</summary>
+        private void AddCareerCard(float y)
+        {
+            var job = session.Loop.Job;
+            var card = UiKit.Fill(content, "Career", Color.white, new Vector2(InnerWidth, 136f), new Vector2(0f, 1f), new Vector2(Margin, y));
+            UiKit.Label(card.transform, Loc.F("Tu puesto: {0}", Loc.T(GameUi.PositionName(job.Position))), 25, UiKit.Ink, new Vector2(InnerWidth - 32f, 36f), new Vector2(0f, 1f), new Vector2(16f, -10f));
+
+            string detail;
+            if (job.Position >= Career.TopPosition)
+            {
+                detail = Loc.T("Ya llegaste al puesto más alto de la soda.");
+            }
+            else
+            {
+                var next = job.Position + 1;
+                var course = Career.Course(Career.CourseFor(next));
+                detail = Loc.F("Para {0}: {1} de {2} días a tiempo, {3}: {4} de {5} tardes.", Loc.T(GameUi.PositionName(next)), System.Math.Min(job.PunctualDays, Career.PunctualDaysFor(next)), Career.PunctualDaysFor(next), Loc.T(course.Name), session.Loop.Courses.Attended(course.Kind), course.Afternoons);
+            }
+
+            var line = UiKit.Label(card.transform, detail, 21, GameUiColors.Muted, new Vector2(InnerWidth - 32f, 70f), new Vector2(0f, 1f), new Vector2(16f, -50f));
+            line.fontStyle = FontStyle.Normal;
+            line.alignment = TextAnchor.UpperLeft;
         }
 
         /// <summary>The two moves of the bank app, under the numbers.</summary>
