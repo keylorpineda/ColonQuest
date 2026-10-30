@@ -125,6 +125,8 @@ namespace ColonQuest.UI
                     return StoreScene(station, then);
                 case StationType.Beach:
                     return BeachScene(station, then);
+                case StationType.Work:
+                    return WorkScene(station, then);
                 case StationType.HealthDesk:
                     return SignScene(station, then, "Doctora", "La recepción", "Llene este formulario y firme aquí, por favor.", false);
                 case StationType.RealEstate:
@@ -331,6 +333,7 @@ namespace ColonQuest.UI
 
             // The month moves on only at the bank, so the last week wakes up in the same week with a reminder.
             bool lastWeek = clock.Day + 1 >= GameRules.DaysPerMonth;
+            bool missedWork = !session.Loop.Job.WorkedToday && !clock.IsLastDay;
             Vector2 bed = Here(station);
             return new Interaction().WalkInto(bed).Say(string.Empty, "Ya es tarde. Toca dormir.")
                 .Pose(PersonPose.Sleep, 0.8f).Zzz(bed + new Vector2(0.2f, 0.5f), 3f)
@@ -338,10 +341,11 @@ namespace ColonQuest.UI
                 .Apply(() => session.Sleep())
                 .Sound(SoundEffectKind.Alarm).Wait(1.1f)
                 .Pose(PersonPose.None, 0.3f).Fade(Dawn, 1f)
-                .Say(string.Empty, lastWeek ? LastWeekThought : "Dormí rico. Amanecí con ganas de arreglar mis cuentas.");
+                .Say(string.Empty, lastWeek ? LastWeekThought : (missedWork ? MissedWorkThought : "Dormí rico. Amanecí con ganas de arreglar mis cuentas."));
         }
 
         public const string LastWeekThought = "Última semana del mes: toca ir al banco a cobrar el salario.";
+        public const string MissedWorkThought = "Ayer no fui a trabajar. Eso me lo van a rebajar del salario.";
 
         /// <summary>
         /// The day ended away from the bed: the player nods off where they stand, the screen goes dark and the next morning
@@ -350,12 +354,13 @@ namespace ColonQuest.UI
         private void FallAsleepScene()
         {
             bool lastWeek = session.Loop.Clock.Day + 1 >= GameRules.DaysPerMonth;
+            bool missedWork = !session.Loop.Job.WorkedToday && !session.Loop.Clock.IsLastDay;
             Vector2 me = HeroAt();
             var scene = new Interaction().Say(string.Empty, "Se me hizo tardísimo... ya no aguanto el sueño.")
                 .Zzz(me + new Vector2(0.2f, 0.6f), 2f).Fade(Night, 1.2f).Wait(1.2f)
                 .Apply(() => session.FallAsleep())
                 .Sound(SoundEffectKind.Alarm).Wait(0.8f).Fade(Dawn, 1f)
-                .Say(string.Empty, lastWeek ? LastWeekThought : "Amanecí todo torcido. Mejor dormir en la cama la próxima vez.");
+                .Say(string.Empty, lastWeek ? LastWeekThought : (missedWork ? MissedWorkThought : "Amanecí todo torcido. Mejor dormir en la cama la próxima vez."));
             if (!scene.Play())
             {
                 session.FallAsleep();

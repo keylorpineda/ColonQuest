@@ -80,6 +80,7 @@ namespace ColonQuest.UI
             session = gameSession;
             BuildCanvas();
             BuildHud();
+            BuildWorkGuide();
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
@@ -217,6 +218,7 @@ namespace ColonQuest.UI
             canvas.enabled = scene.name != SceneNames.Menu;
             HideSpeech();
             usedStations.Clear();
+            workStation = null;
             TryStartOpening(scene);
             BindStations();
         }
@@ -228,6 +230,10 @@ namespace ColonQuest.UI
             {
                 station.PlayerEntered += OnStationEntered;
                 station.PlayerExited += OnStationExited;
+                if (station.Type == StationType.Work)
+                {
+                    workStation = station;
+                }
             }
         }
 
@@ -298,6 +304,7 @@ namespace ColonQuest.UI
 
             TickIncidents();
             TickCell();
+            TickWorkGuide();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
             TickSpeech();
@@ -451,6 +458,8 @@ namespace ColonQuest.UI
                 case StationType.Wardrobe:
                 case StationType.Beach:
                     return "[E]  " + station.DisplayName;
+                case StationType.Work:
+                    return WorkPrompt();
                 default:
                     if (loop.CanDoTask(station.Type))
                     {
@@ -496,6 +505,9 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Beach:
                     ShowBeach();
+                    break;
+                case StationType.Work:
+                    session.FinishShift();
                     break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
@@ -670,6 +682,11 @@ namespace ColonQuest.UI
             phone.Close();
             var text = new StringBuilder();
             text.AppendLine(Loc.F("Salario  {0}", $"<color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.SalaryCredited)}</color>"));
+            if (report.SalaryDocked > 0L)
+            {
+                text.AppendLine(Loc.F("Ya con el rebajo por tardanzas y faltas  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(report.SalaryDocked)}</color>"));
+            }
+
             if (report.AguinaldoCredited > 0L)
             {
                 text.AppendLine(Loc.F("Aguinaldo  {0}", $"<color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.AguinaldoCredited)}</color>"));
