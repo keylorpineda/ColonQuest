@@ -45,6 +45,7 @@ namespace ColonQuest.UI
         {
             sentenceLeft = 0f;
             Door.Locked = false;
+            CellGate.Unlock(true);
             if (cellCard != null)
             {
                 cellCard.SetActive(false);
@@ -68,6 +69,7 @@ namespace ColonQuest.UI
             {
                 sentenceLeft = 0f;
                 Door.Locked = false;
+                CellGate.Unlock(true);
                 cellCard.SetActive(false);
                 subtitles.Show(string.Empty, Loc.T(SentenceDoneThought));
                 return;
