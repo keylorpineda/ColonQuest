@@ -473,6 +473,7 @@ namespace ColonQuest.UI
         {
             var state = session.State;
             var loop = session.Loop;
+            WalkWatch.HasSwimsuit = loop.HasSwimsuit;
             monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay);
             tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
             cashText.text = Money.Format(state.Cash);
