@@ -24,6 +24,26 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator DayTint_FollowsTheHourOfTheClock()
+        {
+            var session = GameSession.Create();
+            session.StartNewGame();
+            yield return null;
+
+            var tint = Object.FindFirstObjectByType<DayTint>();
+            Assert.IsNotNull(tint, "the light of the town is in the scene with its script");
+            Color morning = tint.GetComponent<SpriteRenderer>().color;
+
+            session.Loop.Clock.Advance(GameRules.SecondsPerGameHour * 15.5f, GameRules.SecondsPerGameHour);
+            yield return new WaitForSeconds(2.5f);
+            Color dusk = tint.GetComponent<SpriteRenderer>().color;
+
+            Assert.Greater(dusk.b, morning.b + 0.03f, "the evening turns bluer");
+            Assert.Less(dusk.r, morning.r - 0.1f);
+            session.StartNewGame();
+        }
+
+        [UnityTest]
         public IEnumerator Car_WaitsAtTheCrosswalkWhilePedestriansHaveGreenAndThenGoes()
         {
             Teleport(new Vector2(0f, 8f));

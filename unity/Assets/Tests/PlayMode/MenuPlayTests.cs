@@ -229,7 +229,8 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt("Button_Modo historia").onClick.Invoke();
             Assert.IsTrue(Active("Slots"), "the story button opens the saved games");
             ButtonAt(SlotButton(0, "Nueva partida")).onClick.Invoke();
-            yield return WaitFor(SceneNames.Town);
+            Assert.IsTrue(Active("NewGame"), "a new life first asks who the player is");
+            yield return StartLifeAndSkipOpening();
 
             Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
             Assert.IsNotNull(GameSession.Instance);
@@ -239,6 +240,49 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsNotNull(GameSession.Slots.Load(0), "a new game is saved from the start");
             Assert.IsNotNull(GameObject.Find("GameUi"));
             Assert.IsTrue(GameObject.Find("GameUi").GetComponent<Canvas>().enabled, "the overlay is back in the town");
+        }
+
+        /// <summary>Presses Empezar in the new game window, waits for the opening in the house and skips it to the town.</summary>
+        private static IEnumerator StartLifeAndSkipOpening()
+        {
+            ButtonAt("NewGame/Card/Body/Button_Empezar").onClick.Invoke();
+            yield return WaitFor(SceneNames.Casa);
+            for (float waited = 0f; waited < 10f && !Interaction.Playing; waited += Time.unscaledDeltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsTrue(Interaction.Playing, "the opening plays in the house");
+            Assert.IsNotNull(GameObject.Find("Mama"), "the mother is there for the opening");
+            Interaction.SkipCurrent();
+            yield return WaitFor(SceneNames.Town);
+        }
+
+        [UnityTest]
+        public IEnumerator NewGame_KeepsTheNameAndTheLook()
+        {
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+            ButtonAt(SlotButton(1, "Nueva partida")).onClick.Invoke();
+            Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>().text = "  María  ";
+            ButtonAt("NewGame/Card/Body/Button_Mujer").onClick.Invoke();
+            yield return StartLifeAndSkipOpening();
+
+            Assert.AreEqual("María", PlayerProfile.Name);
+            Assert.IsTrue(PlayerProfile.Female);
+            Assert.AreEqual("María", GameSession.Instance.RunName, "an empty game name takes the player's");
+            var saved = GameSession.Slots.Load(1);
+            Assert.AreEqual("María", saved.characterName);
+            Assert.IsTrue(saved.female);
+
+            yield return null;
+            var player = GameObject.FindWithTag(Station.PlayerTag).transform;
+            Assert.IsNotNull(player.Find("Bob"), "the scenes and the animator find the body by this name");
+            Assert.IsTrue(player.Find("Bob").gameObject.activeSelf);
+            Assert.IsNull(player.Find(PlayerLookSwitch.AlternateBob), "only one look stays");
+
+            yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
+            yield return null;
+            Assert.IsNull(GameObject.Find("Mama"), "after the opening the mother is not in the house");
         }
 
         private static string SlotButton(int slot, string text)
@@ -295,7 +339,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(77_000L, GameSession.Slots.Load(0).Cash);
 
             ButtonAt(SlotButton(0, "¿Seguro? Empezar")).onClick.Invoke();
-            yield return WaitFor(SceneNames.Town);
+            yield return StartLifeAndSkipOpening();
             Assert.AreNotEqual(77_000L, GameSession.Slots.Load(0).Cash, "the new life took the slot");
         }
 
@@ -304,7 +348,7 @@ namespace ColonQuest.World.PlayModeTests
         {
             ButtonAt("Button_Modo historia").onClick.Invoke();
             ButtonAt(SlotButton(2, "Nueva partida")).onClick.Invoke();
-            yield return WaitFor(SceneNames.Town);
+            yield return StartLifeAndSkipOpening();
 
             GameSession.Instance.Loop.Clock.Advance(GameRules.SecondsPerGameHour * 2f, GameRules.SecondsPerGameHour);
             yield return SceneManager.LoadSceneAsync(SceneNames.Menu);
