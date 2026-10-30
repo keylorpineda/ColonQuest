@@ -326,18 +326,22 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// The wardrobe: the player stands in front of it, the doors swing open and, once bought, the swimsuit hangs inside.
-        /// The window to buy it opens after the gesture, and the doors close again before the player is free.
+        /// The wardrobe: the player stands at its doors, they swing open and, once bought, the swimsuit hangs inside. The
+        /// window to buy it opens after the gesture, and the doors close again before the player is free. The wardrobe
+        /// stands against the wall of the living room, so its doors face the bedroom on the right, not down the screen.
         /// </summary>
         private Interaction WardrobeScene(Station station, Action then)
         {
             bool owned = session.Loop.HasSwimsuit;
-            return new Interaction().WalkTo(Here(station, 0f, -0.6f)).Face(Here(station, 0.4f, 1f))
+            return new Interaction().WalkTo(Here(station, WardrobeFront.x, WardrobeFront.y)).Face(Here(station, -1f, WardrobeFront.y))
                 .Reveal(WardrobeSwimsuit, owned)
                 .Pose(PersonPose.Reach, 0.5f).Sound(SoundEffectKind.Knock).Swing(WardrobeDoors, WardrobeOpen, 0.45f)
                 .Wait(0.8f).Apply(then)
                 .Wait(0.3f).Swing(WardrobeDoors, 1f, 0.35f).Sound(SoundEffectKind.Knock).Wait(0.4f);
         }
+
+        /// <summary>Where the player stands to open the wardrobe, relative to its station: beside the doors, mid height.</summary>
+        private static readonly Vector2 WardrobeFront = new Vector2(1.0f, 1.3f);
 
         private const string WardrobeDoors = "Wardrobe_Doors";
         private const string WardrobeSwimsuit = "Wardrobe_Swimsuit";
