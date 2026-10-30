@@ -113,7 +113,7 @@ them with a warning. Money for these purchases moves only in `FinanceEngine` (`H
   `MapBuilder.Realism.cs` and `DayCycle.cs`.
 - The `₡` sign in the built-in UI font and the text layout of the windows.
 - Everything of the last round (menu, loading screen, subtitles, interiors, cell, hit and arrest animations, step sounds, the system fonts, the backend images and the year postcard): written without compiling or running anything.
-- The image keys the game asks for (`npc_don_rafa`, `npc_kevin`, `npc_dona_marta`, `npc_prestamista`, `npc_amigo_piramide`, `scene_postal_tu_ano`) have to match what the pregeneration script of SCRUM-49 produces.
+- The pictures: the portraits (`npc_don_rafa_mecanico`, `npc_kevin_vendedor`, `npc_dona_marta_vendedora`, `npc_prestamista_gota_a_gota`, `npc_amigo_piramide`), the scenes of the events (`imageKey`) and the three postcards (`card_year_*`, chosen by the debt at the end, behind the end window) are asked for with the names that `server/scripts/pregenerate_images.py` produces. Nobody has seen them on screen.
 - Builds now point to `https://colon-quest-api.onrender.com/api`; the editor and the tests keep the local backend. The browser build needs its host in `ALLOWED_ORIGINS`.
 - Frame rate in a browser. The town has thousands of sprite renderers; the download is small but the draw
   cost is unmeasured.

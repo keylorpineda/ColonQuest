@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ColonQuest.Api;
+using ColonQuest.Game;
 using UnityEngine;
 
 namespace ColonQuest.UI
@@ -11,17 +12,26 @@ namespace ColonQuest.UI
     /// </summary>
     public static class RemoteImages
     {
-        /// <summary>The illustration of the end postcard. It has no text or numbers: the figures are written over it by the game.</summary>
-        public const string PostcardKey = "scene_postal_tu_ano";
-
-        public static readonly string[] PortraitKeys =
+        /// <summary>The portraits the backend pregenerates, by the name of the character as <see cref="UiKit.PortraitKey"/> writes it.</summary>
+        private static readonly Dictionary<string, string> Portraits = new Dictionary<string, string>
         {
-            "npc_don_rafa", "npc_kevin", "npc_dona_marta", "npc_prestamista", "npc_amigo_piramide"
+            { "don_rafa", "npc_don_rafa_mecanico" },
+            { "kevin", "npc_kevin_vendedor" },
+            { "dona_marta", "npc_dona_marta_vendedora" },
+            { "prestamista", "npc_prestamista_gota_a_gota" },
+            { "promotor", "npc_amigo_piramide" },
+            { "amigo_piramide", "npc_amigo_piramide" }
         };
 
         private static readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
         private static readonly HashSet<string> asked = new HashSet<string>();
         private static bool prefetched;
+
+        /// <summary>The portrait of a character, if the backend has one for that name and it is already here.</summary>
+        public static Sprite Portrait(string characterName)
+        {
+            return Portraits.TryGetValue(UiKit.PortraitKey(characterName), out var key) ? Get(key) : null;
+        }
 
         /// <summary>The picture if it is already here. When it is not, it is requested and null is returned for now.</summary>
         public static Sprite Get(string key)
@@ -49,12 +59,15 @@ namespace ColonQuest.UI
             }
 
             prefetched = true;
-            foreach (var key in PortraitKeys)
+            foreach (var key in new HashSet<string>(Portraits.Values))
             {
                 Request(key);
             }
 
-            Request(PostcardKey);
+            foreach (var key in PostcardKeys.All)
+            {
+                Request(key);
+            }
         }
 
         private static void Request(string key)

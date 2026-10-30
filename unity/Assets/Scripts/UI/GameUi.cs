@@ -704,7 +704,7 @@ namespace ColonQuest.UI
         private void ShowEnd(SessionSummary summary)
         {
             phone.Close();
-            modal.Backdrop = RemoteImages.Get(RemoteImages.PostcardKey);
+            modal.Backdrop = RemoteImages.Get(PostcardKeys.For(summary.TotalDebt));
             var text = new StringBuilder();
             text.AppendLine(Loc.T(summary.Narrative));
             text.AppendLine();
