@@ -14,6 +14,26 @@ namespace ColonQuest.World
 
         public const string EdgeThought = "No debería alejarme tanto del pueblo.";
         public const string WaterThought = "Mejor me compro un bañador antes de meterme al agua.";
+        public const string SeaThought = "Ya tengo bañador. El chapuzón me lo doy en la orilla de la playa (E).";
+        public const string RiverThought = "Mejor no me meto al río.";
+        public const string PondThought = "Mejor no me meto al estanque.";
+
+        /// <summary>Set by the game from the player's things: with a swimsuit the sea no longer asks for one.</summary>
+        public static bool HasSwimsuit { get; set; }
+
+        /// <summary>What the player thinks at the edge of the water.</summary>
+        public static string ThoughtFor(WaterBody water, bool hasSwimsuit)
+        {
+            switch (water)
+            {
+                case WaterBody.River:
+                    return RiverThought;
+                case WaterBody.Pond:
+                    return PondThought;
+                default:
+                    return hasSwimsuit ? SeaThought : WaterThought;
+            }
+        }
 
         private Vector2 last;
         private float travelled;
@@ -48,11 +68,17 @@ namespace ColonQuest.World
                 }
             }
 
+            // A scene (the swim) moves the player on purpose; it must not be interrupted by a warning.
+            if (Interaction.Playing)
+            {
+                return;
+            }
+
             var hint = WorldHints.Check(scene, now);
             if (hint.Kind != HintKind.None && Time.time >= nextHint)
             {
                 nextHint = Time.time + HintCooldown;
-                Thoughts.Say(hint.Kind == HintKind.Water ? WaterThought : EdgeThought);
+                Thoughts.Say(hint.Kind == HintKind.Water ? ThoughtFor(hint.Water, HasSwimsuit) : EdgeThought);
                 var controller = GetComponent<PlayerController>();
                 if (controller != null)
                 {

@@ -108,9 +108,19 @@ namespace ColonQuest.World
         Water
     }
 
+    /// <summary>Which water the player walked into: only the sea is for swimming.</summary>
+    public enum WaterBody
+    {
+        None,
+        Sea,
+        River,
+        Pond
+    }
+
     public struct WorldHint
     {
         public HintKind Kind;
+        public WaterBody Water;
         public Vector2 Away;
     }
 
@@ -145,19 +155,19 @@ namespace ColonQuest.World
             bool onPier = p.x >= MapLayout.PierXMin - 0.3f && p.x <= MapLayout.PierXMax + 0.3f;
             if (p.y < MapLayout.ShoreY + WaterMargin && p.y > MapLayout.ShoreY - 2f && !onPier)
             {
-                return new WorldHint { Kind = HintKind.Water, Away = Vector2.up };
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Sea, Away = Vector2.up };
             }
 
             if (p.x > MapLayout.RiverXMin - WaterMargin && p.x < MapLayout.RiverXMax + WaterMargin && p.y > MapLayout.ShoreY && !OnDeck(p))
             {
                 float middle = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
-                return new WorldHint { Kind = HintKind.Water, Away = p.x < middle ? Vector2.left : Vector2.right };
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.River, Away = p.x < middle ? Vector2.left : Vector2.right };
             }
 
             var pond = new Rect(Pond.xMin - WaterMargin, Pond.yMin - WaterMargin, Pond.width + WaterMargin * 2f, Pond.height + WaterMargin * 2f);
             if (pond.Contains(p))
             {
-                return new WorldHint { Kind = HintKind.Water, Away = (p - Pond.center).normalized };
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Pond, Away = (p - Pond.center).normalized };
             }
 
             return new WorldHint();
