@@ -16,15 +16,125 @@ namespace ColonQuest.EditorTools
             Vest
         }
 
-        /// <summary>The colors that tell one cartoon character from another.</summary>
+        private enum HairStyle { Auto, Side, Long, Spiky, Bun, Ponytail, Curly, Afro, Bob, Buzz, Bald }
+
+        private enum Hat { None, Cap, FlatCap, Helmet, Police, Nurse, Beanie, Chonete, Hood }
+
+        private enum Expression { Smile, Warm, Smirk, Frown, Neutral }
+
+        [System.Flags]
+        private enum Extras
+        {
+            None = 0,
+            Tie = 1,
+            Badge = 2,
+            Lanyard = 4,
+            Phone = 8,
+            Watch = 16,
+            Pen = 32,
+            Chain = 64,
+            Pouch = 128,
+            Overall = 256,
+            Apron = 512,
+            Coat = 1024,
+            Stethoscope = 2048,
+            Robe = 4096,
+            Scarf = 8192,
+            Stripe = 16384,
+            Backpack = 32768,
+            Cardigan = 65536,
+            Bag = 131072,
+            PoliceBadge = 262144
+        }
+
+        /// <summary>
+        /// The look of one cartoon person. Skin (the name is kept so the old calls compile) is the shirt color and
+        /// every new field is optional: an empty one is filled by Resolve from the old accessory and the color hash.
+        /// </summary>
         private struct Look
         {
             public string Skin;
             public Accessory Extra;
             public string ExtraColor;
+
+            public string SkinTone;
+            public string HairColor;
+            public HairStyle Hair;
+            public string Pants;
+            public string Shoes;
+            public Hat Hat;
+            public string HatColor;
+            public Expression Face;
+            public Extras Wear;
+            public string WearColor;
+            public string WearColor2;
+            public float Width, Height, Head;
+            public bool Glasses, Mustache, Goatee, HeavyLids, SquareJaw, Blush, LongSleeve, Skirt;
+            public float LookAside;
+            public float MouthX;
+            public int BrimSide;
         }
 
-        private static readonly Look PlayerLook = new Look { Skin = "#FF8A3D", Extra = Accessory.None };
+        /// <summary>
+        /// Fills what a look leaves empty: proportions of 1, the old accessory as a hat or a torso detail, and
+        /// skin, hair and pants taken from the color hash, so a pedestrian without a sheet keeps today's colors.
+        /// </summary>
+        private static Look Resolve(Look look, bool isPlayer)
+        {
+            int seed = LookSeed(look);
+            if (look.SkinTone == null)
+            {
+                look.SkinTone = SkinTones[isPlayer ? 1 : seed % SkinTones.Length];
+            }
+
+            if (look.HairColor == null)
+            {
+                look.HairColor = HairTones[isPlayer ? 1 : (seed / 7) % HairTones.Length];
+            }
+
+            if (look.Pants == null)
+            {
+                look.Pants = PantsTones[isPlayer ? 0 : (seed / 13) % PantsTones.Length];
+            }
+
+            if (look.Hair == HairStyle.Auto)
+            {
+                HairStyle[] automatic = { HairStyle.Side, HairStyle.Long, HairStyle.Bun, HairStyle.Buzz };
+                look.Hair = isPlayer ? HairStyle.Side : automatic[(seed / 3) % automatic.Length];
+            }
+
+            if (look.Hat == Hat.None && look.Wear == Extras.None)
+            {
+                switch (look.Extra)
+                {
+                    case Accessory.Cap:
+                        look.Hat = Hat.Cap;
+                        break;
+                    case Accessory.Helmet:
+                        look.Hat = Hat.Helmet;
+                        break;
+                    case Accessory.Hood:
+                        look.Hat = Hat.Hood;
+                        break;
+                    case Accessory.Tie:
+                        look.Wear = Extras.Tie;
+                        break;
+                    case Accessory.Vest:
+                        look.Wear = Extras.Cardigan;
+                        break;
+                }
+            }
+
+            look.HatColor = look.HatColor ?? look.ExtraColor ?? "#2A2F45";
+            look.WearColor = look.WearColor ?? look.ExtraColor ?? "#C0392B";
+            look.WearColor2 = look.WearColor2 ?? look.WearColor;
+            look.Shoes = look.Shoes ?? "#2A2F45";
+            look.Width = look.Width > 0f ? look.Width : 1f;
+            look.Height = look.Height > 0f ? look.Height : 1f;
+            look.Head = look.Head > 0f ? look.Head : 1f;
+            look.BrimSide = look.BrimSide == 0 ? 1 : look.BrimSide;
+            return look;
+        }
 
         /// <summary>
         /// The player: a Rigidbody2D with a round collider, the keyboard controller, and the
@@ -65,6 +175,7 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static Transform BuildNpc(Transform parent, string name, Vector2 position, Look look, bool ySorted)
         {
+            look = ApplyCast(name, look);
             var npc = new GameObject(name);
             npc.transform.SetParent(parent, false);
             npc.transform.position = position;
@@ -85,6 +196,7 @@ namespace ColonQuest.EditorTools
         /// <summary>A pedestrian that walks between two points. It has no collider, so it never blocks the way.</summary>
         private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed)
         {
+            look = ApplyCast(name, look);
             var walker = new GameObject(name);
             walker.transform.SetParent(parent, false);
             walker.transform.position = from;
