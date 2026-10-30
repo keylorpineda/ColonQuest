@@ -24,6 +24,48 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Car_WaitsAtTheCrosswalkWhilePedestriansHaveGreenAndThenGoes()
+        {
+            Teleport(new Vector2(0f, 8f));
+            var signal = CrossingSignal.All.First(s => s.name == "Signal_PlazaEast");
+            var lane = Object.FindObjectsByType<Drift>(FindObjectsSortMode.None)
+                .Where(d => d.GetComponent<TrafficCar>() != null && Mathf.Abs(d.transform.position.y - 0.95f) < 0.1f)
+                .Select(d => d.transform).ToList();
+            Assert.GreaterOrEqual(lane.Count, 1, "a car drives east on the main avenue");
+
+            // Start right as the light turns green for pedestrians, so the whole walking time is ahead.
+            yield return WaitForLight(signal, false, CrossingClock.Cycle + 1f);
+            yield return WaitForLight(signal, true, CrossingClock.Cycle + 1f);
+
+            var car = lane[0];
+            foreach (var other in lane.Skip(1))
+            {
+                other.position = new Vector3(-40f, other.position.y, other.position.z);
+            }
+
+            float line = CarRules.StopLine(signal.ZoneMinX, signal.ZoneMaxX, 1);
+            car.position = new Vector3(line - CarRules.HalfLength - 5f, car.position.y, car.position.z);
+            yield return new WaitForSeconds(4f);
+
+            Assert.IsTrue(signal.WalkLight, "still green for pedestrians");
+            float bumper = car.position.x + CarRules.HalfLength;
+            Assert.LessOrEqual(bumper, line + 0.05f, "the car stops before the stripes");
+            Assert.Greater(bumper, line - 1f, "and it stops right at the line, not far away");
+
+            yield return WaitForLight(signal, false, CrossingClock.WalkSeconds + 1f);
+            yield return new WaitForSeconds(2f);
+            Assert.Greater(car.position.x + CarRules.HalfLength, line + 1f, "red for pedestrians: the car goes on");
+        }
+
+        private static IEnumerator WaitForLight(CrossingSignal signal, bool walk, float timeout)
+        {
+            for (float waited = 0f; waited < timeout && signal.WalkLight != walk; waited += Time.deltaTime)
+            {
+                yield return null;
+            }
+        }
+
+        [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheWest()
         {
             yield return Walk(new Vector2(-42f, 2f), Vector2.left, 2f);
