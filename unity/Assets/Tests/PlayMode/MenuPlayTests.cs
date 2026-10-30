@@ -245,6 +245,12 @@ namespace ColonQuest.World.PlayModeTests
         /// <summary>Presses Empezar in the new game window, waits for the opening in the house and skips it to the town.</summary>
         private static IEnumerator StartLifeAndSkipOpening()
         {
+            var nameBox = Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>();
+            if (string.IsNullOrWhiteSpace(nameBox.text))
+            {
+                nameBox.text = "Alex";
+            }
+
             ButtonAt("NewGame/Card/Body/Button_Empezar").onClick.Invoke();
             yield return WaitFor(SceneNames.Casa);
             for (float waited = 0f; waited < 10f && !Interaction.Playing; waited += Time.unscaledDeltaTime)
@@ -256,6 +262,30 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsNotNull(GameObject.Find("Mama"), "the mother is there for the opening");
             Interaction.SkipCurrent();
             yield return WaitFor(SceneNames.Town);
+        }
+
+        [UnityTest]
+        public IEnumerator NewGame_DoesNotStartWithoutAName()
+        {
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+            ButtonAt(SlotButton(1, "Nueva partida")).onClick.Invoke();
+            var nameBox = Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>();
+            var question = Menu.Find("NewGame/Card/Body/NameQuestion").GetComponent<Text>();
+
+            foreach (string blank in new[] { string.Empty, "    ", "<>{}" })
+            {
+                nameBox.text = blank;
+                ButtonAt("NewGame/Card/Body/Button_Empezar").onClick.Invoke();
+                yield return null;
+
+                Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "still in the menu");
+                Assert.IsTrue(Menu.Find("NewGame").gameObject.activeSelf, "the window stays open");
+                Assert.AreEqual("Escribí tu nombre para empezar.", question.text);
+                Assert.IsNull(GameSession.Slots.Load(1), "nothing is saved");
+            }
+
+            nameBox.text = "María";
+            Assert.AreEqual("¿Cómo te llamás?", question.text, "typing takes the warning away");
         }
 
         [UnityTest]
