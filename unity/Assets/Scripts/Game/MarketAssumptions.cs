@@ -277,6 +277,25 @@ namespace ColonQuest.Game
         /// <summary>The rent of the room the player starts in, per month, until moving to a home of the real estate agency.</summary>
         public const long RoomRent = 90_000L;
 
+        /// <summary>What a service charges this month: electricity follows the appliances, and a house uses more than a room.</summary>
+        public static long BillAmount(BillKind kind, Holdings holdings)
+        {
+            bool house = holdings.Home != null;
+            switch (kind)
+            {
+                case BillKind.Electricity:
+                    return (house ? 15_000L : 7_000L)
+                        + (holdings.Has(FurnitureKind.Fridge) ? 6_000L : 0L)
+                        + (holdings.Has(FurnitureKind.Tv) ? 2_500L : 0L);
+                case BillKind.Water:
+                    return house ? 9_000L : 4_000L;
+                case BillKind.Internet:
+                    return 18_000L;
+                default:
+                    return 9_000L;
+            }
+        }
+
         /// <summary>What a real bed adds to the rest of the month, against the mattress on the floor.</summary>
         public const int BedRestBonus = 2;
 

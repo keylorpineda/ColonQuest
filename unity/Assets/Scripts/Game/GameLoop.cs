@@ -59,6 +59,9 @@ namespace ColonQuest.Game
         /// <summary>The attendance at the first job.</summary>
         public JobRecord Job { get; private set; } = new JobRecord();
 
+        /// <summary>The bills of the home that are waiting to be paid.</summary>
+        public BillBook Bills { get; private set; } = new BillBook();
+
         /// <summary>The fuel and upkeep that went out with the last closed month, to show in its report.</summary>
         public long LastRunningCosts { get; private set; }
 
@@ -89,6 +92,7 @@ namespace ColonQuest.Game
             CookedThisMonth = false;
             Clock = new GameClock();
             Job = new JobRecord();
+            Bills = new BillBook();
             doneStations.Clear();
         }
 
@@ -113,8 +117,16 @@ namespace ColonQuest.Game
                 daysWorked = Job.DaysWorked,
                 latesThisMonth = Job.LatesThisMonth,
                 missedThisMonth = Job.MissedThisMonth,
-                workedToday = Job.WorkedToday
+                workedToday = Job.WorkedToday,
+                billsArrived = Bills.ArrivedThisMonth
             };
+
+            foreach (var bill in Bills.Due)
+            {
+                snapshot.billKinds.Add((int)bill.Kind);
+                snapshot.billAmounts.Add(bill.Amount);
+                snapshot.billMonthsLate.Add(bill.MonthsLate);
+            }
 
             foreach (var station in doneStations)
             {
@@ -146,6 +158,12 @@ namespace ColonQuest.Game
             CookedThisMonth = snapshot.cookedThisMonth;
             Clock.Restore(snapshot.day, snapshot.minutes);
             Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday);
+            Bills.RestoreArrived(snapshot.billsArrived);
+            int bills = Math.Min(snapshot.billKinds?.Count ?? 0, Math.Min(snapshot.billAmounts?.Count ?? 0, snapshot.billMonthsLate?.Count ?? 0));
+            for (int i = 0; i < bills; i++)
+            {
+                Bills.Restore((BillKind)snapshot.billKinds[i], snapshot.billAmounts[i], snapshot.billMonthsLate[i]);
+            }
             foreach (int station in snapshot.doneStations ?? new List<int>())
             {
                 doneStations.Add((StationType)station);
@@ -308,7 +326,45 @@ namespace ColonQuest.Game
             if (Clock.SleepToMorning())
             {
                 EndWorkingDay();
+                if (Clock.IsLastDay)
+                {
+                    Bills.Arrive(BillAmount);
+                }
             }
+        }
+
+        private long BillAmount(BillKind kind)
+        {
+            return MarketAssumptions.BillAmount(kind, Holdings);
+        }
+
+        /// <summary>Pays one bill out of cash. False when nothing is owed for it or the cash is not enough.</summary>
+        public bool PayBill(BillKind kind)
+        {
+            var bill = Bills.Find(kind);
+            if (bill == null || !FinanceEngine.TryPayBill(State, bill.Amount))
+            {
+                return false;
+            }
+
+            Bills.Settle(kind);
+            Decisions++;
+            return true;
+        }
+
+        /// <summary>Pays every bill the cash reaches, in order. Returns how many were paid.</summary>
+        public int PayAllBills()
+        {
+            int paid = 0;
+            foreach (var bill in new List<BillDue>(Bills.Due))
+            {
+                if (PayBill(bill.Kind))
+                {
+                    paid++;
+                }
+            }
+
+            return paid;
         }
 
         private void EndWorkingDay()
@@ -563,6 +619,11 @@ namespace ColonQuest.Game
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
+            if (Bills.CloseMonth(BillAmount) > 0L)
+            {
+                State.RecordHistory("bills_unpaid");
+            }
+
             Job.StartMonth();
             Clock.StartMonth();
             doneStations.Clear();

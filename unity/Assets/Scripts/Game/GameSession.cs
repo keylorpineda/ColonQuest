@@ -775,6 +775,29 @@ namespace ColonQuest.Game
         public long SinpeSent { get; private set; }
 
         /// <summary>Sends money by SINPE from the phone. Only the finance engine moves the cash; false when there is not enough.</summary>
+        public bool PayBill(BillKind kind)
+        {
+            if (Busy || Loop.IsFinished || !Loop.PayBill(kind))
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        public int PayAllBills()
+        {
+            if (Busy || Loop.IsFinished)
+            {
+                return 0;
+            }
+
+            int paid = Loop.PayAllBills();
+            Changed?.Invoke();
+            return paid;
+        }
+
         public bool SendSinpe(long amount)
         {
             if (Busy || Loop.IsFinished || amount <= 0L || !FinanceEngine.TrySpendCash(State, amount))

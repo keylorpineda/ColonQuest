@@ -54,6 +54,10 @@ namespace ColonQuest.Game
         public int latesThisMonth;
         public int missedThisMonth;
         public bool workedToday;
+        public List<int> billKinds = new List<int>();
+        public List<long> billAmounts = new List<long>();
+        public List<int> billMonthsLate = new List<int>();
+        public bool billsArrived;
     }
 
     /// <summary>One saved game: its name, when it was last played and the run.</summary>
