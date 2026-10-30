@@ -28,6 +28,10 @@ services:
         value: "30"
       - key: SUMMARY_MODEL
         value: "muse-spark-1.3"
+      - key: SUMMARY_TIMEOUT_S
+        value: "25"
+      - key: CLASS_REPORT_MODEL
+        value: "muse-spark-1.3"
       - key: DAILY_BUDGET_USD
         value: "5.0"
       - key: ALLOWED_ORIGINS
