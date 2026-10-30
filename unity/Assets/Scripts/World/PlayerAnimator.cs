@@ -72,6 +72,12 @@ namespace ColonQuest.World
         private float poseUntil;
         private float poseWeight;
         private PoseAngles poseAngles;
+        private SpriteRenderer[] forearmParts;
+        private int[] forearmOrders;
+        private bool handsInFront;
+
+        /// <summary>How many sorting steps the forearms and hands climb to pass over the torso and stay under the face.</summary>
+        private const int HandsFrontLift = 7;
 
         /// <summary>True while the person gestures as if speaking, because the player is close or someone set it.</summary>
         public bool Talking => talking;
@@ -138,6 +144,7 @@ namespace ColonQuest.World
                 armRRest = RestAngle(rig.ArmR);
                 elbowLRest = RestAngle(rig.ElbowL);
                 elbowRRest = RestAngle(rig.ElbowR);
+                CollectForearms();
             }
 
             nextBlink = Time.time + PersonMotion.NextBlinkDelay(Random.value);
@@ -223,7 +230,45 @@ namespace ColonQuest.World
             rig.Torso.localScale = new Vector3(1f / breath, breath, 1f);
             rig.Torso.localRotation = Z(Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight);
 
+            SetHandsInFront(poseWeight > 0.5f && PersonPoses.HandsInFront(shownPose));
             AnimateFace(time);
+        }
+
+        /// <summary>The forearms, hands and what they hold, with the order each was built with.</summary>
+        private void CollectForearms()
+        {
+            var parts = new System.Collections.Generic.List<SpriteRenderer>();
+            foreach (var elbow in new[] { rig.ElbowL, rig.ElbowR })
+            {
+                if (elbow != null)
+                {
+                    parts.AddRange(elbow.GetComponentsInChildren<SpriteRenderer>(true));
+                }
+            }
+
+            forearmParts = parts.ToArray();
+            forearmOrders = new int[forearmParts.Length];
+            for (int i = 0; i < forearmParts.Length; i++)
+            {
+                forearmOrders[i] = forearmParts[i].sortingOrder;
+            }
+        }
+
+        private void SetHandsInFront(bool value)
+        {
+            if (value == handsInFront || forearmParts == null)
+            {
+                return;
+            }
+
+            handsInFront = value;
+            for (int i = 0; i < forearmParts.Length; i++)
+            {
+                if (forearmParts[i] != null)
+                {
+                    forearmParts[i].sortingOrder = forearmOrders[i] + (value ? HandsFrontLift : 0);
+                }
+            }
         }
 
         private void AnimateFace(float time)
