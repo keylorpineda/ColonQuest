@@ -113,4 +113,5 @@ class ModelProvider(Protocol):
         output: type[T],
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
+        timeout_s: float | None = None,  # overrides the HTTP timeout for slow background calls
     ) -> StructuredResult[T]: ...

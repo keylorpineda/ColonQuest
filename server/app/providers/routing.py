@@ -31,6 +31,7 @@ class FallbackProvider:
         output: type[T],
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
+        timeout_s: float | None = None,
     ) -> StructuredResult[T]:
         try:
             async with asyncio.timeout(self._timeout_s):
@@ -41,6 +42,7 @@ class FallbackProvider:
                     output=output,
                     reasoning_effort=reasoning_effort,
                     max_tokens=max_tokens,
+                    timeout_s=timeout_s,
                 )
         except (ProviderError, TimeoutError) as error:
             logger.warning("open-weights provider failed (%s), falling back to Meta API", error)
@@ -51,6 +53,7 @@ class FallbackProvider:
             output=output,
             reasoning_effort=reasoning_effort,
             max_tokens=max_tokens,
+            timeout_s=timeout_s,
         )
 
 

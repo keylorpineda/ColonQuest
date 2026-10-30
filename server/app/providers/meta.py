@@ -70,6 +70,7 @@ class MetaProvider:
         output: type[T],
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
+        timeout_s: float | None = None,
     ) -> StructuredResult[T]:
         """Ask for JSON that matches ``output`` and validate it with Pydantic."""
         self._require_key()
@@ -82,6 +83,7 @@ class MetaProvider:
             output=output,
             reasoning_effort=reasoning_effort,
             max_tokens=max_tokens,
+            timeout_s=timeout_s,
         )
 
     async def chat(

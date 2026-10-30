@@ -104,6 +104,23 @@ async def test_structured_translates_http_errors(status: int, error: type[Except
         await provider.structured(model="m", system="s", user="u", output=Greeting)
 
 
+@pytest.mark.parametrize(("timeout_s", "expected"), [(None, 8.0), (25.0, 25.0)])
+async def test_structured_timeout_can_be_raised_per_call(
+    timeout_s: float | None, expected: float
+) -> None:
+    seen: dict[str, Any] = {}
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        seen["timeout"] = request.extensions["timeout"]
+        return httpx2.Response(200, json=completion('{"text": "hola", "count": 2}'))
+
+    await make_provider(handler).structured(
+        model="muse-wonder-1.0", system="sys", user="usr", output=Greeting, timeout_s=timeout_s
+    )
+
+    assert seen["timeout"]["read"] == expected
+
+
 async def test_structured_timeout() -> None:
     def handler(request: httpx2.Request) -> httpx2.Response:
         raise httpx2.ReadTimeout("slow", request=request)
