@@ -128,6 +128,12 @@ namespace ColonQuest.World
     {
         private const float EdgeMargin = 1.1f;
         private const float WaterMargin = 0.9f;
+
+        /// <summary>
+        /// The river and the pond have walls the size of the water, so only a player pressed against them hears the
+        /// thought: the feet (radius 0.3) plus a little. A wider margin covered the sidewalks along the river.
+        /// </summary>
+        public const float TouchMargin = 0.45f;
         private static readonly Rect Pond = new Rect(19.5f - 2.7f, -5.9f - 1.2f, 5.4f, 2.4f);
 
         public static WorldHint Check(string scene, Vector2 p)
@@ -158,13 +164,13 @@ namespace ColonQuest.World
                 return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Sea, Away = Vector2.up };
             }
 
-            if (p.x > MapLayout.RiverXMin - WaterMargin && p.x < MapLayout.RiverXMax + WaterMargin && p.y > MapLayout.ShoreY && !OnDeck(p))
+            if (p.x > MapLayout.RiverXMin - TouchMargin && p.x < MapLayout.RiverXMax + TouchMargin && p.y > MapLayout.ShoreY && !OnDeck(p))
             {
                 float middle = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
                 return new WorldHint { Kind = HintKind.Water, Water = WaterBody.River, Away = p.x < middle ? Vector2.left : Vector2.right };
             }
 
-            var pond = new Rect(Pond.xMin - WaterMargin, Pond.yMin - WaterMargin, Pond.width + WaterMargin * 2f, Pond.height + WaterMargin * 2f);
+            var pond = new Rect(Pond.xMin - TouchMargin, Pond.yMin - TouchMargin, Pond.width + TouchMargin * 2f, Pond.height + TouchMargin * 2f);
             if (pond.Contains(p))
             {
                 return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Pond, Away = (p - Pond.center).normalized };
