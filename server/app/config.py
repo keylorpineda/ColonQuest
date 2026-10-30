@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     open_weights_api_key: SecretStr = SecretStr("")
     open_weights_npc_model: str = "meta-models/muse-spark-open-1026"
     open_weights_timeout_s: float = Field(default=5.0, gt=0)
+    # Baseten credits ($100): at this daily spend the NPCs switch to Meta until midnight UTC.
+    open_weights_daily_budget_usd: float = Field(default=3.0, ge=0)
 
     # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
     agentic_game_master: bool = False

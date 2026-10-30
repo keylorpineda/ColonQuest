@@ -1,25 +1,34 @@
 """Cost control: every model call is priced, recorded in model_calls and counted against the
-daily budget (DAILY_BUDGET_USD).
+daily budget of its provider: DAILY_BUDGET_USD for the Meta Model API and
+OPEN_WEIGHTS_DAILY_BUDGET_USD for the open-weights NPCs on Baseten.
 
 Prices are USD per million tokens from the Meta Model API price list in CLAUDE.md.
 """
 
 import hashlib
+import logging
+import time as clock
 import uuid
+from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from datetime import UTC, datetime, time
 from decimal import Decimal
 from enum import StrEnum
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.db import GameSession, ModelCall
 from app.providers.base import Usage
 
+logger = logging.getLogger(__name__)
+
 MILLION = Decimal(1_000_000)
 META_PROVIDER = "meta_api"
+OPEN_WEIGHTS_PROVIDER = "open_weights"
 USD_PER_AUDIO_HOUR = Decimal("0.18")
 USD_PER_IMAGE = Decimal("0.01")
 
@@ -38,6 +47,8 @@ TOKEN_PRICES: dict[str, TokenPrice] = {
 }
 # Unknown text models are priced like the most expensive one so the guard errs on the safe side.
 FALLBACK_PRICE = TOKEN_PRICES["muse-wonder-1.0"]
+# Muse Spark Open on Baseten, paid with partner credits: same list price as Muse Spark.
+OPEN_WEIGHTS_PRICE = TokenPrice(Decimal("1.25"), Decimal("0.15"), Decimal("4.25"))
 
 
 class BudgetMode(StrEnum):
@@ -63,23 +74,25 @@ class BudgetStatus:
 def estimate_cost(usage: Usage) -> Decimal:
     """Estimated USD cost of one call, rounded to 6 decimals like the model_calls column.
 
-    Only Meta Model API calls count against DAILY_BUDGET_USD; open-weights calls run on partner
-    credits (Baseten or Modal) and are recorded at zero Meta cost.
+    Open-weights calls are priced too, but each provider is summed against its own budget.
     """
     if usage.provider != META_PROVIDER:
-        return Decimal("0.000000")
-    if usage.images:
+        cost = token_cost(usage, OPEN_WEIGHTS_PRICE)
+    elif usage.images:
         cost = USD_PER_IMAGE * usage.images
     elif usage.audio_seconds:
         cost = USD_PER_AUDIO_HOUR * Decimal(str(usage.audio_seconds)) / Decimal(3600)
     else:
-        price = TOKEN_PRICES.get(usage.model, FALLBACK_PRICE)
-        cached = min(usage.cached_input_tokens, usage.input_tokens)
-        fresh = usage.input_tokens - cached
-        cost = (
-            fresh * price.input + cached * price.cached_input + usage.output_tokens * price.output
-        ) / MILLION
+        cost = token_cost(usage, TOKEN_PRICES.get(usage.model, FALLBACK_PRICE))
     return cost.quantize(Decimal("0.000001"))
+
+
+def token_cost(usage: Usage, price: TokenPrice) -> Decimal:
+    cached = min(usage.cached_input_tokens, usage.input_tokens)
+    fresh = usage.input_tokens - cached
+    return (
+        fresh * price.input + cached * price.cached_input + usage.output_tokens * price.output
+    ) / MILLION
 
 
 def budget_mode(spent: Decimal, budget: Decimal) -> BudgetMode:
@@ -123,19 +136,59 @@ async def record_call(
     return call
 
 
-async def spent_today(db: AsyncSession, now: datetime | None = None) -> Decimal:
+async def spent_today(
+    db: AsyncSession, now: datetime | None = None, provider: str = META_PROVIDER
+) -> Decimal:
     total = await db.scalar(
         select(func.coalesce(func.sum(ModelCall.estimated_cost_usd), 0)).where(
-            ModelCall.created_at >= start_of_day(now)
+            ModelCall.created_at >= start_of_day(now), ModelCall.provider == provider
         )
     )
     return Decimal(total or 0)
 
 
-async def budget_status(db: AsyncSession, budget_usd: float) -> BudgetStatus:
-    spent = await spent_today(db)
+async def budget_status(
+    db: AsyncSession, budget_usd: float, provider: str = META_PROVIDER
+) -> BudgetStatus:
+    spent = await spent_today(db, provider=provider)
     budget = Decimal(str(budget_usd))
     return BudgetStatus(spent_usd=spent, budget_usd=budget, mode=budget_mode(spent, budget))
+
+
+SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
+
+
+class OpenWeightsBudget:
+    """Whether today's open-weights spend reached OPEN_WEIGHTS_DAILY_BUDGET_USD.
+
+    Checked before every NPC call, so the answer is cached for ``ttl_s`` instead of querying the
+    database on each turn. A failing query never blocks the NPCs: it counts as not exhausted.
+    """
+
+    def __init__(
+        self, session_factory: SessionFactory, budget_usd: float, ttl_s: float = 60
+    ) -> None:
+        self._session_factory = session_factory
+        self._budget_usd = budget_usd
+        self._ttl_s = ttl_s
+        self._checked_at: float | None = None
+        self._exhausted = False
+
+    async def exhausted(self) -> bool:
+        now = clock.monotonic()
+        if self._checked_at is not None and now - self._checked_at < self._ttl_s:
+            return self._exhausted
+        try:
+            async with self._session_factory() as db:
+                status = await budget_status(db, self._budget_usd, OPEN_WEIGHTS_PROVIDER)
+        except (SQLAlchemyError, OSError) as error:
+            logger.warning("could not read the open-weights spend (%s)", error)
+            return False
+        self._checked_at = now
+        self._exhausted = status.mode == BudgetMode.FALLBACK_ONLY
+        if self._exhausted:
+            logger.warning("open-weights budget spent (%s USD); NPCs use Meta", status.spent_usd)
+        return self._exhausted
 
 
 def select_text_model(configured: str, mode: BudgetMode, settings: Settings) -> str | None:
