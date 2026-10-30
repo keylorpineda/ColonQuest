@@ -14,7 +14,7 @@ namespace ColonQuest.UI
     /// calculator, a block game and a casino). Apps only show or ask; every colon that moves goes through
     /// <see cref="GameSession"/> and the finance engine.
     /// </summary>
-    public sealed class PhoneUi
+    public sealed partial class PhoneUi
     {
         private enum App
         {
@@ -38,16 +38,14 @@ namespace ColonQuest.UI
 
         private const float PhoneWidth = 520f;
         private const float PhoneHeight = 960f;
-        private const float ScreenWidth = PhoneWidth - 56f;
-        private const float ScreenHeight = PhoneHeight - 80f;
+        private const float ScreenWidth = PhoneWidth - 32f;
+        private const float ScreenHeight = PhoneHeight - 32f;
         private const float StatusHeight = 52f;
         private const float BottomHeight = 84f;
         private const float Margin = 20f;
         private const float InnerWidth = ScreenWidth - Margin * 2f;
         private const float CellSize = 28f;
 
-        private static readonly Color Night = new Color(0.14f, 0.16f, 0.26f, 1f);
-        private static readonly Color Screen = new Color(0.95f, 0.96f, 1f, 1f);
         private static readonly Color Violet = new Color(0.78f, 0.7f, 1f, 1f);
         private static readonly Color Red = new Color(1f, 0.55f, 0.55f, 1f);
 
@@ -75,8 +73,7 @@ namespace ColonQuest.UI
 
         private readonly GameSession session;
         private readonly GameObject root;
-        private readonly RectTransform content;
-        private readonly Text clock;
+        private RectTransform content;
 
         private App app = App.Home;
         private int openings;
@@ -126,22 +123,14 @@ namespace ColonQuest.UI
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
-            var dim = root.AddComponent<Image>();
-            dim.color = UiKit.Dim;
-
-            var body = UiKit.Card(root.transform, "Frame", Night, new Vector2(PhoneWidth, PhoneHeight), new Vector2(0.5f, 0.5f), Vector2.zero);
-            var notch = UiKit.Fill(body, "Notch", Color.black, new Vector2(130f, 16f), new Vector2(0.5f, 1f), new Vector2(0f, -12f));
-            notch.raycastTarget = false;
-
-            var screen = UiKit.Fill(body, "Screen", Screen, new Vector2(ScreenWidth, ScreenHeight), new Vector2(0.5f, 0f), new Vector2(0f, 22f));
-            clock = UiKit.Label(screen.transform, string.Empty, 26, GameUiColors.Muted, new Vector2(ScreenWidth - 40f, 40f), new Vector2(0.5f, 1f), new Vector2(0f, -10f), TextAnchor.MiddleLeft);
-            content = UiKit.Rect(screen.transform, "Content", new Vector2(ScreenWidth, ScreenHeight - StatusHeight - BottomHeight), new Vector2(0f, 1f), new Vector2(0f, -StatusHeight));
+            BuildBody(rect);
 
             root.SetActive(false);
             session.Changed += OnSessionChanged;
         }
 
-        public bool IsOpen => root.activeSelf;
+        /// <summary>A phone on its way down no longer counts as open: the game is free again.</summary>
+        public bool IsOpen => root.activeSelf && !closing;
 
         /// <summary>True while a text box has the keyboard, so letters like P do not close the phone.</summary>
         public bool IsTyping => searchInput != null && searchInput.isFocused;
@@ -150,14 +139,18 @@ namespace ColonQuest.UI
         {
             app = App.Home;
             root.SetActive(true);
+            RiseIn();
             Show(App.Home);
             openings++;
         }
 
         public void Close()
         {
-            root.SetActive(false);
             spinning = false;
+            if (root.activeSelf && !closing)
+            {
+                DropOut();
+            }
         }
 
         /// <summary>Escape: back to the home screen from an app, or closes the phone from the home screen.</summary>
@@ -190,7 +183,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            clock.text = Loc.F("Mes {0}  ·  {1}/{2} tareas", Mathf.Min(session.Loop.MonthsPlayed + 1, GameRules.MonthsToPlay), session.Loop.TasksDone, GameRules.TasksPerMonth);
+            RefreshClock();
 
             if (app == App.Blocks)
             {
@@ -212,6 +205,8 @@ namespace ColonQuest.UI
             spinning = false;
             cashLabel = null;
             searchInput = null;
+            bigClock = null;
+            dayLine = null;
             for (int i = content.childCount - 1; i >= 0; i--)
             {
                 UnityEngine.Object.Destroy(content.GetChild(i).gameObject);
@@ -228,8 +223,13 @@ namespace ColonQuest.UI
                 default: BuildHome(); break;
             }
 
+            wallpaper.SetActive(next == App.Home);
+            PaintStatusBar(next == App.Home);
+            ZoomContentIn();
+
             string label = next == App.Home ? "Cerrar celular  (P)" : "Inicio  (Esc)";
-            AddButton(label, next == App.Home ? Red : GameUiColors.Yellow, new Vector2(InnerWidth, 64f), new Vector2(0f, -(ScreenHeight - StatusHeight - 74f)), Back);
+            var homeBar = AddButton(label, next == App.Home ? Glass : Color.white, new Vector2(InnerWidth, 52f), new Vector2(0f, -(ScreenHeight - StatusHeight - 66f)), Back);
+            homeBar.GetComponentInChildren<Text>().fontSize = 22;
         }
 
         // ---------------------------------------------------------------- helpers
@@ -242,72 +242,10 @@ namespace ColonQuest.UI
             return label;
         }
 
-        private Text Heading(string text)
-        {
-            var label = UiKit.Label(content, text, 38, UiKit.Ink, new Vector2(InnerWidth, 50f), new Vector2(0f, 1f), new Vector2(Margin, -4f), TextAnchor.MiddleLeft);
-            return label;
-        }
-
-        private Button AddButton(string text, Color color, Vector2 size, Vector2 position, Action click)
-        {
-            var button = UiKit.MakeButton(content, text, color, size, new Vector2(0f, 1f), new Vector2(Margin + position.x, position.y), click);
-            var label = button.GetComponentInChildren<Text>();
-            label.fontSize = size.y > 60f ? 28 : 24;
-            return button;
-        }
-
         private Text CashLine(float y)
         {
             cashLabel = Label(Loc.F("Efectivo  {0}", Money.Format(session.State.Cash)), 30, GameUiColors.Muted, InnerWidth, new Vector2(0f, y));
             return cashLabel;
-        }
-
-        // ---------------------------------------------------------------- home
-
-        private void BuildHome()
-        {
-            Heading("Mi celular");
-
-            var notice = UiKit.Card(content, "Notice", Violet, new Vector2(InnerWidth, 150f), new Vector2(0f, 1f), new Vector2(Margin, -64f));
-            UiKit.Label(notice, PhoneMessages.SinpeNotice(openings), 24, UiKit.Ink, new Vector2(InnerWidth - 36f, 130f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft).fontStyle = FontStyle.Normal;
-
-            var tiles = new[]
-            {
-                (App.Sinpe, "S", "SINPE", GameUiColors.Blue),
-                (App.Bank, "B", "Banco", GameUiColors.Green),
-                (App.Search, "?", "Buscador", GameUiColors.Yellow),
-                (App.Calculator, "=", "Cuotas", GameUiColors.Pink),
-                (App.Blocks, "T", "Bloques", Violet),
-                (App.Casino, "$", "Casino", Red)
-            };
-
-            for (int i = 0; i < tiles.Length; i++)
-            {
-                var tile = tiles[i];
-                float x = (i % 3) * (InnerWidth - 130f) / 2f;
-                float y = -250f - (i / 3) * 190f;
-                Tile(tile.Item2, tile.Item3, tile.Item4, new Vector2(x, y), () => Show(tile.Item1));
-            }
-
-            var sound = AudioDirector.Muted ? "Sonido: no" : "Sonido: sí";
-            AddButton(sound, Color.white, new Vector2(InnerWidth, 56f), new Vector2(0f, -640f), () =>
-            {
-                AudioDirector.Muted = !AudioDirector.Muted;
-                Show(App.Home);
-            });
-        }
-
-        private void Tile(string glyph, string name, Color color, Vector2 position, Action click)
-        {
-            var outline = UiKit.Fill(content, "Tile_" + name, UiKit.Ink, new Vector2(130f, 130f), new Vector2(0f, 1f), new Vector2(Margin + position.x, position.y));
-            outline.raycastTarget = true;
-            var body = UiKit.Fill(outline.transform, "Body", color, new Vector2(130f - UiKit.Outline * 2f, 130f - UiKit.Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
-            body.raycastTarget = false;
-            var button = outline.gameObject.AddComponent<UnityEngine.UI.Button>();
-            button.targetGraphic = body;
-            button.onClick.AddListener(() => click());
-            UiKit.Label(body.transform, glyph, 72, UiKit.Ink, new Vector2(110f, 110f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
-            UiKit.Label(content, name, 26, UiKit.Ink, new Vector2(150f, 34f), new Vector2(0f, 1f), new Vector2(Margin + position.x - 10f, position.y - 136f), TextAnchor.MiddleCenter);
         }
 
         // ---------------------------------------------------------------- sinpe
@@ -474,11 +412,11 @@ namespace ColonQuest.UI
             Heading("Calculadora de cuotas");
             Label("Mirá cuánto pagás de verdad por comprar a cuotas.", 24, GameUiColors.Muted, InnerWidth, new Vector2(0f, -56f));
 
-            Stepper("Precio", -110f, () => calcPrice = Math.Max(50_000L, calcPrice - 50_000L), () => calcPrice = Math.Min(20_000_000L, calcPrice + 50_000L));
-            Stepper("Plazo (meses)", -190f, () => calcMonths = Math.Max(1, calcMonths - 3), () => calcMonths = Math.Min(120, calcMonths + 3));
-            Stepper("Interés al mes (%)", -270f, () => calcRate = Math.Max(0m, calcRate - 0.5m), () => calcRate = Math.Min(10m, calcRate + 0.5m));
+            Stepper("Precio", -134f, () => calcPrice = Math.Max(50_000L, calcPrice - 50_000L), () => calcPrice = Math.Min(20_000_000L, calcPrice + 50_000L));
+            Stepper("Plazo (meses)", -212f, () => calcMonths = Math.Max(1, calcMonths - 3), () => calcMonths = Math.Min(120, calcMonths + 3));
+            Stepper("Interés al mes (%)", -290f, () => calcRate = Math.Max(0m, calcRate - 0.5m), () => calcRate = Math.Min(10m, calcRate + 0.5m));
 
-            calcValues = Label(string.Empty, 28, UiKit.Ink, InnerWidth, new Vector2(0f, -360f));
+            calcValues = Label(string.Empty, 28, UiKit.Ink, InnerWidth, new Vector2(0f, -376f));
             RefreshCalculator();
         }
 
@@ -524,16 +462,18 @@ namespace ColonQuest.UI
             float left = (ScreenWidth - boardWidth) / 2f;
             var frame = UiKit.Fill(content, "BoardFrame", UiKit.Ink, new Vector2(boardWidth + 8f, TetrisBoard.Height * CellSize + 8f), new Vector2(0f, 1f), new Vector2(left - 4f, -56f));
             frame.raycastTarget = false;
+            frame.pixelsPerUnitMultiplier = 3f;
             for (int x = 0; x < TetrisBoard.Width; x++)
             {
                 for (int y = 0; y < TetrisBoard.Height; y++)
                 {
                     var cell = UiKit.Fill(content, "Cell", new Color(0.88f, 0.9f, 0.97f), new Vector2(CellSize - 2f, CellSize - 2f), new Vector2(0f, 1f), new Vector2(left + x * CellSize + 1f, -60f - y * CellSize));
+                    cell.pixelsPerUnitMultiplier = 4f;
                     cells[x, y] = cell;
                 }
             }
 
-            blocksInfo = Label(string.Empty, 24, GameUiColors.Muted, InnerWidth, new Vector2(0f, -(60f + TetrisBoard.Height * CellSize + 6f)));
+            blocksInfo = Label(string.Empty, 20, GameUiColors.Muted, InnerWidth, new Vector2(0f, -(60f + TetrisBoard.Height * CellSize + 6f)));
 
             float buttonWidth = (InnerWidth - 3f * 8f) / 4f;
             float rowY = -(60f + TetrisBoard.Height * CellSize + 44f);
