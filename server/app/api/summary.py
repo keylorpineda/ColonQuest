@@ -73,4 +73,5 @@ async def finish_session(
         net_worth=stats.net_worth,
         narrative=written.narrative,
         source="model" if written.source == "model" else "fallback",
+        card_image_key=stats.card_image_key,
     )

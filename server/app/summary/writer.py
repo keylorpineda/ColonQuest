@@ -1,4 +1,8 @@
-"""Short year-end narrative written by Muse Spark from the deterministic stats."""
+"""Short year-end narrative written by Muse Wonder from the deterministic stats.
+
+The player waits on a loading screen here, so the call gets SUMMARY_TIMEOUT_S instead of the 8 s
+of live calls (ADR 0004).
+"""
 
 import asyncio
 import json
@@ -96,7 +100,7 @@ class SummaryWriter:
 
         started = time.perf_counter()
         try:
-            async with asyncio.timeout(self._settings.model_timeout_s):
+            async with asyncio.timeout(self._settings.summary_timeout_s):
                 result = await self._provider.structured(
                     model=model,
                     system=SYSTEM_PROMPT,
@@ -104,6 +108,7 @@ class SummaryWriter:
                     output=SummaryText,
                     reasoning_effort=self._settings.live_reasoning_effort,
                     max_tokens=2000,  # reasoning tokens count against this
+                    timeout_s=self._settings.summary_timeout_s,
                 )
         except (TimeoutError, ProviderError):
             await ledger.record(

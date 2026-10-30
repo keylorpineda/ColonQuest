@@ -20,9 +20,13 @@ class Settings(BaseSettings):
     live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
     # Muse Image took about 14 s per 512x512 image on Oct 28; images are cached after the first one.
     image_timeout_s: float = Field(default=30.0, gt=0)
+    # Year-end summary with Muse Wonder (5.8 to 10.5 s at "minimal"); Unity waits up to 30 s there.
+    summary_timeout_s: float = Field(default=25.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
+    # The teacher dashboard is a live call (8 s): it stays on Spark when the summary uses Wonder.
+    class_report_model: str = "muse-spark-1.3-contributor"
     image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
@@ -45,6 +49,9 @@ class Settings(BaseSettings):
     # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
     agentic_game_master: bool = False
     season_planner: bool = False
+    # The planner runs in the background after the first event, so it can use the slow Wonder.
+    planner_model: str = "muse-wonder-1.0"
+    planner_timeout_s: float = Field(default=30.0, gt=0)
     seller_agent: bool = False
     agent_max_steps: int = Field(default=5, ge=1, le=10)
     agent_timeout_s: float = Field(default=10.0, gt=0)

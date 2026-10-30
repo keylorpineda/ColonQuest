@@ -77,6 +77,8 @@ class SessionSummary(ContractModel):
     net_worth: int
     narrative: str
     source: Literal["model", "fallback"]
+    # Pre-generated illustration without text; Unity draws the figures above on top of it.
+    card_image_key: Literal["card_year_debt_free", "card_year_some_debt", "card_year_heavy_debt"]
 
 
 class BudgetInfo(ContractModel):
