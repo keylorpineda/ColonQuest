@@ -40,6 +40,18 @@ namespace ColonQuest.World
         /// </summary>
         public static string CleanName(string typed)
         {
+            string name = Strip(typed);
+            return name.Length > 0 ? name : DefaultName;
+        }
+
+        /// <summary>True when what was typed leaves a real name once it is cleaned, not only spaces or symbols.</summary>
+        public static bool IsUsableName(string typed)
+        {
+            return Strip(typed).Length > 0;
+        }
+
+        private static string Strip(string typed)
+        {
             var clean = new StringBuilder();
             foreach (char c in typed ?? string.Empty)
             {
@@ -62,7 +74,7 @@ namespace ColonQuest.World
                 name = name.Substring(0, MaxNameLength).TrimEnd();
             }
 
-            return name.Length > 0 ? name : DefaultName;
+            return name;
         }
     }
 }
