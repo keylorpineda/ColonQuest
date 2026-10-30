@@ -20,6 +20,10 @@ namespace ColonQuest.World.PlayModeTests
         {
             ApiClient.Instance.Configure(new OfflineTransport(), new ApiConfig());
             ResetSettings();
+
+            // The saved games live in memory here: a test never touches the real ones.
+            realSlots = GameSession.Slots;
+            GameSession.Slots = new SaveSlots(new MemorySaveStore());
             yield return SceneManager.LoadSceneAsync(SceneNames.Menu);
             yield return null;
         }
@@ -28,7 +32,10 @@ namespace ColonQuest.World.PlayModeTests
         public void RestoreSettings()
         {
             ResetSettings();
+            GameSession.Slots = realSlots;
         }
+
+        private SaveSlots realSlots;
 
         private static void ResetSettings()
         {
@@ -213,14 +220,91 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(1, session.Loop.TasksDone, "setup: a task was done");
 
             ButtonAt("Button_Modo historia").onClick.Invoke();
+            Assert.IsTrue(Active("Slots"), "the story button opens the saved games");
+            ButtonAt(SlotButton(0, "Nueva partida")).onClick.Invoke();
             yield return WaitFor(SceneNames.Town);
 
             Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
             Assert.IsNotNull(GameSession.Instance);
             Assert.AreEqual(0, GameSession.Instance.Loop.TasksDone, "a new life starts from zero");
             Assert.AreEqual(0, GameSession.Instance.Loop.MonthsPlayed);
+            Assert.AreEqual(0, GameSession.Instance.ActiveSlot);
+            Assert.IsNotNull(GameSession.Slots.Load(0), "a new game is saved from the start");
             Assert.IsNotNull(GameObject.Find("GameUi"));
             Assert.IsTrue(GameObject.Find("GameUi").GetComponent<Canvas>().enabled, "the overlay is back in the town");
+        }
+
+        private static string SlotButton(int slot, string text)
+        {
+            return "Slots/Card/Body/Rows/Slot" + slot + "/Body/Button_" + text;
+        }
+
+        [UnityTest]
+        public IEnumerator Continue_BringsTheSavedGameBack()
+        {
+            var saved = new GameLoop();
+            saved.State.Cash = 77_000L;
+            saved.Sleep();
+            GameSession.Slots.Save(1, SaveSlot.From("Ana", saved, System.DateTime.UtcNow));
+
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+            ButtonAt(SlotButton(1, "Continuar")).onClick.Invoke();
+            yield return WaitFor(SceneNames.Town);
+
+            var session = GameSession.Instance;
+            Assert.AreEqual(1, session.ActiveSlot);
+            Assert.AreEqual("Ana", session.RunName);
+            Assert.AreEqual(saved.State.Cash, session.State.Cash);
+            Assert.AreEqual(2, session.Loop.Clock.Day);
+        }
+
+        [UnityTest]
+        public IEnumerator Delete_AsksOnceMoreBeforeErasing()
+        {
+            GameSession.Slots.Save(0, SaveSlot.From("Ana", new GameLoop(), System.DateTime.UtcNow));
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+
+            ButtonAt(SlotButton(0, "Borrar")).onClick.Invoke();
+            yield return null;
+            Assert.IsNotNull(GameSession.Slots.Load(0), "the first press only asks");
+
+            ButtonAt(SlotButton(0, "¿Seguro? Borrar")).onClick.Invoke();
+            yield return null;
+            Assert.IsNull(GameSession.Slots.Load(0));
+            Assert.IsNotNull(Menu.Find(SlotButton(0, "Nueva partida")), "the slot is empty again");
+        }
+
+        [UnityTest]
+        public IEnumerator New_OverASavedGameAsksOnceMore()
+        {
+            var saved = new GameLoop();
+            saved.State.Cash = 77_000L;
+            GameSession.Slots.Save(0, SaveSlot.From("Ana", saved, System.DateTime.UtcNow));
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+
+            ButtonAt(SlotButton(0, "Nueva")).onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "the first press only asks");
+            Assert.AreEqual(77_000L, GameSession.Slots.Load(0).Cash);
+
+            ButtonAt(SlotButton(0, "¿Seguro? Empezar")).onClick.Invoke();
+            yield return WaitFor(SceneNames.Town);
+            Assert.AreNotEqual(77_000L, GameSession.Slots.Load(0).Cash, "the new life took the slot");
+        }
+
+        [UnityTest]
+        public IEnumerator BackToTheMenu_SavesTheRun()
+        {
+            ButtonAt("Button_Modo historia").onClick.Invoke();
+            ButtonAt(SlotButton(2, "Nueva partida")).onClick.Invoke();
+            yield return WaitFor(SceneNames.Town);
+
+            GameSession.Instance.Loop.Clock.Advance(GameRules.SecondsPerGameHour * 2f, GameRules.SecondsPerGameHour);
+            yield return SceneManager.LoadSceneAsync(SceneNames.Menu);
+            yield return null;
+
+            Assert.AreEqual(GameSession.Instance.Loop.Clock.Hour, (int)(GameSession.Slots.Load(2).run.minutes / 60f));
+            Assert.GreaterOrEqual(GameSession.Slots.Load(2).run.minutes, (GameRules.DayStartHour + 2) * 60f);
         }
 
         private static IEnumerator WaitFor(string sceneName)
