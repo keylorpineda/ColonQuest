@@ -68,7 +68,7 @@ namespace ColonQuest.Finance
         {
             holdings.AddFurniture(kind);
             state.Wellbeing = ContractLimits.ClampWellbeing(state.Wellbeing + FurnitureWellbeingBoost);
-            state.RecordHistory("bought_furniture");
+            state.RecordHistory("bought_furniture_" + kind.ToString().ToLowerInvariant());
         }
     }
 }

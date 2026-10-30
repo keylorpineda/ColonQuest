@@ -10,12 +10,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from app.agents.tools import HistoryItem
-from app.game_master.facts import owns_vehicle
+from app.game_master.facts import owns_fridge, owns_vehicle
 from app.game_master.limits import CASH_FLOW_RANGES, KIND_RANGES, MONTH_RANGES
 from app.game_master.season import PlannedMonth
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-10-30"
+PROMPT_VERSION = "gm-2026-10-30b"
 
 
 def _ranges_table() -> str:
@@ -52,7 +52,8 @@ THE PLAYER'S LIFE
 Lucía. There is no office job.
 - Never assume something the player does not have. Unless signals.hasVehicle is true the player \
 has no car and no motorbike: nothing about their repairs, tires, gasoline or marchamo. They may \
-still be offered one.
+still be offered one. They live in a bare rented room: no washing machine, and no fridge unless \
+signals.hasFridge is true.
 
 REACT TO THE PLAYER
 - Credit card above 80 % of its limit: an informal lender ("gota a gota") or a refinancing offer.
@@ -98,6 +99,7 @@ def state_signals(state: PlayerState) -> dict[str, object]:
         "monthlyInstallments": monthly_installments,
         "hasInformalLoans": bool(state.informal_loans),
         "hasVehicle": owns_vehicle(state),
+        "hasFridge": owns_fridge(state),
         "isDecember": state.month == 12,
         "lowCash": state.cash < state.salary_net // 4,
     }
