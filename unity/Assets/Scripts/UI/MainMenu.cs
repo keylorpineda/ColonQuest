@@ -14,7 +14,7 @@ namespace ColonQuest.UI
     /// with the mouse. "Modo historia" starts a fresh life behind the loading screen; "Jugar online" explains what the online
     /// mode is.
     /// </summary>
-    public sealed class MainMenu : MonoBehaviour
+    public sealed partial class MainMenu : MonoBehaviour
     {
         private const float ReferenceWidth = 1920f;
 
@@ -62,6 +62,7 @@ namespace ColonQuest.UI
             BuildFooter();
             BuildNotice();
             BuildCredits();
+            BuildSlots();
             settings = new SettingsPanel(root, null);
             openedAt = Time.unscaledTime;
         }
@@ -156,10 +157,10 @@ namespace ColonQuest.UI
         }
 
         /// <summary>True while a window (notice, credits or settings) covers the buttons.</summary>
-        public bool WindowOpen => notice.activeSelf || credits.activeSelf || settings.IsOpen;
+        public bool WindowOpen => notice.activeSelf || credits.activeSelf || settings.IsOpen || slots.activeSelf;
 
-        /// <summary>Starts a new life and goes to the town, behind the loading screen.</summary>
-        public void StartStory()
+        /// <summary>Starts a new life saved in a slot and goes to the town, behind the loading screen.</summary>
+        public void StartStory(int slot, string runName)
         {
             // The first run is created fresh by the session itself; a later one has to be restarted.
             bool existed = GameSession.Instance != null;
@@ -169,6 +170,8 @@ namespace ColonQuest.UI
                 session.StartNewGame();
             }
 
+            session.AssignSlot(slot, runName);
+            CloseWindows();
             LoadingScreen.Load(SceneNames.Town);
         }
 
@@ -176,6 +179,7 @@ namespace ColonQuest.UI
         {
             notice.SetActive(false);
             credits.SetActive(false);
+            slots.SetActive(false);
             settings.Hide();
         }
 
@@ -476,7 +480,7 @@ namespace ColonQuest.UI
             switch (entry)
             {
                 case MenuEntry.Story:
-                    StartStory();
+                    ShowSlots();
                     break;
                 case MenuEntry.Online:
                     notice.SetActive(true);
