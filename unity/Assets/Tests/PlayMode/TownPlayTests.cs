@@ -28,14 +28,15 @@ namespace ColonQuest.World.PlayModeTests
         {
             var session = GameSession.Create();
             session.StartNewGame();
-            yield return null;
 
+            // The color eases toward its goal, so each reading waits for it to settle.
+            yield return new WaitForSeconds(3.5f);
             var tint = Object.FindFirstObjectByType<DayTint>();
             Assert.IsNotNull(tint, "the light of the town is in the scene with its script");
             Color morning = tint.GetComponent<SpriteRenderer>().color;
 
             session.Loop.Clock.Advance(GameRules.SecondsPerGameHour * 15.5f, GameRules.SecondsPerGameHour);
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(3.5f);
             Color dusk = tint.GetComponent<SpriteRenderer>().color;
 
             Assert.Greater(dusk.b, morning.b + 0.03f, "the evening turns bluer");
