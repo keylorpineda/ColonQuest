@@ -47,7 +47,7 @@ services:
       - key: PLANNER_TIMEOUT_S
         value: "30"
       - key: SELLER_AGENT
-        value: "false"
+        value: "true"
       - key: NPC_PROVIDER
         value: "open_weights"
       - key: OPEN_WEIGHTS_TIMEOUT_S
