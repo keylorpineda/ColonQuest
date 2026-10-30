@@ -9,6 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import classes, dashboard, events, health, images, negotiation, sessions, summary
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
+from app.cost_guard import OpenWeightsBudget
+from app.db.session import get_sessionmaker
 from app.game_master.agentic import AgenticGameMaster
 from app.game_master.planner import SeasonPlanner
 from app.game_master.service import GameMaster
@@ -40,7 +42,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
     # NPC dialogue and the seller agent (SELLER_AGENT) run on open weights (Baseten) when
     # NPC_PROVIDER=open_weights, with automatic fallback to Meta on every call.
-    npc_provider = build_npc_provider(settings, provider, open_weights)
+    budget = (
+        OpenWeightsBudget(get_sessionmaker(), settings.open_weights_daily_budget_usd)
+        if settings.database_url
+        else None
+    )
+    npc_provider = build_npc_provider(settings, provider, open_weights, budget)
     app.state.negotiator = SellerAgent(Negotiator(npc_provider, settings), npc_provider, settings)
     # Only consulted when SEASON_PLANNER is on (see app.api.events.get_season_planner).
     app.state.season_planner = SeasonPlanner(provider, settings)
