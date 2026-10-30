@@ -329,7 +329,7 @@ COPY: dict[str, dict[str, Any]] = {
         "tagline": "Every money decision becomes a story.",
         "steps": [
             ("Decide", "pay or save"),
-            ("Narrate", "Muse Wonder"),
+            ("Narrate", "Muse Spark"),
             ("Compute", "exact colones"),
             ("Negotiate", "by voice"),
         ],
@@ -352,23 +352,24 @@ COPY: dict[str, dict[str, Any]] = {
         "month": (
             "HOW A MONTH PLAYS",
             "Your salary arrives with CCSS and income tax already deducted. You decide what to "
-            "pay, save or borrow. Muse Wonder writes one event built for your situation and the "
+            "pay, save or borrow. Muse Spark writes one event built for your situation and the "
             "C# engine applies it in whole colones. When a seller shows up, you negotiate out "
             "loud: the real price, rate, insurance and commission only come out if you ask.",
         ),
         "criteria_title": "JUDGING CRITERIA",
         "criteria": [
             ("Impact", 30, "Telemetry per decision, Class Mode for teachers, a student pilot."),
-            ("Meta tools", 25, "Four Meta models, one clear job each, plus tool-using agents."),
+            ("Meta tools", 25, "Five Meta models, one clear job each, plus tool-using agents."),
             ("Demo", 25, "One link. Every model call has a timeout and a fallback."),
             ("Technical depth", 20, "Validated contracts, an exact engine, 260+ tests in CI."),
         ],
         "models_title": "META MODELS",
         "models": [
-            ("spark", "Muse Wonder", "Game master and the voices of the characters."),
-            ("bolt", "Muse Spark", "Season plan, year-end summary, Class Mode reports."),
+            ("bolt", "Muse Spark", "Live game master with tools; Class Mode reports."),
+            ("spark", "Muse Wonder", "Plans your year, writes the summary and event bank."),
+            ("person", "Muse Spark Open", "The sellers on Baseten: tactics and memory."),
             ("mic", "Voice Transcribe", "You negotiate out loud; typing always works too."),
-            ("picture", "Muse Image", "Pixel-art portraits, pre-generated and cached."),
+            ("picture", "Muse Image", "Portraits, scenes and the year card, no text."),
         ],
         "agents_title": "AGENTS",
         "agents": [
@@ -391,7 +392,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("FastAPI backend", ["Pydantic v2 contracts", "cost guard, agents"]),
             ("Meta Model API", ["Wonder, Spark,", "Voice, Image"]),
             ("Neon Postgres", ["sessions,", "decisions, calls"]),
-            ("Open weights", ["optional NPCs", "Baseten, Modal"]),
+            ("Open weights", ["sellers on Baseten", "Muse Spark Open"]),
         ],
         "rules": [
             "No amount, rate or balance ever comes from a model.",
@@ -424,7 +425,7 @@ COPY: dict[str, dict[str, Any]] = {
         "tagline": "Cada decisión de plata se vuelve una historia.",
         "steps": [
             ("Decidir", "pagar o ahorrar"),
-            ("Narrar", "Muse Wonder"),
+            ("Narrar", "Muse Spark"),
             ("Calcular", "colones exactos"),
             ("Negociar", "con la voz"),
         ],
@@ -449,23 +450,24 @@ COPY: dict[str, dict[str, Any]] = {
         "month": (
             "CÓMO SE JUEGA UN MES",
             "Te llega el salario con el rebajo de la CCSS y la renta. Decidís qué pagar, ahorrar "
-            "o pedir prestado. Muse Wonder escribe un evento hecho para tu situación y el motor "
+            "o pedir prestado. Muse Spark escribe un evento hecho para tu situación y el motor "
             "en C# lo aplica en colones enteros. Cuando aparece un vendedor, negociás en voz "
             "alta: el precio, la tasa, el seguro y la comisión reales solo salen si preguntás.",
         ),
         "criteria_title": "CRITERIOS DEL JURADO",
         "criteria": [
             ("Impacto", 30, "Telemetría por decisión, Modo Clase y una prueba piloto."),
-            ("Meta", 25, "Cuatro modelos de Meta con un rol claro, más agentes."),
+            ("Meta", 25, "Cinco modelos de Meta con un rol claro, más agentes."),
             ("Demo", 25, "Un link. Cada llamada a un modelo tiene respaldo."),
             ("Técnica", 20, "Contratos validados, motor exacto, 260+ tests en CI."),
         ],
         "models_title": "MODELOS DE META",
         "models": [
-            ("spark", "Muse Wonder", "Game master y la voz de los personajes."),
-            ("bolt", "Muse Spark", "Plan de temporada, resumen y Modo Clase."),
+            ("bolt", "Muse Spark", "Game master en vivo con herramientas; Modo Clase."),
+            ("spark", "Muse Wonder", "Planifica tu año, escribe el resumen y los eventos."),
+            ("person", "Muse Spark Open", "Los vendedores en Baseten: tácticas y memoria."),
             ("mic", "Voice Transcribe", "Negociás en voz alta; escribir siempre sirve."),
-            ("picture", "Muse Image", "Retratos en pixel art, pre-generados y en caché."),
+            ("picture", "Muse Image", "Retratos, escenas y la postal del año, sin texto."),
         ],
         "agents_title": "AGENTES",
         "agents": [
@@ -488,7 +490,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Backend FastAPI", ["contratos Pydantic v2", "costos, agentes"]),
             ("API de Meta", ["Wonder, Spark,", "Voice, Image"]),
             ("Neon Postgres", ["sesiones,", "decisiones"]),
-            ("Modelos abiertos", ["NPCs opcionales", "Baseten, Modal"]),
+            ("Modelos abiertos", ["vendedores en Baseten", "Muse Spark Open"]),
         ],
         "rules": [
             "Ningún monto, tasa ni saldo sale de un modelo.",
