@@ -62,6 +62,9 @@ namespace ColonQuest.Game
         /// <summary>The bills of the home that are waiting to be paid.</summary>
         public BillBook Bills { get; private set; } = new BillBook();
 
+        /// <summary>The goals the phone proposed at the start of the run.</summary>
+        public GoalBook Goals { get; private set; } = new GoalBook();
+
         /// <summary>The fuel and upkeep that went out with the last closed month, to show in its report.</summary>
         public long LastRunningCosts { get; private set; }
 
@@ -93,6 +96,7 @@ namespace ColonQuest.Game
             Clock = new GameClock();
             Job = new JobRecord();
             Bills = new BillBook();
+            Goals = GoalBook.Propose(State);
             doneStations.Clear();
         }
 
@@ -120,6 +124,14 @@ namespace ColonQuest.Game
                 workedToday = Job.WorkedToday,
                 billsArrived = Bills.ArrivedThisMonth
             };
+
+            foreach (var goal in Goals.Goals)
+            {
+                snapshot.goalKinds.Add((int)goal.Kind);
+                snapshot.goalTargets.Add(goal.Target);
+                snapshot.goalStarts.Add(goal.Start);
+                snapshot.goalsDone.Add(goal.Done);
+            }
 
             foreach (var bill in Bills.Due)
             {
@@ -158,6 +170,7 @@ namespace ColonQuest.Game
             CookedThisMonth = snapshot.cookedThisMonth;
             Clock.Restore(snapshot.day, snapshot.minutes);
             Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday);
+            RestoreGoals(snapshot);
             Bills.RestoreArrived(snapshot.billsArrived);
             int bills = Math.Min(snapshot.billKinds?.Count ?? 0, Math.Min(snapshot.billAmounts?.Count ?? 0, snapshot.billMonthsLate?.Count ?? 0));
             for (int i = 0; i < bills; i++)
@@ -167,6 +180,24 @@ namespace ColonQuest.Game
             foreach (int station in snapshot.doneStations ?? new List<int>())
             {
                 doneStations.Add((StationType)station);
+            }
+        }
+
+        /// <summary>A save from before the goals existed gets them proposed from where the run is now.</summary>
+        private void RestoreGoals(RunSnapshot snapshot)
+        {
+            int count = snapshot.goalKinds?.Count ?? 0;
+            if (count == 0 || snapshot.goalTargets == null || snapshot.goalStarts == null || snapshot.goalsDone == null)
+            {
+                Goals = GoalBook.Propose(State);
+                return;
+            }
+
+            Goals = new GoalBook();
+            int stored = Math.Min(count, Math.Min(snapshot.goalTargets.Count, Math.Min(snapshot.goalStarts.Count, snapshot.goalsDone.Count)));
+            for (int i = 0; i < stored; i++)
+            {
+                Goals.Restore(new Goal((GoalKind)snapshot.goalKinds[i], snapshot.goalTargets[i], snapshot.goalStarts[i], snapshot.goalsDone[i]));
             }
         }
 
@@ -336,6 +367,18 @@ namespace ColonQuest.Game
         private long BillAmount(BillKind kind)
         {
             return MarketAssumptions.BillAmount(kind, Holdings);
+        }
+
+        /// <summary>Moves cash to the emergency fund. Returns what moved.</summary>
+        public long PutInFund(long amount)
+        {
+            return FinanceEngine.ContributeToEmergencyFund(State, amount, false);
+        }
+
+        /// <summary>Pays down the card outside the monthly cycle. Returns what was paid.</summary>
+        public long PayTowardCard(long amount)
+        {
+            return FinanceEngine.PayTowardCard(State, amount);
         }
 
         /// <summary>Pays one bill out of cash. False when nothing is owed for it or the cash is not enough.</summary>
