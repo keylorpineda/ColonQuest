@@ -21,6 +21,7 @@ namespace ColonQuest.UI
             Home,
             Sinpe,
             Bank,
+            Bills,
             Search,
             Calculator,
             Blocks,
@@ -216,6 +217,7 @@ namespace ColonQuest.UI
             {
                 case App.Sinpe: BuildSinpe(); break;
                 case App.Bank: BuildBank(); break;
+                case App.Bills: BuildBills(); break;
                 case App.Search: BuildSearch(); break;
                 case App.Calculator: BuildCalculator(); break;
                 case App.Blocks: BuildBlocks(); break;
@@ -253,6 +255,11 @@ namespace ColonQuest.UI
         private void BuildSinpe()
         {
             Heading("SINPE Móvil");
+            if (ShowCut(BillKind.Phone, "Te cortaron el teléfono. Pagá el recibo para volver a usar SINPE."))
+            {
+                return;
+            }
+
             CashLine(-54f);
 
             for (int i = 0; i < Contacts.Length; i++)
@@ -369,6 +376,10 @@ namespace ColonQuest.UI
         private void BuildSearch()
         {
             Heading("Buscador");
+            if (ShowCut(BillKind.Internet, "Te cortaron el internet. Pagá el recibo para volver a buscar."))
+            {
+                return;
+            }
 
             var outline = UiKit.Fill(content, "SearchBox", UiKit.Ink, new Vector2(InnerWidth, 64f), new Vector2(0f, 1f), new Vector2(Margin, -64f));
             outline.raycastTarget = true;
