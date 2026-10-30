@@ -84,6 +84,19 @@ namespace ColonQuest.UI
             return (Vector2)station.transform.position + new Vector2(dx, dy);
         }
 
+        /// <summary>How far above the root of a town bench its seat is (see the bench in the map builder).</summary>
+        private const float BenchSeatY = 0.3f;
+
+        /// <summary>The seat of the house sofa relative to its station, which stands beside it.</summary>
+        private static readonly Vector2 SofaSeatOffset = new Vector2(-0.95f, -0.45f);
+
+        /// <summary>The seat of the sofa in this scene, or the fallback when there is none.</summary>
+        private static Vector2 SofaSeat(Vector2 fallback)
+        {
+            var sofa = GameObject.Find("Thing_Sofa");
+            return sofa != null ? (Vector2)sofa.transform.position + SofaSeatOffset : fallback;
+        }
+
         private static Vector2 PersonAt(string name, Vector2 fallback)
         {
             var found = GameObject.Find(name);
@@ -101,9 +114,7 @@ namespace ColonQuest.UI
                 case StationType.Home:
                     return DeskScene(station, then);
                 case StationType.Wardrobe:
-                    return new Interaction().WalkTo(Here(station)).Face(Here(station, -1f, 0.5f))
-                        .Pose(PersonPose.Reach, 0.9f).Sound(SoundEffectKind.Knock).Fly("paper", Here(station, -0.6f, 0.6f), Here(station, 0.1f, 0.2f), 0.6f)
-                        .Wait(0.5f).Apply(then);
+                    return WardrobeScene(station, then);
                 case StationType.Store:
                     return StoreScene(station, then);
                 case StationType.Beach:
@@ -200,7 +211,8 @@ namespace ColonQuest.UI
                 }
 
                 case "Thing_Tv":
-                    return new Interaction().WalkTo(Here(station, 0f, -1.3f)).Face(me)
+                    // Watching from the sofa that faces the TV; without it, from the floor in front of the screen.
+                    return new Interaction().SitOn(SofaSeat(Here(station, 0f, -1.3f)), 0.1f).Face(me)
                         .Pose(PersonPose.Sit, 3.4f).Sound(SoundEffectKind.Beep)
                         .Flicker(Here(station, 0f, 0.3f), new Vector2(1.1f, 0.7f), TvLight, 3.2f)
                         .Wait(1.6f).Sound(SoundEffectKind.Chime).Wait(1.6f).Apply(then);
@@ -216,14 +228,22 @@ namespace ColonQuest.UI
                         .Wait(1.4f).Apply(then);
 
                 case "Thing_Sofa":
+                    return new Interaction().SitOn(SofaSeat(me), 0.1f).Face(Here(station, -3f, 0f)).Pose(PersonPose.Sit, 2.6f)
+                        .Sound(SoundEffectKind.Swish).Wait(0.4f).Apply(then);
+
                 case "Thing_Bench":
-                    return new Interaction().WalkInto(me).Pose(PersonPose.Sit, 2.6f).Sound(SoundEffectKind.Swish)
+                    // The seat is above the root of the bench; the backrest is behind it.
+                    return new Interaction().SitOn(Here(station, 0f, BenchSeatY), 2.6f).Sound(SoundEffectKind.Swish)
                         .Wait(0.4f).Apply(then);
 
                 case "Thing_DiningTable":
-                    return new Interaction().WalkInto(me).Pose(PersonPose.Eat, 2.4f)
-                        .Fly("plate", Here(station, 0.6f, 0.2f), me + new Vector2(0f, 0.15f), 0.6f).Sound(SoundEffectKind.Munch)
+                {
+                    // The chair on the near side of the table, so the player sits facing the screen with the table behind.
+                    Vector2 chair = Here(station, -0.6f, -0.95f);
+                    return new Interaction().SitOn(chair, 0.1f).Pose(PersonPose.SitEat, 2.4f)
+                        .Fly("plate", Here(station, 0.6f, 0.2f), chair + new Vector2(0f, 0.15f), 0.6f).Sound(SoundEffectKind.Munch)
                         .Wait(1.2f).Sound(SoundEffectKind.Munch).Wait(1.1f).Apply(then);
+                }
 
                 case "Thing_Coffee":
                     return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Pose(PersonPose.Eat, 1.8f)
@@ -255,7 +275,8 @@ namespace ColonQuest.UI
                         .Sound(SoundEffectKind.Knock).Wobble("Juez", 0.5f).Wait(0.8f).Apply(then);
 
                 case "Thing_EmergencyWard":
-                    return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Pose(PersonPose.Sit, 2f)
+                    // The player only looks at the beds; there is no seat in the middle of the ward.
+                    return new Interaction().WalkTo(me).Face(Here(station, 1f, 0f))
                         .Sound(SoundEffectKind.Beep).Wait(0.8f).Sound(SoundEffectKind.Beep).Wait(0.8f).Apply(then);
 
                 case "Thing_Fountain":
@@ -304,6 +325,26 @@ namespace ColonQuest.UI
                 .Apply(() => session.Rest());
         }
 
+        /// <summary>
+        /// The wardrobe: the player stands in front of it, the doors swing open and, once bought, the swimsuit hangs inside.
+        /// The window to buy it opens after the gesture, and the doors close again before the player is free.
+        /// </summary>
+        private Interaction WardrobeScene(Station station, Action then)
+        {
+            bool owned = session.Loop.HasSwimsuit;
+            return new Interaction().WalkTo(Here(station, 0f, -0.6f)).Face(Here(station, 0.4f, 1f))
+                .Reveal(WardrobeSwimsuit, owned)
+                .Pose(PersonPose.Reach, 0.5f).Sound(SoundEffectKind.Knock).Swing(WardrobeDoors, WardrobeOpen, 0.45f)
+                .Wait(0.8f).Apply(then)
+                .Wait(0.3f).Swing(WardrobeDoors, 1f, 0.35f).Sound(SoundEffectKind.Knock).Wait(0.4f);
+        }
+
+        private const string WardrobeDoors = "Wardrobe_Doors";
+        private const string WardrobeSwimsuit = "Wardrobe_Swimsuit";
+
+        /// <summary>The width of the open doors seen from above: almost edge-on.</summary>
+        private const float WardrobeOpen = 0.18f;
+
         /// <summary>Cooking: the pan sizzles and the steam rises, the plate is served and eaten. Cooking at home saves against eating out.</summary>
         private Interaction StoveScene(Station station, Action then)
         {
@@ -344,8 +385,10 @@ namespace ColonQuest.UI
                 return null;
             }
 
+            // In from the sand and back to it: the water's edge would warn about the swimsuit after the swim.
             Vector2 shore = Here(station, 0f, -0.9f);
-            var scene = new Interaction().WalkInto(shore).Face(Here(station, 1f, -1f)).Sound(SoundEffectKind.Splash).Pose(PersonPose.Swim, 3.2f);
+            Vector2 sand = Here(station, 0f, 0.2f);
+            var scene = new Interaction().WalkInto(shore, sand).Face(Here(station, 1f, -1f)).Sound(SoundEffectKind.Splash).Pose(PersonPose.Swim, 3.2f);
             for (int i = 0; i < 5; i++)
             {
                 scene.Fly("drop", shore + new Vector2(-0.4f + i * 0.2f, 0.5f), shore + new Vector2(-0.4f + i * 0.2f, -0.1f), 0.5f).Wait(0.55f);
