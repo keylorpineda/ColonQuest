@@ -1,4 +1,5 @@
 using System;
+using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
 
@@ -318,23 +319,47 @@ namespace ColonQuest.UI
 
         /// <summary>
         /// Sleeping: the player walks to the bed and lies down, the Z letters rise, the screen goes dark, the alarm rings and the
-        /// morning comes back. The rest is applied when the player is awake. Already slept this month: the bed only talks.
+        /// morning comes back: the clock skips to the next week. Before the evening the bed only talks, like any object.
         /// </summary>
         private Interaction BedScene(Station station, Action then)
         {
-            if (session.Loop.SleptThisMonth)
+            var clock = session.Loop.Clock;
+            if (!clock.IsNight)
             {
                 return null;
             }
 
+            // The month moves on only at the bank, so the last week wakes up in the same week with a reminder.
+            bool lastWeek = clock.Day + 1 >= GameRules.DaysPerMonth;
             Vector2 bed = Here(station);
             return new Interaction().WalkInto(bed).Say(string.Empty, "Ya es tarde. Toca dormir.")
                 .Pose(PersonPose.Sleep, 0.8f).Zzz(bed + new Vector2(0.2f, 0.5f), 3f)
                 .Fade(Night, 1.4f).Wait(1.4f)
+                .Apply(() => session.Sleep())
                 .Sound(SoundEffectKind.Alarm).Wait(1.1f)
                 .Pose(PersonPose.None, 0.3f).Fade(Dawn, 1f)
-                .Say(string.Empty, "Dormí rico. Amanecí con ganas de arreglar mis cuentas.")
-                .Apply(() => session.Rest());
+                .Say(string.Empty, lastWeek ? LastWeekThought : "Dormí rico. Amanecí con ganas de arreglar mis cuentas.");
+        }
+
+        public const string LastWeekThought = "Última semana del mes: toca ir al banco a cobrar el salario.";
+
+        /// <summary>
+        /// The day ended away from the bed: the player nods off where they stand, the screen goes dark and the next morning
+        /// comes with less mood. The finance engine applies the loss.
+        /// </summary>
+        private void FallAsleepScene()
+        {
+            bool lastWeek = session.Loop.Clock.Day + 1 >= GameRules.DaysPerMonth;
+            Vector2 me = HeroAt();
+            var scene = new Interaction().Say(string.Empty, "Se me hizo tardísimo... ya no aguanto el sueño.")
+                .Zzz(me + new Vector2(0.2f, 0.6f), 2f).Fade(Night, 1.2f).Wait(1.2f)
+                .Apply(() => session.FallAsleep())
+                .Sound(SoundEffectKind.Alarm).Wait(0.8f).Fade(Dawn, 1f)
+                .Say(string.Empty, lastWeek ? LastWeekThought : "Amanecí todo torcido. Mejor dormir en la cama la próxima vez.");
+            if (!scene.Play())
+            {
+                session.FallAsleep();
+            }
         }
 
         /// <summary>
