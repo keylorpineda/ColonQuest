@@ -79,6 +79,7 @@ namespace ColonQuest.UI
         {
             session = gameSession;
             BuildCanvas();
+            BuildPowerCut();
             BuildHud();
             BuildWorkGuide();
             BuildPrompt();
@@ -220,6 +221,7 @@ namespace ColonQuest.UI
             usedStations.Clear();
             workStation = null;
             homeDoor = null;
+            RefreshPowerCut();
             TryStartOpening(scene);
             BindStations();
         }
@@ -585,6 +587,7 @@ namespace ColonQuest.UI
             wellbeingFill.color = wellbeing > 0.5f ? GameUiColors.Gain : (wellbeing > 0.25f ? new Color(0.95f, 0.65f, 0.15f, 1f) : GameUiColors.Loss);
 
             negotiationPanel.Refresh();
+            RefreshPowerCut();
         }
 
         // ---------------------------------------------------------------- windows
@@ -700,6 +703,11 @@ namespace ColonQuest.UI
             }
 
             text.AppendLine(Loc.F("Gastos de vida  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(GameRules.LivingExpenses)}</color>"));
+            if (session.Loop.Bills.LastLateFees > 0L)
+            {
+                text.AppendLine(Loc.F("Recargos por recibos sin pagar  {0} más que debés", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>{Money.Format(session.Loop.Bills.LastLateFees)}</color>"));
+            }
+
             if (session.Loop.LastRoomRent > 0L)
             {
                 text.AppendLine(Loc.F("Alquiler del cuarto  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(session.Loop.LastRoomRent)}</color>"));
@@ -735,6 +743,13 @@ namespace ColonQuest.UI
         /// <summary>Everyday objects only talk: they never move money, that is the finance engine's job.</summary>
         private void ShowThing(Station station)
         {
+            string cut = CutLine(station);
+            if (cut != null)
+            {
+                ShowSpeech(station, string.Empty, Loc.T(cut));
+                return;
+            }
+
             string key = SceneManager.GetActiveScene().name + "/" + station.name;
             thingUses.TryGetValue(key, out int uses);
             thingUses[key] = uses + 1;

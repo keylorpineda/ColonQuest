@@ -29,6 +29,8 @@ namespace ColonQuest.UI
         private static readonly Color BarInk = GamePalette.Hex("#20242E");
         private static readonly Color SinpeColor = GamePalette.Hex("#2F80ED");
         private static readonly Color BankColor = GamePalette.Hex("#1E9E6A");
+        private static readonly Color BillsColor = GamePalette.Hex("#0E8FA8");
+        private static readonly Color SoundColor = GamePalette.Hex("#566072");
         private static readonly Color SearchColor = GamePalette.Hex("#E8912D");
         private static readonly Color CalculatorColor = GamePalette.Hex("#D9477A");
         private static readonly Color BlocksColor = GamePalette.Hex("#7A5AF5");
@@ -206,9 +208,10 @@ namespace ColonQuest.UI
             RefreshClock();
 
             var notice = UiKit.Fill(content, "Notice", Glass, new Vector2(InnerWidth, 118f), new Vector2(0f, 1f), new Vector2(Margin, -170f));
-            var mark = UiKit.Fill(notice.transform, "NoticeIcon", SinpeColor, new Vector2(62f, 62f), new Vector2(0f, 0.5f), new Vector2(14f, 0f));
-            DrawIcon(App.Sinpe, mark.rectTransform, 62f);
-            var noticeText = UiKit.Label(notice.transform, PhoneMessages.SinpeNotice(openings), 21, UiKit.Ink, new Vector2(InnerWidth - 104f, 104f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f));
+            bool billsDue = session.Loop.Bills.Due.Count > 0;
+            var mark = UiKit.Fill(notice.transform, "NoticeIcon", billsDue ? BillsColor : SinpeColor, new Vector2(62f, 62f), new Vector2(0f, 0.5f), new Vector2(14f, 0f));
+            DrawIcon(billsDue ? App.Bills : App.Sinpe, mark.rectTransform, 62f);
+            var noticeText = UiKit.Label(notice.transform, HomeNotice(), 21, UiKit.Ink, new Vector2(InnerWidth - 104f, 104f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f));
             noticeText.fontStyle = FontStyle.Normal;
             motion.Run(0.26f, 0.3f, t =>
             {
@@ -225,6 +228,7 @@ namespace ColonQuest.UI
             {
                 (App.Sinpe, "SINPE", SinpeColor),
                 (App.Bank, "Banco", BankColor),
+                (App.Bills, "Recibos", BillsColor),
                 (App.Search, "Buscador", SearchColor),
                 (App.Calculator, "Cuotas", CalculatorColor),
                 (App.Blocks, "Bloques", BlocksColor),
@@ -235,20 +239,36 @@ namespace ColonQuest.UI
             for (int i = 0; i < tiles.Length; i++)
             {
                 var tile = tiles[i];
-                var at = new Vector2(Margin + (i % 3) * column, -326f - (i / 3) * 168f);
-                Tile(tile.Item1, tile.Item2, tile.Item3, at, 0.1f + i * 0.04f);
+                var at = TileAt(i, column);
+                var box = Tile(tile.Item2, tile.Item3, at, 0.1f + i * 0.035f, tile.Item1, () => Show(tile.Item1));
+                if (tile.Item1 == App.Bills && billsDue)
+                {
+                    Badge(box, session.Loop.Bills.Due.Count);
+                }
             }
 
-            var sound = AudioDirector.Muted ? "Sonido: no" : "Sonido: sí";
-            var toggle = AddButton(sound, Glass, new Vector2(170f, 44f), new Vector2((InnerWidth - 170f) * 0.5f, -700f), () =>
+            string sound = AudioDirector.Muted ? "Sonido: no" : "Sonido: sí";
+            Tile(sound, SoundColor, TileAt(tiles.Length, column), 0.1f + tiles.Length * 0.035f, null, () =>
             {
                 AudioDirector.Muted = !AudioDirector.Muted;
                 Show(App.Home);
             });
-            toggle.GetComponentInChildren<Text>().fontSize = 20;
         }
 
-        private void Tile(App target, string name, Color color, Vector2 position, float delay)
+        private static Vector2 TileAt(int index, float column)
+        {
+            return new Vector2(Margin + (index % 3) * column, -300f - (index / 3) * 152f);
+        }
+
+        /// <summary>The red circle on an icon with how many things wait there.</summary>
+        private static void Badge(RectTransform box, int count)
+        {
+            var badge = UiKit.Round(box, "Badge", GamePalette.Hex("#E5383B"), 38f, new Vector2(1f, 1f), new Vector2(8f, 8f));
+            UiKit.Label(badge.transform, count.ToString(), 22, Color.white, new Vector2(38f, 38f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+        }
+
+        /// <summary>An icon of the home screen. Without an app it is a switch, drawn as a speaker.</summary>
+        private RectTransform Tile(string name, Color color, Vector2 position, float delay, App? target, Action click)
         {
             var box = UiKit.Rect(content, "Tile_" + name, new Vector2(IconSize, IconSize + 40f), new Vector2(0f, 1f), position);
             var shadow = UiKit.Fill(box, "Shadow", new Color(0f, 0f, 0f, 0.28f), new Vector2(IconSize, IconSize), new Vector2(0.5f, 1f), new Vector2(0f, -5f));
@@ -256,7 +276,14 @@ namespace ColonQuest.UI
             var icon = UiKit.Fill(box, "Icon", color, new Vector2(IconSize, IconSize), new Vector2(0.5f, 1f), Vector2.zero);
             icon.pixelsPerUnitMultiplier = 0.85f;
             icon.raycastTarget = true;
-            DrawIcon(target, icon.rectTransform, IconSize);
+            if (target.HasValue)
+            {
+                DrawIcon(target.Value, icon.rectTransform, IconSize);
+            }
+            else
+            {
+                DrawSpeaker(icon.rectTransform, AudioDirector.Muted);
+            }
 
             // The top half is a little lighter, as if the light came from above.
             var sheen = UiKit.Fill(icon.transform, "Sheen", new Color(1f, 1f, 1f, 0.1f), new Vector2(IconSize, IconSize * 0.5f), new Vector2(0.5f, 1f), Vector2.zero);
@@ -273,10 +300,11 @@ namespace ColonQuest.UI
             button.onClick.AddListener(() =>
             {
                 AudioDirector.Click();
-                Show(target);
+                click();
             });
             icon.gameObject.AddComponent<ButtonHover>();
             PopIn(box, delay);
+            return box;
         }
 
         // ---------------------------------------------------------------- icons
@@ -301,6 +329,14 @@ namespace ColonQuest.UI
                     }
 
                     Bar(icon, new Vector2(0f, -34f) * u, new Vector2(74f, 10f) * u, 0f, Color.white);
+                    break;
+
+                case App.Bills:
+                    Bar(icon, Vector2.zero, new Vector2(56f, 74f) * u, 0f, Color.white);
+                    Bar(icon, new Vector2(0f, 20f) * u, new Vector2(36f, 8f) * u, 0f, BillsColor);
+                    Bar(icon, new Vector2(0f, 4f) * u, new Vector2(36f, 8f) * u, 0f, BillsColor);
+                    Bar(icon, new Vector2(-6f, -12f) * u, new Vector2(24f, 8f) * u, 0f, BillsColor);
+                    UiKit.Round(icon, "Paid", BillsColor, 14f * u, new Vector2(0.5f, 0.5f), new Vector2(14f, -24f) * u);
                     break;
 
                 case App.Search:
@@ -340,6 +376,22 @@ namespace ColonQuest.UI
             }
         }
 
+        private static void DrawSpeaker(RectTransform icon, bool muted)
+        {
+            Bar(icon, new Vector2(-22f, 0f), new Vector2(18f, 26f), 0f, Color.white);
+            Tilted(icon, new Vector2(-6f, 0f), new Vector2(30f, 30f), 45f, Color.white);
+            if (muted)
+            {
+                Bar(icon, new Vector2(20f, 0f), new Vector2(38f, 8f), 45f, Color.white);
+                Bar(icon, new Vector2(20f, 0f), new Vector2(38f, 8f), -45f, Color.white);
+            }
+            else
+            {
+                Bar(icon, new Vector2(16f, 0f), new Vector2(7f, 22f), 0f, Color.white);
+                Bar(icon, new Vector2(28f, 0f), new Vector2(7f, 38f), 0f, Color.white);
+            }
+        }
+
         private static void Arrow(RectTransform icon, Vector2 at, float direction, float u)
         {
             Bar(icon, at + new Vector2(-6f * direction, 0f) * u, new Vector2(44f, 10f) * u, 0f, Color.white);
@@ -367,6 +419,7 @@ namespace ColonQuest.UI
             {
                 case App.Sinpe: return SinpeColor;
                 case App.Bank: return BankColor;
+                case App.Bills: return BillsColor;
                 case App.Search: return SearchColor;
                 case App.Calculator: return CalculatorColor;
                 case App.Blocks: return BlocksColor;

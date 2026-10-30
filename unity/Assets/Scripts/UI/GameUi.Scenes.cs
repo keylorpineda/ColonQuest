@@ -206,6 +206,12 @@ namespace ColonQuest.UI
 
         private Interaction ThingScene(Station station, Action then)
         {
+            // A service that was cut leaves only a thought; the gesture would make no sense.
+            if (CutLine(station) != null)
+            {
+                return null;
+            }
+
             Vector2 me = Here(station);
             switch (station.name)
             {
@@ -345,7 +351,7 @@ namespace ColonQuest.UI
                 .Say(string.Empty, lastWeek ? LastWeekThought : (missedWork ? MissedWorkThought : "Dormí rico. Amanecí con ganas de arreglar mis cuentas."));
         }
 
-        public const string LastWeekThought = "Última semana del mes: toca ir al banco a cobrar el salario.";
+        public const string LastWeekThought = "Última semana del mes: llegaron los recibos y toca ir al banco a cobrar el salario.";
         public const string MissedWorkThought = "Ayer no fui a trabajar. Eso me lo van a rebajar del salario.";
 
         /// <summary>
