@@ -64,12 +64,33 @@ namespace ColonQuest.EditorTools
 
             var wardrobe = IL(parts.Props, "Wardrobe");
             Solid(wardrobe, "Wardrobe", rounded, -7.6f, 2.3f, 0.9f, 2.2f, "#7A4F2A");
-            Deco(wardrobe, "Door_Line", square, -7.6f, 2.3f, 0.9f, 0.04f, "#2A3040", 1f, 8);
-            Deco(wardrobe, "Handle", circle, -7.3f, 2.55f, 0.1f, 0.1f, "#FFD23F", 1f, 8);
-            Deco(wardrobe, "Handle", circle, -7.3f, 2.05f, 0.1f, 0.1f, "#FFD23F", 1f, 8);
+            BuildWardrobeInside(wardrobe);
 
             Rug(IL(parts.Floor, "BedroomRug"), -5.1f, 1.85f, 2.2f, 0.9f, "#B98E6A", "#8E6A4C");
             Window(IL(parts.Labels, "BedroomWindow"), -5.1f, 5.6f, 1.4f);
+        }
+
+        /// <summary>
+        /// The inside of the wardrobe, the swimsuit (hidden until it is bought) and the two doors. The doors hang from a
+        /// hinge on the wall side, named "Wardrobe_Doors", that the wardrobe scene squeezes to swing them open.
+        /// </summary>
+        private static void BuildWardrobeInside(Transform wardrobe)
+        {
+            Deco(wardrobe, "Inside", rounded, -7.6f, 2.3f, 0.8f, 2.1f, "#3A2718", 1f, 7);
+            Deco(wardrobe, "Rail", square, -7.6f, 3.1f, 0.06f, 1.2f, "#9AA3B8", 1f, 8);
+            var swimsuit = Group(wardrobe, "Wardrobe_Swimsuit");
+            Deco(swimsuit, "Swimsuit", roundedSmall, -7.55f, 2.2f, 0.36f, 0.5f, "#4DA3FF", 1f, 9).enabled = false;
+            Deco(swimsuit, "Swimsuit_Band", square, -7.55f, 2.35f, 0.36f, 0.06f, "#FFD23F", 1f, 10).enabled = false;
+            Deco(swimsuit, "Hanger", square, -7.55f, 2.5f, 0.3f, 0.04f, "#C9CFDB", 1f, 10).enabled = false;
+
+            var hinge = Group(wardrobe, "Wardrobe_Doors");
+            hinge.localPosition = new Vector2(-8.05f, 2.3f);
+            foreach (float y in new[] { 0.55f, -0.55f })
+            {
+                Deco(hinge, "Door_Outline", rounded, 0.45f, y, 0.94f, 1.12f, "#2A3040", 1f, 11);
+                Deco(hinge, "Door", rounded, 0.45f, y, 0.88f, 1.06f, "#7A4F2A", 1f, 12);
+                Deco(hinge, "Handle", circle, 0.75f, y > 0f ? y - 0.3f : y + 0.3f, 0.1f, 0.1f, "#FFD23F", 1f, 13);
+            }
         }
 
         private static void BuildBathroom(InteriorParts parts)
