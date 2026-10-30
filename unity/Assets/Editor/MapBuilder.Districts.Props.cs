@@ -275,7 +275,6 @@ namespace ColonQuest.EditorTools
             // Every house that is not on the market can be entered: they all lead to the same neighbor's interior, and the
             // door the player came in by is the one they come out of. The four houses with a sign are only for sale or rent.
             BuildHouseDoor(parent, "Casa_Vecina_A", -40.25f, 6f);
-            BuildHouseDoor(parent, "Casa_Vecina_C", -32.5f, -8f);
             BuildHouseDoor(parent, "Casa_Almendros_3", -23f, 33f);
             BuildHouseDoor(parent, "Casa_Almendros_4", 38f, 33f);
             BuildHouseDoor(parent, "Casa_Almendros_5", 46f, 33f);
@@ -283,6 +282,14 @@ namespace ColonQuest.EditorTools
             BuildSpawnPoint(parent, SpawnIds.TownFromComisaria, new Vector2(PoliceX, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-32.5f, -9.2f));
+
+            // The yellow house on the south row rents out rooms: the player's own door.
+            Doorway(parent, new Vector2(-32.5f, -7.8f), SceneNames.Cuarto);
+            BuildSpawnPoint(parent, SpawnIds.TownFromCuarto, new Vector2(-32.5f, -9.2f));
+            string layer = currentLayer;
+            currentLayer = LayerForeground;
+            WallPlate(parent, "CUARTOS", new Vector2(-32.5f, -5.85f), 1.5f, "#F8F5E8", GamePalette.Outline, 0.03f);
+            currentLayer = layer;
 
             // A house with a sign opens just that house. The first two signs are in the original town.
             BuildListingStation(parent, "casa_vecina_b", "Ver la casa en venta", new Vector2(-38.2f, -9.5f));

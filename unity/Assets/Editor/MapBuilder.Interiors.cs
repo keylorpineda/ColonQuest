@@ -27,6 +27,7 @@ namespace ColonQuest.EditorTools
         public static void BuildInteriors()
         {
             BuildInterior(SceneNames.Casa);
+            BuildInterior(SceneNames.Cuarto);
             BuildInterior(SceneNames.Tienda);
             BuildInterior(SceneNames.Banco);
             BuildInterior(SceneNames.Agencia);
@@ -44,6 +45,8 @@ namespace ColonQuest.EditorTools
             {
                 case SceneNames.Casa:
                     return new Room { Name = "Casa", Center = Vector2.zero, Size = MapLayout.CasaSize, Color = GamePalette.FloorHome };
+                case SceneNames.Cuarto:
+                    return new Room { Name = "Cuarto", Center = Vector2.zero, Size = MapLayout.CuartoSize, Color = GamePalette.Hex("#B5A588") };
                 case SceneNames.Tienda:
                     return new Room { Name = "Tienda", Center = Vector2.zero, Size = MapLayout.TiendaSize, Color = GamePalette.FloorStore };
                 case SceneNames.Agencia:
@@ -72,6 +75,8 @@ namespace ColonQuest.EditorTools
             {
                 case SceneNames.Casa:
                     return MapLayout.CasaMat;
+                case SceneNames.Cuarto:
+                    return MapLayout.CuartoMat;
                 case SceneNames.Tienda:
                     return MapLayout.TiendaMat;
                 case SceneNames.Agencia:
@@ -99,6 +104,8 @@ namespace ColonQuest.EditorTools
             {
                 case SceneNames.Casa:
                     return SpawnIds.TownFromCasa;
+                case SceneNames.Cuarto:
+                    return SpawnIds.TownFromCuarto;
                 case SceneNames.Tienda:
                     return SpawnIds.TownFromTienda;
                 case SceneNames.Agencia:
@@ -153,6 +160,9 @@ namespace ColonQuest.EditorTools
                 case SceneNames.Casa:
                     BuildHouseLayout(layout, room);
                     BuildHouseThings(layout);
+                    break;
+                case SceneNames.Cuarto:
+                    BuildRoomLayout(layout, room);
                     break;
                 case SceneNames.Tienda:
                     BuildStoreLayout(layout, room);
