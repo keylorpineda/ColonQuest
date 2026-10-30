@@ -18,6 +18,8 @@ namespace ColonQuest.World
 
         private static AudioDirector instance;
 
+        private float Level => Master * volume;
+
         private readonly Dictionary<MusicTrack, AudioSource> music = new Dictionary<MusicTrack, AudioSource>();
         private readonly AudioClip[] cars = new AudioClip[2];
         private readonly AudioClip[] birds = new AudioClip[3];
@@ -29,11 +31,13 @@ namespace ColonQuest.World
         private AudioSource carSource;
         private AudioSource birdSource;
         private AudioSource voiceSource;
+        private AudioSource collectorSource;
 
         private Transform player;
         private float nextCar = 6f;
         private float nextBirds = 4f;
         private bool muted;
+        private float volume = GameSettings.DefaultVolume;
         private Coroutine talking;
 
         /// <summary>True while all sound is off.</summary>
@@ -47,6 +51,26 @@ namespace ColonQuest.World
                     instance.muted = value;
                 }
             }
+        }
+
+        /// <summary>The master volume, from 0 to 1.</summary>
+        public static float Volume
+        {
+            get => instance != null ? instance.volume : GameSettings.DefaultVolume;
+            set
+            {
+                if (instance != null)
+                {
+                    instance.volume = GameSettings.ClampVolume(value);
+                }
+            }
+        }
+
+        /// <summary>Takes the sound switch and the volume from the settings.</summary>
+        public static void Apply(GameSettings settings)
+        {
+            Muted = !settings.SoundOn;
+            Volume = settings.Volume;
         }
 
         public static void EnsureCreated()
@@ -79,6 +103,7 @@ namespace ColonQuest.World
             }
 
             instance = this;
+            Apply(GameSettings.Current);
             foreach (MusicTrack track in new[] { MusicTrack.Town, MusicTrack.Store, MusicTrack.Bank, MusicTrack.House })
             {
                 music[track] = Source("Music_" + track, true);
@@ -90,6 +115,8 @@ namespace ColonQuest.World
             carSource = Source("Cars", false);
             birdSource = Source("Birds", false);
             voiceSource = Source("Voice", false);
+            collectorSource = Source("CollectorMusic", true);
+            collectorSource.pitch = 0.82f;
             StartCoroutine(Prepare());
         }
 
@@ -147,6 +174,8 @@ namespace ColonQuest.World
             Play(music[MusicTrack.Bank], ProceduralSound.Music(MusicTrack.Bank));
             yield return null;
             Play(music[MusicTrack.House], ProceduralSound.Music(MusicTrack.House));
+            yield return null;
+            Play(collectorSource, ProceduralSound.Music(MusicTrack.Store));
         }
 
         private static void Play(AudioSource source, AudioClip clip)
@@ -158,7 +187,7 @@ namespace ColonQuest.World
         private void Update()
         {
             var levels = SoundMix.Compute(SceneManager.GetActiveScene().name, PlayerPosition());
-            float scale = muted ? 0f : Master;
+            float scale = muted ? 0f : Level;
             float step = FadePerSecond * Time.unscaledDeltaTime;
 
             foreach (var pair in music)
@@ -169,12 +198,26 @@ namespace ColonQuest.World
             Fade(crowd, levels.Crowd * scale, step);
             Fade(sea, levels.Sea * scale, step);
             Fade(river, levels.River * scale, step);
+            Fade(collectorSource, CollectorLevel() * scale, step);
 
             if (!muted)
             {
                 Traffic(levels.Traffic, Time.unscaledDeltaTime);
                 Birds(levels.Birds, Time.unscaledDeltaTime);
             }
+        }
+
+        /// <summary>The music of the collectors' car, louder as it comes close to the player. Silent when it is out of sight.</summary>
+        private float CollectorLevel()
+        {
+            var car = CollectorCar.Instance;
+            if (car == null || !car.IsVisible)
+            {
+                return 0f;
+            }
+
+            float distance = Vector2.Distance(car.transform.position, PlayerPosition());
+            return 0.5f * Mathf.Clamp01(1f - distance / 16f);
         }
 
         private static void Fade(AudioSource source, float target, float step)
@@ -193,20 +236,36 @@ namespace ColonQuest.World
             return player != null ? (Vector2)player.position : Vector2.zero;
         }
 
+        private const float CarHearingRange = 9f;
+
+        private readonly HashSet<TrafficCar> carsHeard = new HashSet<TrafficCar>();
+
+        /// <summary>A car sounds once, as it comes within hearing range of the player. No car near, no sound.</summary>
         private void Traffic(float level, float dt)
         {
             nextCar -= dt;
-            if (nextCar > 0f || level < 0.05f || cars[0] == null)
+            if (level < 0.05f || cars[0] == null)
             {
                 return;
             }
 
-            var clip = cars[Random.Range(0, cars.Length)];
-            bool toRight = Random.value < 0.5f;
-            carSource.panStereo = toRight ? -0.9f : 0.9f;
-            carSource.PlayOneShot(clip, Mathf.Clamp01(level * 0.7f) * Master);
-            StartCoroutine(Pan(carSource, toRight ? -0.9f : 0.9f, toRight ? 0.9f : -0.9f, CarSeconds));
-            nextCar = CarSeconds + Random.Range(2f, 9f) / (0.4f + level);
+            Vector2 listener = PlayerPosition();
+            carsHeard.RemoveWhere(c => c == null || Vector2.Distance(c.transform.position, listener) > CarHearingRange * 1.4f);
+            foreach (var car in TrafficCar.All)
+            {
+                float distance = Vector2.Distance(car.transform.position, listener);
+                if (nextCar > 0f || distance > CarHearingRange || carsHeard.Contains(car))
+                {
+                    continue;
+                }
+
+                carsHeard.Add(car);
+                float side = Mathf.Clamp((car.transform.position.x - listener.x) / CarHearingRange, -0.9f, 0.9f);
+                float closeness = 1f - distance / CarHearingRange;
+                carSource.panStereo = side;
+                carSource.PlayOneShot(cars[Random.Range(0, cars.Length)], Mathf.Clamp01(level * (0.3f + 0.7f * closeness)) * Level);
+                nextCar = 0.6f;
+            }
         }
 
         private void Birds(float level, float dt)
@@ -218,7 +277,7 @@ namespace ColonQuest.World
             }
 
             birdSource.panStereo = Random.Range(-0.8f, 0.8f);
-            birdSource.PlayOneShot(birds[Random.Range(0, birds.Length)], 0.35f * level * Master);
+            birdSource.PlayOneShot(birds[Random.Range(0, birds.Length)], 0.35f * level * Level);
             nextBirds = Random.Range(6f, 15f);
         }
 
@@ -261,7 +320,7 @@ namespace ColonQuest.World
             // About one syllable for every three letters, so the babble lasts as long as the text takes to appear.
             int count = Mathf.Clamp(text.Length / 3, 3, 70);
             var random = new System.Random(hash + text.Length);
-            voiceSource.volume = 0.6f * Master;
+            voiceSource.volume = 0.6f * Level;
 
             for (int i = 0; i < count; i++)
             {

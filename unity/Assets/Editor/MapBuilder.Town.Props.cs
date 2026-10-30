@@ -312,7 +312,7 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>A car on the street. With a speed it drives along its lane and wraps around; without, it stands parked.</summary>
-        private static void Car(Transform parent, Transform shadows, float x, float y, string hex, float speed = 0f)
+        private static Transform Car(Transform parent, Transform shadows, float x, float y, string hex, float speed = 0f, bool tinted = false)
         {
             var root = Root(parent, "Car", new Vector2(x, y), y - 0.55f);
             bool driving = speed != 0f;
@@ -322,7 +322,12 @@ namespace ColonQuest.EditorTools
                 var shadowColor = GamePalette.Outline;
                 shadowColor.a = 0.16f;
                 OnGround(root, "Shadow", softCircle, new Vector2(0.12f, -0.2f), new Vector2(2.6f, 1.3f), shadowColor, TownShadow);
-                root.gameObject.AddComponent<Drift>().Configure(new Vector2(speed, 0f), new Vector2(49f, 100f));
+                root.gameObject.AddComponent<TrafficCar>();
+                var body2d = root.gameObject.AddComponent<Rigidbody2D>();
+                body2d.bodyType = RigidbodyType2D.Kinematic;
+                body2d.useFullKinematicContacts = true;
+                root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.5f, 1.1f);
+                root.gameObject.AddComponent<Drift>().Configure(new Vector2(speed, 0f), new Vector2(MapLayout.PlayEastX - 4f, 100f));
                 if (speed < 0f)
                 {
                     root.localScale = new Vector3(-1f, 1f, 1f);
@@ -346,8 +351,22 @@ namespace ColonQuest.EditorTools
 
             Shape(root, "Body_Outline", rounded, Vector2.zero, new Vector2(2.66f, 1.36f), GamePalette.Outline, 1);
             Shape(root, "Body", rounded, Vector2.zero, new Vector2(2.5f, 1.2f), body, 2);
-            Shape(root, "Windshield", roundedSmall, new Vector2(0.62f, 0f), new Vector2(0.5f, 0.9f), GamePalette.Hex("#A9DDF2"), 3);
-            Shape(root, "RearWindow", roundedSmall, new Vector2(-0.88f, 0f), new Vector2(0.36f, 0.86f), GamePalette.Hex("#8FC3DA"), 3);
+            // Glass you can see through: the seat is behind it, and a driver when the car is on the move. A tinted
+            // car (the collectors') has dark glass nobody can see into.
+            Shape(root, "Seat", roundedSmall, new Vector2(0.62f, 0f), new Vector2(0.44f, 0.8f), GamePalette.Hex("#3A4152"), 3);
+            Shape(root, "RearSeat", roundedSmall, new Vector2(-0.88f, 0f), new Vector2(0.3f, 0.76f), GamePalette.Hex("#3A4152"), 3);
+            if (driving && !tinted)
+            {
+                string[] skins = { "#F2B84B", "#FF8FB1", "#4DA3FF", "#55E08F", "#B28DFF" };
+                var skin = GamePalette.Hex(skins[Mathf.Abs(Mathf.RoundToInt(x * 7f + y * 3f)) % skins.Length]);
+                Shape(root, "DriverBody", roundedSmall, new Vector2(0.56f, -0.14f), new Vector2(0.3f, 0.36f), GamePalette.Hex("#2A3345"), 3);
+                Shape(root, "DriverHead", circle, new Vector2(0.62f, 0.12f), Vector2.one * 0.3f, skin, 3);
+            }
+
+            var glass = tinted ? GamePalette.Hex("#0A0B12") : GamePalette.Hex("#A9DDF2");
+            glass.a = tinted ? 0.97f : 0.42f;
+            Shape(root, "Windshield", roundedSmall, new Vector2(0.62f, 0f), new Vector2(0.5f, 0.9f), glass, 4);
+            Shape(root, "RearWindow", roundedSmall, new Vector2(-0.88f, 0f), new Vector2(0.36f, 0.86f), glass, 4);
             Shape(root, "Roof", rounded, new Vector2(-0.12f, 0f), new Vector2(1.0f, 0.96f), GamePalette.Shade(body, 1.12f), 3);
             Shape(root, "Headlight", circle, new Vector2(1.18f, 0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
             Shape(root, "Headlight", circle, new Vector2(1.18f, -0.4f), Vector2.one * 0.2f, GamePalette.Hex("#FFF1A8"), 4);
@@ -357,6 +376,24 @@ namespace ColonQuest.EditorTools
                 var collider = root.gameObject.AddComponent<BoxCollider2D>();
                 collider.size = new Vector2(2.5f, 1.1f);
             }
+
+            return root;
+        }
+
+        /// <summary>The collectors' car: black, with tinted windows and a gold stripe. It patrols the main street and stops in front of a player who owes.</summary>
+        private static void CollectorCarBuild(Transform parent, Transform shadows)
+        {
+            var root = Car(parent, shadows, MapLayout.TownBounds.xMin, 3.2f, "#15161C", 3.4f, true);
+            root.name = "CollectorCar";
+            var drift = root.GetComponent<Drift>();
+            if (drift != null)
+            {
+                Object.DestroyImmediate(drift);
+            }
+
+            Shape(root, "GoldStripe", roundedSmall, new Vector2(0f, 0f), new Vector2(2.3f, 0.1f), GamePalette.Hex("#FFD23F"), 5);
+            Shape(root, "Speaker", circle, new Vector2(-1.05f, 0.35f), Vector2.one * 0.26f, GamePalette.Hex("#FFD23F"), 5);
+            root.gameObject.AddComponent<CollectorCar>().Configure(3.4f, MapLayout.TownBounds.xMin, MapLayout.PlayEastX + 2f);
         }
 
         private static void Hedge(Transform parent, Vector2 center, Vector2 size)

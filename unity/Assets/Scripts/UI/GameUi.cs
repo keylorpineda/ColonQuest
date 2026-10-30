@@ -16,7 +16,7 @@ namespace ColonQuest.UI
     /// modal windows for events, results, the statement and the end of the run. It is the only
     /// place that turns what happens in <see cref="GameSession"/> into screens.
     /// </summary>
-    public sealed class GameUi : MonoBehaviour
+    public sealed partial class GameUi : MonoBehaviour
     {
         private GameSession session;
         private Canvas canvas;
@@ -26,6 +26,7 @@ namespace ColonQuest.UI
         private ModalPanel modal;
         private NegotiationPanel negotiationPanel;
         private PhoneUi phone;
+        private PauseMenu pause;
         private Negotiation spokenNegotiation;
         private int spokenTurns;
 
@@ -44,12 +45,20 @@ namespace ColonQuest.UI
 
         private readonly List<Station> inside = new List<Station>();
 
+        private static GameUi current;
+
         public static GameUi Create(GameSession gameSession)
         {
+            if (current != null)
+            {
+                return current;
+            }
+
             var go = new GameObject("GameUi");
             DontDestroyOnLoad(go);
             var ui = go.AddComponent<GameUi>();
             ui.Bind(gameSession);
+            current = ui;
             return ui;
         }
 
@@ -63,11 +72,15 @@ namespace ColonQuest.UI
             modal = new ModalPanel(canvas.transform);
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             phone = new PhoneUi(canvas.transform, session);
+            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
+            BuildIncidents();
 
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
             session.NegotiationUpdated += OnNegotiationChanged;
             session.NewGameStarted += CloseWindows;
+            Loc.Changed += Refresh;
+            LocalSeller.Translate = Loc.T;
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
@@ -80,8 +93,16 @@ namespace ColonQuest.UI
 
         private void OnDestroy()
         {
+            if (current == this)
+            {
+                current = null;
+            }
+
+            ReleaseIncidents();
+            Time.timeScale = 1f;
             PlayerController.Blocked = false;
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            Loc.Changed -= Refresh;
             if (session != null)
             {
                 session.Changed -= Refresh;
@@ -140,8 +161,8 @@ namespace ColonQuest.UI
         private Text Row(RectTransform card, string label, int index)
         {
             float y = -(14f + 44f + index * 40f) + 36f;
-            UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(220f, 36f), new Vector2(0f, 1f), new Vector2(22f, y));
-            return UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(220f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
+            UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(280f, 36f), new Vector2(0f, 1f), new Vector2(22f, y));
+            return UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(160f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
         }
 
         private void BuildPrompt()
@@ -164,6 +185,8 @@ namespace ColonQuest.UI
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            // The overlay lives across scenes, but the main menu has its own screen.
+            canvas.enabled = scene.name != SceneNames.Menu;
             BindStations();
         }
 
@@ -201,6 +224,26 @@ namespace ColonQuest.UI
 
         private void Update()
         {
+            if (!canvas.enabled)
+            {
+                return;
+            }
+
+            TickIncidents();
+
+            if (pause.IsOpen)
+            {
+                PlayerController.Blocked = true;
+                promptCard.SetActive(false);
+                loadingCard.SetActive(false);
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    pause.Back();
+                }
+
+                return;
+            }
+
             if (negotiationPanel.IsOpen)
             {
                 // The seller's window takes the keyboard: the text box needs every key.
@@ -239,7 +282,7 @@ namespace ColonQuest.UI
             {
                 promptCard.SetActive(false);
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 9; i++)
                 {
                     if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
                     {
@@ -261,17 +304,30 @@ namespace ColonQuest.UI
                 return;
             }
 
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                OpenPause();
+                return;
+            }
+
             var station = Nearby;
             string text = station != null && !session.Busy ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
             if (text != null)
             {
-                promptText.text = text;
+                promptText.text = PromptText(text);
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     Interact(station);
                 }
             }
+        }
+
+        /// <summary>The prompt in the player's language: the key "[E]  " stays, the rest is translated.</summary>
+        private static string PromptText(string text)
+        {
+            const string key = "[E]  ";
+            return text.StartsWith(key) ? key + Loc.T(text.Substring(key.Length)) : Loc.T(text);
         }
 
         private string PromptFor(Station station)
@@ -287,13 +343,18 @@ namespace ColonQuest.UI
                     return "[E]  " + station.DisplayName;
                 case StationType.Atm:
                     return "[E]  Consultar tu saldo en el cajero";
+                case StationType.RealEstate:
+                case StationType.CarDealer:
+                case StationType.Farm:
+                case StationType.HealthDesk:
+                    return "[E]  " + station.DisplayName;
                 default:
                     if (loop.CanDoTask(station.Type))
                     {
                         return "[E]  " + station.DisplayName;
                     }
 
-                    return loop.AllTasksDone ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar." : "Ya pasaste por " + station.DisplayName + " este mes.";
+                    return loop.AllTasksDone ? "Ya hiciste tus tareas del mes. Ve al banco a cobrar." : Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
             }
         }
 
@@ -314,6 +375,18 @@ namespace ColonQuest.UI
                 case StationType.Store:
                     session.BeginNegotiation();
                     break;
+                case StationType.RealEstate:
+                    ShowRealEstate(station);
+                    break;
+                case StationType.CarDealer:
+                    ShowCarCatalog();
+                    break;
+                case StationType.Farm:
+                    ShowFarm();
+                    break;
+                case StationType.HealthDesk:
+                    ShowHealthDesk();
+                    break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
                     {
@@ -331,6 +404,8 @@ namespace ColonQuest.UI
             modal.Hide();
             phone.Close();
             negotiationPanel.Hide();
+            pause.Hide();
+            Time.timeScale = 1f;
         }
 
         private void OnNegotiationChanged(Negotiation negotiation)
@@ -365,8 +440,8 @@ namespace ColonQuest.UI
         {
             var state = session.State;
             var loop = session.Loop;
-            monthText.text = $"Mes {Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay)} de {GameRules.MonthsToPlay}";
-            tasksText.text = $"Tareas {loop.TasksDone}/{GameRules.TasksPerMonth}";
+            monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay);
+            tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
             cashText.text = Money.Format(state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
             cardText.text = Money.Format(state.CreditCard.Balance);
@@ -389,17 +464,17 @@ namespace ColonQuest.UI
             {
                 var choice = gameEvent.Choices[i];
                 string id = choice.Id;
-                options.Add(new ModalOption { Label = $"{i + 1}.  {choice.Label}", Color = GameUiColors.Cycle(i), OnPress = () => session.Choose(id) });
+                options.Add(new ModalOption { Label = $"{i + 1}.  {Loc.T(choice.Label)}", Color = GameUiColors.Cycle(i), OnPress = () => session.Choose(id) });
             }
 
             string who = gameEvent.Npc != null ? gameEvent.Npc.Name + "  ·  " + gameEvent.Npc.Role : string.Empty;
             if (source == ResultSource.Fallback)
             {
-                who = (who.Length > 0 ? who + "  ·  " : string.Empty) + "evento local";
+                who = (who.Length > 0 ? who + "  ·  " : string.Empty) + Loc.T("evento local");
             }
 
-            AudioDirector.Talk(gameEvent.Narrative, gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
-            modal.Show(gameEvent.Title, who, gameEvent.Narrative, options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
+            AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
+            modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
         }
 
         private void ShowOutcome(ChoiceOutcome outcome)
@@ -414,20 +489,20 @@ namespace ColonQuest.UI
             Line(text, "Deuda con prestamista", outcome.InformalDebtDelta, false);
             if (outcome.WellbeingDelta != 0)
             {
-                text.AppendLine($"Ánimo  <color={GameUiColors.Hex(outcome.WellbeingDelta > 0 ? GameUiColors.Gain : GameUiColors.Loss)}>{(outcome.WellbeingDelta > 0 ? "+" : string.Empty)}{outcome.WellbeingDelta}</color>");
+                text.AppendLine($"{Loc.T("Ánimo")}  <color={GameUiColors.Hex(outcome.WellbeingDelta > 0 ? GameUiColors.Gain : GameUiColors.Loss)}>{(outcome.WellbeingDelta > 0 ? "+" : string.Empty)}{outcome.WellbeingDelta}</color>");
             }
 
             if (outcome.ChangedNothing)
             {
-                text.AppendLine("Tus cuentas quedaron igual.");
+                text.AppendLine(Loc.T("Tus cuentas quedaron igual."));
             }
 
             AppendDeal(text, session.LastDeal);
 
             text.AppendLine();
             text.Append(session.Loop.AllTasksDone
-                ? "Hiciste todas tus tareas. Ve al banco a cobrar el salario."
-                : $"Tareas del mes: {session.Loop.TasksDone} de {GameRules.TasksPerMonth}.");
+                ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
+                : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
 
             modal.Show("Lo que pasó", outcome.ChoiceLabel, text.ToString(), new[] { Continue(null) });
         }
@@ -441,10 +516,14 @@ namespace ColonQuest.UI
             }
 
             text.AppendLine();
-            text.AppendLine($"Precio de contado  {SellerOffer.FormatColones(deal.CashPrice)}");
-            string verb = deal.Bought ? "Terminas pagando" : "A cuotas ibas a pagar";
-            text.AppendLine($"{verb}  <color={GameUiColors.Hex(GameUiColors.Loss)}>{SellerOffer.FormatColones(deal.TotalCost)}</color>  ({SellerOffer.FormatColones(deal.ExtraOverCash)} más)");
-            text.AppendLine($"Preguntas clave que hiciste  {deal.QuestionsAsked} de {deal.QuestionsTotal}");
+            text.AppendLine(Loc.F("Precio de contado  {0}", SellerOffer.FormatColones(deal.CashPrice)));
+            string verb = Loc.T(deal.Bought ? "Terminas pagando" : "A cuotas ibas a pagar");
+            text.AppendLine(Loc.F("{0}  {1}  ({2} más)", verb, $"<color={GameUiColors.Hex(GameUiColors.Loss)}>{SellerOffer.FormatColones(deal.TotalCost)}</color>", SellerOffer.FormatColones(deal.ExtraOverCash)));
+            text.AppendLine(Loc.F("Preguntas clave que hiciste  {0} de {1}", deal.QuestionsAsked, deal.QuestionsTotal));
+            if (!string.IsNullOrEmpty(deal.Note))
+            {
+                text.AppendLine($"<color={GameUiColors.Hex(GameUiColors.Loss)}>{Loc.T(deal.Note)}</color>");
+            }
         }
 
         private static void Line(StringBuilder text, string label, long delta, bool moreIsGood)
@@ -455,14 +534,14 @@ namespace ColonQuest.UI
             }
 
             bool good = (delta > 0L) == moreIsGood;
-            text.AppendLine($"{label}  <color={GameUiColors.Hex(good ? GameUiColors.Gain : GameUiColors.Loss)}>{Money.FormatSigned(delta)}</color>");
+            text.AppendLine($"{Loc.T(label)}  <color={GameUiColors.Hex(good ? GameUiColors.Gain : GameUiColors.Loss)}>{Money.FormatSigned(delta)}</color>");
         }
 
         private void AskCloseMonth()
         {
             string body = session.Loop.AllTasksDone
                 ? "Cobras tu salario y se pagan las cuotas, la tarjeta y los gastos del mes."
-                : $"Todavía te faltan tareas este mes ({session.Loop.TasksDone} de {GameRules.TasksPerMonth}). Si cierras ahora, te pierdes esas decisiones.";
+                : Loc.F("Todavía te faltan tareas este mes ({0} de {1}). Si cierras ahora, te pierdes esas decisiones.", session.Loop.TasksDone, GameRules.TasksPerMonth);
 
             modal.Show("Banco", "Cierre de mes", body, new[]
             {
@@ -475,35 +554,35 @@ namespace ColonQuest.UI
         {
             phone.Close();
             var text = new StringBuilder();
-            text.AppendLine($"Salario  <color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.SalaryCredited)}</color>");
+            text.AppendLine(Loc.F("Salario  {0}", $"<color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.SalaryCredited)}</color>"));
             if (report.AguinaldoCredited > 0L)
             {
-                text.AppendLine($"Aguinaldo  <color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.AguinaldoCredited)}</color>");
+                text.AppendLine(Loc.F("Aguinaldo  {0}", $"<color={GameUiColors.Hex(GameUiColors.Gain)}>{Money.FormatSigned(report.AguinaldoCredited)}</color>"));
             }
 
-            text.AppendLine($"Gastos de vida  <color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(GameRules.LivingExpenses)}</color>");
+            text.AppendLine(Loc.F("Gastos de vida  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(GameRules.LivingExpenses)}</color>"));
             if (report.InstallmentsCharged > 0L)
             {
-                text.AppendLine($"Cuotas  <color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(report.InstallmentsCharged)}</color>");
+                text.AppendLine(Loc.F("Cuotas  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(report.InstallmentsCharged)}</color>"));
             }
 
             var card = report.CardCycle;
             if (card.StartingBalance > 0L)
             {
-                text.AppendLine($"Pago mínimo de la tarjeta  <color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(card.AmountPaid)}</color>");
-                text.AppendLine($"Intereses de la tarjeta  <color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(card.InterestCharged)}</color> de deuda");
+                text.AppendLine(Loc.F("Pago mínimo de la tarjeta  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(card.AmountPaid)}</color>"));
+                text.AppendLine(Loc.F("Intereses de la tarjeta  {0} de deuda", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(card.InterestCharged)}</color>"));
             }
 
             if (report.InformalLoanInterestAccrued > 0L)
             {
-                text.AppendLine($"Intereses del prestamista  <color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(report.InformalLoanInterestAccrued)}</color> de deuda");
+                text.AppendLine(Loc.F("Intereses del prestamista  {0} de deuda", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(report.InformalLoanInterestAccrued)}</color>"));
             }
 
             text.AppendLine();
-            text.Append($"Te queda {Money.Format(report.EndingCash)} en efectivo y la tarjeta debe {Money.Format(report.EndingCardBalance)}.");
+            text.Append(Loc.F("Te queda {0} en efectivo y la tarjeta debe {1}.", Money.Format(report.EndingCash), Money.Format(report.EndingCardBalance)));
 
             bool last = session.Loop.IsFinished;
-            modal.Show($"Mes {report.MonthProcessed} cerrado", "Estado de cuenta del mes", text.ToString(), new[]
+            modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), "Estado de cuenta del mes", text.ToString(), new[]
             {
                 new ModalOption { Label = last ? "Ver mi resumen" : "Seguir", Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
             });
@@ -532,42 +611,86 @@ namespace ColonQuest.UI
         {
             var state = session.State;
             var text = new StringBuilder();
-            text.AppendLine($"Efectivo  {Money.Format(state.Cash)}");
-            text.AppendLine($"Ahorros  {Money.Format(state.Savings)}");
-            text.AppendLine($"Fondo de emergencia  {Money.Format(state.EmergencyFund)}");
-            text.AppendLine($"Tarjeta  {Money.Format(state.CreditCard.Balance)} de {Money.Format(state.CreditCard.Limit)}  ({state.CreditCard.MonthlyRatePct}% al mes)");
+            text.AppendLine(Loc.F("Efectivo  {0}", Money.Format(state.Cash)));
+            text.AppendLine(Loc.F("Ahorros  {0}", Money.Format(state.Savings)));
+            text.AppendLine(Loc.F("Fondo de emergencia  {0}", Money.Format(state.EmergencyFund)));
+            text.AppendLine(Loc.F("Tarjeta  {0} de {1}  ({2}% al mes)", Money.Format(state.CreditCard.Balance), Money.Format(state.CreditCard.Limit), state.CreditCard.MonthlyRatePct));
             foreach (var installment in state.Installments)
             {
                 if (installment.MonthsLeft > 0)
                 {
-                    text.AppendLine($"{installment.Item}  {Money.Format(installment.Monthly)} al mes, faltan {installment.MonthsLeft} cuotas");
+                    text.AppendLine(Loc.F("{0}  {1} al mes, faltan {2} cuotas", Loc.T(installment.Item), Money.Format(installment.Monthly), installment.MonthsLeft));
                 }
             }
 
             foreach (var loan in state.InformalLoans)
             {
-                text.AppendLine($"{loan.Lender}  {Money.Format(loan.Balance)}  ({loan.MonthlyRatePct}% al mes)");
+                text.AppendLine(Loc.F("{0}  {1}  ({2}% al mes)", Loc.T(loan.Lender), Money.Format(loan.Balance), loan.MonthlyRatePct));
             }
 
             text.AppendLine();
-            text.Append($"Lo que tienes menos lo que debes: {Money.Format(GameRules.NetWorth(state))}");
-            modal.Show("Tu estado de cuenta", $"Salario neto {Money.Format(state.SalaryNet)} al mes", text.ToString(), new[] { Continue(null) });
+            text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(GameRules.NetWorth(state))));
+            modal.Show("Tu estado de cuenta", Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
         }
 
         private void ShowEnd(SessionSummary summary)
         {
             phone.Close();
             var text = new StringBuilder();
-            text.AppendLine(summary.Narrative);
+            text.AppendLine(Loc.T(summary.Narrative));
             text.AppendLine();
-            text.AppendLine($"Decisiones tomadas: {summary.Decisions}");
-            text.AppendLine($"Lo que debes: {Money.Format(summary.TotalDebt)}");
-            text.Append($"Lo que tienes menos lo que debes: {Money.Format(summary.NetWorth)}");
+            text.AppendLine(Loc.F("Decisiones tomadas: {0}", summary.Decisions));
+            text.AppendLine(Loc.F("Lo que debes: {0}", Money.Format(summary.TotalDebt)));
+            text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(summary.NetWorth)));
 
-            modal.Show("Fin de la partida", $"{summary.MonthsPlayed} meses jugados", text.ToString(), new[]
+            var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
+            if (assets.Count == 0)
             {
+                modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+                {
+                    new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                });
+                return;
+            }
+
+            long withAssets = GameRules.NetWorth(session.State, session.Loop.Holdings);
+            text.AppendLine();
+            text.Append(Loc.F("Con lo que compraste: {0}", Money.Format(withAssets)));
+            modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+            {
+                new ModalOption { Label = "Ver lo que compraste", Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
                 new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
             });
+        }
+
+        /// <summary>True while the pause window or its settings are up.</summary>
+        public bool PauseOpen => pause.IsOpen;
+
+        /// <summary>
+        /// Opens the pause window. Time stops while it is up; the audio and the window run on unscaled time.
+        /// Nothing happens while the game master is answering.
+        /// </summary>
+        public void OpenPause()
+        {
+            if (session.Busy || pause.IsOpen)
+            {
+                return;
+            }
+
+            Time.timeScale = 0f;
+            pause.Open();
+        }
+
+        private void ResumeFromPause()
+        {
+            Time.timeScale = 1f;
+        }
+
+        private void GoToMenu()
+        {
+            Time.timeScale = 1f;
+            PlayerController.Blocked = false;
+            SceneManager.LoadScene(SceneNames.Menu);
         }
 
         private void Restart()

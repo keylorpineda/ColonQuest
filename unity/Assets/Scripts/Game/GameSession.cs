@@ -39,6 +39,14 @@ namespace ColonQuest.Game
         /// <summary>What the last deal cost and how well the player asked; shown with the result.</summary>
         public DealReport LastDeal { get; private set; }
 
+        /// <summary>The car being negotiated at the agency, or null at the store. The agency is not known to the backend.</summary>
+        public CarModel CurrentCar { get; private set; }
+
+        /// <summary>Why the agency refused to close the deal, shown in the negotiation window; null when there is nothing to say.</summary>
+        public string DealNotice { get; private set; }
+
+        public Holdings Holdings => Loop.Holdings;
+
         public event Action<Negotiation> NegotiationStarted;
         public event Action<Negotiation> NegotiationUpdated;
         public event Action Changed;
@@ -91,6 +99,8 @@ namespace ColonQuest.Game
             CurrentNegotiation = null;
             VoiceNotice = null;
             LastDeal = null;
+            CurrentCar = null;
+            DealNotice = null;
             Summary = null;
 
             // The session id arrives in a moment; until then every event would come from the local catalog.
@@ -199,6 +209,16 @@ namespace ColonQuest.Game
                 text = text.Substring(0, MaxNegotiationText);
             }
 
+            DealNotice = null;
+            if (negotiation.IsLocalOnly)
+            {
+                // The backend does not know this offer: the local seller answers at once and nothing is sent.
+                negotiation.Record(text, LocalSeller.Reply(negotiation.Offer, text), true);
+                NegotiationUpdated?.Invoke(negotiation);
+                Changed?.Invoke();
+                return;
+            }
+
             Busy = true;
             VoiceNotice = null;
             Changed?.Invoke();
@@ -229,7 +249,7 @@ namespace ColonQuest.Game
                 return;
             }
 
-            if (!ApiClient.Instance.Service.HasSession)
+            if (negotiation.IsLocalOnly || !ApiClient.Instance.Service.HasSession)
             {
                 VoiceNotice = VoiceFailedNotice;
                 NegotiationUpdated?.Invoke(negotiation);
@@ -291,11 +311,186 @@ namespace ColonQuest.Game
                 return;
             }
 
+            if (negotiation.IsLocalOnly)
+            {
+                ConcludeCarDeal(negotiation, buy);
+                return;
+            }
+
             negotiation.Close(buy ? DealStatus.Accepted : DealStatus.WalkedAway);
             CurrentNegotiation = null;
             CurrentEvent = negotiation.ToEvent();
             LastDeal = negotiation.Report(buy);
             Choose(buy ? Negotiation.BuyChoice : Negotiation.SkipChoice);
+        }
+
+        // ---------------------------------------------------------------- car agency
+
+        /// <summary>Opens the conversation with the agency seller about this car. The panel listens to <see cref="NegotiationStarted"/>.</summary>
+        public void BeginCarNegotiation(CarModel car)
+        {
+            if (car == null || Busy || CurrentNegotiation != null || Loop.IsFinished || Holdings.Car != null)
+            {
+                return;
+            }
+
+            CurrentCar = car;
+            LastDeal = null;
+            VoiceNotice = null;
+            DealNotice = null;
+            CurrentNegotiation = new Negotiation(car.ToSellerOffer()) { Venue = "Agencia de carros" };
+            NegotiationStarted?.Invoke(CurrentNegotiation);
+        }
+
+        /// <summary>
+        /// Closes the car conversation. Buying goes through the finance engine and needs the cash for the down
+        /// payment and the commission: when it is missing and the window is still open, the agency says so and
+        /// waits; when the deal was already closed by the typed words, it ends without a purchase.
+        /// </summary>
+        private void ConcludeCarDeal(Negotiation negotiation, bool buy)
+        {
+            var car = CurrentCar;
+            string note = string.Empty;
+            if (buy && car != null)
+            {
+                var refusal = Loop.CheckBuyCar(car);
+                if (refusal != PurchaseFailure.None)
+                {
+                    note = PurchaseMessages.For(refusal);
+                    if (!negotiation.IsClosed)
+                    {
+                        DealNotice = note;
+                        NegotiationUpdated?.Invoke(negotiation);
+                        Changed?.Invoke();
+                        return;
+                    }
+
+                    buy = false;
+                }
+            }
+
+            negotiation.Close(buy ? DealStatus.Accepted : DealStatus.WalkedAway);
+            CurrentNegotiation = null;
+            CurrentCar = null;
+            DealNotice = null;
+            LastDeal = negotiation.Report(buy);
+            LastDeal.Note = note;
+
+            ChoiceOutcome outcome = buy ? Loop.BuyCar(car).Outcome : new ChoiceOutcome { ChoiceLabel = "No comprar" };
+            ChoiceApplied?.Invoke(outcome);
+            Changed?.Invoke();
+        }
+
+        // ---------------------------------------------------------------- things that happen to the player
+
+        /// <summary>The police take the player away: a fine, days of the month lost and a lower mood.</summary>
+        public bool Arrest()
+        {
+            if (Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.ArrestPlayer());
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>An officer fines the player for crossing on red. Nothing else changes.</summary>
+        public bool FineRedLight()
+        {
+            if (Loop.IsFinished || Busy)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.FineRedLight());
+            Changed?.Invoke();
+            return true;
+        }
+
+        /// <summary>A car ran the player over. It happens once a month at most; false when it did not count.</summary>
+        public bool Hospitalize()
+        {
+            if (Loop.IsFinished || Busy || Loop.HurtThisMonth)
+            {
+                return false;
+            }
+
+            ChoiceApplied?.Invoke(Loop.HospitalizePlayer());
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool BuyHealthInsurance()
+        {
+            if (!Loop.BuyHealthInsurance())
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool InArrears => !Loop.IsFinished && Loop.InArrears;
+
+        public long CollectionDemand => Loop.CollectionDemand;
+
+        public void PayCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.PayCollectors());
+            Changed?.Invoke();
+        }
+
+        public void NegotiateCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.NegotiateCollectors());
+            Changed?.Invoke();
+        }
+
+        public void IgnoreCollectors()
+        {
+            ChoiceApplied?.Invoke(Loop.IgnoreCollectors());
+            Changed?.Invoke();
+        }
+
+        // ---------------------------------------------------------------- homes and the farm
+
+        /// <summary>Signs a lease. The finance engine moves the money; false when it cannot be done.</summary>
+        public bool RentHome(HomeListing home)
+        {
+            return Apply(() => Loop.RentHome(home));
+        }
+
+        public bool BuyHome(HomeListing home)
+        {
+            return Apply(() => Loop.BuyHome(home));
+        }
+
+        public bool InvestInFarm(FarmOption option, long amount)
+        {
+            return Apply(() => Loop.InvestInFarm(option, amount));
+        }
+
+        private bool Apply(Func<AssetPurchase> purchase)
+        {
+            if (Busy || Loop.IsFinished || CurrentNegotiation != null)
+            {
+                return false;
+            }
+
+            var made = purchase();
+            if (!made.Result.Bought)
+            {
+                Changed?.Invoke();
+                return false;
+            }
+
+            LastDeal = null;
+            ChoiceApplied?.Invoke(made.Outcome);
+            Changed?.Invoke();
+            return true;
         }
 
         /// <summary>What the casino has taken (negative) or paid (positive) in this run, to show how it adds up.</summary>

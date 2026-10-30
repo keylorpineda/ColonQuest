@@ -127,7 +127,7 @@ namespace ColonQuest.EditorTools
 
         private static bool OnOpenGround(float x, float y)
         {
-            return OnOpenGrass(x, y) && !(y > -17.8f && y < 6.8f) && !(x < -27f && y < -17f);
+            return OnOpenGrass(x, y) && !(y > -19.4f && y < 6.8f) && !(x < -27f && y < -17f);
         }
 
         private static Color Hex(string hex, float alpha = 1f)

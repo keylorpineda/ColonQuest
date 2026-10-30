@@ -49,7 +49,15 @@ namespace ColonQuest.World
                 case SceneNames.Tienda:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.5f, Crowd = 0.12f };
                 case SceneNames.Casa:
+                case SceneNames.Vecino:
                     return new SoundLevels { Track = MusicTrack.House, Music = 0.2f };
+                case SceneNames.Agencia:
+                    return new SoundLevels { Track = MusicTrack.Store, Music = 0.3f, Crowd = 0.15f };
+                case SceneNames.Carcel:
+                    return new SoundLevels { Track = MusicTrack.Bank, Music = 0.06f, Crowd = 0.3f };
+                case SceneNames.Hospital:
+                case SceneNames.HospitalArriba:
+                    return new SoundLevels { Track = MusicTrack.House, Music = 0.1f, Crowd = 0.35f };
                 case SceneNames.Town:
                     return Town(position);
                 default:

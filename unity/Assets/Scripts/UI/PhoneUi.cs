@@ -177,7 +177,7 @@ namespace ColonQuest.UI
         {
             if (IsOpen && cashLabel != null)
             {
-                cashLabel.text = "Efectivo  " + Money.Format(session.State.Cash);
+                cashLabel.text = Loc.F("Efectivo  {0}", Money.Format(session.State.Cash));
             }
         }
 
@@ -190,7 +190,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            clock.text = $"Mes {Mathf.Min(session.Loop.MonthsPlayed + 1, GameRules.MonthsToPlay)}  ·  {session.Loop.TasksDone}/{GameRules.TasksPerMonth} tareas";
+            clock.text = Loc.F("Mes {0}  ·  {1}/{2} tareas", Mathf.Min(session.Loop.MonthsPlayed + 1, GameRules.MonthsToPlay), session.Loop.TasksDone, GameRules.TasksPerMonth);
 
             if (app == App.Blocks)
             {
@@ -258,7 +258,7 @@ namespace ColonQuest.UI
 
         private Text CashLine(float y)
         {
-            cashLabel = Label("Efectivo  " + Money.Format(session.State.Cash), 30, GameUiColors.Muted, InnerWidth, new Vector2(0f, y));
+            cashLabel = Label(Loc.F("Efectivo  {0}", Money.Format(session.State.Cash)), 30, GameUiColors.Muted, InnerWidth, new Vector2(0f, y));
             return cashLabel;
         }
 
@@ -321,7 +321,7 @@ namespace ColonQuest.UI
             {
                 int index = i;
                 var color = index == sinpeContact ? GameUiColors.Yellow : Color.white;
-                AddButton(Contacts[i].Name + "   " + Contacts[i].Number, color, new Vector2(InnerWidth, 64f), new Vector2(0f, -96f - i * 72f), () =>
+                AddButton(Loc.T(Contacts[i].Name) + "   " + Contacts[i].Number, color, new Vector2(InnerWidth, 64f), new Vector2(0f, -96f - i * 72f), () =>
                 {
                     sinpeContact = index;
                     sinpeChecked = false;
@@ -337,7 +337,7 @@ namespace ColonQuest.UI
             }
 
             var contact = Contacts[sinpeContact];
-            Label("«" + contact.Message + "»", 26, UiKit.Ink, InnerWidth, new Vector2(0f, -320f));
+            Label("«" + Loc.T(contact.Message) + "»", 26, UiKit.Ink, InnerWidth, new Vector2(0f, -320f));
 
             if (contact.Scam)
             {
@@ -382,12 +382,12 @@ namespace ColonQuest.UI
             }
             else if (contact.Scam)
             {
-                sinpeResult = "Era una estafa. Enviaste " + Money.Format(amount) + " y ese dinero no vuelve.";
+                sinpeResult = Loc.F("Era una estafa. Enviaste {0} y ese dinero no vuelve.", Money.Format(amount));
                 sinpeResultColor = GameUiColors.Loss;
             }
             else
             {
-                sinpeResult = "Enviaste " + Money.Format(amount) + " a " + contact.Name + ".";
+                sinpeResult = Loc.F("Enviaste {0} a {1}.", Money.Format(amount), Loc.T(contact.Name));
                 sinpeResultColor = GameUiColors.Gain;
             }
 
@@ -401,28 +401,28 @@ namespace ColonQuest.UI
             Heading("Banco");
             var state = session.State;
             var text = new StringBuilder();
-            text.AppendLine($"Efectivo  {Money.Format(state.Cash)}");
-            text.AppendLine($"Ahorros  {Money.Format(state.Savings)}");
-            text.AppendLine($"Fondo de emergencia  {Money.Format(state.EmergencyFund)}");
+            text.AppendLine(Loc.F("Efectivo  {0}", Money.Format(state.Cash)));
+            text.AppendLine(Loc.F("Ahorros  {0}", Money.Format(state.Savings)));
+            text.AppendLine(Loc.F("Fondo de emergencia  {0}", Money.Format(state.EmergencyFund)));
             text.AppendLine();
-            text.AppendLine($"Tarjeta  {Money.Format(state.CreditCard.Balance)} de {Money.Format(state.CreditCard.Limit)}");
-            text.AppendLine($"({state.CreditCard.MonthlyRatePct}% de interés al mes)");
+            text.AppendLine(Loc.F("Tarjeta  {0} de {1}", Money.Format(state.CreditCard.Balance), Money.Format(state.CreditCard.Limit)));
+            text.AppendLine(Loc.F("({0}% de interés al mes)", state.CreditCard.MonthlyRatePct));
             foreach (var installment in state.Installments)
             {
                 if (installment.MonthsLeft > 0)
                 {
-                    text.AppendLine($"{installment.Item}: {Money.Format(installment.Monthly)}, faltan {installment.MonthsLeft}");
+                    text.AppendLine(Loc.F("{0}: {1}, faltan {2}", Loc.T(installment.Item), Money.Format(installment.Monthly), installment.MonthsLeft));
                 }
             }
 
             foreach (var loan in state.InformalLoans)
             {
-                text.AppendLine($"{loan.Lender}: {Money.Format(loan.Balance)}");
+                text.AppendLine(Loc.F("{0}: {1}", Loc.T(loan.Lender), Money.Format(loan.Balance)));
             }
 
             text.AppendLine();
-            text.AppendLine($"SINPE enviado en esta partida: {Money.Format(session.SinpeSent)}");
-            text.Append($"Lo que tenés menos lo que debés: {Money.Format(GameRules.NetWorth(state))}");
+            text.AppendLine(Loc.F("SINPE enviado en esta partida: {0}", Money.Format(session.SinpeSent)));
+            text.Append(Loc.F("Lo que tenés menos lo que debés: {0}", Money.Format(GameRules.NetWorth(state))));
             Label(text.ToString(), 26, UiKit.Ink, InnerWidth, new Vector2(0f, -64f));
         }
 
@@ -461,8 +461,8 @@ namespace ColonQuest.UI
 
             var entry = FinanceGlossary.Search(searchInput.text);
             searchResult.text = entry == null
-                ? "No encontré eso. Probá con: tarjeta, cuotas, sinpe, estafa, ahorro, casino, café, casa."
-                : "<b>" + entry.Title + "</b>\n\n" + entry.Text;
+                ? Loc.T("No encontré eso. Probá con: tarjeta, cuotas, sinpe, estafa, ahorro, casino, café, casa.")
+                : "<b>" + Loc.T(entry.Title) + "</b>\n\n" + Loc.T(entry.Text);
             searchResult.color = UiKit.Ink;
             searchResult.supportRichText = true;
         }
@@ -500,13 +500,13 @@ namespace ColonQuest.UI
             long total = payment * calcMonths;
             long extra = total - calcPrice;
             var text = new StringBuilder();
-            text.AppendLine($"Precio  {Money.Format(calcPrice)}");
-            text.AppendLine($"Plazo  {calcMonths} meses");
-            text.AppendLine($"Interés  {calcRate}% al mes");
+            text.AppendLine(Loc.F("Precio  {0}", Money.Format(calcPrice)));
+            text.AppendLine(Loc.F("Plazo  {0} meses", calcMonths));
+            text.AppendLine(Loc.F("Interés  {0}% al mes", calcRate));
             text.AppendLine();
-            text.AppendLine($"Cuota mensual  <b>{Money.Format(payment)}</b>");
-            text.AppendLine($"Pagás en total  <b>{Money.Format(total)}</b>");
-            text.Append($"De más  <color={GameUiColors.Hex(extra > 0 ? GameUiColors.Loss : GameUiColors.Gain)}><b>{Money.Format(extra)}</b></color>");
+            text.AppendLine(Loc.F("Cuota mensual  {0}", $"<b>{Money.Format(payment)}</b>"));
+            text.AppendLine(Loc.F("Pagás en total  {0}", $"<b>{Money.Format(total)}</b>"));
+            text.Append(Loc.F("De más  {0}", $"<color={GameUiColors.Hex(extra > 0 ? GameUiColors.Loss : GameUiColors.Gain)}><b>{Money.Format(extra)}</b></color>"));
             calcValues.supportRichText = true;
             calcValues.text = text.ToString();
         }
@@ -618,7 +618,7 @@ namespace ColonQuest.UI
 
             if (blocksInfo != null)
             {
-                blocksInfo.text = $"Puntos {board.Score}   ·   Líneas {board.Lines}   ·   flechas, Espacio";
+                blocksInfo.text = Loc.F("Puntos {0}   ·   Líneas {1}   ·   flechas, Espacio", board.Score, board.Lines);
             }
 
             if (blocksOver != null)
@@ -656,7 +656,7 @@ namespace ColonQuest.UI
                 });
             }
 
-            AddButton("Apostar " + Money.Format(CasinoStakes[stakeIndex]), Red, new Vector2(InnerWidth, 72f), new Vector2(0f, -348f), PlaceBet);
+            AddButton(Loc.F("Apostar {0}", Money.Format(CasinoStakes[stakeIndex])), Red, new Vector2(InnerWidth, 72f), new Vector2(0f, -348f), PlaceBet);
             casinoMessage = Label("Probá tu suerte.", 28, UiKit.Ink, InnerWidth, new Vector2(0f, -440f));
             casinoTotal = Label(string.Empty, 24, GameUiColors.Muted, InnerWidth, new Vector2(0f, -520f));
             Label("La casa siempre gana a largo plazo: los premios chicos te animan a seguir y las pérdidas llegan solas.", 22, GameUiColors.Muted, InnerWidth, new Vector2(0f, -590f));
@@ -672,7 +672,7 @@ namespace ColonQuest.UI
 
             if (!session.TryCasino(CasinoStakes[stakeIndex], out spinResult))
             {
-                casinoMessage.text = "No te alcanza el efectivo para esa apuesta.";
+                casinoMessage.text = Loc.T("No te alcanza el efectivo para esa apuesta.");
                 casinoMessage.color = GameUiColors.Loss;
                 return;
             }
@@ -680,7 +680,7 @@ namespace ColonQuest.UI
             spinning = true;
             spinClock = 0f;
             spinUntil = 0.9f;
-            casinoMessage.text = "Girando...";
+            casinoMessage.text = Loc.T("Girando...");
             casinoMessage.color = UiKit.Ink;
         }
 
@@ -720,12 +720,12 @@ namespace ColonQuest.UI
 
             if (spinResult.Net > 0L)
             {
-                casinoMessage.text = (spinResult.Outcome == CasinoOutcome.Jackpot ? "Premio grande: " : "Ganaste ") + Money.Format(spinResult.Net);
+                casinoMessage.text = spinResult.Outcome == CasinoOutcome.Jackpot ? Loc.F("Premio grande: {0}", Money.Format(spinResult.Net)) : Loc.F("Ganaste {0}", Money.Format(spinResult.Net));
                 casinoMessage.color = GameUiColors.Gain;
             }
             else
             {
-                casinoMessage.text = "Perdiste " + Money.Format(-spinResult.Net);
+                casinoMessage.text = Loc.F("Perdiste {0}", Money.Format(-spinResult.Net));
                 casinoMessage.color = GameUiColors.Loss;
             }
 
@@ -741,8 +741,8 @@ namespace ColonQuest.UI
 
             long net = session.CasinoNet;
             casinoTotal.text = net >= 0L
-                ? "En esta partida vas ganando " + Money.Format(net)
-                : "En esta partida llevás perdidos " + Money.Format(-net);
+                ? Loc.F("En esta partida vas ganando {0}", Money.Format(net))
+                : Loc.F("En esta partida llevás perdidos {0}", Money.Format(-net));
         }
     }
 }

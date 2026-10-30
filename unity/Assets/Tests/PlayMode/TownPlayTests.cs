@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using ColonQuest.Game;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -46,13 +47,15 @@ namespace ColonQuest.World.PlayModeTests
             }
 
             Assert.GreaterOrEqual(homes, 4, "the neighborhood has homes to rent or buy later");
-            Assert.AreEqual(2, GameObject.FindObjectsByType<Transform>(FindObjectsSortMode.None).Count(t => t.name == "YardSign"));
+            Assert.AreEqual(4, GameObject.FindObjectsByType<Transform>(FindObjectsSortMode.None).Count(t => t.name == "YardSign"),
+                "two signs in the original town and two in the new neighborhood");
         }
 
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheEast()
         {
-            yield return Walk(new Vector2(38f, 2f), Vector2.right, 2f);
+            // Along the street, which now runs on to the farm.
+            yield return Walk(new Vector2(60f, 2f), Vector2.right, 2f);
 
             Assert.Less(Body.position.x, MapLayout.PlayEastX + 0.1f);
         }
@@ -60,8 +63,8 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Player_IsStoppedByTheInvisibleWallInTheNorth()
         {
-            // Up the trail into the forest, which ends at the invisible wall.
-            yield return Walk(new Vector2(0.2f, 15f), Vector2.up, 3f);
+            // Up from the avenue of the north district, between two trees of the back row.
+            yield return Walk(new Vector2(22f, 36f), Vector2.up, 3f);
 
             Assert.Less(Body.position.y, MapLayout.PlayNorthY + 0.1f);
         }
@@ -180,9 +183,9 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return null;
 
-            var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => s.Type != StationType.Thing && s.Type != StationType.Atm);
-            Assert.AreEqual(6, tasks.Count(), "six street stations; SINPE is a phone alert and everyday objects are not tasks");
-            Assert.AreEqual(3, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "three enterable buildings");
+            var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => GameLoop.IsTaskStation(s.Type));
+            Assert.AreEqual(6, tasks.Count(), "six street stations; SINPE is a phone alert, everyday objects and the agencies are not tasks");
+            Assert.AreEqual(7, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the car agency, the police station, the hospital and the neighbor's house");
             Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
             Assert.AreEqual(StationType.Soda, GameObject.Find("Station_Soda").GetComponent<Station>().Type);
         }

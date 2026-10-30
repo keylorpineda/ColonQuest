@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text;
 using ColonQuest.Api;
 using ColonQuest.Game;
+using ColonQuest.World;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -75,7 +76,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice;
+            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
             if (IsOpen && key == lastKey)
             {
                 return;
@@ -165,13 +166,13 @@ namespace ColonQuest.UI
             switch (recorder.State)
             {
                 case VoiceRecorderState.Starting:
-                    talkLabel.text = "Abriendo micro...";
+                    talkLabel.text = Loc.T("Abriendo micro...");
                     break;
                 case VoiceRecorderState.Recording:
-                    talkLabel.text = $"Enviar voz  {Mathf.FloorToInt(recorder.Seconds)}/{WavEncoder.MaxSeconds} s";
+                    talkLabel.text = Loc.F("Enviar voz  {0}/{1} s", Mathf.FloorToInt(recorder.Seconds), WavEncoder.MaxSeconds);
                     break;
                 default:
-                    talkLabel.text = "Hablar";
+                    talkLabel.text = Loc.T("Hablar");
                     break;
             }
         }
@@ -204,9 +205,10 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             float y = -Pad + UiKit.Outline;
 
-            UiKit.Label(card, "Tienda  ·  " + negotiation.Offer.SellerName, 46, UiKit.Ink, new Vector2(textWidth, 60f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Portrait(card, negotiation.Offer.SellerName, 92f, top, new Vector2(textWidth * 0.5f - 46f, y - 4f));
+            UiKit.Label(card, Loc.F("{0}  ·  {1}", Loc.T(negotiation.Venue), negotiation.Offer.SellerName), 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 60f;
-            UiKit.Label(card, "Te ofrece un " + negotiation.Offer.Item + " en cuotas", 26, GameUiColors.Muted, new Vector2(textWidth, 38f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth - 110f, 38f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
             y -= 50f;
 
             var log = UiKit.Label(card, ConversationText(negotiation), 30, UiKit.Ink, new Vector2(textWidth, LogHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
@@ -230,7 +232,7 @@ namespace ColonQuest.UI
 
             if (session.Busy)
             {
-                UiKit.Label(card, negotiation.Offer.SellerName + " está pensando...", 32, GameUiColors.Muted, new Vector2(textWidth, 84f), top, new Vector2(0f, y - 10f), TextAnchor.MiddleCenter);
+                UiKit.Label(card, Loc.F("{0} está pensando...", negotiation.Offer.SellerName), 32, GameUiColors.Muted, new Vector2(textWidth, 84f), top, new Vector2(0f, y - 10f), TextAnchor.MiddleCenter);
             }
             else
             {
@@ -243,11 +245,28 @@ namespace ColonQuest.UI
             UiKit.MakeButton(card, "Me lo llevo", GameUiColors.Green, new Vector2(half, 80f), top, new Vector2(left, y), () => session.AcceptDeal());
             UiKit.MakeButton(card, "Mejor me voy", GameUiColors.Pink, new Vector2(half, 80f), top, new Vector2(-left, y), () => session.WalkAway());
 
+            if (!string.IsNullOrEmpty(session.DealNotice))
+            {
+                UiKit.Label(card, session.DealNotice, 26, GameUiColors.Loss, new Vector2(textWidth, 70f), top, new Vector2(0f, y - 88f), TextAnchor.UpperCenter);
+            }
+
             root.SetActive(true);
             if (input != null)
             {
                 input.ActivateInputField();
             }
+        }
+
+        /// <summary>The line under the title: what is offered and, at the car agency, the costs that come with the car.</summary>
+        private string SubtitleFor(Negotiation negotiation)
+        {
+            var car = session.CurrentCar;
+            if (car == null)
+            {
+                return Loc.F("Te ofrece un {0} en cuotas", Loc.T(negotiation.Offer.Item));
+            }
+
+            return Loc.F("Un {0}: prima {1}, marchamo {2}, gasolina {3} al mes (ejemplo)", Loc.T(negotiation.Offer.Item), Money.Format(car.DownPayment), Money.Format(car.MarchamoFirstYear), Money.Format(car.RunningCostsMonthly));
         }
 
         private void BuildChips(RectTransform card, Negotiation negotiation, float textWidth, float y)
@@ -311,7 +330,7 @@ namespace ColonQuest.UI
             var lines = new System.Collections.Generic.List<string> { $"<b>{seller}:</b> {negotiation.Opening}" };
             foreach (var turn in negotiation.Turns)
             {
-                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>Tú:</b> {Escape(turn.Player)}</color>");
+                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>{Loc.T("Tú:")}</b> {Escape(turn.Player)}</color>");
                 lines.Add($"<b>{seller}:</b> {turn.Seller}");
             }
 

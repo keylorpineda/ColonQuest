@@ -70,6 +70,12 @@ namespace ColonQuest.Game
 
             return state.Cash + state.Savings + state.EmergencyFund - DebtBalance(state) - installmentsLeft;
         }
+
+        /// <summary>The same, plus what the player bought: an owned home, the resale value of the car and the money in the farm.</summary>
+        public static long NetWorth(PlayerState state, Holdings holdings)
+        {
+            return NetWorth(state) + (holdings != null ? holdings.AssetValue : 0L);
+        }
     }
 
     /// <summary>Colones the way Costa Rica writes them: ₡85 000.</summary>

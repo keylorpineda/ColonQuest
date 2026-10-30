@@ -62,6 +62,7 @@ namespace ColonQuest.EditorTools
         [MenuItem("Colon Quest/Build All Scenes")]
         public static void BuildAll()
         {
+            BuildMenu();
             BuildTown();
             BuildInteriors();
         }
@@ -82,10 +83,10 @@ namespace ColonQuest.EditorTools
             UpdateBuildSettings();
         }
 
-        /// <summary>The town is the first scene; the interiors follow. Only scenes that exist are listed.</summary>
+        /// <summary>The menu is the first scene, then the town; the interiors follow. Only scenes that exist are listed.</summary>
         private static void UpdateBuildSettings()
         {
-            var names = new[] { SceneNames.Town, SceneNames.Casa, SceneNames.Tienda, SceneNames.Banco };
+            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino };
             var list = new System.Collections.Generic.List<EditorBuildSettingsScene>();
             foreach (var name in names)
             {
@@ -466,6 +467,7 @@ namespace ColonQuest.EditorTools
             mesh.fontStyle = FontStyle.Bold;
             mesh.anchor = anchor;
             mesh.color = color;
+            go.AddComponent<LocalizedMesh>().Bind(text);
 
             var renderer = go.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = font.material;

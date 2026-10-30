@@ -38,9 +38,11 @@ namespace ColonQuest.EditorTools
             BuildPlazaAndPark(Group(map, "Landmarks"), shadows);
             BuildAlleyAndLot(Group(map, "AlleyAndLot"), shadows);
             BuildWorldProps(Group(map, "WorldProps"), shadows, random);
+            BuildDistricts(map, shadows);
             BuildWorldBorders(Group(map, "Borders"));
             BuildDoorsAndStations(Group(map, "Interactions"));
             BuildPeople(Group(map, "People"));
+            BuildCrossings(Group(map, "Crossings"));
             BuildClouds(Group(map, "Clouds"), random);
             var depthShadows = Group(map, "DepthShadows");
             BuildDepth(Group(map, "Depth"), depthShadows, random);
@@ -57,6 +59,7 @@ namespace ColonQuest.EditorTools
 
             new GameObject("GameBootstrap").AddComponent<ColonQuest.UI.GameBootstrap>();
 
+            ClearNewBuildingFootprints(map);
             SaveScene(scene, SceneNames.Town);
         }
 

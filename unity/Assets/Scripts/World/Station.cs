@@ -20,7 +20,19 @@ namespace ColonQuest.World
         Thing,
 
         /// <summary>A cash machine: it shows the account balance. Not a task.</summary>
-        Atm
+        Atm,
+
+        /// <summary>The real estate agency, or a house with a sign: rent and mortgage. Not a task.</summary>
+        RealEstate,
+
+        /// <summary>The car agency: a car with a down payment and installments. Not a task.</summary>
+        CarDealer,
+
+        /// <summary>The farm: coffee or cattle. Not a task.</summary>
+        Farm,
+
+        /// <summary>The reception of the hospital, where the health insurance is taken out. Not a task.</summary>
+        HealthDesk
     }
 
     /// <summary>

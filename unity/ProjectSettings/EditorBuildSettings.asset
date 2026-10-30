@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 771d3c8905c004b41ad14bdf8db349e5
+  - enabled: 1
     path: Assets/Scenes/Town.unity
     guid: 7a6f70793dfdf27448455d5efaf57f52
   - enabled: 1
@@ -17,5 +20,20 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Banco.unity
     guid: 6feae585a95bf77409fbd5be48b83d29
+  - enabled: 1
+    path: Assets/Scenes/Agencia.unity
+    guid: 675c4c3f4cb57f34fad3c50df97dd76c
+  - enabled: 1
+    path: Assets/Scenes/Carcel.unity
+    guid: eed04c54529978c45afa346ef886448f
+  - enabled: 1
+    path: Assets/Scenes/Hospital.unity
+    guid: 4a11be1f9c4e1a6429c2928bc50172f0
+  - enabled: 1
+    path: Assets/Scenes/HospitalArriba.unity
+    guid: 9b829b66b39e7ac48a360256708f0cf3
+  - enabled: 1
+    path: Assets/Scenes/Vecino.unity
+    guid: 6707da3d26a322a438adc6bce5781147
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

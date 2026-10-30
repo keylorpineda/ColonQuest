@@ -112,7 +112,9 @@ namespace ColonQuest.UI
         }
 
         /// <param name="speaker">When set, the window talks: the text types itself and a face in this name's color speaks it.</param>
-        public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null)
+        /// <param name="bodyFontSize">Smaller than the default for windows that carry a lot of figures.</param>
+        /// <param name="maxBodyHeight">Zero keeps the default; a bigger value leaves room for a longer text.</param>
+        public void Show(string title, string subtitle, string body, IList<ModalOption> choices, string speaker = null, int bodyFontSize = 32, float maxBodyHeight = 0f)
         {
             Clear();
             options.AddRange(choices);
@@ -123,14 +125,15 @@ namespace ColonQuest.UI
 
             // Measure first, so the card can be sized to its content.
             float textWidth = CardWidth - Pad * 2f - UiKit.Outline * 2f;
-            var probe = UiKit.Label(root.transform, body, 32, UiKit.Ink, new Vector2(textWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
-            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, textWidth) + 8f, MaxBodyHeight);
+            var probe = UiKit.Label(root.transform, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, textWidth) + 8f, maxBodyHeight > 0f ? maxBodyHeight : MaxBodyHeight);
             UnityEngine.Object.Destroy(probe.gameObject);
 
             float titleHeight = 64f;
             float subtitleHeight = string.IsNullOrEmpty(subtitle) ? 0f : 40f;
+            float faceGap = talks && bodyHeight > 0f ? 16f : 0f;
             float buttonsHeight = options.Count == 0 ? 0f : options.Count * ButtonHeight + (options.Count - 1) * ButtonGap;
-            float height = Pad + titleHeight + subtitleHeight + (bodyHeight > 0f ? bodyHeight + 20f : 0f) + (buttonsHeight > 0f ? buttonsHeight + 24f : 0f) + Pad;
+            float height = Pad + titleHeight + subtitleHeight + faceGap + (bodyHeight > 0f ? bodyHeight + 20f : 0f) + (buttonsHeight > 0f ? buttonsHeight + 24f : 0f) + Pad;
 
             var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, height), new Vector2(0.5f, 0.5f), Vector2.zero);
             var top = new Vector2(0.5f, 1f);
@@ -152,8 +155,8 @@ namespace ColonQuest.UI
 
             if (bodyHeight > 0f)
             {
-                y -= 12f;
-                var text = UiKit.Label(card, body, 32, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
+                y -= 12f + faceGap;
+                var text = UiKit.Label(card, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
                 text.fontStyle = FontStyle.Normal;
                 if (talks)
                 {
@@ -184,18 +187,7 @@ namespace ColonQuest.UI
         /// <summary>A face in the speaker's color: two eyes and a mouth that opens while the text appears.</summary>
         private void BuildFace(RectTransform card, string speaker, Vector2 position)
         {
-            int hash = 0;
-            foreach (char c in speaker)
-            {
-                hash = hash * 31 + c;
-            }
-
-            float hue = (hash & 0x7fffffff) % 360 / 360f;
-            var face = UiKit.Card(card, "Face", Color.HSVToRGB(hue, 0.35f, 0.98f), new Vector2(112f, 112f), new Vector2(0.5f, 1f), position);
-            UiKit.Fill(face, "EyeL", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(-20f, 14f));
-            UiKit.Fill(face, "EyeR", UiKit.Ink, new Vector2(12f, 18f), new Vector2(0.5f, 0.5f), new Vector2(20f, 14f));
-            var lips = UiKit.Fill(face, "Mouth", UiKit.Ink, new Vector2(34f, 6f), new Vector2(0.5f, 0.5f), new Vector2(0f, -22f));
-            mouth = lips.rectTransform;
+            mouth = UiKit.Portrait(card, speaker, 112f, new Vector2(0.5f, 1f), position);
         }
 
         /// <summary>Presses the option with this index, as if it was clicked. Used for the number keys.</summary>
