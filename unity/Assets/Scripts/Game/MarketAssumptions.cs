@@ -239,6 +239,9 @@ namespace ColonQuest.Game
         /// <summary>The mood lost at the end of a month in which the player never slept in the own bed.</summary>
         public const int SkippedSleepWellbeingLoss = 2;
 
+        /// <summary>The mood lost for each week the player did not show up at work.</summary>
+        public const int MissedWorkWellbeingLoss = 3;
+
         /// <summary>What cooking at home saves against eating out, in colones, once a month.</summary>
         public const long HomeCookingSaving = 6_000L;
 

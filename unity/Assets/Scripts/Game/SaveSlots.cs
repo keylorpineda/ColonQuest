@@ -48,6 +48,10 @@ namespace ColonQuest.Game
         public List<int> doneStations = new List<int>();
         public int day = 1;
         public float minutes = GameRules.DayStartHour * 60f;
+        public int daysWorked;
+        public int latesThisMonth;
+        public int missedThisMonth;
+        public bool workedToday;
     }
 
     /// <summary>One saved game: its name, when it was last played and the run.</summary>

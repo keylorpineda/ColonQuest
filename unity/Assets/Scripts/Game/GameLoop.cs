@@ -56,6 +56,9 @@ namespace ColonQuest.Game
         /// <summary>The home, the car and the farm stakes the player bought in this run.</summary>
         public Holdings Holdings { get; private set; } = new Holdings();
 
+        /// <summary>The attendance at the first job.</summary>
+        public JobRecord Job { get; private set; } = new JobRecord();
+
         /// <summary>The fuel and upkeep that went out with the last closed month, to show in its report.</summary>
         public long LastRunningCosts { get; private set; }
 
@@ -81,6 +84,7 @@ namespace ColonQuest.Game
             SleptThisMonth = false;
             CookedThisMonth = false;
             Clock = new GameClock();
+            Job = new JobRecord();
             doneStations.Clear();
         }
 
@@ -101,7 +105,11 @@ namespace ColonQuest.Game
                 sleptThisMonth = SleptThisMonth,
                 cookedThisMonth = CookedThisMonth,
                 day = Clock.Day,
-                minutes = Clock.Minutes
+                minutes = Clock.Minutes,
+                daysWorked = Job.DaysWorked,
+                latesThisMonth = Job.LatesThisMonth,
+                missedThisMonth = Job.MissedThisMonth,
+                workedToday = Job.WorkedToday
             };
 
             foreach (var station in doneStations)
@@ -133,6 +141,7 @@ namespace ColonQuest.Game
             SleptThisMonth = snapshot.sleptThisMonth;
             CookedThisMonth = snapshot.cookedThisMonth;
             Clock.Restore(snapshot.day, snapshot.minutes);
+            Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday);
             foreach (int station in snapshot.doneStations ?? new List<int>())
             {
                 doneStations.Add((StationType)station);
@@ -144,7 +153,8 @@ namespace ColonQuest.Game
         {
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
                 && type != StationType.RealEstate && type != StationType.CarDealer && type != StationType.Farm
-                && type != StationType.HealthDesk && type != StationType.Wardrobe && type != StationType.Beach;
+                && type != StationType.HealthDesk && type != StationType.Wardrobe && type != StationType.Beach
+                && type != StationType.Work;
         }
 
         public bool CanDoTask(StationType type)
@@ -258,7 +268,7 @@ namespace ColonQuest.Game
         public ChoiceOutcome Sleep()
         {
             var outcome = Rest();
-            Clock.SleepToMorning();
+            NextMorning();
             return outcome;
         }
 
@@ -267,9 +277,41 @@ namespace ColonQuest.Game
         {
             var before = State.Clone();
             FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
-            Clock.SleepToMorning();
+            NextMorning();
             Decisions++;
             return OutcomeFrom(before, Loc.T(PlayerProfile.Pick("Te quedaste dormido fuera de la cama", "Te quedaste dormida fuera de la cama")));
+        }
+
+        /// <summary>The player clocks in now. The time of the morning goes by when the shift is finished.</summary>
+        public ClockInResult ClockIn()
+        {
+            return Job.ClockIn(Clock.Minutes);
+        }
+
+        /// <summary>The work of the morning is done: the clock moves on to the end of the shift.</summary>
+        public void FinishShift()
+        {
+            if (Job.FinishShift())
+            {
+                Clock.SkipTo(GameRules.WorkEndHour * 60f);
+            }
+        }
+
+        /// <summary>Only a night that starts a new week closes the working day: the last week waits at the bank.</summary>
+        private void NextMorning()
+        {
+            if (Clock.SleepToMorning())
+            {
+                EndWorkingDay();
+            }
+        }
+
+        private void EndWorkingDay()
+        {
+            if (Job.EndDay())
+            {
+                FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.MissedWorkWellbeingLoss);
+            }
         }
 
         /// <summary>Cooking at home instead of eating out: a small saving and a little better mood. Once a month.</summary>
@@ -468,9 +510,16 @@ namespace ColonQuest.Game
                 FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
             }
 
+            // The week in course counts only once its morning is over: closing the month early is not an absence.
+            if (Clock.Hour >= GameRules.WorkEndHour)
+            {
+                EndWorkingDay();
+            }
+
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
-                FixedLivingExpensesColones = GameRules.LivingExpenses + LastRunningCosts
+                FixedLivingExpensesColones = GameRules.LivingExpenses + LastRunningCosts,
+                SalaryDockedColones = FinanceEngine.CalculateDockedPay(State.SalaryNet, Job.DockedLates, Job.MissedThisMonth)
             });
 
             MonthsPlayed++;
@@ -479,6 +528,7 @@ namespace ColonQuest.Game
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
+            Job.StartMonth();
             Clock.StartMonth();
             doneStations.Clear();
             return report;

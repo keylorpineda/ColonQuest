@@ -572,6 +572,19 @@ namespace ColonQuest.Game
             return Loop.Clock.Advance(realSeconds, GameRules.SecondsPerGameHour);
         }
 
+        /// <summary>The player clocks in at work.</summary>
+        public ClockInResult ClockIn()
+        {
+            return Loop.ClockIn();
+        }
+
+        /// <summary>The scene of the morning at work is over.</summary>
+        public void FinishShift()
+        {
+            Loop.FinishShift();
+            Changed?.Invoke();
+        }
+
         /// <summary>A night in the bed. The once-a-month rest shows its outcome; the other nights only move the clock.</summary>
         public void Sleep()
         {

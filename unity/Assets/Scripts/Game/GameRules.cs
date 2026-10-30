@@ -27,16 +27,29 @@ namespace ColonQuest.Game
         /// <summary>Real seconds for one hour of the game: a day of 16 hours lasts about 4 minutes.</summary>
         public const float SecondsPerGameHour = 15f;
 
+        /// <summary>The shift of the first job: it starts at this hour, with some minutes of grace, and lasts the morning.</summary>
+        public const int WorkStartHour = 7;
+
+        public const int WorkGraceMinutes = 15;
+
+        public const int WorkEndHour = 12;
+
+        /// <summary>
+        /// The legal minimum for a worker in an unskilled occupation (generic), in force since January 1, 2026: Executive Decree
+        /// 45303-MTSS sets ₡12 436.41 per ordinary day, ₡373 092.30 per month. Rounded to whole colones: money here has no cents.
+        /// </summary>
+        public const long MinimumWageGross = 373_092L;
+
         /// <summary>Rent, food and transport, charged every month.</summary>
         public const long LivingExpenses = 200_000L;
 
-        /// <summary>The starting situation of the contract example: a salary, a card with a balance and a phone in installments.</summary>
+        /// <summary>The starting situation: the minimum wage after its legal deductions, a card with a balance and a phone in installments.</summary>
         public static PlayerState NewPlayer()
         {
             var state = new PlayerState
             {
                 Month = 1,
-                SalaryNet = 450_000L,
+                SalaryNet = FinanceEngine.CalculateNetSalary(MinimumWageGross),
                 Cash = 120_000L,
                 Savings = 50_000L,
                 EmergencyFund = 0L,

@@ -76,6 +76,12 @@ namespace ColonQuest.Game
             return true;
         }
 
+        /// <summary>A scene took the time up to this minute of the day, say a morning at work. The clock never goes back.</summary>
+        public void SkipTo(float minutes)
+        {
+            Minutes = Math.Max(Minutes, Math.Min(EndMinutes, minutes));
+        }
+
         /// <summary>The month was closed: first week, first hour.</summary>
         public void StartMonth()
         {
