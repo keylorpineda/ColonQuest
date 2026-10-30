@@ -165,8 +165,30 @@ namespace ColonQuest.EditorTools
             Glow(player.transform, "Glow", Vector2.zero, 4.2f, "#FFE2A8", 0.16f, OrderPlayer - 3);
 
             var visual = BuildCharacterVisual(player.transform, PlayerLook, false, 0f, true);
+            BuildAlternateLook(player.transform);
             player.AddComponent<PlayerController>().SetVisual(visual);
+            player.AddComponent<PlayerLookSwitch>();
             return player.transform;
+        }
+
+        /// <summary>The second look of the player, switched off: <see cref="PlayerLookSwitch"/> keeps the one of the run. One shadow is enough.</summary>
+        private static void BuildAlternateLook(Transform player)
+        {
+            int before = player.childCount;
+            BuildCharacterVisual(player, PlayerLookF, false, 0f, true);
+            for (int i = player.childCount - 1; i >= before; i--)
+            {
+                var child = player.GetChild(i);
+                if (child.name == "Shadow")
+                {
+                    Object.DestroyImmediate(child.gameObject);
+                }
+                else if (child.name == "Bob")
+                {
+                    child.name = PlayerLookSwitch.AlternateBob;
+                    child.gameObject.SetActive(false);
+                }
+            }
         }
 
         /// <summary>

@@ -14,6 +14,12 @@ namespace ColonQuest.EditorTools
             Face = Expression.Smile, Wear = Extras.Backpack
         };
 
+        private static readonly Look PlayerLookF = new Look
+        {
+            Skin = "#C2477F", SkinTone = "#D9A47A", HairColor = "#3A2418", Hair = HairStyle.Long, Pants = "#2F3E66",
+            Face = Expression.Smile, Wear = Extras.Backpack
+        };
+
         private static readonly Dictionary<string, Look> Cast = new Dictionary<string, Look>
         {
             ["Vendedor"] = new Look

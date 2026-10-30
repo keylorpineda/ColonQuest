@@ -269,7 +269,7 @@ namespace ColonQuest.Game
             FinanceEngine.ChangeWellbeing(State, -MarketAssumptions.SkippedSleepWellbeingLoss);
             Clock.SleepToMorning();
             Decisions++;
-            return OutcomeFrom(before, Loc.T("Te quedaste dormido fuera de la cama"));
+            return OutcomeFrom(before, Loc.T(PlayerProfile.Pick("Te quedaste dormido fuera de la cama", "Te quedaste dormida fuera de la cama")));
         }
 
         /// <summary>Cooking at home instead of eating out: a small saving and a little better mood. Once a month.</summary>

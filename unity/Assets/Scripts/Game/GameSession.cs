@@ -107,10 +107,11 @@ namespace ColonQuest.Game
         }
 
         /// <summary>Ties the run that just started to a slot and writes it there at once.</summary>
-        public void AssignSlot(int slot, string runName)
+        public void AssignSlot(int slot, string runName, string characterName, bool female)
         {
             ActiveSlot = slot;
             RunName = runName ?? string.Empty;
+            PlayerProfile.Set(characterName, female);
             SaveNow();
         }
 
@@ -127,6 +128,7 @@ namespace ColonQuest.Game
             Loop.Restore(saved.run);
             ActiveSlot = slot;
             RunName = saved.name;
+            PlayerProfile.Set(saved.characterName, saved.female);
             Changed?.Invoke();
             return true;
         }
@@ -136,7 +138,10 @@ namespace ColonQuest.Game
         {
             if (ActiveSlot >= 0)
             {
-                Slots.Save(ActiveSlot, SaveSlot.From(RunName, Loop, DateTime.UtcNow));
+                var slot = SaveSlot.From(RunName, Loop, DateTime.UtcNow);
+                slot.characterName = PlayerProfile.Name;
+                slot.female = PlayerProfile.Female;
+                Slots.Save(ActiveSlot, slot);
             }
         }
 
@@ -160,6 +165,7 @@ namespace ColonQuest.Game
             Loop.NewGame();
             ActiveSlot = -1;
             RunName = string.Empty;
+            PlayerProfile.Reset();
             CasinoNet = 0L;
             SinpeSent = 0L;
             Busy = false;

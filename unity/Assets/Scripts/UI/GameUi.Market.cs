@@ -72,7 +72,7 @@ namespace ColonQuest.UI
         private void ShowHomeCatalog()
         {
             var text = new StringBuilder();
-            text.AppendLine(Loc.T("Buenas, bienvenido. Mire, estas son las casas que tengo hoy."));
+            text.AppendLine(Loc.T(PlayerProfile.Pick("Buenas, bienvenido. Mire, estas son las casas que tengo hoy.", "Buenas, bienvenida. Mire, estas son las casas que tengo hoy.")));
             text.AppendLine();
             text.AppendLine(Loc.T("Elige una casa para ver lo que cuesta de verdad, no solo el precio del letrero."));
             text.AppendLine();
