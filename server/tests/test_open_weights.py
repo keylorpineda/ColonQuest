@@ -175,3 +175,17 @@ async def test_fallback_provider_sends_a_failed_agent_step_to_meta() -> None:
 
     assert turn.content == '{"text": "Meta"}'
     assert meta.calls[0]["model"] == "muse-spark-1.3"
+
+
+async def test_spent_open_weights_budget_sends_npcs_to_meta() -> None:
+    class Spent:
+        async def exhausted(self) -> bool:
+            return True
+
+    primary, meta = FakeProvider(meta_answer()), FakeProvider(meta_answer())
+    router = FallbackProvider(primary, meta, timeout_s=1, budget=Spent())  # type: ignore[arg-type]
+    result = await router.structured(model="muse-spark-1.3", system="s", user="u", output=Line)
+
+    assert result.value.text == "desde Meta"
+    assert primary.calls == []
+    assert len(meta.calls) == 1

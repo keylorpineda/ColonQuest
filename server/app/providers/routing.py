@@ -11,10 +11,12 @@ from typing import Any
 from pydantic import BaseModel
 
 from app.config import Settings
+from app.cost_guard import OpenWeightsBudget
 from app.providers.base import (
     ChatModelProvider,
     ChatTurn,
     ProviderError,
+    ProviderUnavailableError,
     ReasoningEffort,
     StructuredResult,
 )
@@ -25,11 +27,20 @@ logger = logging.getLogger(__name__)
 
 class FallbackProvider:
     def __init__(
-        self, primary: ChatModelProvider, fallback: ChatModelProvider, timeout_s: float
+        self,
+        primary: ChatModelProvider,
+        fallback: ChatModelProvider,
+        timeout_s: float,
+        budget: OpenWeightsBudget | None = None,
     ) -> None:
         self._primary = primary
         self._fallback = fallback
         self._timeout_s = timeout_s
+        self._budget = budget
+
+    async def _primary_allowed(self) -> bool:
+        """False once today's open-weights budget is spent: go straight to Meta."""
+        return self._budget is None or not await self._budget.exhausted()
 
     async def structured[T: BaseModel](
         self,
@@ -43,6 +54,8 @@ class FallbackProvider:
         timeout_s: float | None = None,
     ) -> StructuredResult[T]:
         try:
+            if not await self._primary_allowed():
+                raise ProviderUnavailableError("open-weights daily budget spent")
             async with asyncio.timeout(self._timeout_s):
                 return await self._primary.structured(
                     model=model,
@@ -77,6 +90,8 @@ class FallbackProvider:
     ) -> ChatTurn:
         """One seller-agent step on open weights; this step alone goes to Meta if it fails."""
         try:
+            if not await self._primary_allowed():
+                raise ProviderUnavailableError("open-weights daily budget spent")
             async with asyncio.timeout(self._timeout_s):
                 return await self._primary.chat(
                     model=model,
@@ -99,7 +114,10 @@ class FallbackProvider:
 
 
 def build_npc_provider(
-    settings: Settings, meta: ChatModelProvider, open_weights: OpenWeightsProvider | None
+    settings: Settings,
+    meta: ChatModelProvider,
+    open_weights: OpenWeightsProvider | None,
+    budget: OpenWeightsBudget | None = None,
 ) -> ChatModelProvider:
     """Provider for NPC dialogue according to NPC_PROVIDER."""
     if settings.npc_provider != "open_weights":
@@ -107,4 +125,4 @@ def build_npc_provider(
     if open_weights is None or not open_weights.configured:
         logger.warning("NPC_PROVIDER=open_weights but the endpoint is not configured; using Meta")
         return meta
-    return FallbackProvider(open_weights, meta, settings.open_weights_timeout_s)
+    return FallbackProvider(open_weights, meta, settings.open_weights_timeout_s, budget)
