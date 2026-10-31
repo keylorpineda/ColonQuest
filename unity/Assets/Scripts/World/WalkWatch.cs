@@ -21,6 +21,18 @@ namespace ColonQuest.World
         /// <summary>Set by the game from the player's things: with a swimsuit the sea no longer asks for one.</summary>
         public static bool HasSwimsuit { get; set; }
 
+        /// <summary>The walking speed of the player, the same as the controller's.</summary>
+        public const float WalkSpeed = 4.5f;
+
+        /// <summary>
+        /// How long the step back lasts: just enough to leave the warning zone and a little more. A long step pushed the
+        /// player across the beach by the pier and back into the next warning.
+        /// </summary>
+        public static float NudgeSeconds(float depth)
+        {
+            return Mathf.Clamp((Mathf.Max(0f, depth) + 0.25f) / WalkSpeed, 0.1f, 0.35f);
+        }
+
         /// <summary>What the player thinks at the edge of the water.</summary>
         public static string ThoughtFor(WaterBody water, bool hasSwimsuit)
         {
@@ -82,7 +94,7 @@ namespace ColonQuest.World
                 var controller = GetComponent<PlayerController>();
                 if (controller != null)
                 {
-                    controller.Nudge(hint.Away, 0.7f);
+                    controller.Nudge(hint.Away, NudgeSeconds(hint.Depth));
                 }
             }
         }

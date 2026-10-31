@@ -69,6 +69,28 @@ namespace ColonQuest.World.Tests
         }
 
         [Test]
+        public void Hints_BesideThePierTheStepBackLeavesTheWaterZoneWithoutCrossingTheBeach()
+        {
+            // On the sand just west of the pier, pressed against the sea wall.
+            var at = new Vector2(MapLayout.PierXMin - 0.5f, MapLayout.ShoreY + 0.3f);
+            var hint = WorldHints.Check(SceneNames.Town, at);
+            Assert.AreEqual(WaterBody.Sea, hint.Water);
+            Assert.AreEqual(Vector2.up, hint.Away, "back to the sand, not onto the pier");
+
+            float seconds = WalkWatch.NudgeSeconds(hint.Depth);
+            Vector2 after = at + hint.Away * WalkWatch.WalkSpeed * seconds;
+            Assert.AreEqual(HintKind.None, WorldHints.Check(SceneNames.Town, after).Kind, "out of the warning");
+            Assert.Less(Vector2.Distance(at, after), 1.5f, "a short step, not across the beach");
+        }
+
+        [Test]
+        public void Hints_EveryStepBackIsShort()
+        {
+            Assert.LessOrEqual(WalkWatch.NudgeSeconds(10f), 0.35f);
+            Assert.GreaterOrEqual(WalkWatch.NudgeSeconds(-1f), 0.1f);
+        }
+
+        [Test]
         public void Thoughts_AreRaisedToTheListeners()
         {
             string heard = null;

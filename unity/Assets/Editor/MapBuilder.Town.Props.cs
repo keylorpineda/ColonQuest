@@ -921,11 +921,15 @@ namespace ColonQuest.EditorTools
         /// 3-Tier Carved Stone Colonial Fountain with ornamental relief panels, turquoise water,
         /// animated white foam rings, floating pink petals, and cascading water streams.
         /// </summary>
+        /// <summary>How far below the middle of the fountain the player stands to use it: just past the stone rim.</summary>
+        private const float FountainFront = 1.85f;
+
         private static void Fountain(Transform parent, Transform shadows, Vector2 center)
         {
             GroundShadow(shadows, center + new Vector2(0.22f, -0.48f), new Vector2(4.7f, 2.3f), 0.28f);
             var root = Root(parent, "Fountain", center, center.y - 1.3f);
-            BuildThing(root, "Fountain", "Ver la fuente", Vector2.zero, new Vector2(3.7f, 3.0f),
+            // Only from the front: a strip below the basin, so walking along its sides does not offer it.
+            BuildThing(root, "Fountain", "Ver la fuente", new Vector2(0f, -FountainFront), new Vector2(1.6f, 0.4f),
                 "Hay monedas en el fondo. Pedir un deseo es gratis; cumplirlo casi siempre empieza por ahorrar.");
 
             var stone = GamePalette.Hex("#E3D9C6");

@@ -351,8 +351,9 @@ namespace ColonQuest.UI
                         .Sound(SoundEffectKind.Beep).Wait(0.8f).Sound(SoundEffectKind.Beep).Wait(0.8f).Apply(then);
 
                 case "Thing_Fountain":
+                    // The station is the strip in front of the rim: the player stays there and the coin lands in the water.
                     return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Pose(PersonPose.Handover, 0.7f)
-                        .Fly("coin", me + new Vector2(0f, 0.5f), Here(station, 0f, 0.3f), 0.7f)
+                        .Fly("coin", me + new Vector2(0f, 0.5f), Here(station, 0f, 1.6f), 0.7f)
                         .Wait(0.7f).Sound(SoundEffectKind.Coin).Sound(SoundEffectKind.Splash)
                         .Say(string.Empty, "Pedí un deseo: llegar a fin de mes con ahorro.").Wait(1f).Apply(then);
 
