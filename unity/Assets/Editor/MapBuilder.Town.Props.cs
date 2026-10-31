@@ -1589,7 +1589,7 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildOverheadPowerNetwork(Transform parent, Transform shadows)
         {
-            Vector2 poleWest = new Vector2(-31.5f, 5.45f);
+            Vector2 poleWest = new Vector2(-34.3f, 5.45f);
             Vector2 poleCasa = new Vector2(-21.25f, 5.45f);
             Vector2 poleEast = new Vector2(-13.85f, 5.45f);
 
