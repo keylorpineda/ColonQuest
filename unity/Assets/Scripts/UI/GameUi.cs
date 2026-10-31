@@ -474,7 +474,7 @@ namespace ColonQuest.UI
 
                     return "[E]  " + station.DisplayName;
                 case StationType.Atm:
-                    return "[E]  Consultar tu saldo en el cajero";
+                    return "[E]  Usar el cajero automático";
                 case StationType.RealEstate:
                 case StationType.CarDealer:
                 case StationType.Farm:
@@ -522,10 +522,18 @@ namespace ColonQuest.UI
                     AskCloseMonth();
                     break;
                 case StationType.Home:
-                case StationType.Atm:
                     ShowStatement();
                     break;
+                case StationType.Atm:
+                    ShowAtm();
+                    break;
                 case StationType.Thing:
+                    if (station.name == DepositWindowName)
+                    {
+                        ShowDeposit();
+                        break;
+                    }
+
                     ShowThing(station);
                     break;
                 case StationType.Store:
@@ -684,6 +692,12 @@ namespace ColonQuest.UI
             if (outcome.ChangedNothing)
             {
                 text.AppendLine(Loc.T("Tus cuentas quedaron igual."));
+            }
+
+            if (!string.IsNullOrEmpty(outcome.Note))
+            {
+                text.AppendLine();
+                text.AppendLine(outcome.Note);
             }
 
             AppendDeal(text, session.LastDeal);

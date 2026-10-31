@@ -71,14 +71,15 @@ namespace ColonQuest.EditorTools
             {
                 float x = TellerWindows[i];
                 bool open = i == 1 || i == 3;
-                WallPlate(windows, "CAJA " + (i + 1), new Vector2(x, TellerCounterY + 0.75f), 1.0f, open ? "#1D4F8C" : "#6B7186", GamePalette.White, 0.024f);
+                // The number hangs on the front of the counter, below the teller, so the teller never stands on it.
+                WallPlate(windows, "CAJA " + (i + 1), new Vector2(x, TellerCounterY - 0.32f), 1.0f, open ? "#1D4F8C" : "#6B7186", GamePalette.White, 0.024f);
                 Deco(staff, "Monitor", roundedSmall, x + 0.55f, TellerCounterY + 0.05f, 0.55f, 0.4f, "#2A3040", 1f, 8);
                 Deco(staff, "Monitor_Screen", roundedSmall, x + 0.55f, TellerCounterY + 0.05f, 0.45f, 0.28f, "#4DA3FF", 1f, 9);
-                Deco(staff, "Tray", roundedSmall, x - 0.35f, TellerCounterY - 0.25f, 0.5f, 0.2f, "#9AA3B8", 1f, 9);
+                Deco(staff, "Tray", roundedSmall, x - 0.45f, TellerCounterY + 0.05f, 0.5f, 0.2f, "#9AA3B8", 1f, 9);
                 Deco(staff, "Chair", circle, x, TellerCounterY + 1.55f, 0.55f, 0.55f, "#2A3345", 1f, 6);
                 if (!open)
                 {
-                    WallPlate(windows, "CERRADO", new Vector2(x, TellerCounterY - 0.25f), 0.9f, "#E8505B", GamePalette.White, 0.02f);
+                    WallPlate(windows, "CERRADO", new Vector2(x, TellerCounterY + 0.3f), 0.9f, "#E8505B", GamePalette.White, 0.02f);
                 }
             }
 
@@ -127,7 +128,6 @@ namespace ColonQuest.EditorTools
                 Deco(office, "Chair", circle, cx, 7.2f, 0.6f, 0.6f, "#2A3345", 1f, 6);
                 Solid(office, "GuestChair", roundedSmall, cx - 0.6f, 5.3f, 0.55f, 0.5f, "#3B6FB6");
                 Solid(office, "GuestChair", roundedSmall, cx + 0.6f, 5.3f, 0.55f, 0.5f, "#3B6FB6");
-                Plant(office, cx + side * 1.8f, 4.3f, 0.8f);
                 Flickering(Glow(parts.Lights, "Light_Desk", new Vector2(cx, 6.4f), 2.8f, "#FFD23F", 0.16f, OrderLight), 0.06f, 0.9f, cx);
             }
 
@@ -136,6 +136,37 @@ namespace ColonQuest.EditorTools
             WallPlate(plates, "CRÉDITOS", new Vector2(9.75f, 8.0f), 1.6f, "#1D4F8C", GamePalette.White, 0.026f);
             NpcAt(parts.People, "Gerente", new Vector2(-9.75f, 7.15f), "#F2B84B", "#2A3345");
             NpcAt(parts.People, "Asesora", new Vector2(9.75f, 7.15f), "#F2994A", "#E8505B");
+
+            // The player talks to them from the guest side of the desk.
+            BuildThing(parts.Stations, "Manager", "Hablar con el gerente", new Vector2(-9.75f, 5.85f), new Vector2(2.6f, 0.6f),
+                "\"Bienvenido. Si algún día tiene un problema con un cobro, venga a hablar antes de dejar de pagar.\"",
+                "\"El banco gana con los intereses que usted paga. Por eso conviene pagar la tarjeta completa cada mes.\"");
+            BuildThing(parts.Stations, "CreditAdvisor", "Hablar con la asesora de créditos", new Vector2(9.75f, 5.85f), new Vector2(2.6f, 0.6f),
+                "\"Un préstamo personal aquí cobra mucho menos interés que el prestamista del barrio. Pregunte siempre la tasa anual.\"",
+                "\"Antes de firmar un crédito, pida el costo total: la cuota por los meses, más seguros y comisiones.\"",
+                "\"Para darle un crédito revisamos que la cuota no pase de un tercio de su salario. Más que eso ahoga.\"");
+        }
+
+        /// <summary>People of the town who come in for an errand and leave; each one has its own routine.</summary>
+        private static void BuildBankCustomers(Transform parent)
+        {
+            var looks = new[]
+            {
+                new Look { Skin = "#E8505B", SkinTone = "#C68B59", Hair = HairStyle.Curly, HairColor = "#2A2018", Pants = "#3B4A6B" },
+                new Look { Skin = "#55E08F", SkinTone = "#F1C9A5", Hair = HairStyle.Ponytail, HairColor = "#6B3E26", Pants = "#2A3345", Skirt = true },
+                new Look { Skin = "#FFD23F", SkinTone = "#8D5A3B", Hair = HairStyle.Buzz, HairColor = "#1C1C1C", Pants = "#5A4636", Hat = Hat.Cap, HatColor = "#1D4F8C" },
+                new Look { Skin = "#B28DFF", SkinTone = "#E0AC7E", Hair = HairStyle.Bun, HairColor = "#9AA3B8", Pants = "#4B5568", Glasses = true }
+            };
+
+            for (int i = 0; i < looks.Length; i++)
+            {
+                var customer = new GameObject("BankCustomer" + (i + 1));
+                customer.transform.SetParent(parent, false);
+                customer.transform.position = BankCustomer.Door;
+                MakeYSorted(customer, -0.45f);
+                BuildCharacterVisual(customer.transform, looks[i], true);
+                customer.AddComponent<BankCustomer>().Configure(i);
+            }
         }
 
         private static void NpcAt(Transform parent, string name, Vector2 at, string skin, string tie)
@@ -178,7 +209,7 @@ namespace ColonQuest.EditorTools
             var screen = IL(parts.Props, "TurnScreen");
             Solid(screen, "Stand", roundedSmall, -8.2f, 1.0f, 0.2f, 0.4f, "#4B5568");
             Deco(screen, "Screen", rounded, -8.2f, 1.6f, 2.6f, 1.0f, "#1D2238", 1f, 8);
-            Label(screen, "TURNO A-27", new Vector2(-8.2f, 1.75f), GamePalette.Hex("#FFD23F"), 0.032f, TextAnchor.MiddleCenter);
+            Label(screen, "TURNO A-32", new Vector2(-8.2f, 1.75f), GamePalette.Hex("#FFD23F"), 0.032f, TextAnchor.MiddleCenter);
             Label(screen, "CAJA 2", new Vector2(-8.2f, 1.4f), GamePalette.Hex("#55E08F"), 0.028f, TextAnchor.MiddleCenter);
 
             var ticket = IL(parts.Props, "TicketMachine");
@@ -186,12 +217,12 @@ namespace ColonQuest.EditorTools
             Deco(ticket, "Screen", roundedSmall, -2.6f, -5.85f, 0.55f, 0.3f, "#55E08F", 1f, 8);
             Deco(ticket, "Slot", roundedSmall, -2.6f, -6.25f, 0.45f, 0.08f, "#F8F5E8", 1f, 8);
 
-            // The board with today's rates, the same ones the game uses.
+            // The board of the exchange rate: the bank buys the dollar for less than it sells it.
             var rates = IL(parts.Props, "RatesBoard");
             Solid(rates, "Board", rounded, -10.6f, -6.4f, 2.2f, 1.1f, "#1D2238");
-            Label(rates, "TASAS DEL MES", new Vector2(-10.6f, -6.1f), GamePalette.White, 0.024f, TextAnchor.MiddleCenter);
-            Label(rates, "TARJETA 3.5%", new Vector2(-10.6f, -6.4f), GamePalette.Hex("#E8505B"), 0.024f, TextAnchor.MiddleCenter);
-            Label(rates, "AHORRO 0.3%", new Vector2(-10.6f, -6.7f), GamePalette.Hex("#55E08F"), 0.024f, TextAnchor.MiddleCenter);
+            Label(rates, "TIPO DE CAMBIO", new Vector2(-10.6f, -6.1f), GamePalette.White, 0.024f, TextAnchor.MiddleCenter);
+            Label(rates, "COMPRA 503", new Vector2(-10.6f, -6.4f), GamePalette.Hex("#55E08F"), 0.024f, TextAnchor.MiddleCenter);
+            Label(rates, "VENTA 511", new Vector2(-10.6f, -6.7f), GamePalette.Hex("#E8505B"), 0.024f, TextAnchor.MiddleCenter);
 
             // Information desk on the right, with brochures.
             var info = IL(parts.Props, "InfoDesk");
@@ -228,10 +259,12 @@ namespace ColonQuest.EditorTools
             }
 
             var plants = IL(parts.Props, "Plants");
-            foreach (var at in new[] { new Vector2(-11.3f, -7.8f), new Vector2(11.3f, -7.8f), new Vector2(-11.3f, 2.9f), new Vector2(11.3f, 2.9f) })
+            foreach (var at in new[] { new Vector2(-11.3f, -7.8f), new Vector2(11.3f, -7.8f) })
             {
                 Plant(plants, at.x, at.y, 1.1f);
             }
+
+            BuildBankCustomers(parts.People);
 
             var bins = IL(parts.Props, "Bins");
             Solid(bins, "Bin", roundedSmall, 9.6f, -7.8f, 0.5f, 0.6f, "#4A6B5A");

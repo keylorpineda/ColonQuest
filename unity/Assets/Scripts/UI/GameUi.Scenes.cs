@@ -176,7 +176,8 @@ namespace ColonQuest.UI
         {
             Vector2 me = Here(station);
             Vector2 teller = PersonAt("Cajera", Here(station, 0f, 2.3f));
-            return new Interaction().WalkTo(me).Face(teller)
+            return WaitTurn(new Interaction().WalkTo(me + new Vector2(0f, -0.9f)).Face(teller), BankCustomer.Window2, "Cajera", "Cajera")
+                .WalkTo(me).Face(teller)
                 .Say("Cajera", "Buenas. ¿Viene a cerrar el mes?")
                 .Pose(PersonPose.Handover, 0.7f)
                 .Sound(SoundEffectKind.Bills).Fly("bills", me + new Vector2(0f, 0.4f), teller, 0.8f)
@@ -188,6 +189,25 @@ namespace ColonQuest.UI
                 .Pose(PersonPose.Read, 1.2f)
                 .Apply(then);
         }
+
+        /// <summary>
+        /// When a customer is at the window, the player waits behind them: the teller asks for a moment and the scene goes
+        /// on once the window is free, or after a few seconds at most.
+        /// </summary>
+        private static Interaction WaitTurn(Interaction scene, Vector2 window, string teller, string speaker)
+        {
+            if (!BankCustomer.IsBeingServed(window))
+            {
+                return scene;
+            }
+
+            float until = Time.time + BankWaitSeconds;
+            return scene.NpcPose(teller, PersonPose.Wave, 0.8f).Say(speaker, "Un momentito, ya casi termino con el cliente.")
+                .WaitUntil(() => !BankCustomer.IsBeingServed(window) || Time.time > until).Wait(0.4f);
+        }
+
+        /// <summary>The longest the player waits in line before the teller turns to them.</summary>
+        private const float BankWaitSeconds = 8f;
 
         /// <summary>The cash machine: the card goes in, the keys are tapped, the bills come out and the receipt prints.</summary>
         private Interaction AtmScene(Station station, Action then)
@@ -341,8 +361,24 @@ namespace ColonQuest.UI
                 case "Thing_Guard":
                 case "Thing_Receptionist":
                 case "Thing_Cashier":
-                case "Thing_Teller3":
                     return new Interaction().Face(Here(station, 0f, 1f)).Pose(PersonPose.Wave, 1.4f).Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+
+                case "Thing_Teller3":
+                {
+                    var scene = WaitTurn(new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)), BankCustomer.Window4, "Cajero2", "Cajero");
+                    return scene.Pose(PersonPose.Wave, 1f).NpcPose("Cajero2", PersonPose.Wave, 1f).Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
+                case "Thing_Manager":
+                case "Thing_CreditAdvisor":
+                {
+                    // The player stands on the guest side of the desk while the other person talks.
+                    string person = station.name == "Thing_Manager" ? "Gerente" : "Asesora";
+                    Vector2 desk = PersonAt(person, Here(station, 0f, 1.3f));
+                    return new Interaction().WalkTo(me).Face(desk).Pose(PersonPose.Wave, 0.9f).NpcPose(person, PersonPose.Wave, 1.2f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.4f).Fly("paper", desk + new Vector2(0f, -0.4f), me + new Vector2(0f, 0.3f), 0.7f)
+                        .Pose(PersonPose.Read, 1.2f).Apply(then);
+                }
 
                 case "Thing_Pet":
                     // The player bends to pet the dog and the dog wiggles with joy.

@@ -692,6 +692,16 @@ namespace ColonQuest.Game
             return Apply(Loop.Cook());
         }
 
+        public bool WithdrawSavings(long amount)
+        {
+            return Apply(Loop.WithdrawSavings(amount));
+        }
+
+        public bool DepositCash(long amount)
+        {
+            return Apply(Loop.DepositCash(amount));
+        }
+
         private bool Apply(ChoiceOutcome outcome)
         {
             if (outcome == null || Loop.IsFinished || Busy)

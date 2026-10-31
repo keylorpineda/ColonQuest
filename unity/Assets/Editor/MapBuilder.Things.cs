@@ -54,8 +54,8 @@ namespace ColonQuest.EditorTools
             BuildThing(things, "Receptionist", "Preguntar en información", new Vector2(5.6f, -5.3f), new Vector2(2.4f, 0.6f),
                 "\"Para abrir una cuenta de ahorro solo ocupa la cédula. Puede programar que se le rebaje algo cada quincena.\"",
                 "\"Un certificado a plazo le paga más interés que la cuenta, pero no lo puede sacar antes.\"");
-            BuildThing(things, "Teller3", "Hablar con el cajero", new Vector2(TellerWindows[3], TellerCounterY - 1.2f), new Vector2(1.4f, 1.0f),
-                "\"Esta caja es solo para depósitos. Para cobrar el salario vaya a la caja 2.\"");
+            BuildThing(things, "Teller3", "Depositar en la caja 4", new Vector2(TellerWindows[3], TellerCounterY - 1.2f), new Vector2(1.4f, 1.0f),
+                "\"Esta caja es para depósitos. Para cobrar el salario vaya a la caja 2.\"");
         }
 
         private static void BuildStoreThings(InteriorParts parts)
