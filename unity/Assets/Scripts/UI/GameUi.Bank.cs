@@ -55,7 +55,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(new ModalOption { Label = Loc.T("Ver estado de cuenta"), Color = GameUiColors.Blue, OnPress = ShowStatement });
-            modal.Show(Loc.T("Cajero automático"), Loc.T("Retiro de efectivo"), text.ToString(), options.Count < 4 ? AddLeave(options) : options);
+            modal.Show(Loc.T("Cajero automático"), Loc.T("Retiro de efectivo"), text.ToString(), AddLeave(options));
         }
 
         private void ShowDeposit()
@@ -98,9 +98,18 @@ namespace ColonQuest.UI
             modal.Show(Loc.T("Caja 4: depósitos"), Loc.T("Depósito a tu cuenta"), text.ToString(), AddLeave(options), Loc.T("Cajero"));
         }
 
+        /// <summary>
+        /// Adds the way out, always, and numbers the options like every other window: the keys 1 to 9 press them and the
+        /// window has no other way to close.
+        /// </summary>
         private static List<ModalOption> AddLeave(List<ModalOption> options)
         {
             options.Add(new ModalOption { Label = Loc.T("Cerrar"), Color = GameUiColors.Muted, OnPress = null });
+            for (int i = 0; i < options.Count; i++)
+            {
+                options[i].Label = (i + 1) + ".  " + options[i].Label;
+            }
+
             return options;
         }
     }
