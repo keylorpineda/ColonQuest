@@ -373,6 +373,34 @@ namespace ColonQuest.UI
             return lips.rectTransform;
         }
 
+        /// <summary>Height of the band on top of every window, see <see cref="Header"/>.</summary>
+        public const float HeaderHeight = 104f;
+
+        /// <summary>
+        /// The band on top of a window: a strip of color with the title in the title font and an ink line under it. Every window
+        /// of the menu uses it, so they read as one family. The window also pops in softly when it opens.
+        /// </summary>
+        public static Text Header(RectTransform card, string title, Color band)
+        {
+            float width = card.sizeDelta.x;
+            var top = new Vector2(0.5f, 1f);
+            var strip = Fill(card, "Header", band, new Vector2(width, HeaderHeight), top, Vector2.zero);
+            Fill(card, "HeaderLine", Ink, new Vector2(width, Outline), top, new Vector2(0f, -HeaderHeight));
+            var label = Label(strip.transform, title, 54, Paper, new Vector2(width - 80f, HeaderHeight - 12f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+            label.font = TitleFont;
+            var outline = label.gameObject.AddComponent<UnityEngine.UI.Outline>();
+            outline.effectColor = Ink;
+            outline.effectDistance = new Vector2(3f, -3f);
+
+            var frame = card.parent as RectTransform;
+            if (frame != null && frame.GetComponent<PopIn>() == null)
+            {
+                frame.gameObject.AddComponent<PopIn>();
+            }
+
+            return label;
+        }
+
         /// <summary>The height a text needs when wrapped to <paramref name="width"/>.</summary>
         public static float MeasureHeight(Text label, float width)
         {
