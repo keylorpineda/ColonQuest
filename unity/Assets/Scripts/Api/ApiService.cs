@@ -43,7 +43,18 @@ namespace ColonQuest.Api
 
         public IEnumerator CreateSession(string classCode, Action<ApiResult<string>> done)
         {
-            string body = string.IsNullOrEmpty(classCode) ? "{}" : "{\"classCode\":\"" + Escape(classCode) + "\"}";
+            string lang = ColonQuest.World.Loc.Current == ColonQuest.World.GameLanguage.English ? "en" : "es";
+            string body;
+            if (string.IsNullOrEmpty(classCode))
+            {
+                body = lang == "en" ? "{\"language\":\"en\"}" : "{}";
+            }
+            else
+            {
+                body = lang == "en"
+                    ? "{\"classCode\":\"" + Escape(classCode) + "\",\"language\":\"en\"}"
+                    : "{\"classCode\":\"" + Escape(classCode) + "\"}";
+            }
             HttpResponseData response = null;
             yield return transport.Send(Post("sessions", body, config.Timeout), r => response = r);
 
@@ -118,7 +129,8 @@ namespace ColonQuest.Api
                 yield break;
             }
 
-            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text });
+            string lang = ColonQuest.World.Loc.Current == ColonQuest.World.GameLanguage.English ? "en" : "es";
+            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
             HttpResponseData response = null;
             yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.Timeout), r => response = r);
             done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));

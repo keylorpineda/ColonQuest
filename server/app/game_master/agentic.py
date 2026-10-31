@@ -15,7 +15,12 @@ from app.cost_guard import select_text_model
 from app.game_master.facts import assumes_missing_thing
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
-from app.game_master.prompt import SYSTEM_PROMPT, PromptContext, build_user_prompt
+from app.game_master.prompt import (
+    SYSTEM_PROMPT,
+    SYSTEM_PROMPT_EN,
+    PromptContext,
+    build_user_prompt,
+)
 from app.game_master.service import EventOutcome, EventSource, FallbackReason, GameMaster
 from app.providers.base import ProviderError, ToolCallingProvider
 from app.schemas import GameEvent
@@ -43,6 +48,25 @@ example how paying only the minimum keeps the card balance growing). Quote their
 - Use at most 4 tool calls, then answer with the event JSON only."""
 )
 
+AGENT_SYSTEM_PROMPT_EN = (
+    SYSTEM_PROMPT_EN
+    + """
+
+TOOLS
+- Before answering you may call: get_player_history, get_concepts_not_yet_taught, \
+simulate_purchase, project_debt. They only read data or compute; they never change the player.
+- Use get_player_history to build on what the player already did and to avoid repeating events.
+- Use simulate_purchase or project_debt to pick amounts that make the consequence concrete (for \
+example how paying only the minimum keeps the card balance growing). Quote their results exactly.
+- Use at most 4 tool calls, then answer with the event JSON only."""
+)
+
+
+def get_agent_system_prompt(language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        return AGENT_SYSTEM_PROMPT_EN
+    return AGENT_SYSTEM_PROMPT
+
 
 class AgenticGameMaster:
     def __init__(self, base: GameMaster, provider: ToolCallingProvider, settings: Settings) -> None:
@@ -66,7 +90,7 @@ class AgenticGameMaster:
             session_id=session_id,
             endpoint=ENDPOINT,
             model=model,
-            system=AGENT_SYSTEM_PROMPT,
+            system=get_agent_system_prompt(context.language),
             user=build_user_prompt(context),
             output=GameEvent,
             tools=GAME_MASTER_TOOLS,

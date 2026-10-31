@@ -28,6 +28,12 @@ def test_normalize_removes_accents_and_case() -> None:
         ("¿Y de contado cuánto sale?", {KeyQuestion.CASH_PRICE}),
         ("¿Hay letra pequeña?", {KeyQuestion.HIDDEN_FEES}),
         ("Diay mae, qué tuanis el celular", set()),
+        ("How much is it in total with insurance?", {KeyQuestion.TOTAL_COST, KeyQuestion.INSURANCE}),
+        ("What is the interest rate?", {KeyQuestion.INTEREST_RATE}),
+        ("Are there any extra fees or commission?", {KeyQuestion.HIDDEN_FEES}),
+        ("How many months is the term?", {KeyQuestion.TERM}),
+        ("How much in cash upfront?", {KeyQuestion.CASH_PRICE}),
+        ("Is there any fine print?", {KeyQuestion.HIDDEN_FEES}),
     ],
 )
 def test_classify_questions(text: str, expected: set[KeyQuestion]) -> None:
@@ -71,3 +77,15 @@ def test_fallback_pitch_when_nothing_was_asked() -> None:
     reply, revealed = fallback_reply(OFFER, set())
     assert revealed == [SellerFact.MONTHLY_PAYMENT]
     assert "₡19 600" in reply
+
+
+def test_fallback_reply_english() -> None:
+    pitch, revealed = fallback_reply(OFFER, set(), language="en")
+    assert revealed == [SellerFact.MONTHLY_PAYMENT]
+    assert "Dude" in pitch
+    assert "₡19 600" in pitch
+
+    reply, revealed = fallback_reply(OFFER, {KeyQuestion.TOTAL_COST}, language="en")
+    assert revealed == [SellerFact.TOTAL_COST]
+    assert "in total you end up paying" in reply
+    assert "₡569 400" in reply

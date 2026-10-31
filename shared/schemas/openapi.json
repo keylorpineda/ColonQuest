@@ -250,6 +250,10 @@
               }
             ],
             "title": "Classcode"
+          },
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
           }
         },
         "title": "CreateSessionRequest",
@@ -499,6 +503,14 @@
         "title": "GameEvent",
         "type": "object"
       },
+      "GameLanguage": {
+        "enum": [
+          "es",
+          "en"
+        ],
+        "title": "GameLanguage",
+        "type": "string"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -690,6 +702,10 @@
       "NegotiationRequest": {
         "additionalProperties": false,
         "properties": {
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
+          },
           "offerId": {
             "pattern": "^[a-z0-9_]{1,40}$",
             "title": "Offerid",
@@ -824,6 +840,16 @@
               }
             ],
             "title": "Jobposition"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GameLanguage"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "month": {
             "maximum": 12.0,

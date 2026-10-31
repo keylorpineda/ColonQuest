@@ -105,7 +105,7 @@ namespace ColonQuest.UI
             session.NewGameStarted += CloseWindows;
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
-            ApiService.LocalTextsOnly = () => Loc.Current == GameLanguage.English;
+            ApiService.LocalTextsOnly = () => false;
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
@@ -658,7 +658,7 @@ namespace ColonQuest.UI
 
             modal.Backdrop = RemoteImages.Get(gameEvent.ImageKey);
             AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
-            modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
+            modal.Show(Loc.T(gameEvent.Title), who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : Loc.T("Narrador"));
         }
 
         private void ShowOutcome(ChoiceOutcome outcome)
@@ -688,7 +688,7 @@ namespace ColonQuest.UI
                 ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
                 : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
 
-            modal.Show("Lo que pasó", outcome.ChoiceLabel, text.ToString(), new[] { Continue(null) });
+            modal.Show(Loc.T("Lo que pasó"), Loc.T(outcome.ChoiceLabel), text.ToString(), new[] { Continue(null) });
         }
 
         /// <summary>After a deal: the real cost of the installments next to the cash price, and the questions asked.</summary>
@@ -794,9 +794,9 @@ namespace ColonQuest.UI
             text.Append(Loc.F("Te queda {0} en efectivo y la tarjeta debe {1}.", Money.Format(report.EndingCash), Money.Format(report.EndingCardBalance)));
 
             bool last = session.Loop.IsFinished;
-            modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), "Estado de cuenta del mes", text.ToString(), new[]
+            modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), Loc.T("Estado de cuenta del mes"), text.ToString(), new[]
             {
-                new ModalOption { Label = last ? "Ver mi resumen" : "Seguir", Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
+                new ModalOption { Label = last ? Loc.T("Ver mi resumen") : Loc.T("Seguir"), Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
             });
         }
 
@@ -828,7 +828,7 @@ namespace ColonQuest.UI
             thingUses.TryGetValue(key, out int uses);
             thingUses[key] = uses + 1;
             string line = ThingLines.Pick(station.Lines, uses, session.State);
-            AudioDirector.Talk(line, station.DisplayName);
+            AudioDirector.Talk(Loc.T(line), station.DisplayName);
 
             // A pedestrian stops walking to chat.
             var walker = station.GetComponentInParent<Patrol>();
@@ -840,7 +840,7 @@ namespace ColonQuest.UI
 
             // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
             bool person = station.name == "Thing_Talk";
-            ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, line);
+            ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, Loc.T(line));
         }
 
         /// <summary>The name that goes before what a person says: the one of the character, or a plain word for a passer-by.</summary>
@@ -901,7 +901,7 @@ namespace ColonQuest.UI
 
             text.AppendLine();
             text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(GameRules.NetWorth(state))));
-            modal.Show("Tu estado de cuenta", Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
+            modal.Show(Loc.T("Tu estado de cuenta"), Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
         }
 
         private void ShowEnd(SessionSummary summary)
@@ -924,9 +924,9 @@ namespace ColonQuest.UI
             var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
             if (assets.Count == 0)
             {
-                modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+                modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
                 {
-                    new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                    new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
                 });
                 return;
             }
@@ -934,10 +934,10 @@ namespace ColonQuest.UI
             long withAssets = GameRules.NetWorth(session.State, session.Loop.Holdings);
             text.AppendLine();
             text.Append(Loc.F("Con lo que compraste: {0}", Money.Format(withAssets)));
-            modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+            modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
             {
-                new ModalOption { Label = "Ver lo que compraste", Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
-                new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
+                new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
             });
         }
 
@@ -979,7 +979,7 @@ namespace ColonQuest.UI
 
         private static ModalOption Continue(System.Action then)
         {
-            return new ModalOption { Label = "Continuar", Color = GameUiColors.Yellow, OnPress = then };
+            return new ModalOption { Label = Loc.T("Continuar"), Color = GameUiColors.Yellow, OnPress = then };
         }
     }
 }

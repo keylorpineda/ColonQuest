@@ -29,6 +29,7 @@ namespace ColonQuest.Api
                 savings = state.Savings,
                 emergencyFund = state.EmergencyFund,
                 wellbeing = state.Wellbeing,
+                language = ColonQuest.World.Loc.Current == ColonQuest.World.GameLanguage.English ? "en" : "es",
                 creditCard = new CreditCardDto
                 {
                     balance = state.CreditCard.Balance,

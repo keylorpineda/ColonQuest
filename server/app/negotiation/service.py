@@ -57,8 +57,39 @@ leave or refuse, otherwise "open".
 
 Answer with JSON only, matching the provided schema."""
 
-ACCEPT_PATTERN = re.compile(r"\b(acepto|me lo llevo|trato hecho|de una|deme uno)\b", re.IGNORECASE)
-LEAVE_PATTERN = re.compile(r"\b(no gracias|me voy|mejor no|paso|no me interesa)\b", re.IGNORECASE)
+SYSTEM_PROMPT_EN = """You play a friendly but pushy salesperson in Costa Rica in the game \
+"Colón Quest". You earn a commission on installment sales.
+
+RULES
+- Speak natural English, keeping the Costa Rican setting and currency (colones like ₡85 000, places, friendly Costa Rican tone), at most 2 short sentences, at most 300 characters.
+- You receive a hidden sheet with the true figures. Never state any amount that is not on it, \
+never change a figure, never invent discounts.
+- Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
+cash price or total cost ONLY when the player asks about it directly. If they ask, answer honestly.
+- playerHabits, when present, lists the key questions this player asked other sellers in this \
+game. Change your tactic to match: if they always ask about the insurance or the total, \
+anticipate it and sell on another angle. Habits never allow a figure that is not on the sheet.
+- revealedFacts lists every fact from the sheet you mention in this reply.
+- dealStatus: "accepted" only if the player clearly agrees to buy, "walked_away" if they clearly \
+leave or refuse, otherwise "open".
+
+Answer with JSON only, matching the provided schema."""
+
+
+def get_system_prompt(language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        return SYSTEM_PROMPT_EN
+    return SYSTEM_PROMPT
+
+
+ACCEPT_PATTERN = re.compile(
+    r"\b(acepto|me lo llevo|trato hecho|de una|deme uno|deal|i'?ll take it|take it|i accept|agree|done deal|sold)\b",
+    re.IGNORECASE,
+)
+LEAVE_PATTERN = re.compile(
+    r"\b(no gracias|me voy|mejor no|paso|no me interesa|no thanks|pass|not interested|leave|walk away|i'?m leaving|bye|never mind)\b",
+    re.IGNORECASE,
+)
 
 
 class SellerTurn(ContractModel):
@@ -98,6 +129,7 @@ def build_user_prompt(
     history: Sequence[PreviousTurn],
     player_text: str,
     habits: Sequence[KeyQuestion] = (),
+    language: str = "es",
 ) -> str:
     payload: dict[str, object] = {
         "product": offer.item,
@@ -108,6 +140,8 @@ def build_user_prompt(
     }
     if habits:
         payload["playerHabits"] = {"askedOtherSellers": [question.value for question in habits]}
+    if language and language != "es":
+        payload["language"] = language
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -120,6 +154,7 @@ class NegotiationResponder(Protocol):
         player_text: str,
         history: Sequence[PreviousTurn] = (),
         habits: Sequence[KeyQuestion] = (),
+        language: str = "es",
     ) -> NegotiationOutcome: ...
 
 
@@ -136,17 +171,20 @@ class Negotiator:
         player_text: str,
         history: Sequence[PreviousTurn] = (),
         habits: Sequence[KeyQuestion] = (),
+        language: str = "es",
     ) -> NegotiationOutcome:
         questions = classify_questions(player_text)
         mode = await ledger.budget_mode()
         model = select_text_model(self._settings.game_master_model, mode, self._settings)
         if model is None or await ledger.limit_exceeded(session_id) is not None:
-            return self.fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions, language=language)
 
-        prompt = build_user_prompt(offer, history, player_text, habits)
+        prompt = build_user_prompt(offer, history, player_text, habits, language=language)
         try:
             async with asyncio.timeout(self._settings.model_timeout_s):
-                turn = await self._ask_model(ledger, session_id, model, offer, prompt)
+                turn = await self._ask_model(
+                    ledger, session_id, model, offer, prompt, language=language
+                )
         except (TimeoutError, ProviderTimeoutError):
             await ledger.record(
                 usage=Usage(model=model),
@@ -155,9 +193,9 @@ class Negotiator:
                 ok=False,
                 session_id=session_id,
             )
-            return self.fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions, language=language)
         except ProviderError:
-            return self.fallback(offer, player_text, questions)
+            return self.fallback(offer, player_text, questions, language=language)
 
         reply = NegotiationReply(
             transcript=player_text,
@@ -169,7 +207,13 @@ class Negotiator:
         return NegotiationOutcome(reply=reply, source="model")
 
     async def _ask_model(
-        self, ledger: Ledger, session_id: uuid.UUID, model: str, offer: Offer, prompt: str
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        model: str,
+        offer: Offer,
+        prompt: str,
+        language: str = "es",
     ) -> SellerTurn:
         for attempt in range(1, MAX_ATTEMPTS + 1):
             last_attempt = attempt == MAX_ATTEMPTS
@@ -177,7 +221,7 @@ class Negotiator:
             try:
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
+                    system=get_system_prompt(language),
                     user=prompt,
                     output=SellerTurn,
                     reasoning_effort=self._settings.live_reasoning_effort,
@@ -213,12 +257,16 @@ class Negotiator:
         raise AssertionError("unreachable")  # pragma: no cover
 
     def fallback(
-        self, offer: Offer, player_text: str, questions: set[KeyQuestion] | None = None
+        self,
+        offer: Offer,
+        player_text: str,
+        questions: set[KeyQuestion] | None = None,
+        language: str = "es",
     ) -> NegotiationOutcome:
         """Scripted reply that never calls a model."""
         if questions is None:
             questions = classify_questions(player_text)
-        text, facts = fallback_reply(offer, questions)
+        text, facts = fallback_reply(offer, questions, language=language)
         reply = NegotiationReply(
             transcript=player_text,
             npc_reply=text,

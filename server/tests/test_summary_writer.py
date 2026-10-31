@@ -103,3 +103,17 @@ async def test_summary_timeout_reaches_the_provider() -> None:
     assert provider.calls[0]["timeout_s"] == 25.0
     assert provider.calls[0]["reasoning_effort"] == "minimal"
     assert provider.calls[0]["max_tokens"] == 2000
+
+
+def test_fallback_narrative_english() -> None:
+    narrative = fallback_narrative(STATS, language="en")
+    assert "You closed the year owing ₡386 000" in narrative
+    assert "asking about the total cost" in narrative
+
+
+async def test_summary_writer_english() -> None:
+    provider = FakeProvider(text("You finished owing ₡386 000, good questions."))
+    written = await make_writer(provider).write(FakeLedger(), uuid.uuid4(), STATS, language="en")
+    assert written.source == "model"
+    assert "Natural English" in provider.calls[0]["system"]
+    assert '"language": "en"' in provider.calls[0]["user"]

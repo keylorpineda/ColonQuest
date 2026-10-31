@@ -354,5 +354,22 @@ namespace ColonQuest.Api.Tests
             Assert.AreEqual(120000L, result.Value.NetWorth);
             Assert.AreEqual("fallback", result.Value.Source);
         }
+
+        [Test]
+        public void CreateSession_InEnglishSendsLanguageEn()
+        {
+            var originalLang = ColonQuest.World.Loc.Current;
+            try
+            {
+                ColonQuest.World.Loc.Set(ColonQuest.World.GameLanguage.English);
+                transport.Replies.Enqueue(FakeTransport.Ok("{\"sessionId\":\"" + SessionId + "\"}"));
+                Run(service.CreateSession(null, _ => { }));
+                Assert.AreEqual("{\"language\":\"en\"}", transport.Requests[0].JsonBody);
+            }
+            finally
+            {
+                ColonQuest.World.Loc.Set(originalLang);
+            }
+        }
     }
 }

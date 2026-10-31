@@ -12,7 +12,7 @@ La parte A es para arreglar. La parte B es la lista para verificar absolutamente
 | A3 Salida de la casa | Arreglado: suena la puerta, el personaje sigue caminando mientras oscurece y sale caminando del otro lado |
 | A4 Tiempo | Arreglado: 30 s por hora en normal (8 min por día) y 10 s en rápida |
 | A5 8 tareas por mes | Arreglado: 2 por día, también el día 4; un lugar se repite en otro día, no el mismo |
-| A6 Inglés | Arreglado del lado de Unity: en inglés se usan los eventos, el vendedor y el resumen locales, ya traducidos. **Pendiente de Keylor:** que el servidor reciba el idioma para que en inglés también escriba la IA (puntos 1 a 4) |
+| A6 Inglés | Arreglado totalmente (Keylor & Jefferson): contrato bilingüe con GameLanguage, backend IA genera en inglés (GameMaster, Negotiator, SummaryWriter, Whisper voice bias), Unity mapea language en session, decision y negotiation, y GameUi traduce todas las ventanas sin fugas de español |
 | A7 Escenas faltantes | Arreglado: mascota, doctores, moto, accesorios, carros, taller, pizarra del banco y la gente que conversa en la calle |
 | A8 Puentes | Arreglado: el paso va de baranda a baranda; escenas regeneradas |
 

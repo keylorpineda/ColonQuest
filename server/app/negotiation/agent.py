@@ -20,6 +20,7 @@ from app.negotiation.questions import classify_questions, invalid_amounts
 from app.negotiation.seller_sheet import Offer
 from app.negotiation.service import (
     SYSTEM_PROMPT,
+    SYSTEM_PROMPT_EN,
     NegotiationOutcome,
     Negotiator,
     PreviousTurn,
@@ -52,6 +53,29 @@ interest or the insurance, give the exact figure for the term you are offering.
 "dealStatus": "open" | "accepted" | "walked_away"}"""
 )
 
+AGENT_SYSTEM_PROMPT_EN = (
+    SYSTEM_PROMPT_EN
+    + """
+
+YOUR GOAL AND TOOLS
+- You want to maximize your earnings: the longer the term, the more you earn.
+- quote_term(months) re-prices this exact offer at another term and tells you your private \
+earnings. Call it before mentioning any other term, and quote its figures exactly.
+- Push a longer term by highlighting the lower monthly payment. Never tell the player your \
+earnings.
+- You may omit figures until asked, but never lie: if the player asks for the total cost, the \
+interest or the insurance, give the exact figure for the term you are offering.
+- Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
+{"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \
+"dealStatus": "open" | "accepted" | "walked_away"}"""
+)
+
+
+def get_agent_system_prompt(language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        return AGENT_SYSTEM_PROMPT_EN
+    return AGENT_SYSTEM_PROMPT
+
 
 class SellerAgent:
     def __init__(self, base: Negotiator, provider: ToolCallingProvider, settings: Settings) -> None:
@@ -67,21 +91,24 @@ class SellerAgent:
         player_text: str,
         history: Sequence[PreviousTurn] = (),
         habits: Sequence[KeyQuestion] = (),
+        language: str = "es",
     ) -> NegotiationOutcome:
         if not self._settings.seller_agent:
-            return await self._base.reply(ledger, session_id, offer, player_text, history, habits)
+            return await self._base.reply(
+                ledger, session_id, offer, player_text, history, habits, language=language
+            )
         model = select_text_model(
             self._settings.game_master_model, await ledger.budget_mode(), self._settings
         )
         if model is None or await ledger.limit_exceeded(session_id) is not None:
-            return self._base.fallback(offer, player_text)
+            return self._base.fallback(offer, player_text, language=language)
 
         request = AgentRequest(
             session_id=session_id,
             endpoint=ENDPOINT,
             model=model,
-            system=AGENT_SYSTEM_PROMPT,
-            user=build_user_prompt(offer, history, player_text, habits),
+            system=get_agent_system_prompt(language),
+            user=build_user_prompt(offer, history, player_text, habits, language=language),
             output=SellerTurn,
             tools=SELLER_TOOLS,
             context=ToolContext(offer=offer),
@@ -94,16 +121,18 @@ class SellerAgent:
             result = await run_tool_loop(self._provider, ledger, request)
         except TimeoutError:
             logger.warning("seller agent timed out; serving a scripted reply")
-            return self._base.fallback(offer, player_text)
+            return self._base.fallback(offer, player_text, language=language)
         except ProviderError as error:
             logger.warning("seller agent failed (%s); using the base negotiator", error)
-            return await self._base.reply(ledger, session_id, offer, player_text, history, habits)
+            return await self._base.reply(
+                ledger, session_id, offer, player_text, history, habits, language=language
+            )
 
         turn = result.value
         bad = invalid_amounts(turn.npc_reply, offer, quotable_amounts(result.tool_results))
         if bad:
             logger.warning("seller agent quoted amounts no tool computed: %s", bad)
-            return self._base.fallback(offer, player_text)
+            return self._base.fallback(offer, player_text, language=language)
         logger.info(
             "seller agent answered after %s steps, tools=%s", result.steps, result.tools_used
         )

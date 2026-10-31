@@ -22,6 +22,7 @@ namespace ColonQuest.World
             { "Entendido", "Got it" },
             { "Volver", "Back" },
             { "Desarrollado por", "Developed by" },
+            { "Narrador", "Narrator" },
             { "Diseño y desarrollo: Jefferson Abarca y Keylor Pineda", "Design and development: Jefferson Abarca and Keylor Pineda" },
             { "Clic o cualquier tecla para saltar", "Click or press any key to skip" },
             { "Salir del juego", "Quit the game" },

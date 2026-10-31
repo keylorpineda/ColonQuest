@@ -1,4 +1,14 @@
 {
+  "$defs": {
+    "GameLanguage": {
+      "enum": [
+        "es",
+        "en"
+      ],
+      "title": "GameLanguage",
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
   "properties": {
     "classCode": {
@@ -13,6 +23,10 @@
       ],
       "default": null,
       "title": "Classcode"
+    },
+    "language": {
+      "$ref": "#/$defs/GameLanguage",
+      "default": "es"
     }
   },
   "title": "CreateSessionRequest",
