@@ -328,6 +328,22 @@ namespace ColonQuest.World
                 skip = true;
             }
 
+            /// <summary>
+            /// A scene change destroys the runner in the middle of its script, and the coroutine never reaches its finally:
+            /// without this the game would think a scene is still playing and hide every prompt from then on.
+            /// </summary>
+            private void OnDestroy()
+            {
+                if (Current != this)
+                {
+                    return;
+                }
+
+                Current = null;
+                SetPlaying(false);
+                PlayerController.Frozen = false;
+            }
+
             public IEnumerator Run(List<Step> script, GameObject player, Action finished)
             {
                 Current = this;
