@@ -991,15 +991,25 @@ namespace ColonQuest.EditorTools
             Shape(root, "Cabin_Outline", rounded, new Vector2(0f, 2.3f), new Vector2(2.4f, 1.5f), GamePalette.Outline, 2);
             Shape(root, "Cabin", rounded, new Vector2(0f, 2.3f), new Vector2(2.24f, 1.34f), GamePalette.Hex("#FFF1C9"), 3);
             Shape(root, "Window", roundedSmall, new Vector2(0f, 2.35f), new Vector2(1.1f, 0.5f), GamePalette.Hex("#BFE3F5"), 4);
-            Shape(root, "Roof_Outline", rounded, new Vector2(0f, 3.25f), new Vector2(2.9f, 0.6f), GamePalette.Outline, 4);
-            Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 5);
+
+            var guardLook = new Look
+            {
+                Skin = "#E8505B", SkinTone = "#D9A47A", HairColor = "#1D2238", Hair = HairStyle.Buzz,
+                Pants = "#C0392B", Extra = Accessory.Cap, ExtraColor = "#FFD23F"
+            };
+            BuildNpc(root, "Salvavidas", new Vector2(x, y + 2.05f), guardLook, false);
+            BuildThing(root, "Salvavidas", "Hablar con el salvavidas", new Vector2(0f, 0.4f), new Vector2(2.2f, 1.6f),
+                "¡Ojo con la corriente, mae!");
+
+            Shape(root, "Roof_Outline", rounded, new Vector2(0f, 3.25f), new Vector2(2.9f, 0.6f), GamePalette.Outline, 35);
+            Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 36);
 
             var flagRig = new GameObject("FlagRig").transform;
             flagRig.SetParent(root, false);
             flagRig.localPosition = new Vector2(0.85f, 3.8f);
             flagRig.gameObject.AddComponent<FoliagePhysics>().Configure(6.5f, 2.8f, x, 0.03f, false);
-            Shape(flagRig, "Flag_Outline", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.58f, 0.38f), GamePalette.Outline, 5);
-            Shape(flagRig, "Flag", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 6);
+            Shape(flagRig, "Flag_Outline", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.58f, 0.38f), GamePalette.Outline, 37);
+            Shape(flagRig, "Flag", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 38);
             root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.0f, 0.5f);
         }
 

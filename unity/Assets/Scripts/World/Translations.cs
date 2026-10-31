@@ -13,6 +13,8 @@ namespace ColonQuest.World
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
             // Playtest batch 3 of the 31st
+            { "Hablar con el salvavidas", "Talk to the lifeguard" },
+            { "¡Ojo con la corriente, mae!", "Watch out for the current, mate!" },
             { "Diseño y desarrollo: DoWhile Team", "Design and development: DoWhile Team" },
 
             // Visual polish of the 31st
