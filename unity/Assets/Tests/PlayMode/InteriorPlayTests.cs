@@ -31,8 +31,19 @@ namespace ColonQuest.World.PlayModeTests
 
         public static void InteractNow(Station station)
         {
+            Call("InteractNow", station);
+        }
+
+        /// <summary>Plays the station's scene first, then opens its window: the whole press of E.</summary>
+        public static void Interact(Station station)
+        {
+            Call("Interact", station);
+        }
+
+        private static void Call(string method, Station station)
+        {
             var ui = Object.FindFirstObjectByType<GameUi>();
-            typeof(GameUi).GetMethod("InteractNow", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(ui, new object[] { station });
+            typeof(GameUi).GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(ui, new object[] { station });
         }
     }
 
@@ -232,6 +243,33 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Shopkeeper_GoesHomeAtNightAndComesBackInTheMorning()
+        {
+            yield return InteriorUi.StartOfflineRun();
+            var vendor = GameObject.Find("Vendedor").GetComponent<NightShift>();
+            Assert.IsNotNull(vendor, "the shopkeeper closes at night");
+            var clock = GameSession.Instance.Loop.Clock;
+            for (int hour = 0; hour < 30 && !clock.IsNight; hour++)
+            {
+                clock.Advance(GameRules.SecondsPerGameHour, GameRules.SecondsPerGameHour);
+            }
+
+            Assert.IsTrue(clock.IsNight);
+            for (float waited = 0f; waited < 4f && !vendor.Gone; waited += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsTrue(vendor.Gone, "walked off and is gone");
+            Assert.IsFalse(vendor.GetComponent<Collider2D>().enabled, "nobody to bump into");
+
+            GameSession.Instance.StartNewGame();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(vendor.Gone, "back at the post in the morning");
+        }
+
+        [UnityTest]
         public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheShop()
         {
             Teleport(MapLayout.TiendaMat);
@@ -276,6 +314,136 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Wardrobe_RecolorsTheBodyAndTheClothesStayAcrossScenes([Values(false, true)] bool female)
+        {
+            PlayerProfile.Set("Alex", female);
+            try
+            {
+                yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
+                yield return null;
+                FindPlayer();
+                yield return InteriorUi.StartOfflineRun();
+                var shirt = GamePalette.Hex("#F8F5E8");
+
+                Assert.IsTrue(GameSession.Instance.Loop.Wear(PlayerOutfit.Sunday, PlayerOutfit.Swimsuit));
+                PlayerOutfit.Wear(Body.gameObject, PlayerOutfit.Sunday);
+                Assert.Less(Distance(shirt, TorsoColor()), 0.03f, "the Sunday shirt is on");
+
+                yield return SceneManager.LoadSceneAsync(SceneNames.Banco);
+                yield return null;
+                yield return null;
+                FindPlayer();
+                Assert.Less(Distance(shirt, TorsoColor()), 0.03f, "the clothes come along to the next scene");
+            }
+            finally
+            {
+                GameSession.Instance.Loop.Wear(PlayerOutfit.Everyday, PlayerOutfit.Swimsuit);
+                PlayerProfile.Reset();
+            }
+        }
+
+        private static float Distance(Color a, Color b)
+        {
+            return Mathf.Abs(a.r - b.r) + Mathf.Abs(a.g - b.g) + Mathf.Abs(a.b - b.b);
+        }
+
+        private Color TorsoColor()
+        {
+            return Body.GetComponentsInChildren<SpriteRenderer>().First(r => r.name == "Torso").color;
+        }
+
+        /// <summary>
+        /// Plays the scene of a piece of furniture from where the player would press E, and measures the longest move of a
+        /// single frame: walking is a few hundredths, a jump to the seat is far more.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Furniture_ScenesWalkToTheSeatWithoutJumping(
+            [Values("Thing_Sofa", "Thing_Tv", "Thing_DiningTable")] string thing)
+        {
+            yield return InteriorUi.StartOfflineRun();
+            var station = GameObject.Find(thing).GetComponent<Station>();
+            var starts = new System.Collections.Generic.Dictionary<string, Vector2>
+            {
+                { "Thing_Sofa", new Vector2(-3.2f, -1.8f) },
+                { "Thing_Tv", new Vector2(-6.9f, -0.8f) },
+                { "Thing_DiningTable", new Vector2(5.0f, -4.3f) }
+            };
+            Teleport(starts[thing]);
+            yield return new WaitForFixedUpdate();
+
+            InteriorUi.Interact(station);
+            float longest = 0f;
+            Vector2 last = Body.position;
+            for (float waited = 0f; waited < 12f && Interaction.Playing; waited += Time.deltaTime)
+            {
+                yield return null;
+                longest = Mathf.Max(longest, Vector2.Distance(last, Body.position));
+                last = Body.position;
+            }
+
+            Assert.Less(longest, 0.5f, thing + " moves the player in one jump");
+        }
+
+        [UnityTest]
+        public IEnumerator HouseForRent_IsNotUsableUntilItIsRentedAndHasNoMother()
+        {
+            HouseVisit.Enter("casa_vecina_d");
+            string heard = null;
+            System.Action<string> listener = text => heard = text;
+            Thoughts.Said += listener;
+            try
+            {
+                yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
+                yield return null;
+                FindPlayer();
+                yield return InteriorUi.StartOfflineRun();
+
+                Assert.IsNull(GameObject.Find("Mama"), "the mother lives in her own house");
+                InteriorUi.Interact(GameObject.Find("Thing_Shower").GetComponent<Station>());
+                yield return null;
+                Assert.IsFalse(Interaction.Playing, "no shower in a house that is not the player's");
+                Assert.AreEqual(HouseVisit.NotMineThought, heard);
+            }
+            finally
+            {
+                Thoughts.Said -= listener;
+                HouseVisit.Enter(string.Empty);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator MothersHouse_KeepsTheMotherAndItsThingsWork()
+        {
+            HouseVisit.Enter(string.Empty);
+            yield return InteriorUi.StartOfflineRun();
+
+            Assert.IsNotNull(GameObject.Find("Mama"));
+            InteriorUi.Interact(GameObject.Find("Thing_Sink").GetComponent<Station>());
+            yield return null;
+            Assert.IsTrue(Interaction.Playing || InteriorUi.ModalOpen, "the sink works in the mother's house");
+
+            Interaction.SkipCurrent();
+            for (float waited = 0f; waited < 5f && Interaction.Playing; waited += Time.deltaTime)
+            {
+                yield return null;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Scene_ThatIsCutByASceneChangeDoesNotLeaveTheGameBusy()
+        {
+            yield return InteriorUi.StartOfflineRun();
+            InteriorUi.Interact(GameObject.Find("Thing_Sink").GetComponent<Station>());
+            yield return null;
+            Assert.IsTrue(Interaction.Playing);
+
+            yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
+            yield return null;
+            Assert.IsFalse(Interaction.Playing, "the prompts and the phone work again in the new scene");
+            Assert.IsFalse(PlayerController.Frozen);
+        }
+
+        [UnityTest]
         public IEnumerator Shower_IsOfferedInTheBathroomButNotThroughTheKitchenWall()
         {
             yield return InteriorUi.StartOfflineRun();
@@ -301,6 +469,37 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
 
             Assert.AreEqual(-19.5f, Body.position.x, 0.6f);
+            Assert.AreEqual(4.3f, Body.position.y, 0.6f);
+        }
+    }
+
+    /// <summary>The savings cooperative: the advisor's counter with the task inside, and the way back to its door.</summary>
+    public sealed class CooperativaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Cooperativa;
+
+        [UnityTest]
+        public IEnumerator Cooperative_HasTheAdvisorTheTaskAndTheTermSavings()
+        {
+            yield return null;
+
+            var station = GameObject.Find("Station_Coop").GetComponent<Station>();
+            Assert.AreEqual(StationType.Coop, station.Type);
+            Assert.Greater(GameObject.Find("AsesoraCoop").transform.position.y, station.transform.position.y, "the advisor is behind the counter");
+            Assert.IsNotNull(GameObject.Find("Thing_TermSavings"));
+            Assert.AreEqual(0f, Body.position.x, 0.5f);
+            Assert.AreEqual(MapLayout.CooperativaMat.y + 1.3f, Body.position.y, 0.5f, "the player comes in on the mat");
+        }
+
+        [UnityTest]
+        public IEnumerator Doormat_LeadsBackToTheTownInFrontOfTheCooperative()
+        {
+            Teleport(MapLayout.CooperativaMat);
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
+            Assert.AreEqual(-31.5f, Body.position.x, 0.6f);
             Assert.AreEqual(4.3f, Body.position.y, 0.6f);
         }
     }
