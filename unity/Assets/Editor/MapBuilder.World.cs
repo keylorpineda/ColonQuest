@@ -332,6 +332,26 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Line_Bottom", square, center - new Vector2(0f, size.y * 0.5f - 0.4f), new Vector2(size.x - 0.8f, 0.1f), line, 8);
             Shape(parent, "Line_Left", square, center - new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
             Shape(parent, "Line_Right", square, center + new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
+
+            // Ball and players running within the pitch
+            Shape(parent, "SoccerBall", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.35f, GamePalette.Hex("#F8F5E8"), 9);
+            Shape(parent, "SoccerBallSpot", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.12f, GamePalette.Hex("#1D2238"), 10);
+
+            var teamRed = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Buzz, HairColor = "#1D2238" };
+            var teamRed2 = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Side, HairColor = "#555A66" };
+            var teamRed3 = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Spiky, HairColor = "#2A1810" };
+
+            var teamBlue = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Buzz, HairColor = "#2A1810" };
+            var teamBlue2 = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Side, HairColor = "#1D2238" };
+            var teamBlue3 = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Afro, HairColor = "#1D2238" };
+
+            BuildPedestrian(parent, "JugadorRojo1", new Vector2(-34f, -22f), new Vector2(-30.5f, -21.6f), teamRed, 2.2f);
+            BuildPedestrian(parent, "JugadorRojo2", new Vector2(-38f, -24.2f), new Vector2(-33.5f, -24.0f), teamRed2, 2.0f);
+            BuildPedestrian(parent, "JugadorRojo3", new Vector2(-40f, -23.0f), new Vector2(-37.0f, -23.5f), teamRed3, 1.8f);
+
+            BuildPedestrian(parent, "JugadorAzul1", new Vector2(-36f, -22.4f), new Vector2(-39.0f, -22.0f), teamBlue, 2.2f);
+            BuildPedestrian(parent, "JugadorAzul2", new Vector2(-32f, -24.0f), new Vector2(-36.0f, -24.5f), teamBlue2, 2.0f);
+            BuildPedestrian(parent, "JugadorAzul3", new Vector2(-29f, -23.0f), new Vector2(-32.0f, -23.4f), teamBlue3, 1.8f);
         }
 
         // ---------------------------------------------------------------- borders
@@ -841,6 +861,23 @@ namespace ColonQuest.EditorTools
             {
                 Rock(parent, shadows, spot.x, spot.y, 0.7f);
             }
+
+            // People relaxing on the beach and walking the shore
+            Shape(parent, "BeachTowel1", roundedSmall, new Vector2(-13.8f, -24.2f), new Vector2(1.5f, 0.85f), GamePalette.Hex("#FF8A3D"), 6);
+            Shape(parent, "BeachTowelStripe1", square, new Vector2(-13.8f, -24.2f), new Vector2(1.5f, 0.22f), GamePalette.Hex("#FFFFFF"), 7);
+            var lookBeach1 = new Look { Skin = "#4DA3FF", Pants = "#FFD23F", Hair = HairStyle.Side, Extra = Accessory.Cap, ExtraColor = "#E8505B" };
+            BuildNpc(parent, "PlayeroTowel", new Vector2(-13.8f, -24.1f), lookBeach1, true);
+
+            Shape(parent, "BeachTowel2", roundedSmall, new Vector2(31.5f, -24.5f), new Vector2(1.5f, 0.85f), GamePalette.Hex("#2E8B57"), 6);
+            Shape(parent, "BeachTowelStripe2", square, new Vector2(31.5f, -24.5f), new Vector2(1.5f, 0.22f), GamePalette.Hex("#FFFFFF"), 7);
+            var lookBeach2 = new Look { Skin = "#FFD23F", Pants = "#E8505B", Hair = HairStyle.Bun, HairColor = "#555A66" };
+            BuildNpc(parent, "PlayeraTowel", new Vector2(31.5f, -24.4f), lookBeach2, true);
+
+            var lookBeach3 = new Look { Skin = "#E07A5F", Pants = "#3D2B1F", Hair = HairStyle.Side, Extra = Accessory.Cap, ExtraColor = "#4DA3FF" };
+            BuildNpc(parent, "PlayeroSombra", new Vector2(-1.6f, -23.4f), lookBeach3, true);
+
+            var lookWalker = new Look { Skin = "#55E08F", Pants = "#FFFFFF", Hair = HairStyle.Buzz, HairColor = "#1D2238" };
+            BuildPedestrian(parent, "PaseantePlaya", new Vector2(-9.0f, -26.3f), new Vector2(0.5f, -26.3f), lookWalker, 1.3f);
 
             Building(parent, shadows, new BuildingSpec
             {
