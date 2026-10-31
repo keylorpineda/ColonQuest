@@ -58,6 +58,17 @@ namespace ColonQuest.World.Tests
         }
 
         [Test]
+        public void Hints_TheSidewalksOfEveryBridgeAreNotWater()
+        {
+            foreach (float y in new[] { -1.2f, 5.0f, -15.2f, -8.8f, 24.8f, 31.6f })
+            {
+                Assert.AreEqual(HintKind.None, WorldHints.Check(SceneNames.Town, new Vector2(29.5f, y)).Kind, "sidewalk at y " + y);
+            }
+
+            Assert.AreEqual(HintKind.Water, WorldHints.Check(SceneNames.Town, new Vector2(29.5f, 8f)).Kind, "past the railing");
+        }
+
+        [Test]
         public void Thoughts_AreRaisedToTheListeners()
         {
             string heard = null;

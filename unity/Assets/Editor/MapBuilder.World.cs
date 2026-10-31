@@ -186,9 +186,9 @@ namespace ColonQuest.EditorTools
             }
 
             // Two bridges, on the streets: railings and posts on the street edges.
-            Bridge(parent, x, 6f, -2f);
-            Bridge(parent, x, -8f, -16f);
-            Bridge(parent, x, NorthSidewalkY, 24f);
+            Bridge(parent, x, MapLayout.BridgeFirstStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeFirstStreet.yMin - MapLayout.RailingHalf);
+            Bridge(parent, x, MapLayout.BridgeSouthStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeSouthStreet.yMin - MapLayout.RailingHalf);
+            Bridge(parent, x, MapLayout.BridgeAvenue.yMax + MapLayout.RailingHalf, MapLayout.BridgeAvenue.yMin - MapLayout.RailingHalf);
             Bridge(parent, x, -17.45f, -19.15f);
 
             // Plunge pool under the waterfall, at the foot of the cliff.
@@ -352,15 +352,15 @@ namespace ColonQuest.EditorTools
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
 
-            // The river, open only over the decks of the bridges: the two streets, the avenue and the beach path.
-            // The water between the railings and the deck is water, so it blocks like the rest of the river.
+            // The river, open over the bridges from railing to railing: the street and both sidewalks, so a player walking
+            // on the sidewalk crosses too. The railings themselves stay closed.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
             RiverWall(parent, riverX, riverWidth, shore, -19.15f);
-            RiverWall(parent, riverX, riverWidth, -17.45f, -14f);
-            RiverWall(parent, riverX, riverWidth, -10f, 0f);
-            RiverWall(parent, riverX, riverWidth, 4f, MapLayout.AvenueY - 2f);
-            RiverWall(parent, riverX, riverWidth, MapLayout.AvenueY + 2f, MapLayout.WorldNorthEdgeY);
+            RiverWall(parent, riverX, riverWidth, -17.45f, MapLayout.BridgeSouthStreet.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeSouthStreet.yMax, MapLayout.BridgeFirstStreet.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeFirstStreet.yMax, MapLayout.BridgeAvenue.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeAvenue.yMax, MapLayout.WorldNorthEdgeY);
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
 
