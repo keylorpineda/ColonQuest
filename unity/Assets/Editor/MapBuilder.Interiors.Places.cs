@@ -562,6 +562,15 @@ namespace ColonQuest.EditorTools
                 }
             }
 
+            // The mother lives in her own house, not in the neighbor's.
+            foreach (var part in new[] { parts.People.Find(OpeningMother), parts.Stations.Find("Thing_" + OpeningMother) })
+            {
+                if (part != null)
+                {
+                    Object.DestroyImmediate(part.gameObject);
+                }
+            }
+
             BuildNpc(parts.People, "DonMario", new Vector2(3.0f, 0.4f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#2A7F8C" }, false);
 
             // The officer is not here until the owner calls: he comes in by the door and goes straight to the player.
