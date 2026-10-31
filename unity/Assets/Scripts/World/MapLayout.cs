@@ -19,6 +19,7 @@ namespace ColonQuest.World
         public const string Finca = "Finca";
         public const string Inmobiliaria = "Inmobiliaria";
         public const string Soda = "Soda";
+        public const string Cooperativa = "Cooperativa";
     }
 
     /// <summary>
@@ -44,6 +45,7 @@ namespace ColonQuest.World
         public const string TownFromHospital = "Town_FromHospital";
         public const string TownFromVecino = "Town_FromVecino";
         public const string TownFromSoda = "Town_FromSoda";
+        public const string TownFromCooperativa = "Town_FromCooperativa";
 
         // Inside: the cell, the hospital bed and the two ends of the hospital stairs.
         public const string JailCell = "Carcel_Cell";
@@ -130,5 +132,7 @@ namespace ColonQuest.World
         public static readonly Vector2 InmobiliariaMat = new Vector2(0f, -5f);
         public static readonly Vector2 SodaSize = new Vector2(18f, 12f);
         public static readonly Vector2 SodaMat = new Vector2(0f, -5f);
+        public static readonly Vector2 CooperativaSize = new Vector2(18f, 11f);
+        public static readonly Vector2 CooperativaMat = new Vector2(0f, -4.5f);
     }
 }

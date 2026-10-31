@@ -83,6 +83,7 @@ namespace ColonQuest.World
                 case SceneNames.Agencia:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.3f, Crowd = 0.15f };
                 case SceneNames.Inmobiliaria:
+                case SceneNames.Cooperativa:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.22f, Crowd = 0.1f };
                 case SceneNames.Soda:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.25f, Crowd = 0.3f };

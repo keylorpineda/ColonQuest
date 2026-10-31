@@ -47,5 +47,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Soda.unity
     guid: fc5b896744b1bb440a3634c03f238219
+  - enabled: 1
+    path: Assets/Scenes/Cooperativa.unity
+    guid: 77dc016b200444249ab8eb676426ecae
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

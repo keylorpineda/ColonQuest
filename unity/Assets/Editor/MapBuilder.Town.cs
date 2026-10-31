@@ -442,7 +442,6 @@ namespace ColonQuest.EditorTools
             BuildNpc(parent, "Prestamista", new Vector2(-14f, -5.3f), new Look { Skin = "#5B4B7A", Extra = Accessory.Hood, ExtraColor = "#2A2140" }, true);
             BuildNpc(parent, "Promotor", new Vector2(9.0f, -5.7f), new Look { Skin = "#2EAA55", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, true);
 
-            BuildNpc(parent, "AsesoraCoop", new Vector2(-29.6f, 4.85f), new Look { Skin = "#2E8B57", Extra = Accessory.Vest, ExtraColor = "#F1F4FF" }, true);
 
             // Iconic cast members in the residential and central plaza zones
             var donMario = BuildNpc(parent, "DonMario", new Vector2(-17.1f, 5.05f), new Look { Skin = "#E9E2D0" }, true);

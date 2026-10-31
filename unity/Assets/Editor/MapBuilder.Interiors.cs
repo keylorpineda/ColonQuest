@@ -38,6 +38,7 @@ namespace ColonQuest.EditorTools
             BuildInterior(SceneNames.Finca);
             BuildInterior(SceneNames.Inmobiliaria);
             BuildInterior(SceneNames.Soda);
+            BuildInterior(SceneNames.Cooperativa);
         }
 
         private static Room RoomFor(string sceneName)
@@ -64,6 +65,8 @@ namespace ColonQuest.EditorTools
                     return new Room { Name = "Finca", Center = Vector2.zero, Size = MapLayout.FincaSize, Color = GamePalette.Hex("#B98C5A") };
                 case SceneNames.Inmobiliaria:
                     return new Room { Name = "Inmobiliaria", Center = Vector2.zero, Size = MapLayout.InmobiliariaSize, Color = GamePalette.Hex("#D9E6EA") };
+                case SceneNames.Cooperativa:
+                    return new Room { Name = "Cooperativa", Center = Vector2.zero, Size = MapLayout.CooperativaSize, Color = GamePalette.Hex("#E6EFE3") };
                 case SceneNames.Soda:
                     return new Room { Name = "Soda", Center = Vector2.zero, Size = MapLayout.SodaSize, Color = GamePalette.Hex("#F7E5C8") };
                 default:
@@ -98,6 +101,8 @@ namespace ColonQuest.EditorTools
                     return MapLayout.InmobiliariaMat;
                 case SceneNames.Soda:
                     return MapLayout.SodaMat;
+                case SceneNames.Cooperativa:
+                    return MapLayout.CooperativaMat;
                 default:
                     return MapLayout.BancoMat;
             }
@@ -129,6 +134,8 @@ namespace ColonQuest.EditorTools
                     return SpawnIds.TownFromInmobiliaria;
                 case SceneNames.Soda:
                     return SpawnIds.TownFromSoda;
+                case SceneNames.Cooperativa:
+                    return SpawnIds.TownFromCooperativa;
                 default:
                     return SpawnIds.TownFromBanco;
             }
@@ -195,6 +202,9 @@ namespace ColonQuest.EditorTools
                     break;
                 case SceneNames.Inmobiliaria:
                     BuildRealEstateLayout(layout, room);
+                    break;
+                case SceneNames.Cooperativa:
+                    BuildCoopLayout(layout, room);
                     break;
                 case SceneNames.Soda:
                     BuildSodaLayout(layout, room);

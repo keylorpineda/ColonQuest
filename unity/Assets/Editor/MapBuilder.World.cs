@@ -528,7 +528,7 @@ namespace ColonQuest.EditorTools
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Cooperativa", Sign = "COOPERATIVA", Roof = "#2E8B57", Wall = "#F4EBD0",
-                XMin = -36.5f, XMax = -26.5f, YBottom = 6f, YTop = 13.4f, DoorX = -31.5f, FacadeHeight = 3.2f, Entrance = Entrance.Window,
+                XMin = -36.5f, XMax = -26.5f, YBottom = 6f, YTop = 13.4f, DoorX = -31.5f, FacadeHeight = 3.2f, Entrance = Entrance.Door,
                 AwningA = "#2E8B57", AwningB = "#F8F5E8"
             });
 

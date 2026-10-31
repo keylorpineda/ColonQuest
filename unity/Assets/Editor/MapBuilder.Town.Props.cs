@@ -1309,7 +1309,8 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Grocery", StationType.Grocery, "Pulperia", new Vector2(-19.5f, -9.0f));
             BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f));
             BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
-            BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
+            Doorway(parent, new Vector2(-31.5f, 5.7f), SceneNames.Cooperativa, true);
+            BuildSpawnPoint(parent, SpawnIds.TownFromCooperativa, new Vector2(-31.5f, 4.3f));
             BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(0f, 4.6f));
             currentLayer = LayerWorld;
         }

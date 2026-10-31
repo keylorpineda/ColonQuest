@@ -53,6 +53,7 @@ namespace ColonQuest.World
                 case SceneNames.HospitalArriba:
                 case SceneNames.Inmobiliaria:
                 case SceneNames.Soda:
+                case SceneNames.Cooperativa:
                     return SurfaceKind.Tile;
                 case SceneNames.Town:
                     return Town(position);
