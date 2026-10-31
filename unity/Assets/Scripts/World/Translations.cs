@@ -12,6 +12,9 @@ namespace ColonQuest.World
     {
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
+            // Visual polish of the 31st
+            { "CASA DE MAMÁ", "MOM'S HOUSE" },
+
             // ---- main menu
             { "Modo historia", "Story mode" },
             { "Jugar online", "Play online" },

@@ -209,8 +209,8 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// Transforms "TU CASA" into the L-shaped colonial Costa Rican home from the concept art:
-        /// protruding right gable roof with diagonal terracotta ridge tiles, wooden plank sign "TU CASA",
+        /// Transforms "CASA DE MAMÁ" into the L-shaped colonial Costa Rican home from the concept art:
+        /// protruding right gable roof with diagonal terracotta ridge tiles, wooden plank sign "CASA DE MAMÁ",
         /// and a recessed left garden alcove with potted Monstera and Parlour Palm plants.
         /// </summary>
         private static void DecorateCasaArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
@@ -249,8 +249,8 @@ namespace ColonQuest.EditorTools
                 Tilt(tileRB, -38f);
             }
 
-            // Large weathered wooden plank sign "TU CASA" mounted on the gable
-            DrawWoodenPlankSign(root, "TU CASA", new Vector2(gableX, fh + 0.68f), 3.3f, 0.88f, 10);
+            // Large weathered wooden plank sign "CASA DE MAMÁ" mounted on the gable
+            DrawWoodenPlankSign(root, "CASA DE MAMÁ", new Vector2(gableX, fh + 0.68f), 4.4f, 0.88f, 10);
 
             // Potted Monstera deliciosa & Parlour Palms in terracotta pots flanking the house and garden
             BuildMonsteraPot(root, new Vector2(-3.55f, -0.15f), 1.05f, 12);
