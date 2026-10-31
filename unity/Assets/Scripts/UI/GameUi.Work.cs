@@ -157,15 +157,68 @@ namespace ColonQuest.UI
             var scene = new Interaction().WalkTo(me).Face(machine)
                 .Pose(PersonPose.Reach, 0.6f).Fly("card", me + new Vector2(0.2f, 0.4f), machine, 0.5f).Sound(SoundEffectKind.Beep)
                 .Wait(0.5f).Sound(SoundEffectKind.Chime)
-                .Say(Boss, BossLine(result)).Wait(2.6f)
-                .Pose(PersonPose.Sweep, 2.6f).Sound(SoundEffectKind.Swish).Wait(1.3f).Sound(SoundEffectKind.Swish).Wait(1.3f)
-                .Pose(PersonPose.Wash, 2.2f).Sound(SoundEffectKind.Water).Wait(2.2f)
-                .Pose(PersonPose.Handover, 1.2f).Fly("plate", me + new Vector2(0f, 0.3f), machine, 0.6f).Sound(SoundEffectKind.Coin).Wait(1.2f)
-                .Pose(PersonPose.None, 0.2f)
-                .Apply(then);
+                .Say(Boss, BossLine(result)).Wait(2.6f);
+
+            // The shift itself, at the real furniture of the soda; Space skips it like any scene.
+            for (int round = 0; round < ShiftRounds; round++)
+            {
+                ShiftRound(scene, session.Loop.Job.Position, round);
+            }
+
+            scene.WalkTo(me).Face(machine).Pose(PersonPose.None, 0.2f).Apply(then);
 
             // What counts is the state after clocking in: today may be the day that was missing.
             return session.Loop.CanBePromoted ? AddPromotion(scene) : scene.Say(string.Empty, "Listo por hoy. Tengo el resto del día libre.");
+        }
+
+        private const int ShiftRounds = 2;
+
+        // Where the staff stands at the soda (see MapBuilder.Interiors.Soda.cs): in front of the stove, the prep table and the
+        // fridge along the back wall, behind the register, and around the two ends of the counter to the dining tables.
+        private static readonly Vector2 SodaStove = new Vector2(-3.5f, 3.05f);
+        private static readonly Vector2 SodaPrep = new Vector2(0f, 3.15f);
+        private static readonly Vector2 SodaFridge = new Vector2(3.6f, 2.95f);
+        private static readonly Vector2 SodaPass = new Vector2(0.6f, 1.4f);
+        private static readonly Vector2 SodaRegister = new Vector2(-1.8f, 1.4f);
+
+        /// <summary>One round of the shift for the player's position at the soda.</summary>
+        private static void ShiftRound(Interaction scene, JobPosition position, int round)
+        {
+            switch (position)
+            {
+                case JobPosition.Helper:
+                    // The helper washes the dishes at the prep table, takes what is needed from the fridge and cooks.
+                    scene.WalkTo(SodaPrep).Face(SodaPrep + Vector2.up).Pose(PersonPose.Wash, 2f).Sound(SoundEffectKind.Water)
+                        .Fly("plate", SodaPrep + new Vector2(-0.4f, 0.6f), SodaPrep + new Vector2(0.4f, 0.6f), 0.5f).Wait(0.6f)
+                        .WalkTo(SodaFridge).Face(SodaFridge + Vector2.up).Pose(PersonPose.Reach, 0.6f).Sound(SoundEffectKind.Knock).Wait(0.3f)
+                        .WalkTo(SodaStove).Face(SodaStove + Vector2.up).Sound(SoundEffectKind.Sizzle).Pose(PersonPose.Cook, 2f)
+                        .Steam(SodaStove + new Vector2(-0.4f, 1.2f), 1.8f).Wait(0.4f);
+                    break;
+                case JobPosition.Cashier:
+                    // The cashier also waits tables: a plate from the pass to a table, one side each round.
+                    Serve(scene, round);
+                    scene.WalkTo(SodaRegister).Face(SodaRegister + Vector2.down).Pose(PersonPose.Count, 1.2f).Sound(SoundEffectKind.Coin);
+                    break;
+                default:
+                    // Managing: the register is counted, a table is served and the papers are checked.
+                    scene.WalkTo(SodaRegister).Face(SodaRegister + Vector2.down).Pose(PersonPose.Count, 1.6f).Sound(SoundEffectKind.Coin).Wait(0.3f);
+                    Serve(scene, round);
+                    scene.Pose(PersonPose.Read, 1.4f).Sound(SoundEffectKind.Swish);
+                    break;
+            }
+        }
+
+        /// <summary>Takes a plate from the pass around the end of the counter to a table, and comes back behind the counter.</summary>
+        private static void Serve(Interaction scene, int round)
+        {
+            float side = round % 2 == 0 ? 1f : -1f;
+            var behindEnd = new Vector2(side * 5.4f, 1.4f);
+            var frontEnd = new Vector2(side * 5.4f, -0.8f);
+            var table = new Vector2(side * 3.9f, -1.4f);
+            scene.WalkTo(SodaPass).Face(SodaPrep).Pose(PersonPose.Reach, 0.5f).Fly("plate", SodaPrep + new Vector2(0f, 0.6f), SodaPass + new Vector2(0f, 0.3f), 0.5f)
+                .WalkTo(behindEnd).WalkTo(frontEnd).WalkTo(table).Face(new Vector2(side * 5.2f, -2.6f))
+                .Pose(PersonPose.Handover, 0.8f).Fly("plate", table + new Vector2(0f, 0.3f), new Vector2(side * 4.75f, -2.6f), 0.5f).Sound(SoundEffectKind.Chime)
+                .Wait(0.3f).WalkTo(frontEnd).WalkTo(behindEnd);
         }
 
         private static string BossLine(ClockInResult result)
