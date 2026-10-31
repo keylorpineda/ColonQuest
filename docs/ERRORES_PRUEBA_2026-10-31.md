@@ -129,9 +129,12 @@ Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
 
 ### NPC e inteligencia artificial
 - [ ] T3-15 (A) Desaparición de NPC: al terminar sus turnos laborales, los NPC desaparecen de golpe. Programar que caminen físicamente hasta su casa asignada.
-- [ ] T3-16 (S) Interacciones y negociaciones: sistema de diálogo para negociar con NPC clave del pueblo.
-  - [ ] T3-16a (S) Invertir Ya (300%): actualmente no hay opción de negociar con ellos.
-  - [ ] T3-16b (S) Prestamista de dinero rápido: habilitar opciones de negociación o pago para el NPC que presta con intereses excesivos.
+- [x] T3-16 (S) Interacciones y negociaciones: sistema de diálogo para negociar con NPC clave del pueblo.
+  Hecho: en el prestamista y en Invierte Ya sale "Hablar y negociar (texto o voz)" antes de escuchar la oferta.
+  - [x] T3-16a (S) Invertir Ya (300%): actualmente no hay opción de negociar con ellos.
+    Hecho: Invierte Ya responde por reglas: admite de dónde sale la plata, que no hay contrato ni SUGEF, solo si le preguntan.
+  - [x] T3-16b (S) Prestamista de dinero rápido: habilitar opciones de negociación o pago para el NPC que presta con intereses excesivos.
+    Hecho: el prestamista dice la tasa (20% al mes) y el total real (₡100 000 se vuelven ₡172 800 en 3 meses) cuando le preguntan.
 - [ ] T3-17 (A) Vida en el mapa:
   - [ ] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros jugando en la cancha de fútbol.
   - [ ] T3-17b (A) Torre de salvavidas: el NPC salvavidas no está en su puesto, la torre está vacía.
@@ -140,8 +143,10 @@ Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
 ### Evento de cobradores y sistema de negociación
 - [x] T3-19 (S) Animación y sincronización con el prólogo: el evento de los cobradores debe ejecutarse literalmente como lo describe el texto: un carro negro polarizado frena físicamente frente al jugador, se bajan dos hombres y caminan hacia el personaje para realizar el cobro.
   Hecho: el carro frena, se bajan dos cobradores, caminan hasta el jugador, hablan y después sale el menú; al elegir vuelven al carro.
-- [ ] T3-20 (S) Opción interactiva de negociación: al ser abordado por los cobradores, el menú de interacción debe incluir obligatoriamente una opción de "Negociar".
-- [ ] T3-21 (S) Soporte de input por texto y voz: la negociación debe soportar input escrito (teclado) y reconocimiento de voz (micrófono), para que el jugador negocie con sus propias palabras.
+- [x] T3-20 (S) Opción interactiva de negociación: al ser abordado por los cobradores, el menú de interacción debe incluir obligatoriamente una opción de "Negociar".
+  Hecho: el menú de los cobradores tiene "Negociar con tus palabras"; el arreglo (mitad hoy, resto con recargo) aparece solo si lo pedís.
+- [x] T3-21 (S) Soporte de input por texto y voz: la negociación debe soportar input escrito (teclado) y reconocimiento de voz (micrófono), para que el jugador negocie con sus propias palabras.
+  Hecho: ventana de conversación con caja de texto y botón Hablar (micrófono). La voz se transcribe en el backend; sin backend pide escribir.
 
 ### Sistema de guardado y salida del juego
 - [x] T3-22 (S) Mensaje de confirmación exacto: al intentar salir de la partida, mostrar obligatoriamente una alerta con el texto exacto: "¿Seguro? Se pierde la partida, ¿quieres guardar?".
