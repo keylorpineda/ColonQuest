@@ -69,6 +69,7 @@ namespace ColonQuest.Game.Tests
             loop.Holdings.SetHealthInsurance(15_000L);
             loop.Holdings.AddFarm(FarmKind.Coffee, 200_000L, 1);
             loop.BuySwimsuit();
+            loop.Wear(3, 3);
             loop.Sleep();
             loop.Clock.Advance(GameRules.SecondsPerGameHour * 3f, GameRules.SecondsPerGameHour);
             long cash = loop.State.Cash;
@@ -91,6 +92,7 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(15_000L, back.Holdings.HealthPremium);
             Assert.AreEqual(200_000L, back.Holdings.FarmInvested);
             Assert.IsTrue(back.HasSwimsuit);
+            Assert.AreEqual(3, back.Outfit, "the clothes the player wore");
             Assert.IsTrue(back.SleptThisMonth);
             Assert.AreEqual(2, back.Clock.Day);
             Assert.AreEqual("09:00", back.Clock.Time);

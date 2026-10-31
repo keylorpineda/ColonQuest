@@ -217,6 +217,55 @@ namespace ColonQuest.World
             }
         }
 
+        /// <summary>
+        /// The pixel blur of the shower: small squares in tones of the skin over the body, from the chest to the knees. It
+        /// follows the body as it moves and goes away by itself.
+        /// </summary>
+        public static void Censor(GameObject player, Color skin, float seconds)
+        {
+            Transform torso = null;
+            SpriteRenderer torsoRenderer = null;
+            foreach (var renderer in player.GetComponentsInChildren<SpriteRenderer>())
+            {
+                if (renderer.name == "Torso")
+                {
+                    torsoRenderer = renderer;
+                    torso = renderer.transform.parent;
+                    break;
+                }
+            }
+
+            if (torso == null)
+            {
+                return;
+            }
+
+            var go = new GameObject("Censor");
+            go.transform.SetParent(torso, false);
+            go.transform.localPosition = new Vector3(0f, -0.14f, 0f);
+            const int columns = 4;
+            const int rows = 6;
+            const float cell = 0.13f;
+            for (int x = 0; x < columns; x++)
+            {
+                for (int y = 0; y < rows; y++)
+                {
+                    float tone = 0.86f + ((x * 7 + y * 3) % 5) * 0.06f;
+                    var block = new GameObject("Pixel");
+                    block.transform.SetParent(go.transform, false);
+                    block.transform.localPosition = new Vector3((x - (columns - 1) * 0.5f) * cell, (y - (rows - 1) * 0.5f) * cell, 0f);
+                    block.transform.localScale = new Vector3(cell, cell, 1f);
+                    var renderer = block.AddComponent<SpriteRenderer>();
+                    renderer.sprite = Square();
+                    renderer.color = GamePalette.Shade(skin, tone);
+                    renderer.sortingLayerID = torsoRenderer.sortingLayerID;
+                    renderer.sortingOrder = torsoRenderer.sortingOrder + 40;
+                }
+            }
+
+            Object.Destroy(go, Mathf.Max(0.1f, seconds));
+        }
+
         /// <summary>A rectangle that changes brightness quickly: the light of a television.</summary>
         public static void Flicker(Vector2 at, Vector2 size, Color color, float seconds)
         {

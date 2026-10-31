@@ -238,14 +238,22 @@ namespace ColonQuest.UI
 
                 case "Thing_Shower":
                 {
-                    var scene = new Interaction().WalkInto(me).Pose(PersonPose.Wash, 3.2f).Sound(SoundEffectKind.Water).Steam(Here(station, 0f, 0.4f), 3f);
+                    // The clothes come off behind the glass with a pixel blur on the body, and go back on at the end.
+                    var scene = new Interaction().WalkInto(me).Sound(SoundEffectKind.Swish).Pose(PersonPose.Reach, 0.5f)
+                        .Undress(4.4f).Wait(0.3f).Pose(PersonPose.Wash, 3.2f).Sound(SoundEffectKind.Water).Steam(Here(station, 0f, 0.4f), 3f);
                     for (int i = 0; i < 6; i++)
                     {
                         scene.Fly("drop", Here(station, -0.25f + i * 0.1f, 1.1f), Here(station, -0.25f + i * 0.1f, -0.1f), 0.5f).Wait(0.45f);
                     }
 
-                    return scene.Pose(PersonPose.None, 0.3f).Say(string.Empty, "Un baño caliente y a seguir con las cuentas.").Apply(then);
+                    return scene.Pose(PersonPose.None, 0.2f).Sound(SoundEffectKind.Swish).Wear(session.Loop.Outfit)
+                        .Say(string.Empty, "Un baño corto y a seguir con las cuentas.").Apply(then);
                 }
+
+                case "Thing_Toilet":
+                    // The screen dims while the player uses the toilet, the flush sounds and the light comes back.
+                    return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Fade(new Color(0.02f, 0.03f, 0.1f, 0.85f), 0.5f)
+                        .Wait(1.2f).Sound(SoundEffectKind.Water).Wait(0.8f).Fade(Dawn, 0.5f).Apply(then);
 
                 case "Thing_Tv":
                     // Watching from the sofa that faces the TV; without it, from the floor in front of the screen.

@@ -247,6 +247,28 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.WaitUntil, Condition = condition });
         }
 
+        /// <summary>Changes the player's clothes, as at the wardrobe (see <see cref="PlayerOutfit"/>).</summary>
+        public Interaction Wear(int outfit)
+        {
+            return Apply(() => PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), outfit));
+        }
+
+        /// <summary>The clothes come off for the shower and the pixel blur covers the body for these seconds.</summary>
+        public Interaction Undress(float seconds)
+        {
+            return Apply(() =>
+            {
+                var player = GameObject.FindWithTag(Station.PlayerTag);
+                if (player == null)
+                {
+                    return;
+                }
+
+                PlayerOutfit.Undress(player);
+                InteractionProps.Censor(player, PlayerOutfit.SkinOf(player), seconds);
+            });
+        }
+
         /// <summary>The moment the game changes. It runs even if the player skips the scene.</summary>
         public Interaction Apply(Action action)
         {

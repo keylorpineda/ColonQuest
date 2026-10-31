@@ -105,6 +105,7 @@ namespace ColonQuest.Game
             HurtThisMonth = false;
             Arrests = 0;
             HasSwimsuit = false;
+            Outfit = 0;
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
@@ -131,6 +132,7 @@ namespace ColonQuest.Game
                 arrests = Arrests,
                 hurtThisMonth = HurtThisMonth,
                 hasSwimsuit = HasSwimsuit,
+                outfit = Outfit,
                 swamThisMonth = SwamThisMonth,
                 sleptThisMonth = SleptThisMonth,
                 cookedThisMonth = CookedThisMonth,
@@ -194,6 +196,7 @@ namespace ColonQuest.Game
             Arrests = Math.Max(0, snapshot.arrests);
             HurtThisMonth = snapshot.hurtThisMonth;
             HasSwimsuit = snapshot.hasSwimsuit;
+            Outfit = Math.Max(0, snapshot.outfit);
             SwamThisMonth = snapshot.swamThisMonth;
             SleptThisMonth = snapshot.sleptThisMonth;
             CookedThisMonth = snapshot.cookedThisMonth;
@@ -265,6 +268,21 @@ namespace ColonQuest.Game
         public int Arrests { get; private set; }
 
         public bool HasSwimsuit { get; private set; }
+
+        /// <summary>The clothes the player wears, by number (see PlayerOutfit): 0 is the everyday clothes, 3 the swimsuit.</summary>
+        public int Outfit { get; private set; }
+
+        /// <summary>Changes the clothes. The swimsuit can only be worn once it was bought.</summary>
+        public bool Wear(int outfit, int swimsuit)
+        {
+            if (outfit < 0 || (outfit == swimsuit && !HasSwimsuit))
+            {
+                return false;
+            }
+
+            Outfit = outfit;
+            return true;
+        }
 
         public bool SwamThisMonth { get; private set; }
 

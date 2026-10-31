@@ -235,6 +235,10 @@ namespace ColonQuest.UI
             RefreshPowerCut();
             TryStartOpening(scene);
             BindStations();
+            if (session != null && session.Loop.Outfit != PlayerOutfit.Everyday)
+            {
+                PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), session.Loop.Outfit);
+            }
         }
 
         private void BindStations()
