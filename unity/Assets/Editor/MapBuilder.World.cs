@@ -382,6 +382,7 @@ namespace ColonQuest.EditorTools
             BuildNeighborhood(parent, shadows, random);
             BuildEastFarm(parent, shadows, random);
             BuildBeach(parent, shadows, random);
+            BuildEastTreeline(parent, shadows);
 
             foreach (float x in new[] { -36f, -27f, -18f, -9f, 0f, 9f, 18f, 36f, 39.5f })
             {
@@ -522,6 +523,22 @@ namespace ColonQuest.EditorTools
         }
 
         // ---------------------------------------------------------------- neighborhood (west)
+
+        /// <summary>Three staggered rows of big trees along the east edge, hiding where the roads meet the rock face.</summary>
+        private static void BuildEastTreeline(Transform parent, Transform shadows)
+        {
+            // Its own random so the rest of the world keeps the layout it had.
+            var random = new System.Random(31);
+            for (int row = 0; row < 3; row++)
+            {
+                for (float y = -23f + row * 0.8f; y < MapLayout.WorldNorthEdgeY + 3f; y += 2.4f)
+                {
+                    float jx = 68.2f + row * 2.5f + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    float jy = y + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    Tree(parent, shadows, jx, jy, 1.5f + (float)random.NextDouble() * 0.25f, DistrictGreens[random.Next(DistrictGreens.Length)], false);
+                }
+            }
+        }
 
         private static void BuildNeighborhood(Transform parent, Transform shadows, System.Random random)
         {
