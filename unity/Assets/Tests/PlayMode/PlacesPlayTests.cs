@@ -247,6 +247,32 @@ namespace ColonQuest.World.PlayModeTests
         protected override string SceneToLoad => SceneNames.Vecino;
 
         [UnityTest]
+        public IEnumerator Neighbor_HasNoMotherAndOnlySomeHousesHaveADog()
+        {
+            yield return null;
+            Assert.IsNull(GameObject.Find("Mama"), "the mother lives in her own house");
+            Assert.IsNull(GameObject.Find("Thing_Mama"));
+
+            string remembered = Door.RememberedReturn;
+            try
+            {
+                Door.SetRememberedReturn("Town_From_Casa_Almendros_3");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNull(GameObject.Find("Thing_Pet"), "no dog in this house");
+
+                Door.SetRememberedReturn("Town_From_Casa_Vecina_A");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNotNull(GameObject.Find("Thing_Pet"), "this neighbor keeps a dog");
+            }
+            finally
+            {
+                Door.SetRememberedReturn(remembered);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator Neighbor_TheOwnerCountsDownAndThePlayersOwnDeskIsNotThere()
         {
             yield return null;

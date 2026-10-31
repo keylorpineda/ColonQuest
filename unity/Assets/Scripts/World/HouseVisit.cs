@@ -17,5 +17,30 @@ namespace ColonQuest.World
         {
             ListingId = listingId ?? string.Empty;
         }
+
+        /// <summary>The neighbors' houses that keep a dog; the others have none.</summary>
+        private static readonly string[] DogHouses = { "Casa_Vecina_A", "Casa_Almendros_4" };
+
+        /// <summary>
+        /// True when the neighbor's house the player came in by has a dog. The key is the spot in front of its door, the
+        /// remembered return of the door (for example "Town_From_Casa_Vecina_A").
+        /// </summary>
+        public static bool NeighborHasDog(string doorReturn)
+        {
+            if (string.IsNullOrEmpty(doorReturn))
+            {
+                return false;
+            }
+
+            foreach (var house in DogHouses)
+            {
+                if (doorReturn.EndsWith(house))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

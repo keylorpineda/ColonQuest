@@ -248,8 +248,11 @@ namespace ColonQuest.EditorTools
             var ear = Deco(pet, "Ear", roundedSmall, 6.28f, -1.63f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
             Tilt(ear, -18f);
 
-            BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
+            var petTalk = BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
                 "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
+
+            // The same rooms serve the neighbors and the houses for sale: the dog decides at run time if it lives here.
+            pet.gameObject.AddComponent<HouseDog>().Configure(petTalk.gameObject);
 
             // By the front door: shoes, coats and a plant.
             var entry = IL(parts.Props, "Entry");
