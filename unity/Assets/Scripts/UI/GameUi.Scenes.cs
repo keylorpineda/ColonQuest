@@ -440,7 +440,7 @@ namespace ColonQuest.UI
 
         /// <summary>
         /// Sleeping: the player walks to the bed and lies down, the Z letters rise, the screen goes dark, the alarm rings and the
-        /// morning comes back: the clock skips to the next week. Before the evening the bed only talks, like any object.
+        /// morning comes back: the clock skips to the next week. Before the evening it is only a short nap.
         /// </summary>
         private Interaction BedScene(Station station, Action then)
         {

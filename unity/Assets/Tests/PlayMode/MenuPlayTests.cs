@@ -330,7 +330,10 @@ namespace ColonQuest.World.PlayModeTests
 
             yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
             yield return null;
-            Assert.IsNull(GameObject.Find("Mama"), "after the opening the mother is not in the house");
+            var mother = GameObject.Find("Mama");
+            Assert.IsNotNull(mother, "the house is the mother's: she is still there after the opening");
+            Assert.Less(mother.transform.position.y, 0.8f, "back in the living room, out of the bedroom");
+            Assert.IsNotNull(GameObject.Find("Thing_Mama"), "the player can talk to her");
         }
 
         private static string SlotButton(int slot, string text)

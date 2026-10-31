@@ -635,7 +635,8 @@ namespace ColonQuest.UI
                 + "  ·  " + Loc.F("Semana {0}", loop.Clock.Day);
             clockText.text = loop.Clock.Time;
             tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
-            cashText.text = Money.Format(state.Cash);
+            // In the opening the pocket is empty until the mother hands over the present.
+            cashText.text = Money.Format(openingPlaying && !openingCashGiven ? 0L : state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
             cardText.text = Money.Format(state.CreditCard.Balance);
             installmentsText.text = Money.Format(GameRules.MonthlyInstallments(state));

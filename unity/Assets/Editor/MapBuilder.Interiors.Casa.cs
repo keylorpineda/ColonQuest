@@ -15,6 +15,7 @@ namespace ColonQuest.EditorTools
         private const float BathroomRight = 1.6f;
         private const string HouseWallFace = "#E9DDC9";
         private const string OpeningMother = "Mama";
+        private static readonly Vector2 MotherAt = new Vector2(2.4f, -0.8f);
 
         private static void BuildHouseLayout(InteriorParts parts, Room room)
         {
@@ -66,12 +67,6 @@ namespace ColonQuest.EditorTools
             var wardrobe = IL(parts.Props, "Wardrobe");
             Solid(wardrobe, "Wardrobe", rounded, -7.6f, 2.3f, 0.9f, 2.2f, "#7A4F2A");
             BuildWardrobeInside(wardrobe);
-
-            // The player's mother, only there in the opening scene.
-            BuildNpc(parts.People, OpeningMother, new Vector2(-4.0f, 1.7f), new Look
-            {
-                Skin = "#5FA38C", SkinTone = "#D9A47A", HairColor = "#555A66", Hair = HairStyle.Bun, Pants = "#6B5B50", Face = Expression.Warm
-            }, false).gameObject.AddComponent<OpeningActor>();
 
             Rug(IL(parts.Floor, "BedroomRug"), -5.1f, 1.85f, 2.2f, 0.9f, "#B98E6A", "#8E6A4C");
             Window(IL(parts.Labels, "BedroomWindow"), -5.1f, 5.6f, 1.4f);
@@ -206,6 +201,17 @@ namespace ColonQuest.EditorTools
 
             Deco(dining, "Vase", circle, 5.0f, -2.6f, 0.26f, 0.26f, "#55E08F", 1f, 9);
             CeilingLight(parts.Lights, new Vector2(5.0f, -2.6f), 4.0f, "#FFE9A8", 0.1f);
+
+            // The house is the mother's: she stays in the living room, out of the way between the sofa and the table. The
+            // opening moves her to the bedroom for the present (see GameUi.Opening.cs).
+            BuildNpc(parts.People, OpeningMother, MotherAt, new Look
+            {
+                Skin = "#5FA38C", SkinTone = "#D9A47A", HairColor = "#555A66", Hair = HairStyle.Bun, Pants = "#6B5B50", Face = Expression.Warm
+            }, false);
+            BuildThing(parts.Stations, OpeningMother, "Hablar con tu mamá", MotherAt + new Vector2(0f, -0.5f), new Vector2(0.8f, 0.6f),
+                "\"Antes de comprar algo, esperá un día. Si al otro día lo seguís queriendo, ahí sí.\"",
+                "\"Apartá primero para el ahorro y después gastás. Al revés nunca alcanza.\"",
+                "\"Si alguien te ofrece plata fácil, desconfiá. Nadie regala nada.\"");
 
             // The desk with the bills and the laptop: the account statement station.
             var desk = IL(parts.Props, "BillsDesk");

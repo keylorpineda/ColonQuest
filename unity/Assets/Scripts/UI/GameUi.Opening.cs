@@ -1,4 +1,5 @@
 using System.Collections;
+using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
 
@@ -13,16 +14,23 @@ namespace ColonQuest.UI
         public const string SkipHint = "[Espacio]  Saltar";
 
         private static readonly Vector2 OpeningStart = new Vector2(-6.0f, 1.8f);
+
+        /// <summary>Where the mother stands for the present, next to the bed. The rest of the time she is in the living room.</summary>
+        private static readonly Vector2 OpeningMotherAt = new Vector2(-4.0f, 1.7f);
+
         private const string Mother = "Mama";
 
         private bool openingPending;
         private bool openingPlaying;
 
+        /// <summary>False in the opening until the box changes hands: the HUD shows an empty pocket until then.</summary>
+        private bool openingCashGiven;
+
         /// <summary>The next time the house loads, the opening plays there.</summary>
         public void PlayOpeningNext()
         {
             openingPending = true;
-            OpeningActor.Show = true;
+            HouseVisit.Enter(string.Empty);
         }
 
         private void TryStartOpening(UnityEngine.SceneManagement.Scene scene)
@@ -37,11 +45,19 @@ namespace ColonQuest.UI
         private IEnumerator OpeningSequence()
         {
             openingPlaying = true;
+            openingCashGiven = false;
+            Refresh();
             var hero = GameObject.FindWithTag(Station.PlayerTag);
             if (hero != null)
             {
                 hero.transform.position = OpeningStart;
                 hero.GetComponent<Rigidbody2D>().position = OpeningStart;
+            }
+
+            var mother = GameObject.Find(Mother);
+            if (mother != null)
+            {
+                mother.transform.position = OpeningMotherAt;
             }
 
             // The loading screen goes first: the story begins when the player can see it.
@@ -63,14 +79,14 @@ namespace ColonQuest.UI
             }
 
             openingPlaying = false;
-            OpeningActor.Show = false;
+            openingCashGiven = true;
             promptCard.SetActive(false);
             SceneTransition.Go(SceneNames.Town, SpawnIds.TownFromCasa);
         }
 
-        private static Interaction OpeningScene()
+        private Interaction OpeningScene()
         {
-            Vector2 mom = PersonAt(Mother, new Vector2(-4.0f, 1.7f));
+            Vector2 mom = PersonAt(Mother, OpeningMotherAt);
             Vector2 me = OpeningStart;
             string name = PlayerProfile.HasName ? PlayerProfile.Name : PlayerProfile.DefaultName;
             return new Interaction()
@@ -79,6 +95,15 @@ namespace ColonQuest.UI
                 .Say("Mamá", Loc.F("¡Feliz cumpleaños, {0}! Ya 18 años, ¿quién lo diría?", name)).Wait(3.2f)
                 .NpcPose(Mother, PersonPose.Handover, 1.2f).Sound(SoundEffectKind.Swish)
                 .Fly("box", mom, me + new Vector2(0f, 0.2f), 0.9f).Wait(1f)
+
+                // The money is in the box: it reaches the HUD now, even if the scene is skipped.
+                .Apply(() =>
+                {
+                    openingCashGiven = true;
+                    Refresh();
+                    AudioDirector.Effect(SoundEffectKind.Coin);
+                })
+                .Say("Mamá", Loc.F("Adentro van {0} para que empecés. Es tu plata: cuidala.", Money.Format(session.State.Cash))).Wait(3f)
                 .Pose(PersonPose.Wave, 1.4f)
                 .Say(string.Empty, "Gracias, mami. Qué chiva.").Wait(1.2f)
                 .Say("Mamá", "Ahora te toca manejar tu propia plata. Con cuidado, ¿oyó?").Wait(3.4f)
