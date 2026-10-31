@@ -17,6 +17,7 @@ namespace ColonQuest.World
         [SerializeField] private bool useRememberedReturn;
         [SerializeField] private bool closesAtNight;
         [SerializeField] private GameObject closedSign;
+        [SerializeField] private string listingId;
 
         /// <summary>Where the last house door of the town left the player, so the shared house interior leads back to the right door.</summary>
         public static string RememberedReturn { get; set; } = string.Empty;
@@ -72,6 +73,12 @@ namespace ColonQuest.World
         {
             Configure(scene, spawn, direction);
             returnSpawn = outsideSpawn;
+        }
+
+        /// <summary>The door of a house for sale or rent: inside, the house is not the player's until it is rented or bought.</summary>
+        public void MarkListing(string id)
+        {
+            listingId = id;
         }
 
         /// <summary>The mat of the shared house: it leads to the door the player came in by.</summary>
@@ -151,6 +158,9 @@ namespace ColonQuest.World
                 {
                     RememberedReturn = returnSpawn;
                 }
+
+                // Every door says which house it opens: a listing, or none (the mother's house and every other place).
+                HouseVisit.Enter(listingId);
 
                 string spawn = ResolveSpawn(useRememberedReturn, RememberedReturn, targetSpawn);
                 var elevator = GetComponent<Elevator>();

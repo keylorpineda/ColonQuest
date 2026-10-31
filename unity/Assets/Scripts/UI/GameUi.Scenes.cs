@@ -36,6 +36,12 @@ namespace ColonQuest.UI
                 return;
             }
 
+            if (InHouseNotMine())
+            {
+                Thoughts.Say(HouseVisit.NotMineThought);
+                return;
+            }
+
             sceneStation = station;
 
             var scene = SceneFor(station, () => InteractNow(station));

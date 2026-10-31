@@ -239,6 +239,39 @@ namespace ColonQuest.UI
             {
                 PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), session.Loop.Outfit);
             }
+
+            if (scene.name == SceneNames.Casa && HouseVisit.InListing)
+            {
+                // A house for sale or rent uses the same rooms, but the mother lives in her own house.
+                foreach (var name in new[] { "Mama", "Thing_Mama" })
+                {
+                    var mother = GameObject.Find(name);
+                    if (mother != null)
+                    {
+                        mother.SetActive(false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>True inside a house for sale or rent that the player has not rented or bought.</summary>
+        private bool InHouseNotMine()
+        {
+            if (!HouseVisit.InListing || SceneManager.GetActiveScene().name != SceneNames.Casa)
+            {
+                return false;
+            }
+
+            var home = session.Holdings.Home;
+            foreach (var listing in MarketAssumptions.Homes)
+            {
+                if (listing.Id == HouseVisit.ListingId)
+                {
+                    return home == null || home.Name != listing.Name;
+                }
+            }
+
+            return true;
         }
 
         private void BindStations()

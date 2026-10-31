@@ -162,6 +162,7 @@ namespace ColonQuest.UI
                 {
                     modal.Hide();
                     Door.SetRememberedReturn("Town_From_" + home.Id);
+                    HouseVisit.Enter(home.Id);
                     SceneTransition.Go(SceneNames.Casa, SpawnIds.FromTown);
                 }
             });

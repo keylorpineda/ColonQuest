@@ -313,7 +313,9 @@ namespace ColonQuest.EditorTools
             var trigger = go.AddComponent<BoxCollider2D>();
             trigger.size = new Vector2(1.3f, 1.0f);
             trigger.isTrigger = true;
-            go.AddComponent<Door>().ConfigureHouse(SceneNames.Casa, SpawnIds.FromTown, Vector2.up, spawn);
+            var door = go.AddComponent<Door>();
+            door.ConfigureHouse(SceneNames.Casa, SpawnIds.FromTown, Vector2.up, spawn);
+            door.MarkListing(listingId);
             BuildSpawnPoint(parent, spawn, new Vector2(x, yBottom - 1.2f));
         }
 
