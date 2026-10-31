@@ -446,7 +446,13 @@ namespace ColonQuest.UI
                 return;
             }
 
-            // The clock runs only while the player is free: no window, no scene, no wait for the server.
+            // At work the clock goes through the morning while the shift plays, instead of jumping at the end.
+            if (Interaction.Playing && session.Loop.Job.OnShift)
+            {
+                session.Loop.TickShift(Time.deltaTime);
+            }
+
+            // Otherwise the clock runs only while the player is free: no window, no scene, no wait for the server.
             if (!session.Busy && !Interaction.Playing && !SceneTransition.IsBusy && session.TickClock(Time.deltaTime))
             {
                 FallAsleepScene();

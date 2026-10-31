@@ -409,10 +409,29 @@ namespace ColonQuest.Game
             return OutcomeFrom(before, Loc.T(PlayerProfile.Pick("Te quedaste dormido fuera de la cama", "Te quedaste dormida fuera de la cama")));
         }
 
-        /// <summary>The player clocks in now. The time of the morning goes by when the shift is finished.</summary>
+        private float shiftStartMinutes;
+
+        /// <summary>The player clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>
         public ClockInResult ClockIn()
         {
+            shiftStartMinutes = Clock.Minutes;
             return Job.ClockIn(Clock.Minutes);
+        }
+
+        /// <summary>
+        /// While the player works, the clock moves through the morning little by little: from clocking in to the end of the
+        /// shift over <see cref="GameRules.ShiftRealSeconds"/>. It never passes the end of the shift.
+        /// </summary>
+        public void TickShift(float realSeconds)
+        {
+            if (!Job.OnShift || realSeconds <= 0f)
+            {
+                return;
+            }
+
+            float end = GameRules.WorkEndHour * 60f;
+            float perSecond = Math.Max(0f, end - shiftStartMinutes) / GameRules.ShiftRealSeconds;
+            Clock.SkipTo(Math.Min(end, Clock.Minutes + perSecond * realSeconds));
         }
 
         /// <summary>The work of the morning is done: the clock moves on to the end of the shift.</summary>

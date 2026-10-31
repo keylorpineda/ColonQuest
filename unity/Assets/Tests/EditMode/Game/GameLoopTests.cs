@@ -159,6 +159,26 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Shift_TheClockGoesThroughTheMorningLittleByLittle()
+        {
+            var testLoop = new GameLoop();
+            testLoop.Clock.SkipTo(GameRules.WorkStartHour * 60f);
+            testLoop.ClockIn();
+            float start = testLoop.Clock.Minutes;
+            float end = GameRules.WorkEndHour * 60f;
+
+            testLoop.TickShift(GameRules.ShiftRealSeconds / 2f);
+            Assert.AreEqual((start + end) / 2f, testLoop.Clock.Minutes, 0.5f, "halfway through the scene, halfway through the morning");
+
+            testLoop.TickShift(GameRules.ShiftRealSeconds * 3f);
+            Assert.AreEqual(end, testLoop.Clock.Minutes, 0.01f, "never past the end of the shift");
+
+            testLoop.FinishShift();
+            testLoop.TickShift(10f);
+            Assert.AreEqual(end, testLoop.Clock.Minutes, 0.01f, "off the shift the clock does not move by itself");
+        }
+
+        [Test]
         public void FallAsleep_AppliesDailyWellbeingLoss()
         {
             var testLoop = new GameLoop();
