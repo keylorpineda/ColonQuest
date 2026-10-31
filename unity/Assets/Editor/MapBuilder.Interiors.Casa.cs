@@ -219,12 +219,29 @@ namespace ColonQuest.EditorTools
 
             // The pet (zaguatico) resting by the living room
             var pet = IL(parts.Props, "Pet");
-            Deco(pet, "Cushion", rounded, 6.2f, -1.8f, 1.3f, 1.0f, "#A0522D", 1f, 7);
-            Deco(pet, "Inner", circle, 6.2f, -1.8f, 1.0f, 0.8f, "#D2B48C", 1f, 8);
-            Deco(pet, "Body", circle, 6.2f, -1.75f, 0.7f, 0.5f, "#C68B59", 1f, 9);
-            Deco(pet, "Head", circle, 6.48f, -1.65f, 0.38f, 0.34f, "#A66D3B", 1f, 10);
-            Deco(pet, "Ear", circle, 6.55f, -1.55f, 0.15f, 0.2f, "#7D4E27", 1f, 11);
-            Deco(pet, "Tail", roundedSmall, 5.82f, -1.75f, 0.28f, 0.1f, "#C68B59", 1f, 9);
+            Deco(pet, "Cushion", roundedSmall, 6.2f, -1.8f, 1.05f, 0.62f, "#8C4A28", 1f, 7);
+            Deco(pet, "CushionFleece", roundedSmall, 6.2f, -1.8f, 0.90f, 0.48f, "#D4B086", 1f, 8);
+
+            Deco(pet, "Body", roundedSmall, 6.12f, -1.78f, 0.58f, 0.36f, "#C68B59", 1f, 9);
+            Deco(pet, "Spot", circle, 6.06f, -1.72f, 0.22f, 0.16f, "#A66D3B", 1f, 10);
+
+            var tail = Deco(pet, "Tail", roundedSmall, 5.78f, -1.72f, 0.24f, 0.10f, "#C68B59", 1f, 9);
+            Tilt(tail, 30f);
+
+            Deco(pet, "PawBack", roundedSmall, 6.42f, -1.90f, 0.24f, 0.09f, "#A66D3B", 1f, 9);
+            Deco(pet, "PawFront", roundedSmall, 6.46f, -1.85f, 0.26f, 0.10f, "#C68B59", 1f, 10);
+            Deco(pet, "PawToe", circle, 6.56f, -1.85f, 0.08f, 0.08f, "#E2B98A", 1f, 11);
+
+            Deco(pet, "Head", circle, 6.36f, -1.70f, 0.32f, 0.32f, "#C68B59", 1f, 10);
+            Deco(pet, "Collar", square, 6.28f, -1.74f, 0.06f, 0.18f, "#E8505B", 1f, 11);
+            Deco(pet, "Tag", circle, 6.30f, -1.82f, 0.08f, 0.08f, "#FFD23F", 1f, 12);
+
+            Deco(pet, "Muzzle", roundedSmall, 6.48f, -1.72f, 0.20f, 0.14f, "#E2B98A", 1f, 11);
+            Deco(pet, "Nose", circle, 6.56f, -1.70f, 0.06f, 0.05f, "#1F1F1F", 1f, 12);
+            Deco(pet, "Eye", circle, 6.40f, -1.66f, 0.05f, 0.05f, "#1F1F1F", 1f, 12);
+            var ear = Deco(pet, "Ear", roundedSmall, 6.28f, -1.63f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
+            Tilt(ear, -18f);
+
             BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
                 "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
 
