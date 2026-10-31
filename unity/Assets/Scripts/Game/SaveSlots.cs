@@ -70,6 +70,8 @@ namespace ColonQuest.Game
         public long quincenaPaidThisMonth;
         public int tasksToday;
         public int jailDaysRemaining;
+        public bool visitedRoom;
+        public bool arrivalDay;
     }
 
     /// <summary>One saved game: its name, when it was last played and the run.</summary>

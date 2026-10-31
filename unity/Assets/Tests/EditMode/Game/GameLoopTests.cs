@@ -159,6 +159,56 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Shift_TheClockGoesThroughTheMorningLittleByLittle()
+        {
+            var testLoop = new GameLoop();
+            testLoop.Clock.SkipTo(GameRules.WorkStartHour * 60f);
+            testLoop.ClockIn();
+            float start = testLoop.Clock.Minutes;
+            float end = GameRules.WorkEndHour * 60f;
+
+            testLoop.TickShift(GameRules.ShiftRealSeconds / 2f);
+            Assert.AreEqual((start + end) / 2f, testLoop.Clock.Minutes, 0.5f, "halfway through the scene, halfway through the morning");
+
+            testLoop.TickShift(GameRules.ShiftRealSeconds * 3f);
+            Assert.AreEqual(end, testLoop.Clock.Minutes, 0.01f, "never past the end of the shift");
+
+            testLoop.FinishShift();
+            testLoop.TickShift(10f);
+            Assert.AreEqual(end, testLoop.Clock.Minutes, 0.01f, "off the shift the clock does not move by itself");
+        }
+
+        [Test]
+        public void Bed_SleepingEarlyNeedsTheMorningOfWorkDone()
+        {
+            var testLoop = new GameLoop();
+            Assert.IsFalse(testLoop.CanSleepEarly, "before work the bed only gives a rest");
+
+            testLoop.ClockIn();
+            Assert.IsFalse(testLoop.CanSleepEarly, "never in the middle of a shift");
+
+            testLoop.FinishShift();
+            Assert.IsTrue(testLoop.CanSleepEarly, "after work the player may go to bed for the night");
+
+            var lazy = new GameLoop();
+            lazy.Clock.SkipTo(GameRules.WorkEndHour * 60f);
+            Assert.IsTrue(lazy.CanSleepEarly, "once the morning is past there is no shift left to miss");
+        }
+
+        [Test]
+        public void Bed_ANapMovesTheClockOnButNotPastTheEndOfTheDay()
+        {
+            var testLoop = new GameLoop();
+            float before = testLoop.Clock.Minutes;
+            testLoop.Nap();
+            Assert.AreEqual(before + GameRules.NapMinutes, testLoop.Clock.Minutes, 0.01f);
+
+            testLoop.Clock.SkipTo(GameRules.DayEndHour * 60f - 10f);
+            testLoop.Nap();
+            Assert.AreEqual(GameRules.DayEndHour * 60f, testLoop.Clock.Minutes, 0.01f);
+        }
+
+        [Test]
         public void FallAsleep_AppliesDailyWellbeingLoss()
         {
             var testLoop = new GameLoop();

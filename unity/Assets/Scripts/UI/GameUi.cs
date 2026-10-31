@@ -27,6 +27,7 @@ namespace ColonQuest.UI
         private SubtitleBar subtitles;
         private ScreenEffects effects;
         private NegotiationPanel negotiationPanel;
+        private TalkPanel talkPanel;
         private PhoneUi phone;
         private PauseMenu pause;
         private Negotiation spokenNegotiation;
@@ -82,6 +83,7 @@ namespace ColonQuest.UI
             BuildPowerCut();
             BuildHud();
             BuildWorkGuide();
+            BuildTasks();
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
@@ -91,8 +93,9 @@ namespace ColonQuest.UI
             Interaction.Spoke += OnSpoke;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             negotiationPanel.SignContract = PlayContract;
+            talkPanel = new TalkPanel(canvas.transform, session, TalkActions);
             phone = new PhoneUi(canvas.transform, session);
-            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
+            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu, () => session.SaveNow(), () => session.LeaveWithoutSaving());
             BuildIncidents();
             BuildCell();
 
@@ -102,6 +105,7 @@ namespace ColonQuest.UI
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
             session.NegotiationUpdated += OnNegotiationChanged;
+            session.TalkUpdated += OnTalkChanged;
             session.NewGameStarted += CloseWindows;
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
@@ -137,6 +141,7 @@ namespace ColonQuest.UI
                 session.Changed -= Refresh;
                 session.NegotiationStarted -= OnNegotiationChanged;
                 session.NegotiationUpdated -= OnNegotiationChanged;
+                session.TalkUpdated -= OnTalkChanged;
                 session.NewGameStarted -= CloseWindows;
                 session.EventReady -= ShowEvent;
                 session.ChoiceApplied -= ShowOutcome;
@@ -172,7 +177,8 @@ namespace ColonQuest.UI
         private void BuildHud()
         {
             var topLeft = new Vector2(0f, 1f);
-            var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
+            var hudPaper = new Color(UiKit.Paper.r, UiKit.Paper.g, UiKit.Paper.b, 0.8f);
+            var card = UiKit.Card(canvas.transform, "Hud", hudPaper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
             // Warm header band under the month and clock.
             UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.65f), new Vector2(434f, 48f), topLeft, new Vector2(12f, -10f));
@@ -367,6 +373,7 @@ namespace ColonQuest.UI
             TickIncidents();
             TickCell();
             TickWorkGuide();
+            TickTasks();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
             TickSpeech();
@@ -381,6 +388,16 @@ namespace ColonQuest.UI
                     pause.Back();
                 }
 
+                return;
+            }
+
+            if (talkPanel.IsOpen)
+            {
+                // The talk takes the keyboard like the seller's window: the text box needs every key.
+                PlayerController.Blocked = true;
+                loadingCard.SetActive(false);
+                promptCard.SetActive(false);
+                talkPanel.Tick();
                 return;
             }
 
@@ -446,7 +463,13 @@ namespace ColonQuest.UI
                 return;
             }
 
-            // The clock runs only while the player is free: no window, no scene, no wait for the server.
+            // At work the clock goes through the morning while the shift plays, instead of jumping at the end.
+            if (Interaction.Playing && session.Loop.Job.OnShift)
+            {
+                session.Loop.TickShift(Time.deltaTime);
+            }
+
+            // Otherwise the clock runs only while the player is free: no window, no scene, no wait for the server.
             if (!session.Busy && !Interaction.Playing && !SceneTransition.IsBusy && session.TickClock(Time.deltaTime))
             {
                 FallAsleepScene();
@@ -608,6 +631,10 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Work:
                     session.FinishShift();
+                    break;
+                case StationType.Lender:
+                case StationType.Pyramid:
+                    AskHowToTalk(station.Type);
                     break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))

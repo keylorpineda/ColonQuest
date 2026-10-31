@@ -96,6 +96,8 @@ namespace ColonQuest.Game
 
         public void NewGame()
         {
+            ArrivalDay = false;
+            VisitedRoom = false;
             State = GameRules.NewPlayer();
             MonthsPlayed = 0;
             TasksDone = 0;
@@ -149,7 +151,9 @@ namespace ColonQuest.Game
                 punctualDays = Job.PunctualDays,
                 jobPosition = (int)Job.Position,
                 attendedToday = Courses.AttendedToday,
-                quincenaPaidThisMonth = QuincenaPaidThisMonth
+                quincenaPaidThisMonth = QuincenaPaidThisMonth,
+                visitedRoom = VisitedRoom,
+                arrivalDay = ArrivalDay
             };
 
             foreach (var course in Career.Courses)
@@ -205,6 +209,9 @@ namespace ColonQuest.Game
             CookedThisMonth = snapshot.cookedThisMonth;
             QuincenaPaidThisMonth = Math.Max(0L, snapshot.quincenaPaidThisMonth);
             Clock.Restore(snapshot.day, snapshot.minutes);
+
+            VisitedRoom = snapshot.visitedRoom;
+            ArrivalDay = snapshot.arrivalDay && snapshot.daysWorked == 0;
             Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday, snapshot.punctualDays, (JobPosition)snapshot.jobPosition);
             Courses.AttendedToday = snapshot.attendedToday;
             int courses = Math.Min(Career.Courses.Count, snapshot.courseAfternoons?.Count ?? 0);
@@ -409,10 +416,77 @@ namespace ColonQuest.Game
             return OutcomeFrom(before, Loc.T(PlayerProfile.Pick("Te quedaste dormido fuera de la cama", "Te quedaste dormida fuera de la cama")));
         }
 
-        /// <summary>The player clocks in now. The time of the morning goes by when the shift is finished.</summary>
+        /// <summary>
+        /// The player may go to bed for the night before the evening once the morning of work is over: they worked today, or
+        /// the shift is already past. Never in the middle of a shift.
+        /// </summary>
+        public bool CanSleepEarly => !Job.OnShift && (Job.WorkedToday || Clock.Hour >= GameRules.WorkEndHour);
+
+        /// <summary>A rest in bed during the day: the clock moves on by <see cref="GameRules.NapMinutes"/>, never past the end of the day.</summary>
+        public void Nap()
+        {
+            Clock.SkipTo(Clock.Minutes + GameRules.NapMinutes);
+        }
+
+        private float shiftStartMinutes;
+
+        /// <summary>The player has been in their rented room at least once. The first shift waits for it.</summary>
+        public bool VisitedRoom { get; private set; }
+
+        public void MarkRoomVisited()
+        {
+            VisitedRoom = true;
+        }
+
+        /// <summary>
+        /// True in a new story until the first shift: the day of arrival, when the player first sees their room and takes out
+        /// the health insurance. A run made any other way (a test, an old save) starts without it.
+        /// </summary>
+        public bool ArrivalDay { get; private set; }
+
+        public void BeginArrivalDay()
+        {
+            ArrivalDay = true;
+            VisitedRoom = false;
+        }
+
+        /// <summary>Before the first shift of a new story the room is seen and the insurance taken out. After it nothing more is asked.</summary>
+        public bool ReadyForFirstShift => !ArrivalDay || Job.DaysWorked > 0 || (VisitedRoom && Holdings.HasHealthInsurance);
+
+        /// <summary>The player clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>
         public ClockInResult ClockIn()
         {
-            return Job.ClockIn(Clock.Minutes);
+            if (!Job.WorkedToday && !ReadyForFirstShift)
+            {
+                return ClockInResult.NotReady;
+            }
+
+            // The first shift of a new story forgives the time spent getting ready for it: it is never late.
+            float minutes = ArrivalDay && Job.DaysWorked == 0 ? Math.Min(Clock.Minutes, GameRules.WorkStartHour * 60f) : Clock.Minutes;
+            var result = Job.ClockIn(minutes);
+            if (Job.DaysWorked > 0)
+            {
+                ArrivalDay = false;
+            }
+
+            shiftStartMinutes = Clock.Minutes;
+            return result;
+        }
+
+        /// <summary>
+        /// While the player works, the clock moves through the morning little by little: from clocking in to the end of the
+        /// shift over <see cref="GameRules.ShiftRealSeconds"/>. It never passes the end of the shift.
+        /// </summary>
+        public void TickShift(float realSeconds)
+        {
+            if (!Job.OnShift || realSeconds <= 0f)
+            {
+                return;
+            }
+
+            float end = GameRules.WorkEndHour * 60f;
+            float perSecond = Math.Max(0f, end - shiftStartMinutes) / GameRules.ShiftRealSeconds;
+            Clock.SkipTo(Math.Min(end, Clock.Minutes + perSecond * realSeconds));
         }
 
         /// <summary>The work of the morning is done: the clock moves on to the end of the shift.</summary>

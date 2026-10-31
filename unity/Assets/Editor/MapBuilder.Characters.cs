@@ -232,8 +232,33 @@ namespace ColonQuest.EditorTools
             { "Cajero", new Vector2(0f, 1.2f) }
         };
 
+        /// <summary>
+        /// The two men of the collectors' car: dark clothes, serious faces. They wait hidden off the map, without a collider, and
+        /// the overlay shows them and walks them to the player when the car stops.
+        /// </summary>
+        private static void BuildCollectorMen(Transform parent)
+        {
+            for (int i = 0; i < CollectorCar.MenNames.Length; i++)
+            {
+                var look = new Look
+                {
+                    Skin = "#1F2230", SkinTone = i == 0 ? "#C68B59" : "#8A5A3C", HairColor = "#1A1414", Hair = HairStyle.Buzz,
+                    Pants = "#15161C", Face = Expression.Frown, Width = 1.06f, Height = 1.04f, Glasses = i == 0, SquareJaw = true
+                };
+                var man = new GameObject(CollectorCar.MenNames[i]);
+                man.transform.SetParent(parent, false);
+                man.transform.position = new Vector2(MapLayout.PlayWestX - 8f - i, 3.2f);
+                MakeYSorted(man, -0.45f);
+                BuildCharacterVisual(man.transform, look);
+                foreach (var renderer in man.GetComponentsInChildren<SpriteRenderer>(true))
+                {
+                    renderer.enabled = false;
+                }
+            }
+        }
+
         /// <summary>A pedestrian that walks between two points. It has no collider, so it never blocks the way.</summary>
-        private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed)
+        private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed, Vector2? home = null)
         {
             look = ApplyCast(name, look);
             var walker = new GameObject(name);
@@ -242,7 +267,15 @@ namespace ColonQuest.EditorTools
 
             MakeYSorted(walker, -0.45f);
             BuildCharacterVisual(walker.transform, look, true);
-            walker.AddComponent<Patrol>().Configure(from, to, speed, 1.6f);
+            var patrol = walker.AddComponent<Patrol>();
+            if (home.HasValue)
+            {
+                patrol.Configure(from, to, speed, 1.6f, home.Value);
+            }
+            else
+            {
+                patrol.Configure(from, to, speed, 1.6f);
+            }
             BuildThing(walker.transform, "Talk", "Saludar", Vector2.zero, new Vector2(0.6f, 0.6f), PasserbyLines(name));
             return walker.transform;
         }

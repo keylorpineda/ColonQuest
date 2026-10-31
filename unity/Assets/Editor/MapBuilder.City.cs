@@ -840,6 +840,7 @@ namespace ColonQuest.EditorTools
                 Part(root, circle, new Vector2(0.2f, 0.28f), new Vector2(0.2f, 0.18f), "#F8F5E8", 1);
                 Shape(root, "Beak", roundedSmall, new Vector2(0.34f, 0.27f), new Vector2(0.12f, 0.06f), Hex("#FFD23F"), 6);
                 Shape(root, "Wing", circle, new Vector2(-0.06f, 0.18f), new Vector2(0.28f, 0.14f), Hex("#9AA3B8"), 5);
+                root.gameObject.AddComponent<Seagull>();
             });
 
             Scatter(CityGroup(parent, "Crabs"), random, 8, new Rect(-46f, -27f, 92f, 8f), (x, y) => OnSand(x, y), 2f, (g, x, y) =>
@@ -906,14 +907,19 @@ namespace ColonQuest.EditorTools
             for (int i = 0; i < 3; i++)
             {
                 var boat = Group(boats, "Boat");
-                boat.localPosition = new Vector2(-30f + i * 28f, -33f);
+                // Two boats sail west of the pier and one east of it: each turns around before the pier, never across it.
+                float startX = i == 0 ? -30f : (i == 1 ? -10f : 30f);
+                boat.localPosition = new Vector2(startX, -33f);
                 string previous = currentLayer;
                 currentLayer = LayerFloor;
                 Shape(boat, "Hull", rounded, Vector2.zero, new Vector2(1.8f, 0.5f), Hex("#B2475A"), 10);
                 Shape(boat, "Mast", square, new Vector2(0f, 0.6f), new Vector2(0.05f, 1.1f), Hex("#7A4F2A"), 10);
                 Shape(boat, "Sail", square, new Vector2(0.25f, 0.65f), new Vector2(0.5f, 0.8f), Hex("#F8F5E8"), 10);
                 currentLayer = previous;
-                boat.gameObject.AddComponent<Drift>().Configure(new Vector2(0.35f + i * 0.1f, 0f), new Vector2(46f, 40f));
+                bool west = i < 2;
+                boat.gameObject.AddComponent<Drift>().ConfigureSpan(0.35f + i * 0.1f,
+                    west ? MapLayout.TownBounds.xMin + 2f : MapLayout.PierXMax + 3f,
+                    west ? MapLayout.PierXMin - 2.5f : MapLayout.PlayEastX);
             }
         }
 

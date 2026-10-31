@@ -454,7 +454,7 @@ namespace ColonQuest.EditorTools
                 "¡Bienvenido al Banco! Adentro podés abrir tu cuenta de ahorros o consultar tus cuotas.",
                 "Ahorrar aunque sea un poquito cada mes te salva de cualquier imprevisto.");
 
-            var vendedorExt = BuildNpc(parent, "Vendedor", new Vector2(8.5f, 5.45f), new Look { Skin = "#2E86C1" }, true);
+            var vendedorExt = BuildNpc(parent, "Vendedor", new Vector2(10.5f, 5.45f), new Look { Skin = "#2E86C1" }, true);
             BuildThing(vendedorExt, "Talk_Vendedor", "Hablar con Kevin de la Tienda", Vector2.zero, new Vector2(0.8f, 0.8f),
                 "¡Pase adelante! Tenemos fruta fresca afuera y todo para el hogar adentro.",
                 "Eso sí: antes de comprar a crédito, fijate bien cuánto terminás pagando en total.");
@@ -465,15 +465,15 @@ namespace ColonQuest.EditorTools
                 "El que compra con lista en mano no gasta en lo que no ocupa.");
 
             BuildPedestrian(parent, "Peaton_F", new Vector2(-25f, -17.8f), new Vector2(38.5f, -17.8f), new Look { Skin = "#4DA3FF", Extra = Accessory.Cap, ExtraColor = "#FFD23F" }, 1.3f);
-            BuildPedestrian(parent, "Peaton_G", new Vector2(-46f, 5.2f), new Vector2(-39.5f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);
+            BuildPedestrian(parent, "Peaton_G", new Vector2(-46f, 5.2f), new Vector2(-39.5f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f, new Vector2(-40.25f, 6.0f));
             BuildPedestrian(parent, "Peaton_H", new Vector2(41.5f, 5.2f), new Vector2(46f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#55E08F" }, 1.1f);
-            BuildPedestrian(parent, "Peaton_I", new Vector2(-37f, -9.0f), new Vector2(-26f, -9.0f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#4DA3FF" }, 1.2f);
-            BuildPedestrian(parent, "Peaton_A", new Vector2(-24f, 5.2f), new Vector2(-14.5f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#FF7A5C" }, 1.1f);
+            BuildPedestrian(parent, "Peaton_I", new Vector2(-37f, -9.0f), new Vector2(-26f, -9.0f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#4DA3FF" }, 1.2f, new Vector2(-32.5f, -7.8f));
+            BuildPedestrian(parent, "Peaton_A", new Vector2(-24f, 5.2f), new Vector2(-14.5f, 5.2f), new Look { Skin = "#B28DFF", Extra = Accessory.Cap, ExtraColor = "#FF7A5C" }, 1.1f, new Vector2(-19.5f, 5.7f));
             BuildPedestrian(parent, "Peaton_B", new Vector2(24f, -9.0f), new Vector2(14.5f, -9.0f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.2f);
             BuildPedestrian(parent, "Peaton_C", new Vector2(-10f, -1.0f), new Vector2(10f, -1.0f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
             BuildPedestrian(parent, "Peaton_D", new Vector2(17.5f, -3.5f), new Vector2(22f, -3.5f), new Look { Skin = "#FFD23F", Extra = Accessory.None }, 0.9f);
             BuildPedestrian(parent, "Peaton_E", new Vector2(-3f, 5.5f), new Vector2(3f, 5.5f), new Look { Skin = "#F2B84B", Extra = Accessory.Tie, ExtraColor = "#1D4F8C" }, 1.0f);
-            BuildPedestrian(parent, "Estudiante", new Vector2(-22f, -9.0f), new Vector2(-12f, -9.0f), new Look { Skin = "#C0392B" }, 1.1f);
+            BuildPedestrian(parent, "Estudiante", new Vector2(-22f, -9.0f), new Vector2(-12f, -9.0f), new Look { Skin = "#C0392B" }, 1.1f, new Vector2(-8.5f, -9.1f));
             BuildPedestrian(parent, "Repartidor", new Vector2(10f, 5.2f), new Vector2(24f, 5.2f), new Look { Skin = "#F39C12" }, 1.5f);
         }
 

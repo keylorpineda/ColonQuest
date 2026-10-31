@@ -61,13 +61,13 @@ namespace ColonQuest.Game.Tests
         [Test]
         public void RedLightFine_WithoutCashGoesOnTheCard()
         {
-            var loop = Loop(10_000L);
+            var loop = Loop(2_000L);
             long card = loop.State.CreditCard.Balance;
 
             loop.FineRedLight();
 
             Assert.AreEqual(0L, loop.State.Cash);
-            Assert.AreEqual(card + MarketAssumptions.RedLightFine - 10_000L, loop.State.CreditCard.Balance);
+            Assert.AreEqual(card + MarketAssumptions.RedLightFine - 2_000L, loop.State.CreditCard.Balance);
         }
 
         [Test]

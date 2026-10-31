@@ -49,7 +49,7 @@ namespace ColonQuest.UI
                 warningText.text = watch.PoliceCalled ? watch.CalledWarning : watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
             }
 
-            CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
+            CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
         }
 
         // ---------------------------------------------------------------- the law
@@ -266,28 +266,95 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- the collectors
 
+        /// <summary>
+        /// As the prologue tells it: the black car brakes in front of the player, two men get out and walk up to them, and only
+        /// then the window with the choices opens. When the choice is made they walk back to the car and it drives off.
+        /// </summary>
         private void OnCollectorsArrived(CollectorCar car)
         {
-            if (modal.IsOpen || SceneTransition.IsBusy)
+            if (modal.IsOpen || SceneTransition.IsBusy || Interaction.Playing)
             {
                 return;
             }
 
+            CollectorCar.Held = true;
+            Vector2 at = car.transform.position;
+            Vector2 me = HeroAt();
+            string[] men = CollectorCar.MenNames;
+            var left = me + new Vector2(-0.95f, 0.15f);
+            var right = me + new Vector2(0.95f, 0.15f);
+            var scene = new Interaction()
+                .Wait(0.5f)
+                .Apply(() => PlaceCollectors(at))
+                .Sound(SoundEffectKind.DoorOpen).Reveal(men[0], true).Reveal(men[1], true)
+                .NpcWalk(men[0], left, 1.3f).NpcWalk(men[1], right, 1.3f).Wait(1.35f)
+                .Face(right)
+                .Say("Cobrador", Loc.F("Mae, usted debe plata. Hoy venimos por {0}.", Money.Format(session.CollectionDemand))).Wait(2.4f)
+                .Apply(ShowCollectorChoices);
+            if (!scene.Play())
+            {
+                ShowCollectorChoices();
+            }
+        }
+
+        /// <summary>The men step out next to the doors of the car, which has stopped wherever its brakes left it.</summary>
+        private static void PlaceCollectors(Vector2 car)
+        {
+            for (int i = 0; i < CollectorCar.MenNames.Length; i++)
+            {
+                var man = GameObject.Find(CollectorCar.MenNames[i]);
+                if (man != null)
+                {
+                    man.transform.position = car + new Vector2(i == 0 ? -0.6f : 0.6f, -0.7f);
+                }
+            }
+        }
+
+        /// <summary>The men walk back to the car, get in and it drives off.</summary>
+        private void CollectorsLeave()
+        {
+            var car = CollectorCar.Instance;
+            Vector2 at = car != null ? (Vector2)car.transform.position : HeroAt();
+            string[] men = CollectorCar.MenNames;
+            var scene = new Interaction()
+                .NpcWalk(men[0], at + new Vector2(-0.6f, -0.7f), 1.1f).NpcWalk(men[1], at + new Vector2(0.6f, -0.7f), 1.1f).Wait(1.15f)
+                .Sound(SoundEffectKind.Slam).Reveal(men[0], false).Reveal(men[1], false)
+                .Apply(() => CollectorCar.Held = false);
+            if (!scene.Play())
+            {
+                foreach (string man in men)
+                {
+                    var found = GameObject.Find(man);
+                    if (found != null)
+                    {
+                        foreach (var renderer in found.GetComponentsInChildren<SpriteRenderer>(true))
+                        {
+                            renderer.enabled = false;
+                        }
+                    }
+                }
+
+                CollectorCar.Held = false;
+            }
+        }
+
+        private void ShowCollectorChoices()
+        {
             long demand = session.CollectionDemand;
             var text = new StringBuilder();
             text.AppendLine(Loc.T("Un carro negro, con los vidrios polarizados y la música a todo volumen, frena frente a ti. Se bajan dos hombres."));
             text.AppendLine();
             text.AppendLine(Loc.F("«Mae, usted debe plata. Hoy venimos por {0}.»", Money.Format(demand)));
             text.AppendLine();
-            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar paga la mitad hoy y deja el resto como un préstamo nuevo con recargo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
+            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar es hablarles, por texto o por voz: preguntá y pedí un arreglo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
             text.AppendLine();
             text.Append(Loc.T("Cifras de ejemplo del juego."));
 
             var options = new List<ModalOption>
             {
-                new ModalOption { Label = Loc.F("1.  Pagar  ·  {0}", Money.Format(demand)), Color = GameUiColors.Green, OnPress = () => session.PayCollectors() },
-                new ModalOption { Label = Loc.F("2.  Negociar  ·  pagar {0} hoy", Money.Format(demand / 2L)), Color = GameUiColors.Yellow, OnPress = () => session.NegotiateCollectors() },
-                new ModalOption { Label = Loc.T("3.  Ignorarlos"), Color = GameUiColors.Pink, OnPress = () => session.IgnoreCollectors() }
+                new ModalOption { Label = Loc.F("1.  Pagar  ·  {0}", Money.Format(demand)), Color = GameUiColors.Green, OnPress = () => { CollectorsLeave(); session.PayCollectors(); } },
+                new ModalOption { Label = Loc.T("2.  Negociar con tus palabras"), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(TalkPartner.Collectors) },
+                new ModalOption { Label = Loc.T("3.  Ignorarlos"), Color = GameUiColors.Pink, OnPress = () => { CollectorsLeave(); session.IgnoreCollectors(); } }
             };
 
             modal.Show(Loc.T("Los cobradores"), Loc.T("Cobro por atraso"), text.ToString(), options);

@@ -176,6 +176,7 @@ namespace ColonQuest.UI
                 session.StartNewGame();
             }
 
+            session.Loop.BeginArrivalDay();
             session.AssignSlot(slot, runName, characterName, female);
             GameUi.Create(session).PlayOpeningNext();
             CloseWindows();
@@ -367,25 +368,23 @@ namespace ColonQuest.UI
             var card = UiKit.Card(credits.transform, "Card", UiKit.Paper, new Vector2(1100f, 960f), center, Vector2.zero);
             UiKit.Header(card, "Créditos", GamePalette.Hex("#C0612B"));
 
-            UiKit.Label(card, "Desarrollado por", 30, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -124f), TextAnchor.MiddleCenter);
-            var team = UiKit.PlainLabel(card, "Team", MenuEntries.Team, 64, UiKit.Ink, new Vector2(1000f, 76f), top, new Vector2(0f, -160f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "Desarrollado por", 30, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -130f), TextAnchor.MiddleCenter);
+            var team = UiKit.PlainLabel(card, "Team", MenuEntries.Team, 64, UiKit.Ink, new Vector2(1000f, 76f), top, new Vector2(0f, -175f), TextAnchor.MiddleCenter);
             team.font = UiKit.TitleFont;
-            UiKit.Label(card, "Keylor Pineda: backend, IA y motor financiero", 28, UiKit.Ink, new Vector2(1000f, 40f), top, new Vector2(0f, -244f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, "Jefferson Abarca: Unity, arte y flujo del juego", 28, UiKit.Ink, new Vector2(1000f, 40f), top, new Vector2(0f, -284f), TextAnchor.MiddleCenter);
-            Divider(card, -340f, 860f);
+            Divider(card, -260f, 860f);
 
-            UiKit.Label(card, "Herramientas de Meta", 38, UiKit.Ink, new Vector2(1000f, 52f), top, new Vector2(0f, -358f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "Herramientas de Meta", 38, UiKit.Ink, new Vector2(1000f, 52f), top, new Vector2(0f, -285f), TextAnchor.MiddleCenter);
             for (int i = 0; i < MenuEntries.Tools.Length; i++)
             {
                 var tool = MenuEntries.Tools[i];
-                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -434f - i * 96f));
-                UiKit.Label(card, tool[0], 32, GameUiColors.Gain, new Vector2(920f, 42f), top, new Vector2(0f, -420f - i * 96f), TextAnchor.MiddleCenter);
-                UiKit.Label(card, tool[1], 26, GameUiColors.Muted, new Vector2(860f, 54f), top, new Vector2(0f, -462f - i * 96f), TextAnchor.UpperCenter);
+                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -365f - i * 110f));
+                UiKit.Label(card, tool[0], 34, GameUiColors.Gain, new Vector2(920f, 44f), top, new Vector2(0f, -350f - i * 110f), TextAnchor.MiddleCenter);
+                UiKit.Label(card, tool[1], 26, GameUiColors.Muted, new Vector2(860f, 58f), top, new Vector2(0f, -395f - i * 110f), TextAnchor.UpperCenter);
             }
 
-            Divider(card, -804f, 860f);
-            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -818f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -852f), TextAnchor.MiddleCenter);
+            Divider(card, -740f, 860f);
+            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -765f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -805f), TextAnchor.MiddleCenter);
 
             UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(320f, 72f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), CloseWindows);
             credits.SetActive(false);
@@ -458,7 +457,7 @@ namespace ColonQuest.UI
             teamShadow.effectDistance = new Vector2(6f, -6f);
 
             UiKit.Fill(content, "Rule", Beak, new Vector2(420f, 6f), center, new Vector2(0f, -40f));
-            UiKit.Label(content, "Diseño y desarrollo: Jefferson Abarca y Keylor Pineda", 34, Cream, new Vector2(1300f, 50f), center, new Vector2(0f, -96f), TextAnchor.MiddleCenter);
+            UiKit.Label(content, "Diseño y desarrollo: " + MenuEntries.Team, 34, Cream, new Vector2(1300f, 50f), center, new Vector2(0f, -96f), TextAnchor.MiddleCenter);
             UiKit.Label(content, "Hecho para el Meta Global AI Developer Hackathon", 28, muted, new Vector2(1300f, 44f), center, new Vector2(0f, -150f), TextAnchor.MiddleCenter);
 
             UiKit.Label(layer.transform, "Clic o cualquier tecla para saltar", 22, GamePalette.Hex("#7C8580"), new Vector2(800f, 36f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), TextAnchor.MiddleCenter);

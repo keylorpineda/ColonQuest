@@ -127,13 +127,35 @@ namespace ColonQuest.Game
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
         }
 
-        /// <summary>Going back to the main menu saves the run, so nothing played is lost.</summary>
+        private bool skipNextMenuSave;
+
+        /// <summary>
+        /// Going back to the main menu saves the run, so nothing played is lost, unless the player chose to leave
+        /// without saving (<see cref="LeaveWithoutSaving"/>).
+        /// </summary>
         private void OnSceneChanged(UnityEngine.SceneManagement.Scene from, UnityEngine.SceneManagement.Scene to)
         {
+            if (to.name == SceneNames.Cuarto)
+            {
+                Loop.MarkRoomVisited();
+            }
+
             if (to.name == SceneNames.Menu)
             {
+                if (skipNextMenuSave)
+                {
+                    skipNextMenuSave = false;
+                    return;
+                }
+
                 SaveNow();
             }
+        }
+
+        /// <summary>The player leaves to the menu and says no to saving: the slot keeps what it had before.</summary>
+        public void LeaveWithoutSaving()
+        {
+            skipNextMenuSave = true;
         }
 
         /// <summary>Ties the run that just started to a slot and writes it there at once.</summary>
@@ -770,6 +792,109 @@ namespace ColonQuest.Game
         public void IgnoreCollectors()
         {
             ChoiceApplied?.Invoke(Loop.IgnoreCollectors());
+            Changed?.Invoke();
+        }
+
+        // ---------------------------------------------------------------- talks in the player's own words
+
+        /// <summary>The talk with the collectors, the lender or the pyramid stand, while its window is open.</summary>
+        public DebtTalk CurrentTalk { get; private set; }
+
+        public event Action<DebtTalk> TalkUpdated;
+
+        public void BeginTalk(TalkPartner partner)
+        {
+            if (CurrentTalk != null)
+            {
+                return;
+            }
+
+            VoiceNotice = null;
+            CurrentTalk = new DebtTalk(partner, partner == TalkPartner.Collectors ? CollectionDemand : 0L);
+            TalkUpdated?.Invoke(CurrentTalk);
+        }
+
+        /// <summary>One typed turn: the answer follows the fixed rules of the talk, at once and without the server.</summary>
+        public void SendTalk(string text)
+        {
+            var talk = CurrentTalk;
+            text = text == null ? string.Empty : text.Trim();
+            if (talk == null || Busy || text.Length == 0)
+            {
+                return;
+            }
+
+            if (text.Length > MaxNegotiationText)
+            {
+                text = text.Substring(0, MaxNegotiationText);
+            }
+
+            VoiceNotice = null;
+            talk.Say(text);
+            TalkUpdated?.Invoke(talk);
+        }
+
+        /// <summary>
+        /// One spoken turn. Only the backend can transcribe: the clip goes through the voice of the store's negotiation and only
+        /// the transcript is kept; the answer is the talk's own. Without the backend the player is asked to type.
+        /// </summary>
+        public void SendTalkVoice(byte[] wav)
+        {
+            var talk = CurrentTalk;
+            if (talk == null || Busy || wav == null || wav.Length == 0)
+            {
+                return;
+            }
+
+            var offer = SellerOffer.ForMonth(Loop.MonthsPlayed);
+            if (ApiClient.Instance == null || ApiClient.Instance.Service == null || !ApiClient.Instance.Service.HasSession || SellerOffer.Find(offer.OfferId) == null)
+            {
+                VoiceNotice = VoiceFailedNotice;
+                TalkUpdated?.Invoke(talk);
+                return;
+            }
+
+            Busy = true;
+            VoiceNotice = null;
+            Changed?.Invoke();
+            ApiClient.Instance.SendNegotiationVoice(offer.OfferId, wav, result =>
+            {
+                Busy = false;
+                if (CurrentTalk == talk)
+                {
+                    if (result.Ok && !string.IsNullOrWhiteSpace(result.Value.Transcript))
+                    {
+                        talk.Say(result.Value.Transcript);
+                    }
+                    else
+                    {
+                        VoiceNotice = VoiceFailedNotice;
+                    }
+
+                    TalkUpdated?.Invoke(talk);
+                }
+
+                Changed?.Invoke();
+            });
+        }
+
+        /// <summary>Closes the talk and keeps the questions the player asked, for the metrics of the pilot.</summary>
+        public void EndTalk()
+        {
+            var talk = CurrentTalk;
+            if (talk == null)
+            {
+                return;
+            }
+
+            foreach (string tag in talk.HistoryTags())
+            {
+                State.RecordHistory(tag);
+            }
+
+            CurrentTalk = null;
+            VoiceNotice = null;
+            TalkUpdated?.Invoke(null);
             Changed?.Invoke();
         }
 
