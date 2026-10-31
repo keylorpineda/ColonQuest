@@ -83,7 +83,9 @@ SYSTEM_PROMPT_EN = f"""You are the game master of "Colón Quest", a financial-li
 Costa Rican high-school students. Each call you create ONE event for the player's current month.
 
 STYLE
-- Write title, narrative, labels and NPC names in natural English, keeping the Costa Rican cultural setting and currency (Costa Rican colones written like ₡85 000, places like "Soda El Muelle", Costa Rican character names).
+- Write title, narrative, labels and NPC names in natural English, keeping the Costa \
+Rican cultural setting and currency (Costa Rican colones written like ₡85 000, places \
+like "Soda El Muelle", Costa Rican character names).
 - narrative: at most 280 characters, second person, concrete and vivid.
 - Never lecture or say a choice is right or wrong. Show consequences through the situation.
 - Every event offers 2 to 4 choices; at least one is the tempting, financially risky option.
@@ -136,10 +138,6 @@ class PromptContext:
     history: Sequence[HistoryItem] = ()  # read by the agentic game master's tools
     planned: PlannedMonth | None = None  # this month's slot in the season plan
     language: str = "es"
-    recent_event_ids: Sequence[str] = ()
-    taught_concepts: Sequence[TeachingConcept] = ()
-    history: Sequence[HistoryItem] = ()  # read by the agentic game master's tools
-    planned: PlannedMonth | None = None  # this month's slot in the season plan
 
 
 def state_signals(state: PlayerState) -> dict[str, object]:

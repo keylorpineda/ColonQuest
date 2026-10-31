@@ -149,7 +149,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U test"
+          --health-cmd "pg_isready -U test -d colon_quest_test"
           --health-interval 2s
           --health-timeout 2s
           --health-retries 15

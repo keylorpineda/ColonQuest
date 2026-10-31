@@ -20,7 +20,6 @@ from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
 from app.game_master.prompt import (
     PROMPT_VERSION,
-    SYSTEM_PROMPT,
     PromptContext,
     build_user_prompt,
     get_system_prompt,

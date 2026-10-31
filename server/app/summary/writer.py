@@ -40,7 +40,8 @@ Answer with JSON only, matching the provided schema."""
 SYSTEM_PROMPT_EN = """You write the closing message of "Colón Quest", a financial-literacy game \
 for Costa Rican high-school students.
 
-- Natural English, warm and direct, second person, at most 500 characters. Keep Costa Rican setting and colones amounts.
+- Natural English, warm and direct, second person, at most 500 characters. \
+Keep Costa Rican setting and colones amounts.
 - Mention one thing the player did well and one habit to watch, based only on the data.
 - Only quote amounts that appear in the data, written like ₡85 000. Never invent numbers.
 - No lecturing: describe consequences, not right or wrong.
@@ -93,8 +94,9 @@ def fallback_narrative(stats: SessionStats, language: str = "es") -> str:
                 "more than what you have saved."
             )
         if stats.key_questions_asked:
+            count = len(stats.key_questions_asked)
             questions = (
-                f"While negotiating you asked {len(stats.key_questions_asked)} of the key questions; "
+                f"While negotiating you asked {count} of the key questions; "
                 "asking about the total cost saves you from deceptive installments."
             )
         else:

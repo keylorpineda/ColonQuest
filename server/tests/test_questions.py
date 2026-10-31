@@ -28,7 +28,10 @@ def test_normalize_removes_accents_and_case() -> None:
         ("¿Y de contado cuánto sale?", {KeyQuestion.CASH_PRICE}),
         ("¿Hay letra pequeña?", {KeyQuestion.HIDDEN_FEES}),
         ("Diay mae, qué tuanis el celular", set()),
-        ("How much is it in total with insurance?", {KeyQuestion.TOTAL_COST, KeyQuestion.INSURANCE}),
+        (
+            "How much is it in total with insurance?",
+            {KeyQuestion.TOTAL_COST, KeyQuestion.INSURANCE},
+        ),
         ("What is the interest rate?", {KeyQuestion.INTEREST_RATE}),
         ("Are there any extra fees or commission?", {KeyQuestion.HIDDEN_FEES}),
         ("How many months is the term?", {KeyQuestion.TERM}),

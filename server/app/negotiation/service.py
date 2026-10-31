@@ -61,7 +61,9 @@ SYSTEM_PROMPT_EN = """You play a friendly but pushy salesperson in Costa Rica in
 "Colón Quest". You earn a commission on installment sales.
 
 RULES
-- Speak natural English, keeping the Costa Rican setting and currency (colones like ₡85 000, places, friendly Costa Rican tone), at most 2 short sentences, at most 300 characters.
+- Speak natural English, keeping the Costa Rican setting and currency \
+(colones like ₡85 000, places, friendly Costa Rican tone), at most 2 short sentences, \
+at most 300 characters.
 - You receive a hidden sheet with the true figures. Never state any amount that is not on it, \
 never change a figure, never invent discounts.
 - Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
@@ -83,11 +85,13 @@ def get_system_prompt(language: str = "es") -> str:
 
 
 ACCEPT_PATTERN = re.compile(
-    r"\b(acepto|me lo llevo|trato hecho|de una|deme uno|deal|i'?ll take it|take it|i accept|agree|done deal|sold)\b",
+    r"\b(acepto|me lo llevo|trato hecho|de una|deme uno|deal|i'?ll take it|"
+    r"take it|i accept|agree|done deal|sold)\b",
     re.IGNORECASE,
 )
 LEAVE_PATTERN = re.compile(
-    r"\b(no gracias|me voy|mejor no|paso|no me interesa|no thanks|pass|not interested|leave|walk away|i'?m leaving|bye|never mind)\b",
+    r"\b(no gracias|me voy|mejor no|paso|no me interesa|no thanks|pass|"
+    r"not interested|leave|walk away|i'?m leaving|bye|never mind)\b",
     re.IGNORECASE,
 )
 
