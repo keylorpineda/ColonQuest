@@ -801,6 +801,8 @@ namespace ColonQuest.EditorTools
         private static void CoursesBoard(Transform parent, float x, float y)
         {
             var root = Root(parent, "CoursesBoard", new Vector2(x, y), y);
+            // Solid base so the easel cannot be walked through; the station stays in front of it.
+            Wall(root, "Board_Collider", new Vector2(0f, 0.2f), new Vector2(1.3f, 0.4f));
             foreach (float post in new[] { -0.55f, 0.55f })
             {
                 Shape(root, "Post_Outline", roundedSmall, new Vector2(post, 0.52f), new Vector2(0.18f, 1.12f), GamePalette.Outline, 0);
