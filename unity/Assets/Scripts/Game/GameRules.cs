@@ -10,8 +10,11 @@ namespace ColonQuest.Game
         /// <summary>Months in a run. The vertical slice is short on purpose; the engine supports 12.</summary>
         public const int MonthsToPlay = 3;
 
-        /// <summary>Tasks (events) the player does each month before collecting the salary at the bank.</summary>
-        public const int TasksPerMonth = 3;
+        /// <summary>Tasks (events) the player does each month before collecting the salary at the bank: two a week.</summary>
+        public const int TasksPerMonth = TasksPerDay * DaysPerMonth;
+
+        /// <summary>Tasks a day allows. A day stands for a week, so this is two errands a week.</summary>
+        public const int TasksPerDay = 2;
 
         /// <summary>Days of play in a month. Each one stands for a week, so the month has four.</summary>
         public const int DaysPerMonth = 4;

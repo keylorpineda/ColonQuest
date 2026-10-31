@@ -498,17 +498,12 @@ namespace ColonQuest.UI
                         return Loc.T("Ya hiciste tus tareas del mes. Ve al banco a cobrar.");
                     }
 
-                    if (loop.Clock.IsLastDay)
+                    if (loop.TasksToday >= GameRules.TasksPerDay)
                     {
-                        return Loc.T("Hoy es día de pago. Ve al banco a cobrar.");
+                        return Loc.T("Ya resolviste los pendientes de hoy. Descansa hasta mañana.");
                     }
 
-                    if (loop.TasksToday >= 1)
-                    {
-                        return Loc.T("Ya resolviste el pendiente de hoy. Descansa hasta mañana.");
-                    }
-
-                    return Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
+                    return Loc.F("Ya pasaste por {0} hoy.", Loc.T(station.DisplayName));
             }
         }
 

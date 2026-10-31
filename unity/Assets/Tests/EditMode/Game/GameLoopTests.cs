@@ -95,51 +95,58 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void Choose_CountsOneTaskPerPlaceAndMonth()
+        public void Choose_CountsOneTaskPerPlaceAndDay()
         {
             loop.Choose(Expense(), "cash", StationType.Garage);
 
             Assert.AreEqual(1, loop.TasksDone);
             Assert.AreEqual(1, loop.TasksToday);
-            Assert.IsFalse(loop.CanDoTask(StationType.Garage), "the same place once a month");
-            Assert.IsFalse(loop.CanDoTask(StationType.Store), "only one task per day");
+            Assert.IsFalse(loop.CanDoTask(StationType.Garage), "the same place once a day");
+            Assert.IsTrue(loop.CanDoTask(StationType.Store), "a second task the same day");
 
             loop.Sleep();
             Assert.AreEqual(0, loop.TasksToday);
-            Assert.IsTrue(loop.CanDoTask(StationType.Store));
+            Assert.IsTrue(loop.CanDoTask(StationType.Garage), "a new week opens the places again");
         }
 
         [Test]
         public void Tasks_StopAtTheLimitOfTheMonth()
         {
-            loop.Choose(Expense(), "cash", StationType.Garage);
-            loop.Sleep();
-            loop.Choose(Expense(), "cash", StationType.Store);
-            loop.Sleep();
-            loop.Choose(Expense(), "cash", StationType.Kiosk);
+            var places = new[] { StationType.Garage, StationType.Store, StationType.Grocery, StationType.Lender };
+            for (int day = 0; day < GameRules.DaysPerMonth; day++)
+            {
+                loop.Choose(Expense(), "cash", places[day]);
+                loop.Choose(Expense(), "cash", StationType.Coop);
+                if (day < GameRules.DaysPerMonth - 1)
+                {
+                    loop.Sleep();
+                }
+            }
 
+            Assert.AreEqual(8, GameRules.TasksPerMonth);
             Assert.IsTrue(loop.AllTasksDone);
             Assert.IsFalse(loop.CanDoTask(StationType.Pyramid));
         }
 
         [Test]
-        public void Tasks_MaxOnePerDay_AndCannotDoOnPayday()
+        public void Tasks_TwoPerDay_AlsoOnPayday()
         {
             Assert.AreEqual(0, loop.TasksToday);
-            Assert.IsTrue(loop.CanDoTask(StationType.Garage));
-
             loop.Choose(Expense(), "cash", StationType.Garage);
-            Assert.AreEqual(1, loop.TasksToday);
-            Assert.IsFalse(loop.CanDoTask(StationType.Store), "cannot do more than one task per day");
+            loop.Choose(Expense(), "cash", StationType.Store);
+            Assert.AreEqual(2, loop.TasksToday);
+            Assert.IsFalse(loop.CanDoTask(StationType.Grocery), "cannot do more than two tasks per day");
 
             loop.Sleep(); // day 2
-            Assert.AreEqual(0, loop.TasksToday);
-            Assert.IsTrue(loop.CanDoTask(StationType.Store));
-
             loop.Sleep(); // day 3
             loop.Sleep(); // day 4 (payday)
             Assert.IsTrue(loop.Clock.IsLastDay);
-            Assert.IsFalse(loop.CanDoTask(StationType.Store), "no tasks allowed on payday");
+            Assert.IsTrue(loop.CanDoTask(StationType.Grocery), "the last week has its two tasks before the bank");
+
+            loop.Choose(Expense(), "cash", StationType.Grocery);
+            loop.Choose(Expense(), "cash", StationType.Soda);
+            loop.Sleep(); // still day 4: sleeping does not open more tasks
+            Assert.IsFalse(loop.CanDoTask(StationType.Pyramid), "a night on payday gives no new tasks");
         }
 
         [Test]

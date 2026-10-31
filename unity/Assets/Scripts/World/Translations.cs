@@ -59,7 +59,7 @@ namespace ColonQuest.World
             { "Revisar tu estado de cuenta", "Check your account statement" },
             { "Consultar tu saldo en el cajero", "Check your balance at the ATM" },
             { "Ya hiciste tus tareas del mes. Ve al banco a cobrar.", "You finished this month's tasks. Go to the bank to get paid." },
-            { "Ya pasaste por {0} este mes.", "You already stopped by {0} this month." },
+            { "Ya pasaste por {0} hoy.", "You already stopped by {0} today." },
 
             // ---- places (the names of the stations)
             { "Taller de Don Rafa", "Don Rafa's garage" },
@@ -678,7 +678,7 @@ namespace ColonQuest.World
             { "Te quedas en la celda {0}. Puedes esperar a cumplir la condena o pagar la fianza.", "You stay in the cell for {0}. You can wait out the sentence or pay the bail." },
             { "Te quedas en la celda {0} {1}. Puedes dormir en la litera para cumplir la condena o pagar la fianza.", "You stay in the cell for {0} {1}. You can sleep on the bunk to serve your sentence or pay bail." },
             { "Hoy es día de pago. Ve al banco a cobrar.", "Today is payday. Go to the bank to collect." },
-            { "Ya resolviste el pendiente de hoy. Descansa hasta mañana.", "You already handled today's task. Rest until tomorrow." },
+            { "Ya resolviste los pendientes de hoy. Descansa hasta mañana.", "You already handled today's errands. Rest until tomorrow." },
             { "Aviso: el mes aún no termina (semana {0} de {1}). Se te rebajarán {2} turnos de trabajo no laborados.", "Notice: the month is not over yet (week {0} of {1}). {2} unworked shifts will be docked from your salary." },
             { "Cargando", "Loading" },
             { "Antes de comprar a cuotas, pregunta cuánto pagas en total.", "Before buying on installments, ask how much you pay in total." },
