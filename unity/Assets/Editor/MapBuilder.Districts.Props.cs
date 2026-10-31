@@ -351,8 +351,8 @@ namespace ColonQuest.EditorTools
         {
             // The agent and Don Beto now wait inside their own places.
 
-            BuildPedestrian(parent, "Peaton_J", new Vector2(-44f, 31.6f), new Vector2(-21f, 31.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f);
-            BuildPedestrian(parent, "Peaton_K", new Vector2(36f, 31.6f), new Vector2(62f, 31.6f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.1f);
+            BuildPedestrian(parent, "Peaton_J", new Vector2(-44f, 31.6f), new Vector2(-21f, 31.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.None }, 1.0f, new Vector2(-39f, 31.8f));
+            BuildPedestrian(parent, "Peaton_K", new Vector2(36f, 31.6f), new Vector2(62f, 31.6f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#4DA3FF" }, 1.1f, new Vector2(38f, 33f));
             BuildPedestrian(parent, "Peaton_L", new Vector2(64f, -9f), new Vector2(46f, -9f), new Look { Skin = "#FFD23F", Extra = Accessory.None }, 1.2f);
         }
     }

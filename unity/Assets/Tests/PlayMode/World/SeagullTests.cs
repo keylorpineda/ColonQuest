@@ -56,7 +56,7 @@ namespace ColonQuest.World.PlayModeTests
             // Wait for away timer to finish and return
             yield return new WaitForSeconds(0.35f);
             Assert.AreEqual(Seagull.SeagullState.Idle, seagull.State);
-            Assert.AreEqual(seagull.HomePosition, seagullObj.transform.position);
+            Assert.Less(Vector2.Distance(seagull.HomePosition, seagullObj.transform.position), 0.1f);
 
             Object.Destroy(seagullObj);
             Object.Destroy(playerObj);

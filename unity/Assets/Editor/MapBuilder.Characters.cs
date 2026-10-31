@@ -233,7 +233,7 @@ namespace ColonQuest.EditorTools
         };
 
         /// <summary>A pedestrian that walks between two points. It has no collider, so it never blocks the way.</summary>
-        private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed)
+        private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed, Vector2? home = null)
         {
             look = ApplyCast(name, look);
             var walker = new GameObject(name);
@@ -242,7 +242,15 @@ namespace ColonQuest.EditorTools
 
             MakeYSorted(walker, -0.45f);
             BuildCharacterVisual(walker.transform, look, true);
-            walker.AddComponent<Patrol>().Configure(from, to, speed, 1.6f);
+            var patrol = walker.AddComponent<Patrol>();
+            if (home.HasValue)
+            {
+                patrol.Configure(from, to, speed, 1.6f, home.Value);
+            }
+            else
+            {
+                patrol.Configure(from, to, speed, 1.6f);
+            }
             BuildThing(walker.transform, "Talk", "Saludar", Vector2.zero, new Vector2(0.6f, 0.6f), PasserbyLines(name));
             return walker.transform;
         }
