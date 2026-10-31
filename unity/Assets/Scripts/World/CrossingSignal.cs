@@ -85,9 +85,11 @@ namespace ColonQuest.World
         /// <summary>The officer fined the player: the crossings stop counting until the player leaves or the light turns green.</summary>
         public static void ForgiveAll()
         {
+            Offenses.Clear(OffenseKind.RedLight);
             foreach (var signal in all)
             {
                 signal.fined = true;
+                signal.raised = false;
             }
         }
 
@@ -132,15 +134,19 @@ namespace ColonQuest.World
             }
 
             bool offending = !SceneTransition.IsBusy && CrossingRules.IsRedLightOffense(inside, walk, fined);
-            if (offending && !raised)
+            if (offending)
             {
                 Offenses.Raise(OffenseKind.RedLight);
                 raised = true;
             }
-            else if (!offending && raised)
+            else if (raised)
             {
-                Offenses.Clear(OffenseKind.RedLight);
-                raised = false;
+                // Keep the red-light offense active while any nearby officer is still pursuing the player to issue the fine.
+                if (!PoliceOfficer.IsAnyPursuingRedLight())
+                {
+                    Offenses.Clear(OffenseKind.RedLight);
+                    raised = false;
+                }
             }
         }
     }

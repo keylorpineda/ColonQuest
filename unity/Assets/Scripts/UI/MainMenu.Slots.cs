@@ -31,10 +31,9 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             var card = UiKit.Card(slots.transform, "Card", UiKit.Paper, new Vector2(1260f, 850f), center, Vector2.zero);
 
-            var title = UiKit.Label(card, "Modo historia", 60, UiKit.Ink, new Vector2(1100f, 76f), top, new Vector2(0f, -26f), TextAnchor.MiddleCenter);
-            title.font = UiKit.TitleFont;
-            UiKit.Label(card, "Elegí una partida guardada o empezá una vida nueva.", 30, GameUiColors.Muted, new Vector2(1100f, 44f), top, new Vector2(0f, -104f), TextAnchor.MiddleCenter);
-            Divider(card, -156f, 1140f);
+            UiKit.Header(card, "Modo historia", Beak);
+            UiKit.Label(card, "Elegí una partida guardada o empezá una vida nueva.", 30, GameUiColors.Muted, new Vector2(1100f, 44f), top, new Vector2(0f, -114f), TextAnchor.MiddleCenter);
+            Divider(card, -162f, 1140f);
 
             slotRows = UiKit.Rect(card, "Rows", new Vector2(1200f, 580f), top, new Vector2(0f, -170f));
             UiKit.MakeButton(card, "Volver", GameUiColors.Pink, new Vector2(300f, 76f), new Vector2(0.5f, 0f), new Vector2(0f, 26f), CloseWindows);
@@ -206,9 +205,7 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             var card = UiKit.Card(newGame.transform, "Card", UiKit.Paper, new Vector2(960f, 760f), center, Vector2.zero);
 
-            var title = UiKit.Label(card, "Nueva vida", 60, UiKit.Ink, new Vector2(860f, 76f), top, new Vector2(0f, -26f), TextAnchor.MiddleCenter);
-            title.font = UiKit.TitleFont;
-            Divider(card, -112f, 800f);
+            UiKit.Header(card, "Nueva vida", Beak);
 
             nameQuestion = UiKit.Label(card, NameQuestion, 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -132f));
             nameQuestion.name = "NameQuestion";

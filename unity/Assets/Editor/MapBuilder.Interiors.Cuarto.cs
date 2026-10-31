@@ -88,8 +88,12 @@ namespace ColonQuest.EditorTools
 
             // A bare bulb hanging from the ceiling, a little unsteady.
             var bulb = new Vector2(-0.4f, wall);
-            Deco(wear, "Wire", square, bulb.x, bulb.y + 0.2f, 0.03f, 0.45f, "#2A3040", 1f, 8);
-            Deco(wear, "Bulb", circle, bulb.x, bulb.y - 0.1f, 0.2f, 0.24f, "#FFF3C4", 1f, 9);
+            var bulbRig = new GameObject("BulbRig").transform;
+            bulbRig.SetParent(wear, false);
+            bulbRig.localPosition = new Vector2(bulb.x, bulb.y + 0.42f);
+            bulbRig.gameObject.AddComponent<FoliagePhysics>().Configure(2.8f, 1.35f, 4.2f, 0f, false);
+            Deco(bulbRig, "Wire", square, 0f, -0.22f, 0.03f, 0.45f, "#2A3040", 1f, 8);
+            Deco(bulbRig, "Bulb", circle, 0f, -0.52f, 0.2f, 0.24f, "#FFF3C4", 1f, 9);
             Flickering(Glow(parts.Lights, "Light_Bulb", new Vector2(-0.4f, 0.4f), 6.5f, "#FFE9A8", 0.1f, OrderLight), 0.12f, 2.2f, 4f);
         }
 

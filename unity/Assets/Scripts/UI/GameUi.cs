@@ -105,6 +105,7 @@ namespace ColonQuest.UI
             session.NewGameStarted += CloseWindows;
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
+            ApiService.LocalTextsOnly = () => Loc.Current == GameLanguage.English;
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
@@ -172,10 +173,16 @@ namespace ColonQuest.UI
             var topLeft = new Vector2(0f, 1f);
             var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
+            // Warm header band under the month and clock.
+            UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.65f), new Vector2(434f, 48f), topLeft, new Vector2(12f, -10f));
+            UiKit.Fill(card, "HeaderDivider", new Color(0.18f, 0.20f, 0.30f, 0.16f), new Vector2(426f, 2f), topLeft, new Vector2(16f, -58f));
+
             // Top line: the month and its week on the left, the hour on the right. The tasks go on the bottom line.
-            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -14f));
+            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -12f));
+            monthText.font = UiKit.TitleFont;
             monthText.horizontalOverflow = HorizontalWrapMode.Overflow;
-            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -14f), TextAnchor.MiddleRight);
+            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -12f), TextAnchor.MiddleRight);
+            clockText.font = UiKit.TitleFont;
             tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(190f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -276f), TextAnchor.MiddleRight);
 
             cashText = Row(card, "Efectivo", 1);
@@ -184,6 +191,7 @@ namespace ColonQuest.UI
             installmentsText = Row(card, "Cuotas al mes", 4);
 
             UiKit.Label(card, "Ánimo", 26, GameUiColors.Muted, new Vector2(200f, 36f), topLeft, new Vector2(22f, -226f));
+            UiKit.Fill(card, "WellbeingOutline", UiKit.Ink, new Vector2(BarWidth + 6f, 32f), topLeft, new Vector2(247f, -228f));
             UiKit.Fill(card, "WellbeingBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
             wellbeingFill = UiKit.Fill(card, "WellbeingFill", GameUiColors.Gain, new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
             UiKit.Label(card, "[P]  Celular", 24, GameUiColors.Muted, new Vector2(300f, 36f), topLeft, new Vector2(22f, -276f));
@@ -491,17 +499,12 @@ namespace ColonQuest.UI
                         return Loc.T("Ya hiciste tus tareas del mes. Ve al banco a cobrar.");
                     }
 
-                    if (loop.Clock.IsLastDay)
+                    if (loop.TasksToday >= GameRules.TasksPerDay)
                     {
-                        return Loc.T("Hoy es día de pago. Ve al banco a cobrar.");
+                        return Loc.T("Ya resolviste los pendientes de hoy. Descansa hasta mañana.");
                     }
 
-                    if (loop.TasksToday >= 1)
-                    {
-                        return Loc.T("Ya resolviste el pendiente de hoy. Descansa hasta mañana.");
-                    }
-
-                    return Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
+                    return Loc.F("Ya pasaste por {0} hoy.", Loc.T(station.DisplayName));
             }
         }
 

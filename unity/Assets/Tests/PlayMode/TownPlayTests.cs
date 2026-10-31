@@ -282,7 +282,11 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name);
             Assert.AreEqual(0f, Body.position.x, 0.6f);
-            Assert.AreEqual(MapLayout.CasaMat.y + 1.3f, Body.position.y, 0.6f);
+
+            // The player appears at the doormat and takes a few steps in, the same way it walked through the door.
+            float steps = SceneTransition.WalkOutSeconds * 4.5f;
+            Assert.GreaterOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f - 0.6f);
+            Assert.LessOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f + steps + 0.6f);
         }
 
         [UnityTest]

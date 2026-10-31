@@ -183,7 +183,14 @@ namespace ColonQuest.World
 
         private static bool OnDeck(Vector2 p)
         {
-            return (p.y > -0.4f && p.y < 4.4f) || (p.y > -14.4f && p.y < -9.6f) || (p.y > 25.6f && p.y < 30.4f) || (p.y > -19.6f && p.y < -17.0f);
+            // From railing to railing, like the walls of the river: a player on the sidewalk of a bridge is not in the water.
+            return Between(p.y, MapLayout.BridgeFirstStreet) || Between(p.y, MapLayout.BridgeSouthStreet) || Between(p.y, MapLayout.BridgeAvenue)
+                || (p.y > -19.6f && p.y < -17.0f);
+        }
+
+        private static bool Between(float y, Rect deck)
+        {
+            return y > deck.yMin - TouchMargin && y < deck.yMax + TouchMargin;
         }
     }
 

@@ -201,7 +201,7 @@ namespace ColonQuest.EditorTools
 
             var layer = ParallaxGroup(parent, "HighClouds", -0.45f);
             var white = GamePalette.White;
-            white.a = 0.2f;
+            white.a = 0.04f;
             for (int i = 0; i < 12; i++)
             {
                 var cloud = Group(layer, "Cloud");

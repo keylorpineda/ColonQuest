@@ -127,6 +127,15 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Player_CrossesTheRiverOnTheSidewalkOfTheBridge()
+        {
+            yield return Walk(new Vector2(25f, -1.0f), Vector2.right, 3.2f);
+
+            // Past the water: what stands on the sidewalk after the bridge may stop the walk, the river does not.
+            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 0.3f);
+        }
+
+        [UnityTest]
         public IEnumerator Player_IsStoppedByTheRiverNorthOfTheAvenue()
         {
             yield return Walk(new Vector2(25.5f, 37f), Vector2.right, 2f);

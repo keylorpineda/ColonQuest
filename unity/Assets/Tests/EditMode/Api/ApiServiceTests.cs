@@ -138,6 +138,29 @@ namespace ColonQuest.Api.Tests
         }
 
         [Test]
+        public void LocalTextsOnly_UsesTheTranslatedEventsAndSellerWithoutAskingTheBackend()
+        {
+            StartSession();
+            int sent = transport.Requests.Count;
+            ApiService.LocalTextsOnly = () => true;
+            try
+            {
+                ApiResult<GameEvent> gameEvent = null;
+                ApiResult<NegotiationReply> reply = null;
+                Run(service.RequestEvent(State(), r => gameEvent = r));
+                Run(service.SendNegotiationText("phone", "¿Cuánto pago en total?", r => reply = r));
+
+                Assert.AreEqual(ResultSource.Fallback, gameEvent.Source);
+                Assert.IsFalse(reply.Ok, "the game answers with the local seller");
+                Assert.AreEqual(sent, transport.Requests.Count, "no text is asked to the backend");
+            }
+            finally
+            {
+                ApiService.LocalTextsOnly = () => false;
+            }
+        }
+
+        [Test]
         public void Event_FallsBackWhenTheRequestTimesOut()
         {
             StartSession();

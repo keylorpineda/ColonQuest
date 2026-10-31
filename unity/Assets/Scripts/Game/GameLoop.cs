@@ -50,7 +50,7 @@ namespace ColonQuest.Game
         public int TasksDone { get; private set; }
         public int Decisions { get; private set; }
 
-        /// <summary>Tasks completed today: at most 1 task event per day is allowed.</summary>
+        /// <summary>Tasks completed today: at most <see cref="GameRules.TasksPerDay"/> per day.</summary>
         public int TasksToday { get; private set; }
 
         /// <summary>Remaining days of jail sentence to serve.</summary>
@@ -237,7 +237,7 @@ namespace ColonQuest.Game
             }
         }
 
-        /// <summary>The bank, the house and the market places are not tasks; every other place offers one event per month.</summary>
+        /// <summary>The bank, the house and the market places are not tasks; every other place offers one event per day.</summary>
         public static bool IsTaskStation(StationType type)
         {
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
@@ -248,7 +248,7 @@ namespace ColonQuest.Game
 
         public bool CanDoTask(StationType type)
         {
-            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && TasksToday < 1 && !Clock.IsLastDay && !doneStations.Contains(type);
+            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && TasksToday < GameRules.TasksPerDay && !doneStations.Contains(type);
         }
 
         public bool AlreadyDid(StationType type)
@@ -273,10 +273,10 @@ namespace ColonQuest.Game
 
         public bool CookedThisMonth { get; private set; }
 
-        /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): they count as tasks not done.</summary>
+        /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): their tasks count as not done.</summary>
         public void LoseTasks(int days)
         {
-            TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days));
+            TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days) * GameRules.TasksPerDay);
         }
 
         // ---------------------------------------------------------------- things that happen to the player
@@ -424,10 +424,12 @@ namespace ColonQuest.Game
         private void NextMorning()
         {
             Courses.AttendedToday = false;
-            TasksToday = 0;
             int previousDay = Clock.Day;
             if (Clock.SleepToMorning())
             {
+                // A new week: two more errands, and the places of last week can be visited again.
+                TasksToday = 0;
+                doneStations.Clear();
                 EndWorkingDay();
                 if (previousDay == 2)
                 {

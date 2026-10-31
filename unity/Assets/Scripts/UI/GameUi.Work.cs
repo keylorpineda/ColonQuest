@@ -31,10 +31,12 @@ namespace ColonQuest.UI
 
         private void BuildWorkGuide()
         {
-            var card = UiKit.Card(canvas.transform, "WorkGuide", UiKit.Paper, new Vector2(520f, 64f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
+            var card = UiKit.Card(canvas.transform, "WorkGuide", GamePalette.Hex("#FFF3C9"), new Vector2(540f, 68f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
             workGuide = card.parent.gameObject;
 
-            workArrow = UiKit.Rect(card, "Arrow", new Vector2(40f, 40f), new Vector2(0f, 0.5f), new Vector2(36f, 0f));
+            UiKit.Round(card, "ArrowBadgeOutline", UiKit.Ink, 48f, new Vector2(0f, 0.5f), new Vector2(14f, 0f));
+            UiKit.Round(card, "ArrowBadge", GamePalette.Hex("#FFD23F"), 40f, new Vector2(0f, 0.5f), new Vector2(18f, 0f));
+            workArrow = UiKit.Rect(card, "Arrow", new Vector2(28f, 28f), new Vector2(0f, 0.5f), new Vector2(38f, 0f));
 
             // It turns around its own middle, not around the corner it is anchored to.
             workArrow.pivot = new Vector2(0.5f, 0.5f);
@@ -43,7 +45,8 @@ namespace ColonQuest.UI
             image.color = UiKit.Ink;
             image.raycastTarget = false;
 
-            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(440f, 50f), new Vector2(1f, 0.5f), new Vector2(-12f, 0f), TextAnchor.MiddleCenter);
+            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(440f, 50f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), TextAnchor.MiddleCenter);
+            workGuideText.font = UiKit.TitleFont;
             workGuide.SetActive(false);
         }
 

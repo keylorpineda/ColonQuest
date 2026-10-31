@@ -179,6 +179,13 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
             Body.GetComponent<PlayerController>().enabled = false;
 
+            // The screen clears and the doors of the elevator open and close behind the player before it can ride again.
+            yield return new WaitForSeconds(0.5f);
+            for (float waited = 0f; waited < 5f && (SceneTransition.IsBusy || Interaction.Playing); waited += Time.deltaTime)
+            {
+                yield return null;
+            }
+
             Teleport(MapLayout.HospitalArribaMat + new Vector2(0f, 0.3f));
             Body.linearVelocity = Vector2.down * 3f;
             yield return WaitForScene(SceneNames.Hospital, 10f);
@@ -277,7 +284,7 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Carcel, SceneManager.GetActiveScene().name);
             Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, session.State.Cash);
-            Assert.AreEqual(1, session.Loop.TasksDone);
+            Assert.AreEqual(GameRules.TasksPerDay, session.Loop.TasksDone, "a day in the cell is a day of tasks lost");
             Assert.AreEqual(1, session.Loop.JailDaysRemaining);
         }
     }
@@ -374,7 +381,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(SceneNames.Hospital, SceneManager.GetActiveScene().name);
             Assert.IsTrue(session.Loop.HurtThisMonth);
             Assert.AreEqual(600_000L - MarketAssumptions.HospitalBill, session.State.Cash);
-            Assert.AreEqual(MarketAssumptions.HospitalDaysLost, session.Loop.TasksDone);
+            Assert.AreEqual(MarketAssumptions.HospitalDaysLost * GameRules.TasksPerDay, session.Loop.TasksDone);
         }
 
         [UnityTest]

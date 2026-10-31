@@ -28,6 +28,7 @@ namespace ColonQuest.World
                 Vector2 position = spawn.transform.position;
                 transform.position = position;
                 GetComponent<Rigidbody2D>().position = position;
+                SceneTransition.WalkOut(GetComponent<PlayerController>());
                 return;
             }
 

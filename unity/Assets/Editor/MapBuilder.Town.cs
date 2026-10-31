@@ -6,9 +6,9 @@ namespace ColonQuest.EditorTools
 {
     public static partial class MapBuilder
     {
-        private static readonly Color GrassColor = GamePalette.Hex("#6DBE7A");
-        private static readonly Color WalkColor = GamePalette.Hex("#D6D9E6");
-        private static readonly Color RoadColor = GamePalette.Hex("#545C70");
+        private static readonly Color GrassColor = GamePalette.Hex("#67C242");
+        private static readonly Color WalkColor = GamePalette.Hex("#DBD1BD");
+        private static readonly Color RoadColor = GamePalette.Hex("#484A52");
 
         /// <summary>
         /// The overworld: two streets joined by an avenue, a plaza with a fountain, a park and
@@ -61,12 +61,23 @@ namespace ColonQuest.EditorTools
             new GameObject("GameBootstrap").AddComponent<ColonQuest.UI.GameBootstrap>();
 
             ClearNewBuildingFootprints(map);
+            foreach (var sg in map.GetComponentsInChildren<UnityEngine.Rendering.SortingGroup>(true))
+            {
+                if (sg != null && sg.GetComponent<YSort>() == null)
+                {
+                    Object.DestroyImmediate(sg);
+                }
+            }
             SaveScene(scene, SceneNames.Town);
         }
 
         private static void BuildGround(Transform parent, System.Random random)
         {
             Shape(parent, "Grass", rounded, MapLayout.TownBounds.center, MapLayout.TownBounds.size, GrassColor, TownGrass);
+            if (grassDetailTex != null)
+            {
+                TiledShape(parent, "Grass_Texture", grassDetailTex, MapLayout.TownBounds.center, MapLayout.TownBounds.size, GamePalette.White, TownGrassPatch);
+            }
 
             // Big soft darker patches and small tufts so the grass is not one flat color.
             var patch = GamePalette.Hex("#58A867");
@@ -100,11 +111,12 @@ namespace ColonQuest.EditorTools
         {
             // Sidewalks first, then the roads on top so the road edge reads as a curb.
             // The roads run past the edge of the map, into the fog, so they never seem to end.
-            Walk(parent, new Rect(-50f, 4f, 100f, 2f));
-            Walk(parent, new Rect(-50f, -2f, 100f, 2f));
-            Walk(parent, new Rect(-50f, -10f, 100f, 2f));
-            Walk(parent, new Rect(-50f, -16f, 100f, 2f));
-            Walk(parent, new Rect(-4f, 4f, 8f, 9f));
+            Walk(parent, new Rect(-50f, 4f, 100f, 2f), true);
+            Walk(parent, new Rect(-50f, -2f, 100f, 2f), false);
+            Walk(parent, new Rect(-50f, -10f, 100f, 2f), true);
+            Walk(parent, new Rect(-50f, -16f, 100f, 2f), false);
+            CobblestonePlaza(parent, new Rect(-4f, 4f, 8f, 9f));
+            CasaGardenPath(parent);
 
             Road(parent, new Rect(-50f, 0f, 100f, 4f));
             Road(parent, new Rect(-50f, -14f, 100f, 4f));
@@ -117,17 +129,151 @@ namespace ColonQuest.EditorTools
             Crosswalk(parent, 3.6f, -14f, -10f);
         }
 
-        private static void Walk(Transform parent, Rect area)
+        private static void Walk(Transform parent, Rect area, bool curbSouth = true)
         {
-            Shape(parent, "Walk_Outline", rounded, area.center, area.size + Vector2.one * 0.16f, GamePalette.Shade(WalkColor, 0.45f), TownWalkOutline);
+            Shape(parent, "Walk_Outline", rounded, area.center, area.size + Vector2.one * 0.16f, GamePalette.Outline, TownWalkOutline);
             Shape(parent, "Walk", rounded, area.center, area.size, WalkColor, TownWalk);
-            Shape(parent, "Walk_Plate", rounded, area.center, area.size - Vector2.one * 0.5f, GamePalette.Shade(WalkColor, 1.03f), TownWalkPlate);
+            if (sidewalkSlabTex != null)
+            {
+                TiledShape(parent, "Walk_SlabPattern", sidewalkSlabTex, area.center, area.size - new Vector2(0.12f, 0.08f), GamePalette.White, TownWalkPlate + 1);
+            }
+            else
+            {
+                Shape(parent, "Walk_Plate", rounded, area.center, area.size - Vector2.one * 0.4f, GamePalette.Shade(WalkColor, 1.03f), TownWalkPlate);
+            }
+
+            if (area.width > area.height)
+            {
+                // Bold 3D yellow-and-amber painted street curb along the road edge
+                float curbBaseY = curbSouth ? area.yMin : area.yMax;
+                float dir = curbSouth ? 1f : -1f;
+
+                Shape(parent, "Curb_GutterOutline", square, new Vector2(area.center.x, curbBaseY + dir * 0.03f), new Vector2(area.width - 0.2f, 0.06f), GamePalette.Outline, TownWalkPlate + 2);
+                Shape(parent, "Curb_FrontFace", square, new Vector2(area.center.x, curbBaseY + dir * 0.10f), new Vector2(area.width - 0.2f, 0.11f), GamePalette.Hex("#C48B12"), TownWalkPlate + 2);
+                Shape(parent, "Curb_TopBevel", square, new Vector2(area.center.x, curbBaseY + dir * 0.20f), new Vector2(area.width - 0.2f, 0.12f), GamePalette.Hex("#F5C42F"), TownWalkPlate + 2);
+                Shape(parent, "Curb_TopHighlight", square, new Vector2(area.center.x, curbBaseY + dir * 0.24f), new Vector2(area.width - 0.2f, 0.04f), GamePalette.Hex("#FFE066"), TownWalkPlate + 3);
+                Shape(parent, "Curb_InkSeam", square, new Vector2(area.center.x, curbBaseY + dir * 0.27f), new Vector2(area.width - 0.2f, 0.04f), GamePalette.Outline, TownWalkPlate + 3);
+
+                for (float x = area.xMin + 2.0f; x < area.xMax - 1.5f; x += 2.0f)
+                {
+                    Shape(parent, "Curb_Joint", square, new Vector2(x, curbBaseY + dir * 0.15f), new Vector2(0.05f, 0.24f), GamePalette.Outline, TownWalkPlate + 3);
+                }
+
+                // Lush green lawn border with hand-inked scalloped grass blades overlapping the top of the concrete sidewalk
+                if (curbSouth && grassEdgeTex != null)
+                {
+                    if (Mathf.Abs(area.yMin - 4f) < 0.1f)
+                    {
+                        // Leave [-14..14] open for the Terracotta Flagstone Courtyard in front of Banco, Plaza, and Tienda
+                        Rect leftLawn = new Rect(area.xMin, area.yMax - 0.56f, -14.0f - area.xMin, 0.62f);
+                        Rect rightLawn = new Rect(14.0f, area.yMax - 0.56f, area.xMax - 14.0f, 0.62f);
+                        Shape(parent, "Walk_LawnStripL", square, leftLawn.center, leftLawn.size, GrassColor, TownWalkPlate + 2);
+                        Shape(parent, "Walk_LawnStripR", square, rightLawn.center, rightLawn.size, GrassColor, TownWalkPlate + 2);
+                        TiledShape(parent, "Walk_GrassEdgeL", grassEdgeTex, new Vector2(leftLawn.center.x, area.yMax - 0.52f), new Vector2(leftLawn.width, 0.56f), GamePalette.White, TownWalkPlate + 3);
+                        TiledShape(parent, "Walk_GrassEdgeR", grassEdgeTex, new Vector2(rightLawn.center.x, area.yMax - 0.52f), new Vector2(rightLawn.width, 0.56f), GamePalette.White, TownWalkPlate + 3);
+                    }
+                    else
+                    {
+                        TiledShape(parent, "Walk_GrassEdge", grassEdgeTex, new Vector2(area.center.x, area.yMax - 0.18f), new Vector2(area.width - 0.4f, 0.52f), GamePalette.White, TownWalkPlate + 3);
+                    }
+                }
+            }
+        }
+
+        private static void CobblestonePlaza(Transform parent, Rect area)
+        {
+            var borderTerracotta = GamePalette.Hex("#8E4828");
+            var baseTerracotta = GamePalette.Hex("#D4794A");
+
+            // Grand Colonial Terracotta Flagstone Courtyard spanning in front of Banco, Central Plaza, and Tienda
+            Rect promenade = new Rect(-14.0f, 5.34f, 28.0f, 0.92f);
+            Shape(parent, "Promenade_Outline", roundedSmall, promenade.center, promenade.size + new Vector2(0.16f, 0.14f), GamePalette.Outline, TownPlaza);
+            Shape(parent, "Promenade_Surface", roundedSmall, promenade.center, promenade.size, baseTerracotta, TownPlaza + 1);
+            if (plazaFlagstoneTex != null)
+            {
+                TiledShape(parent, "Promenade_Flagstones", plazaFlagstoneTex, promenade.center, promenade.size - new Vector2(0.08f, 0.06f), GamePalette.White, TownPlaza + 2);
+            }
+
+            Rect centralPlaza = new Rect(area.xMin - 0.25f, 5.34f, area.width + 0.5f, area.yMax - 5.14f);
+            Shape(parent, "Plaza_Outline", rounded, centralPlaza.center, centralPlaza.size + Vector2.one * 0.22f, GamePalette.Outline, TownPlaza);
+            Shape(parent, "Plaza_Border", rounded, centralPlaza.center, centralPlaza.size, borderTerracotta, TownPlaza + 1);
+            Shape(parent, "Plaza_Surface", rounded, centralPlaza.center, centralPlaza.size - Vector2.one * 0.28f, baseTerracotta, TownPlaza + 2);
+            if (plazaFlagstoneTex != null)
+            {
+                TiledShape(parent, "Plaza_Flagstones", plazaFlagstoneTex, centralPlaza.center, centralPlaza.size - Vector2.one * 0.34f, GamePalette.White, TownPlaza + 3);
+            }
+
+            // Concentric carved stone rings framing the 3-tier central fountain at (0, 9).
+            Vector2 fCenter = new Vector2(0f, 9f);
+            Shape(parent, "Plaza_RingOuterInk", circle, fCenter, new Vector2(5.8f, 4.0f), GamePalette.Outline, TownPlaza + 4);
+            Shape(parent, "Plaza_RingOuterTerra", circle, fCenter, new Vector2(5.64f, 3.86f), GamePalette.Hex("#C96D3E"), TownPlaza + 5);
+            Shape(parent, "Plaza_RingMidInk", circle, fCenter, new Vector2(5.05f, 3.45f), GamePalette.Outline, TownPlaza + 6);
+            Shape(parent, "Plaza_RingStone", circle, fCenter, new Vector2(4.90f, 3.32f), GamePalette.Hex("#D8CEBC"), TownPlaza + 7);
+            Shape(parent, "Plaza_RingInnerInk", circle, fCenter, new Vector2(4.46f, 3.02f), GamePalette.Outline, TownPlaza + 8);
+            Shape(parent, "Plaza_RingInner", circle, fCenter, new Vector2(4.32f, 2.90f), GamePalette.Hex("#EAE2D3"), TownPlaza + 9);
+        }
+
+        private static void CasaGardenPath(Transform parent)
+        {
+            // Warm dirt/sand side trail to the right of Tu Casa (between Casa and Banco, under the tropical tree)
+            Rect dirtTrail = new Rect(-15.55f, 5.40f, 1.75f, 7.2f);
+            Shape(parent, "DirtTrail_Edge", rounded, dirtTrail.center, dirtTrail.size + new Vector2(0.24f, 0.16f), GamePalette.Hex("#3E8E2C"), TownWalkPlate + 3);
+            Shape(parent, "DirtTrail", rounded, dirtTrail.center, dirtTrail.size, GamePalette.Hex("#DFA872"), TownWalkPlate + 4);
+            Shape(parent, "DirtTrail_Center", rounded, dirtTrail.center, dirtTrail.size - new Vector2(0.45f, 0.4f), GamePalette.Hex("#E8B986"), TownWalkPlate + 5);
+
+            // Irregular hand-inked grey-cream flagstones leading from the sidewalk gate to Tu Casa's door and curving into the left garden
+            (Vector2 pos, Vector2 size, float angle)[] stones =
+            {
+                (new Vector2(-19.58f, 5.48f), new Vector2(0.72f, 0.28f), -4f),
+                (new Vector2(-19.22f, 5.68f), new Vector2(0.56f, 0.24f), 6f),
+                (new Vector2(-19.62f, 5.84f), new Vector2(0.64f, 0.25f), -3f),
+                // Branch curving left across Tu Casa's recessed left garden
+                (new Vector2(-20.45f, 5.64f), new Vector2(0.78f, 0.34f), 12f),
+                (new Vector2(-21.25f, 5.88f), new Vector2(0.84f, 0.36f), -8f),
+                (new Vector2(-22.05f, 6.08f), new Vector2(0.88f, 0.38f), 14f),
+                (new Vector2(-22.75f, 6.38f), new Vector2(0.86f, 0.38f), -6f),
+                (new Vector2(-23.05f, 6.82f), new Vector2(0.84f, 0.36f), 4f)
+            };
+
+            foreach (var s in stones)
+            {
+                var o = Shape(parent, "SteppingStone_Outline", roundedSmall, s.pos, s.size + new Vector2(0.12f, 0.10f), GamePalette.Outline, TownWalkPlate + 4);
+                var b = Shape(parent, "SteppingStone_Base", roundedSmall, s.pos, s.size, GamePalette.Hex("#A8A396"), TownWalkPlate + 5);
+                var t = Shape(parent, "SteppingStone_Top", roundedSmall, s.pos + new Vector2(-0.02f, 0.02f), s.size - new Vector2(0.10f, 0.08f), GamePalette.Hex("#C9C4B6"), TownWalkPlate + 6);
+                Tilt(o, s.angle);
+                Tilt(b, s.angle);
+                Tilt(t, s.angle);
+            }
+
+            // Lush 4-leaf clover clusters in Tu Casa's front lawn
+            Vector2[] clovers =
+            {
+                new Vector2(-20.15f, 5.48f), new Vector2(-20.85f, 5.52f), new Vector2(-22.4f, 5.65f),
+                new Vector2(-23.3f, 5.75f), new Vector2(-18.5f, 5.62f), new Vector2(-17.4f, 5.68f)
+            };
+            foreach (var cp in clovers)
+            {
+                for (int leaf = 0; leaf < 4; leaf++)
+                {
+                    float a = (leaf * 90f + 25f) * Mathf.Deg2Rad;
+                    Vector2 lp = cp + new Vector2(Mathf.Cos(a) * 0.09f, Mathf.Sin(a) * 0.07f);
+                    Shape(parent, "Clover_Out", circle, lp, Vector2.one * 0.16f, GamePalette.Outline, TownWalkPlate + 4);
+                    Shape(parent, "Clover", circle, lp, Vector2.one * 0.11f, GamePalette.Hex("#3FA834"), TownWalkPlate + 5);
+                }
+            }
         }
 
         private static void Road(Transform parent, Rect area)
         {
             Shape(parent, "Road_Outline", rounded, area.center, area.size + Vector2.one * 0.24f, GamePalette.Outline, TownRoadOutline);
             Shape(parent, "Road", rounded, area.center, area.size, RoadColor, TownRoad);
+
+            if (area.width > area.height)
+            {
+                var wear = GamePalette.Shade(RoadColor, 0.92f);
+                Shape(parent, "Road_WearNorth", square, new Vector2(area.center.x, area.center.y + 0.95f), new Vector2(area.width - 0.8f, 0.7f), wear, TownRoad);
+                Shape(parent, "Road_WearSouth", square, new Vector2(area.center.x, area.center.y - 0.95f), new Vector2(area.width - 0.8f, 0.7f), wear, TownRoad);
+            }
         }
 
         /// <summary>The dark alley, the gravel lot for the stand, the park path and the pond. All lie on the ground.</summary>
@@ -241,12 +387,12 @@ namespace ColonQuest.EditorTools
 
         private static void BuildStreetFurniture(Transform parent, Transform shadows)
         {
-            foreach (float x in new[] { -22.8f, -14.5f, -2.8f, 2.8f, 14.5f, 22.8f })
+            foreach (float x in new[] { 14.5f, 22.8f })
             {
                 Lamp(parent, x, 4.5f);
             }
 
-            foreach (float x in new[] { -18f, -6f, 6f, 18f })
+            foreach (float x in new[] { -25.5f, -6f, 6f, 18f })
             {
                 Lamp(parent, x, -0.8f);
             }
@@ -261,8 +407,8 @@ namespace ColonQuest.EditorTools
 
             // Traffic keeps to the right: east along the south lane of each road, west along the north lane.
             // Cars in the same lane share a speed, so none catches up with the one ahead.
-            Car(parent, shadows, -21f, 0.95f, "#E8505B", 2.4f);
-            Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
+            Car(parent, shadows, -20.2f, 1.35f, "#E8505B", 2.4f);
+            Car(parent, shadows, 12.5f, 1.35f, "#4DA3FF", 2.4f);
             // The north lane of the main street belongs to the collectors' car, so no other car shares it.
             Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
             Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
@@ -272,122 +418,21 @@ namespace ColonQuest.EditorTools
         private static void BuildPlazaAndPark(Transform parent, Transform shadows)
         {
             Fountain(parent, shadows, new Vector2(0f, 9f));
-            Bench(parent, shadows, -3.0f, 7.6f);
-            Bench(parent, shadows, 3.0f, 7.6f);
-            Lamp(parent, -3.4f, 5.2f);
-            Lamp(parent, 3.4f, 5.2f);
+            PlazaBench(parent, shadows, -2.55f, 10.55f, 20f);
+            PlazaBench(parent, shadows, 2.55f, 10.55f, -20f);
+            ColonialLamp(parent, -3.45f, 9.6f);
+            ColonialLamp(parent, 3.45f, 9.6f);
+            PlazaPlanter(parent, shadows, new Vector2(-3.25f, 7.6f));
+            PlazaPlanter(parent, shadows, new Vector2(3.25f, 7.6f));
+            PlazaPlanter(parent, shadows, new Vector2(-3.55f, 9.3f));
+            PlazaPlanter(parent, shadows, new Vector2(3.55f, 9.3f));
+            FestoonGarland(parent, new Vector2(-3.45f, 9.6f), new Vector2(3.45f, 9.6f), 2.8f);
+            CasaFrontFence(parent, shadows);
+            BuildOverheadPowerNetwork(parent, shadows);
 
             Bench(parent, shadows, 16.5f, -2.9f);
             Bench(parent, shadows, 22.4f, -2.9f);
             Lamp(parent, 19.5f, -2.6f);
-        }
-
-        private static void BuildAlleyAndLot(Transform parent, Transform shadows)
-        {
-            // Trash cans and crates in the alley.
-            foreach (var can in new[] { new Vector2(-15.2f, -4.1f), new Vector2(-12.9f, -6.9f) })
-            {
-                var root = Root(parent, "TrashCan", can, can.y - 0.4f);
-                GroundShadow(shadows, can + new Vector2(0.1f, -0.35f), new Vector2(0.9f, 0.4f), 0.3f);
-                Shape(root, "Outline", roundedSmall, new Vector2(0f, 0.3f), new Vector2(0.78f, 0.9f), GamePalette.Outline, 0);
-                Shape(root, "Can", roundedSmall, new Vector2(0f, 0.28f), new Vector2(0.64f, 0.76f), GamePalette.Hex("#7E869C"), 1);
-                Shape(root, "Lid", roundedSmall, new Vector2(0f, 0.68f), new Vector2(0.76f, 0.2f), GamePalette.Hex("#9AA3B8"), 2);
-                root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(0.7f, 0.8f);
-            }
-
-            var crates = Root(parent, "Crates", new Vector2(-15.1f, -5.6f), -6.0f);
-            Shape(crates, "Crate_Outline", rounded, new Vector2(0f, 0.4f), new Vector2(1.14f, 1.14f), GamePalette.Outline, 0);
-            Shape(crates, "Crate", rounded, new Vector2(0f, 0.4f), new Vector2(1.0f, 1.0f), GamePalette.Hex("#A9743F"), 1);
-            Shape(crates, "Crate_Plank", square, new Vector2(0f, 0.4f), new Vector2(1.0f, 0.06f), GamePalette.Hex("#7A4F2A"), 2);
-            Shape(crates, "Crate_Plank", square, new Vector2(0f, 0.4f), new Vector2(0.06f, 1.0f), GamePalette.Hex("#7A4F2A"), 2);
-            crates.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(1.0f, 0.9f);
-
-            // Neon sign over the alley mouth. It hangs high, so the player always walks under it.
-            var sign = Root(parent, "AlleySign", new Vector2(-14f, -2.55f), -9f);
-            Shape(sign, "Outline", roundedSmall, Vector2.zero, new Vector2(3.5f, 0.74f), GamePalette.Outline, 0);
-            var neon = Shape(sign, "Neon", roundedSmall, Vector2.zero, new Vector2(3.36f, 0.6f), GamePalette.Hex("#8E1F2B"), 1);
-            Flickering(neon, 0.45f, 7f, 4f);
-            Label(sign, "PRESTAMOS RAPIDOS", Vector2.zero, GamePalette.Hex("#FFD23F"), 0.026f, TextAnchor.MiddleCenter);
-
-            // The stand: striped canopy, a banner and a table with piles of cash.
-            var tent = Root(parent, "Stand", new Vector2(7f, -5.2f), -5.2f);
-            GroundShadowRect(shadows, new Vector2(7.3f, -4.4f), new Vector2(4.6f, 2.4f), 0.25f);
-            Shape(tent, "Pole", square, new Vector2(-2.0f, 1.0f), new Vector2(0.14f, 2.0f), GamePalette.Hex("#6F7890"), 0);
-            Shape(tent, "Pole", square, new Vector2(2.0f, 1.0f), new Vector2(0.14f, 2.0f), GamePalette.Hex("#6F7890"), 0);
-            Shape(tent, "Canopy_Outline", rounded, new Vector2(0f, 2.25f), new Vector2(4.7f, 1.3f), GamePalette.Outline, 1);
-            for (int i = 0; i < 6; i++)
-            {
-                Shape(tent, "Canopy", square, new Vector2(-2.0f + 0.4f + i * 0.72f, 2.25f), new Vector2(0.72f, 1.14f), GamePalette.Hex(i % 2 == 0 ? "#E8505B" : "#FFD23F"), 2);
-            }
-
-            Shape(tent, "Banner_Outline", roundedSmall, new Vector2(0f, 1.2f), new Vector2(4.1f, 0.74f), GamePalette.Outline, 3);
-            Shape(tent, "Banner", roundedSmall, new Vector2(0f, 1.2f), new Vector2(3.96f, 0.6f), GamePalette.Hex("#2E7D4F"), 4);
-            Label(tent, "INVIERTE YA 300%", new Vector2(0f, 1.2f), GamePalette.White, 0.027f, TextAnchor.MiddleCenter);
-
-            var table = Root(parent, "StandTable", new Vector2(7f, -5.7f), -5.95f);
-            Shape(table, "Table_Outline", rounded, new Vector2(0f, 0.3f), new Vector2(2.7f, 0.84f), GamePalette.Outline, 0);
-            Shape(table, "Table", rounded, new Vector2(0f, 0.3f), new Vector2(2.54f, 0.68f), GamePalette.Hex("#A9743F"), 1);
-            for (int i = 0; i < 3; i++)
-            {
-                Shape(table, "Cash", roundedSmall, new Vector2(-0.8f + i * 0.8f, 0.4f), new Vector2(0.56f, 0.34f), GamePalette.MoneyIn, 2);
-                Shape(table, "Cash_Band", square, new Vector2(-0.8f + i * 0.8f, 0.4f), new Vector2(0.06f, 0.34f), GamePalette.Hex("#2E7D4F"), 3);
-            }
-
-            table.gameObject.AddComponent<BoxCollider2D>().offset = new Vector2(0f, 0.3f);
-            table.GetComponent<BoxCollider2D>().size = new Vector2(2.5f, 0.6f);
-
-            // The man of the stand, behind the table: the player can talk to him, and what he promises is the lesson.
-            var seller = BuildNpc(parent, "Estafador", new Vector2(7f, -4.7f), new Look { Skin = "#C98B5C", Extra = Accessory.Tie, ExtraColor = "#2E7D4F" }, true);
-            BuildThing(seller, "Talk", "Hablar con el del puesto", Vector2.zero, new Vector2(0.8f, 0.8f),
-                "Triplicá tu plata en un mes. Solo traé efectivo y no le contés a nadie.",
-                "Es seguro, es seguro. Papeles no tengo, pero confiá en mí.",
-                "Con los {cash} que tenés hoy, mañana tendrías el triple. Eso me dijeron mis clientes.",
-                "Nadie puede garantizar 300% en un mes. Un negocio así se llama esquema piramidal: gana el que entra primero.");
-        }
-
-        private static void BuildDoorsAndStations(Transform parent)
-        {
-            // Walking up into a building door goes inside.
-            Doorway(parent, new Vector2(-19.5f, 5.7f), SceneNames.Casa);
-            Doorway(parent, new Vector2(-8.5f, 5.7f), SceneNames.Banco, true);
-            Doorway(parent, new Vector2(8.5f, 5.7f), SceneNames.Tienda, true);
-            Doorway(parent, new Vector2(12.5f, -24.3f), SceneNames.Soda, true);
-
-            // Out in the street the stations lie on the ground, in front of each place.
-            currentLayer = LayerFloor;
-            BuildStation(parent, "Station_Garage", StationType.Garage, "Taller de Don Rafa", new Vector2(19.5f, 4.9f));
-            BuildStation(parent, "Station_Grocery", StationType.Grocery, "Pulperia", new Vector2(-19.5f, -9.0f));
-            BuildStation(parent, "Station_Lender", StationType.Lender, "Prestamos Rapidos", new Vector2(-14f, -3.9f));
-            BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
-            BuildStation(parent, "Station_Coop", StationType.Coop, "Cooperativa de ahorro", new Vector2(-31.5f, 4.9f));
-            BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(0f, 4.6f));
-            currentLayer = LayerWorld;
-        }
-
-        private static void Doorway(Transform parent, Vector2 position, string targetScene, bool closesAtNight = false)
-        {
-            var go = new GameObject("Door_" + targetScene);
-            go.transform.SetParent(parent, false);
-            go.transform.position = position;
-
-            var trigger = go.AddComponent<BoxCollider2D>();
-            trigger.size = new Vector2(1.3f, 1.0f);
-            trigger.isTrigger = true;
-            var door = go.AddComponent<Door>();
-            door.Configure(targetScene, SpawnIds.FromTown, Vector2.up);
-            door.SetClosesAtNight(closesAtNight);
-
-            if (closesAtNight)
-            {
-                var sign = new GameObject("ClosedSign");
-                sign.transform.SetParent(go.transform, false);
-                sign.transform.localPosition = new Vector2(0f, 1.3f);
-                Shape(sign.transform, "SignPlate", roundedSmall, Vector2.zero, new Vector2(1.1f, 0.45f), GamePalette.Hex("#B22222"), 15);
-                Shape(sign.transform, "SignBorder", roundedSmall, Vector2.zero, new Vector2(1.18f, 0.53f), GamePalette.Outline, 14);
-                Label(sign.transform, "CERRADO", Vector2.zero, GamePalette.White, 0.026f, TextAnchor.MiddleCenter);
-                door.AttachClosedSign(sign);
-                sign.SetActive(false);
-            }
         }
 
         private static void BuildPeople(Transform parent)
@@ -398,6 +443,27 @@ namespace ColonQuest.EditorTools
             BuildNpc(parent, "Promotor", new Vector2(9.0f, -5.7f), new Look { Skin = "#2EAA55", Extra = Accessory.Tie, ExtraColor = "#E8505B" }, true);
 
             BuildNpc(parent, "AsesoraCoop", new Vector2(-29.6f, 4.85f), new Look { Skin = "#2E8B57", Extra = Accessory.Vest, ExtraColor = "#F1F4FF" }, true);
+
+            // Iconic cast members in the residential and central plaza zones
+            var donMario = BuildNpc(parent, "DonMario", new Vector2(-17.1f, 5.05f), new Look { Skin = "#E9E2D0" }, true);
+            BuildThing(donMario, "Talk_DonMario", "Saludar a Don Mario", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "¡Buenos días, vecino! Qué bonito día hace hoy en el barrio.",
+                "Cuidar la casa y llevar las cuentas al día da una paz que no tiene precio.");
+
+            var cajeraExt = BuildNpc(parent, "Cajera", new Vector2(-6.3f, 5.65f), new Look { Skin = "#EAF0F8" }, true);
+            BuildThing(cajeraExt, "Talk_Cajera", "Hablar con la asesora del Banco", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "¡Bienvenido al Banco! Adentro podés abrir tu cuenta de ahorros o consultar tus cuotas.",
+                "Ahorrar aunque sea un poquito cada mes te salva de cualquier imprevisto.");
+
+            var vendedorExt = BuildNpc(parent, "Vendedor", new Vector2(8.5f, 5.45f), new Look { Skin = "#2E86C1" }, true);
+            BuildThing(vendedorExt, "Talk_Vendedor", "Hablar con Kevin de la Tienda", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "¡Pase adelante! Tenemos fruta fresca afuera y todo para el hogar adentro.",
+                "Eso sí: antes de comprar a crédito, fijate bien cuánto terminás pagando en total.");
+
+            var martaPlaza = BuildNpc(parent, "DonaMarta", new Vector2(1.9f, 5.05f), new Look { Skin = "#D9707F" }, true);
+            BuildThing(martaPlaza, "Talk_MartaPlaza", "Conversar con Doña Marta", Vector2.zero, new Vector2(0.8f, 0.8f),
+                "Vengo de hacer los mandados con mi canasta y mi lista en mano.",
+                "El que compra con lista en mano no gasta en lo que no ocupa.");
 
             BuildPedestrian(parent, "Peaton_F", new Vector2(-25f, -17.8f), new Vector2(38.5f, -17.8f), new Look { Skin = "#4DA3FF", Extra = Accessory.Cap, ExtraColor = "#FFD23F" }, 1.3f);
             BuildPedestrian(parent, "Peaton_G", new Vector2(-46f, 5.2f), new Vector2(-39.5f, 5.2f), new Look { Skin = "#FF7A5C", Extra = Accessory.None }, 1.0f);
@@ -418,7 +484,7 @@ namespace ColonQuest.EditorTools
             currentLayer = LayerForeground;
             var layer = ParallaxGroup(parent, "CloudShadows", -0.1f);
             var color = GamePalette.Hex("#0B1630");
-            color.a = 0.12f;
+            color.a = 0.03f;
 
             for (int i = 0; i < 20; i++)
             {

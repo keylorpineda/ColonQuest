@@ -215,7 +215,9 @@ namespace ColonQuest.EditorTools
             else
             {
                 var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
-                Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 1.0f, 0.3f, "#55E08F");
+                Deco(layout.Labels, "ExitSign_Outline", roundedSmall, exit.x, exit.y, 1.14f, 0.42f, "#1C2233", 1f, OrderLabel - 2);
+                Deco(layout.Labels, "ExitSign_Frame", roundedSmall, exit.x, exit.y, 1.06f, 0.34f, "#2E9E62", 1f, OrderLabel - 1);
+                Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 0.96f, 0.26f, "#55E08F", 1f, OrderLabel - 1);
                 Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
             }
             DustMotes(IL(layout.Props, "DustMotes"), new System.Random(5), room, 18);
@@ -325,14 +327,18 @@ namespace ColonQuest.EditorTools
             }
         }
 
-        /// <summary>The visible face of the back wall: a darker band with a baseboard line.</summary>
+        /// <summary>The visible face of the back wall: a darker band with crown molding, wainscot and baseboard.</summary>
         private static void WallFace(Transform parent, Room room, int order)
         {
             float top = room.Center.y + room.Size.y * 0.5f;
             Shape(parent, room.Name + "_WallFace", roundedSmall, new Vector2(room.Center.x, top - 0.4f),
-                new Vector2(room.Size.x, 0.8f), GamePalette.Shade(room.Color, 0.66f), order);
+                new Vector2(room.Size.x, 0.8f), GamePalette.Shade(room.Color, 0.68f), order);
+            Shape(parent, room.Name + "_CrownMolding", square, new Vector2(room.Center.x, top - 0.06f),
+                new Vector2(room.Size.x - 0.2f, 0.08f), GamePalette.Shade(room.Color, 0.52f), order);
+            Shape(parent, room.Name + "_Wainscot", square, new Vector2(room.Center.x, top - 0.62f),
+                new Vector2(room.Size.x - 0.24f, 0.28f), GamePalette.Shade(room.Color, 0.58f), order);
             Shape(parent, room.Name + "_Baseboard", square, new Vector2(room.Center.x, top - 0.78f),
-                new Vector2(room.Size.x - 0.3f, 0.07f), GamePalette.Shade(room.Color, 0.45f), order);
+                new Vector2(room.Size.x - 0.24f, 0.09f), GamePalette.Shade(room.Color, 0.42f), order);
         }
 
         // ---------------------------------------------------------------- room structure
@@ -358,10 +364,21 @@ namespace ColonQuest.EditorTools
 
             if (planks)
             {
-                // Plank ends are staggered from one row to the next.
+                // Plank ends are staggered from one row to the next, with warm alternating plank tint.
+                var altTint = GamePalette.Shade(color, 0.95f);
+                altTint.a = 0.45f;
                 int row = 0;
                 for (float y = area.yMin; y < area.yMax - 0.01f; y += jointStep, row++)
                 {
+                    if (row % 2 == 1)
+                    {
+                        float h = Mathf.Min(jointStep - 0.04f, area.yMax - y);
+                        if (h > 0.05f)
+                        {
+                            Shape(zone, "PlankTone", square, new Vector2(area.center.x, y + h * 0.5f), new Vector2(area.width, h), altTint, OrderRug - 5);
+                        }
+                    }
+
                     for (float x = area.xMin + (row % 2 == 0 ? 1.2f : 2.4f); x < area.xMax - 0.1f; x += 2.4f)
                     {
                         Shape(zone, "PlankEnd", square, new Vector2(x, y + jointStep * 0.5f), new Vector2(0.04f, jointStep), joint, OrderRug - 5);
@@ -391,7 +408,9 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Wall", square, center, size, GamePalette.Outline, OrderWall);
             if (horizontal)
             {
-                Shape(parent, "WallFace", square, center + new Vector2(0f, -InnerWallThickness * 0.5f - 0.14f), new Vector2(size.x, 0.28f), GamePalette.Hex(faceHex), OrderWall);
+                var faceColor = GamePalette.Hex(faceHex);
+                Shape(parent, "WallFace", square, center + new Vector2(0f, -InnerWallThickness * 0.5f - 0.14f), new Vector2(size.x, 0.28f), faceColor, OrderWall);
+                Shape(parent, "WallBaseboard", square, center + new Vector2(0f, -InnerWallThickness * 0.5f - 0.25f), new Vector2(size.x, 0.06f), GamePalette.Shade(faceColor, 0.68f), OrderWall);
             }
 
             Wall(parent, "WallCollider", center, size);
@@ -424,6 +443,7 @@ namespace ColonQuest.EditorTools
         {
             string previous = currentLayer;
             currentLayer = LayerFloor;
+            Shape(parent, "Threshold_Outline", square, at, new Vector2(width, InnerWallThickness + 0.06f), GamePalette.Outline, OrderRug + 2);
             Shape(parent, "Threshold", square, at, new Vector2(width, InnerWallThickness), GamePalette.Hex("#9C6B43"), OrderRug + 3);
             currentLayer = previous;
         }
@@ -431,16 +451,21 @@ namespace ColonQuest.EditorTools
         /// <summary>A small plate with text on a wall, such as a room name or a teller number.</summary>
         private static void WallPlate(Transform parent, string text, Vector2 at, float width, string plateHex, Color textColor, float textSize = 0.032f)
         {
-            Deco(parent, "Plate_Outline", roundedSmall, at.x, at.y, width + 0.08f, 0.42f, "#2A3345", 1f, OrderLabel - 2);
-            Deco(parent, "Plate", roundedSmall, at.x, at.y, width, 0.34f, plateHex, 1f, OrderLabel - 1);
+            Deco(parent, "Plate_Shadow", roundedSmall, at.x + 0.03f, at.y - 0.03f, width + 0.14f, 0.46f, "#1C2233", 0.35f, OrderLabel - 3);
+            Deco(parent, "Plate_Outline", roundedSmall, at.x, at.y, width + 0.14f, 0.46f, "#2A3345", 1f, OrderLabel - 2);
+            Deco(parent, "Plate_Frame", roundedSmall, at.x, at.y, width + 0.06f, 0.38f, "#8B5A3C", 1f, OrderLabel - 2);
+            Deco(parent, "Plate", roundedSmall, at.x, at.y, width - 0.04f, 0.3f, plateHex, 1f, OrderLabel - 1);
             Label(parent, text, at, textColor, textSize, TextAnchor.MiddleCenter);
         }
 
         private static void Window(Transform parent, float x, float y, float width)
         {
-            Deco(parent, "Window_Frame", rounded, x, y, width, 0.5f, "#2A3345");
-            Deco(parent, "Window_Glass", rounded, x, y, width - 0.14f, 0.36f, "#BFE3F5", 1f, 8);
-            Deco(parent, "Window_Bar", square, x, y, 0.05f, 0.36f, "#2A3345", 1f, 9);
+            Deco(parent, "Window_Frame", rounded, x, y, width, 0.52f, "#2A3345");
+            Deco(parent, "Window_Wood", rounded, x, y, width - 0.08f, 0.44f, "#8B5A3C", 1f, 7);
+            Deco(parent, "Window_Glass", rounded, x, y, width - 0.18f, 0.34f, "#BFE3F5", 1f, 8);
+            Deco(parent, "Window_Shine", roundedSmall, x - width * 0.22f, y + 0.04f, width * 0.22f, 0.18f, "#FFFFFF", 0.45f, 8);
+            Deco(parent, "Window_Bar", square, x, y, 0.05f, 0.34f, "#2A3345", 1f, 9);
+            Deco(parent, "Window_Sill", roundedSmall, x, y - 0.24f, width + 0.14f, 0.1f, "#A9743F", 1f, 9);
         }
     }
 }
