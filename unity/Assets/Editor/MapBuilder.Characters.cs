@@ -232,6 +232,31 @@ namespace ColonQuest.EditorTools
             { "Cajero", new Vector2(0f, 1.2f) }
         };
 
+        /// <summary>
+        /// The two men of the collectors' car: dark clothes, serious faces. They wait hidden off the map, without a collider, and
+        /// the overlay shows them and walks them to the player when the car stops.
+        /// </summary>
+        private static void BuildCollectorMen(Transform parent)
+        {
+            for (int i = 0; i < CollectorCar.MenNames.Length; i++)
+            {
+                var look = new Look
+                {
+                    Skin = "#1F2230", SkinTone = i == 0 ? "#C68B59" : "#8A5A3C", HairColor = "#1A1414", Hair = HairStyle.Buzz,
+                    Pants = "#15161C", Face = Expression.Frown, Width = 1.06f, Height = 1.04f, Glasses = i == 0, SquareJaw = true
+                };
+                var man = new GameObject(CollectorCar.MenNames[i]);
+                man.transform.SetParent(parent, false);
+                man.transform.position = new Vector2(MapLayout.PlayWestX - 8f - i, 3.2f);
+                MakeYSorted(man, -0.45f);
+                BuildCharacterVisual(man.transform, look);
+                foreach (var renderer in man.GetComponentsInChildren<SpriteRenderer>(true))
+                {
+                    renderer.enabled = false;
+                }
+            }
+        }
+
         /// <summary>A pedestrian that walks between two points. It has no collider, so it never blocks the way.</summary>
         private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed)
         {

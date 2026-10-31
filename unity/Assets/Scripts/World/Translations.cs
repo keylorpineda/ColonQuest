@@ -984,6 +984,8 @@ namespace ColonQuest.World
             { "Qué buena siesta. Ya pasaron un par de horas.", "What a good nap. A couple of hours went by." },
             { "Ya terminé por hoy. A dormir temprano.", "I am done for today. Off to bed early." },
             { "Tareas de hoy  ·  Tab", "Today's tasks  ·  Tab" },
+            { "Mae, usted debe plata. Hoy venimos por {0}.", "Dude, you owe money. Today we came for {0}." },
+            { "Cobrador", "Debt collector" },
             { "Conocer tu cuarto de alquiler", "See your rented room" },
             { "Sacar el seguro de salud en el hospital", "Take out the health insurance at the hospital" },
             { "Tu primer turno en la soda El Muelle", "Your first shift at the soda El Muelle" },

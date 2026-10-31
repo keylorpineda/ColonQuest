@@ -107,6 +107,15 @@ namespace ColonQuest.World
         /// <summary>Raised once each time the car stops in front of the player.</summary>
         public static event Action<CollectorCar> Arrived;
 
+        /// <summary>The two men in the car. They wait hidden on the street until the car stops in front of the player.</summary>
+        public static readonly string[] MenNames = { "Cobrador_1", "Cobrador_2" };
+
+        /// <summary>While true a stopped car stays stopped: the men are out talking to the player.</summary>
+        public static bool Held { get; set; }
+
+        /// <summary>How hard the car brakes when it stops in front of the player, in units per second squared.</summary>
+        private const float Brake = 9f;
+
         public bool IsVisible => patrol != null && patrol.Current != CollectorPatrol.Mode.Waiting;
 
         /// <summary>True while the car is stopped, so a window can stay open.</summary>
@@ -125,6 +134,7 @@ namespace ColonQuest.World
         {
             patrol = new CollectorPatrol(25f, 40f);
             Instance = this;
+            Held = false;
             currentSpeed = speed;
             Traffic.Register(transform);
         }
@@ -147,7 +157,14 @@ namespace ColonQuest.World
             }
 
             float dt = Time.deltaTime;
-            if (patrol.Tick(dt))
+            if (patrol.Current == CollectorPatrol.Mode.Stopped && currentSpeed > 0f)
+            {
+                // It brakes on the street instead of stopping dead.
+                currentSpeed = Mathf.Max(0f, currentSpeed - Brake * dt);
+                SetX(transform.position.x + currentSpeed * dt);
+            }
+
+            if (!(Held && patrol.Current == CollectorPatrol.Mode.Stopped) && patrol.Tick(dt))
             {
                 SetX(minX);
                 SetVisible(true);

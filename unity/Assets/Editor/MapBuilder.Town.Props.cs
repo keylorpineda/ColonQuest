@@ -1353,6 +1353,7 @@ namespace ColonQuest.EditorTools
             Shape(root, "GoldStripe", roundedSmall, new Vector2(0f, -0.04f), new Vector2(2.4f, 0.09f), GamePalette.Hex("#FFD23F"), 5);
             Shape(root, "Speaker", circle, new Vector2(-0.15f, 0.68f), Vector2.one * 0.26f, GamePalette.Hex("#FFD23F"), 5);
             root.gameObject.AddComponent<CollectorCar>().Configure(3.4f, MapLayout.PlayWestX - 12f, MapLayout.PlayEastX + 12f);
+            BuildCollectorMen(parent);
         }
 
         private static void Hedge(Transform parent, Vector2 center, Vector2 size)
