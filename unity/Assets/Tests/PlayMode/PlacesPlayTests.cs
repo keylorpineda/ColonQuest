@@ -453,8 +453,22 @@ namespace ColonQuest.World.PlayModeTests
             yield return new WaitForSeconds(0.5f);
 
             Assert.IsTrue(car.IsStopped);
+            Assert.IsTrue(Interaction.Playing, "first the two men get out and walk up to the player");
+            Assert.IsTrue(CollectorCar.Held, "the car waits for them");
+            Interaction.SkipCurrent();
+            for (float waited = 0f; waited < 5f && Interaction.Playing; waited += Time.unscaledDeltaTime)
+            {
+                yield return null;
+            }
+
+            var man = GameObject.Find(CollectorCar.MenNames[0]);
+            Assert.IsNotNull(man);
+            Assert.IsTrue(man.GetComponentInChildren<SpriteRenderer>().enabled, "the men stand next to the player");
+            Assert.Less(Vector2.Distance(man.transform.position, GameObject.FindWithTag(Station.PlayerTag).transform.position), 1.5f);
+
             var modal = Ui.Find("Modal");
             Assert.IsTrue(modal.gameObject.activeSelf, "the collectors' window is open");
+            Assert.IsTrue(car.IsStopped, "the car stays while the window is open");
 
             long debt = FinanceEngine.DebtOwed(session.State);
             session.PayCollectors();
