@@ -358,17 +358,16 @@ namespace ColonQuest.Api.Tests
         [Test]
         public void CreateSession_InEnglishSendsLanguageEn()
         {
-            var originalLang = ColonQuest.World.Loc.Current;
             try
             {
-                ColonQuest.World.Loc.Set(ColonQuest.World.GameLanguage.English);
+                ApiService.Language = () => "en";
                 transport.Replies.Enqueue(FakeTransport.Ok("{\"sessionId\":\"" + SessionId + "\"}"));
                 Run(service.CreateSession(null, _ => { }));
                 Assert.AreEqual("{\"language\":\"en\"}", transport.Requests[0].JsonBody);
             }
             finally
             {
-                ColonQuest.World.Loc.Set(originalLang);
+                ApiService.Language = () => "es";
             }
         }
     }

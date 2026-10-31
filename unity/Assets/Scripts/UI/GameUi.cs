@@ -106,6 +106,7 @@ namespace ColonQuest.UI
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
             ApiService.LocalTextsOnly = () => false;
+            ApiService.Language = () => Loc.Current == GameLanguage.English ? "en" : "es";
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;

@@ -25,6 +25,9 @@ namespace ColonQuest.Api
         /// </summary>
         public static Func<bool> LocalTextsOnly = () => false;
 
+        /// <summary>The language the backend writes in, "es" or "en". The game sets this from its own language setting.</summary>
+        public static Func<string> Language = () => "es";
+
         public ApiService(IHttpTransport transport, ApiConfig config)
         {
             this.transport = transport;
@@ -43,7 +46,7 @@ namespace ColonQuest.Api
 
         public IEnumerator CreateSession(string classCode, Action<ApiResult<string>> done)
         {
-            string lang = ColonQuest.World.Loc.Current == ColonQuest.World.GameLanguage.English ? "en" : "es";
+            string lang = Language();
             string body;
             if (string.IsNullOrEmpty(classCode))
             {
@@ -129,7 +132,7 @@ namespace ColonQuest.Api
                 yield break;
             }
 
-            string lang = ColonQuest.World.Loc.Current == ColonQuest.World.GameLanguage.English ? "en" : "es";
+            string lang = Language();
             string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
             HttpResponseData response = null;
             yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.Timeout), r => response = r);
