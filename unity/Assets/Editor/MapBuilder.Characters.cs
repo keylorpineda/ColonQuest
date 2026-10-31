@@ -212,8 +212,25 @@ namespace ColonQuest.EditorTools
             }
 
             BuildCharacterVisual(npc.transform, look, true, 2.6f);
+            if (NightShiftExits.TryGetValue(name, out var exit))
+            {
+                npc.AddComponent<NightShift>().Configure(exit);
+            }
+
             return npc.transform;
         }
+
+        /// <summary>The people who close their place at night, and which way they walk off: toward the back of it.</summary>
+        private static readonly System.Collections.Generic.Dictionary<string, Vector2> NightShiftExits = new System.Collections.Generic.Dictionary<string, Vector2>
+        {
+            { "DonRafa", new Vector2(0f, 1.4f) },
+            { "DonaMarta", new Vector2(0f, 1.4f) },
+            { "Promotor", new Vector2(1.4f, 0f) },
+            { "Estafador", new Vector2(1.4f, 0f) },
+            { "DonaLucia", new Vector2(0f, 1.6f) },
+            { "Vendedor", new Vector2(0f, 1.2f) },
+            { "Cajero", new Vector2(0f, 1.2f) }
+        };
 
         /// <summary>A pedestrian that walks between two points. It has no collider, so it never blocks the way.</summary>
         private static Transform BuildPedestrian(Transform parent, string name, Vector2 from, Vector2 to, Look look, float speed)
