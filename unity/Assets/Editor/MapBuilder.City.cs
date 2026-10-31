@@ -906,14 +906,19 @@ namespace ColonQuest.EditorTools
             for (int i = 0; i < 3; i++)
             {
                 var boat = Group(boats, "Boat");
-                boat.localPosition = new Vector2(-30f + i * 28f, -33f);
+                // Two boats sail west of the pier and one east of it: each turns around before the pier, never across it.
+                float startX = i == 0 ? -30f : (i == 1 ? -10f : 30f);
+                boat.localPosition = new Vector2(startX, -33f);
                 string previous = currentLayer;
                 currentLayer = LayerFloor;
                 Shape(boat, "Hull", rounded, Vector2.zero, new Vector2(1.8f, 0.5f), Hex("#B2475A"), 10);
                 Shape(boat, "Mast", square, new Vector2(0f, 0.6f), new Vector2(0.05f, 1.1f), Hex("#7A4F2A"), 10);
                 Shape(boat, "Sail", square, new Vector2(0.25f, 0.65f), new Vector2(0.5f, 0.8f), Hex("#F8F5E8"), 10);
                 currentLayer = previous;
-                boat.gameObject.AddComponent<Drift>().Configure(new Vector2(0.35f + i * 0.1f, 0f), new Vector2(46f, 40f));
+                bool west = i < 2;
+                boat.gameObject.AddComponent<Drift>().ConfigureSpan(0.35f + i * 0.1f,
+                    west ? MapLayout.TownBounds.xMin + 2f : MapLayout.PierXMax + 3f,
+                    west ? MapLayout.PierXMin - 2.5f : MapLayout.PlayEastX);
             }
         }
 

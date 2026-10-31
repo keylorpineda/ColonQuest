@@ -12,6 +12,10 @@ namespace ColonQuest.World
         [SerializeField] private float laneMinX;
         [SerializeField] private float laneMaxX;
 
+        [SerializeField] private bool span;
+        [SerializeField] private float spanMinX;
+        [SerializeField] private float spanMaxX;
+
         public void Configure(Vector2 speed, Vector2 range)
         {
             velocity = speed;
@@ -28,6 +32,36 @@ namespace ColonQuest.World
             laneWrap = true;
             laneMinX = minX;
             laneMaxX = maxX;
+        }
+
+        /// <summary>
+        /// A boat on the sea: it sails back and forth between two x positions, turning around at each end, so it never crosses
+        /// what stands outside them (the pier).
+        /// </summary>
+        public void ConfigureSpan(float speedX, float minX, float maxX)
+        {
+            velocity = new Vector2(speedX, 0f);
+            span = true;
+            spanMinX = minX;
+            spanMaxX = maxX;
+        }
+
+        /// <summary>One step of a back-and-forth move: the new x, and the speed turned around when an end was reached.</summary>
+        public static float Bounce(float x, ref float speed, float deltaTime, float minX, float maxX)
+        {
+            x += speed * deltaTime;
+            if (x > maxX)
+            {
+                x = maxX - (x - maxX);
+                speed = -Mathf.Abs(speed);
+            }
+            else if (x < minX)
+            {
+                x = minX + (minX - x);
+                speed = Mathf.Abs(speed);
+            }
+
+            return Mathf.Clamp(x, minX, maxX);
         }
 
         private float laneSpeed;
@@ -49,6 +83,16 @@ namespace ColonQuest.World
         private void Update()
         {
             Vector3 position = transform.localPosition;
+            if (span)
+            {
+                position.x = Bounce(position.x, ref velocity.x, Time.deltaTime, spanMinX, spanMaxX);
+                var scale = transform.localScale;
+                scale.x = Mathf.Abs(scale.x) * (velocity.x >= 0f ? 1f : -1f);
+                transform.localScale = scale;
+                transform.localPosition = position;
+                return;
+            }
+
             if (laneWrap)
             {
                 // A car: it slows down for the lights and the car ahead (see CarRules), then wraps around the map.
