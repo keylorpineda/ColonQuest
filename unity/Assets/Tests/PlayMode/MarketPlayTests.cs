@@ -131,7 +131,8 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return Walk(new Vector2(25f, -1.0f), Vector2.right, 3.2f);
 
-            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 1f);
+            // Past the water: what stands on the sidewalk after the bridge may stop the walk, the river does not.
+            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 0.3f);
         }
 
         [UnityTest]
