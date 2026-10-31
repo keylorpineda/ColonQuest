@@ -161,7 +161,7 @@ namespace ColonQuest.World
                     return;
                 }
 
-                SceneTransition.Go(targetScene, spawn);
+                SceneTransition.Go(targetScene, spawn, velocity);
             }
         }
     }

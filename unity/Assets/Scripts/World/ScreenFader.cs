@@ -10,7 +10,8 @@ namespace ColonQuest.World
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class ScreenFader : MonoBehaviour
     {
-        [SerializeField] private float duration = 0.25f;
+        /// <summary>Long enough to see the player walk into the dark and out of it, short enough not to wait.</summary>
+        public const float Seconds = 0.45f;
 
         private SpriteRenderer spriteRenderer;
 
@@ -32,9 +33,10 @@ namespace ColonQuest.World
         public IEnumerator FadeTo(float target)
         {
             float start = spriteRenderer.color.a;
-            for (float elapsed = 0f; elapsed < duration; elapsed += Time.unscaledDeltaTime)
+            for (float elapsed = 0f; elapsed < Seconds; elapsed += Time.unscaledDeltaTime)
             {
-                SetAlpha(Mathf.Lerp(start, target, elapsed / duration));
+                // Eased, so the dark settles in and lifts softly instead of snapping.
+                SetAlpha(Mathf.Lerp(start, target, Mathf.SmoothStep(0f, 1f, elapsed / Seconds)));
                 yield return null;
             }
 

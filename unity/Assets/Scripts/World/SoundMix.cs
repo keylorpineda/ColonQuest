@@ -33,7 +33,10 @@ namespace ColonQuest.World
         Splash,
         Munch,
         Swish,
-        Cuffs
+        Cuffs,
+
+        /// <summary>A door that opens: the latch clicks and the hinge creaks a little.</summary>
+        DoorOpen
     }
 
     /// <summary>How loud each layer of the soundscape should be at one spot. All values are 0 to 1.</summary>

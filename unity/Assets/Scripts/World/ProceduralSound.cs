@@ -454,6 +454,8 @@ namespace ColonQuest.World
                     return 0.55f;
                 case SoundEffectKind.Swish:
                     return 0.6f;
+                case SoundEffectKind.DoorOpen:
+                    return 0.55f;
                 default:
                     return 0.45f;
             }
@@ -609,6 +611,16 @@ namespace ColonQuest.World
                     {
                         float arc = Mathf.Sin(Mathf.PI * Mathf.Clamp01(t / seconds));
                         buffer[i] = lowpassed * arc * 0.7f;
+                        break;
+                    }
+
+                    case SoundEffectKind.DoorOpen:
+                    {
+                        // The click of the latch, then a short creak that bends up as the door swings.
+                        float click = highpassed * Mathf.Exp(-90f * t) * 0.9f;
+                        float swing = Mathf.Clamp01((t - 0.06f) * 6f) * fadeOut;
+                        float creak = Mathf.Sin((float)TwoPi * (240f + 160f * t) * t) * Mathf.Sin((float)TwoPi * 31f * t) * swing * 0.25f;
+                        buffer[i] = click + creak + lowpassed * swing * 0.2f;
                         break;
                     }
 
