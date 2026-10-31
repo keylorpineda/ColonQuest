@@ -15,7 +15,7 @@ namespace ColonQuest.World
         public const float WalkInSeconds = 0.45f;
 
         /// <summary>How long the player walks out of the door on the other side, while the screen clears.</summary>
-        public const float WalkOutSeconds = 0.4f;
+        public const float WalkOutSeconds = 0.25f;
 
         private static string pendingSpawnId;
 
