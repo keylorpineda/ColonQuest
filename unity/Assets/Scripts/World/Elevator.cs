@@ -89,9 +89,6 @@ namespace ColonQuest.World
                 .Play();
         }
 
-        /// <summary>Where a player arriving on this floor waits before the doors open: inside the cabin.</summary>
-        public Vector2 Inside => inside;
-
         private static void Place(GameObject hero, Vector2 at)
         {
             if (hero == null)
