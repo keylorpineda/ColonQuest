@@ -194,20 +194,33 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
             Body.GetComponent<PlayerController>().enabled = false;
 
-            // The screen clears and the doors of the elevator open and close behind the player before it can ride again.
-            yield return new WaitForSeconds(0.5f);
-            for (float waited = 0f; waited < 5f && (SceneTransition.IsBusy || Interaction.Playing); waited += Time.deltaTime)
-            {
-                yield return null;
-            }
+            // Upstairs the elevator is in the front wall: the player starts in the cabin and walks up, into the corridor.
+            float firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Less(firstY, Body.position.y - 1f, "out of the cabin and up into the corridor");
+            Assert.Greater(Body.position.y, MapLayout.HospitalArribaMat.y + 0.8f, "in the room, not in the wall");
 
             Teleport(MapLayout.HospitalArribaMat + new Vector2(0f, 0.3f));
             Body.linearVelocity = Vector2.down * 3f;
             yield return WaitForScene(SceneNames.Hospital, 10f);
             FindPlayer();
 
+            // Downstairs it is in the back wall: the player starts in the cabin and walks down, the way they went in.
+            firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Greater(firstY, Body.position.y + 1f, "out of the cabin and down into the hall");
             Assert.AreEqual(-8.4f, Body.position.x, 0.8f);
             Assert.AreEqual(4.0f, Body.position.y, 0.8f);
+        }
+
+        /// <summary>The screen clears and the doors of the elevator open and close behind the player.</summary>
+        private static IEnumerator WaitForArrival()
+        {
+            yield return new WaitForSeconds(0.5f);
+            for (float waited = 0f; waited < 6f && (SceneTransition.IsBusy || Interaction.Playing); waited += Time.deltaTime)
+            {
+                yield return null;
+            }
         }
     }
 

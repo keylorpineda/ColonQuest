@@ -299,26 +299,28 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildElevator(InteriorParts parts, Vector2 center, Vector2 doorAt, Vector2 doorSize, string targetScene, string targetSpawn, Vector2 entry, Vector2 inside)
         {
-            const float halfWidth = 0.95f;
+            // Big enough for a whole person: the player walks in and the doors close in front of them.
+            const float halfWidth = 1.05f;
+            const float height = 1.6f;
             var lift = IL(parts.Props, "Elevator");
-            Deco(lift, "Elevator_Frame_Outline", rounded, center.x, center.y, 2.5f, 1.35f, "#2A3345", 1f, 7);
-            Deco(lift, "Elevator_Frame", rounded, center.x, center.y, 2.4f, 1.25f, "#B7C0D0", 1f, 8);
-            Deco(lift, "Elevator_Cabin", square, center.x, center.y, halfWidth * 2f, 1.0f, "#3A4152", 1f, 9);
+            Deco(lift, "Elevator_Frame_Outline", rounded, center.x, center.y, 2.8f, height + 0.35f, "#2A3345", 1f, 7);
+            Deco(lift, "Elevator_Frame", rounded, center.x, center.y, 2.7f, height + 0.25f, "#B7C0D0", 1f, 8);
+            Deco(lift, "Elevator_Cabin", square, center.x, center.y, halfWidth * 2f, height, "#3A4152", 1f, 9);
 
             foreach (int side in new[] { -1, 1 })
             {
                 var hinge = Group(lift, side < 0 ? "Elevator_LeafL" : "Elevator_LeafR");
                 hinge.localPosition = new Vector2(center.x + side * halfWidth, center.y);
-                Deco(hinge, "Leaf", square, -side * halfWidth * 0.5f, 0f, halfWidth, 1.0f, "#D5DBE6", 1f, 10);
-                Deco(hinge, "Leaf_Shine", square, -side * halfWidth * 0.75f, 0f, 0.06f, 0.9f, "#F2F5FA", 1f, 11);
-                Deco(hinge, "Leaf_Edge", square, -side * (halfWidth - 0.02f), 0f, 0.04f, 1.0f, "#8E96AA", 1f, 11);
+                Deco(hinge, "Leaf", square, -side * halfWidth * 0.5f, 0f, halfWidth, height, "#D5DBE6", 1f, 10);
+                Deco(hinge, "Leaf_Shine", square, -side * halfWidth * 0.75f, 0f, 0.06f, height - 0.1f, "#F2F5FA", 1f, 11);
+                Deco(hinge, "Leaf_Edge", square, -side * (halfWidth - 0.02f), 0f, 0.04f, height, "#8E96AA", 1f, 11);
             }
 
-            var buttons = new Vector2(center.x + 1.55f, center.y);
+            var buttons = new Vector2(center.x + 1.7f, center.y);
             Deco(lift, "Buttons", roundedSmall, buttons.x, buttons.y, 0.3f, 0.55f, "#4B5568", 1f, 8);
             Deco(lift, "ButtonUp", circle, buttons.x, buttons.y + 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
             Deco(lift, "ButtonDown", circle, buttons.x, buttons.y - 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
-            WallPlate(parts.Labels, "ASCENSOR", new Vector2(center.x, center.y + 0.95f), 1.5f, "#2A3345", GamePalette.White, 0.022f);
+            WallPlate(parts.Labels, "ASCENSOR", new Vector2(center.x, center.y + height * 0.5f + 0.4f), 1.5f, "#2A3345", GamePalette.White, 0.022f);
 
             var door = new GameObject("Door_Elevator");
             door.transform.SetParent(parts.Stations, false);
