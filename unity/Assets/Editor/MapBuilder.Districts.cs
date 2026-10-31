@@ -91,11 +91,15 @@ namespace ColonQuest.EditorTools
 
         private static void BuildNorthStreets(Transform parent)
         {
+            float from = -50f;
+            float endX = 65.5f;
+            float length = endX - from;
             // Sidewalks first, then the road on top so its edge reads as a curb. The avenue runs past both edges.
-            Walk(parent, new Rect(-50f, AvenueRoadY - 2f, 124f, 2f));
-            Walk(parent, new Rect(-50f, AvenueRoadY + 4f, 124f, NorthSidewalkY - (AvenueRoadY + 4f)));
-            Road(parent, new Rect(-50f, AvenueRoadY, 124f, 4f));
-            DashedLine(parent, MapLayout.AvenueY, -49f, 73f);
+            Walk(parent, new Rect(from, AvenueRoadY - 2f, length, 2f));
+            Walk(parent, new Rect(from, AvenueRoadY + 4f, length, NorthSidewalkY - (AvenueRoadY + 4f)));
+            Road(parent, new Rect(from, AvenueRoadY, length, 4f));
+            Walk(parent, new Rect(endX - 0.5f, AvenueRoadY - 2f, 1.6f, NorthSidewalkY - (AvenueRoadY - 2f)));
+            DashedLine(parent, MapLayout.AvenueY, -49f, endX - 1.5f);
 
             // Where the dirt path from the first street reaches the avenue.
             Crosswalk(parent, MapLayout.NorthPathX, AvenueRoadY, AvenueRoadY + 4f);
@@ -104,16 +108,20 @@ namespace ColonQuest.EditorTools
         private static void BuildEastStreets(Transform parent)
         {
             float from = EastStreetsFrom;
-            float length = EastStreetsLength;
+            float endX = 65.5f;
+            float length = endX - from;
             Walk(parent, new Rect(from, 4f, length, 2f));
             Walk(parent, new Rect(from, -2f, length, 2f));
+            Road(parent, new Rect(from, 0f, length, 4f));
+            Walk(parent, new Rect(endX - 0.5f, -2f, 1.6f, 8f));
+            DashedLine(parent, 2f, from, endX - 1.5f);
+            Crosswalk(parent, 62f, 0f, 4f);
+
             Walk(parent, new Rect(from, -10f, length, 2f));
             Walk(parent, new Rect(from, -16f, length, 2f));
-            Road(parent, new Rect(from, 0f, length, 4f));
             Road(parent, new Rect(from, -14f, length, 4f));
-            DashedLine(parent, 2f, from, from + length + 1f);
-            DashedLine(parent, -12f, from, from + length + 1f);
-            Crosswalk(parent, 62f, 0f, 4f);
+            Walk(parent, new Rect(endX - 0.5f, -16f, 1.6f, 8f));
+            DashedLine(parent, -12f, from, endX - 1.5f);
         }
 
         /// <summary>A dirt path from the first street, between the garage and the river, up to the avenue.</summary>

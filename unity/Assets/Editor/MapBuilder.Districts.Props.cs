@@ -215,11 +215,13 @@ namespace ColonQuest.EditorTools
             for (float y = -25f; y < MapLayout.PlayNorthY; y += 3.3f)
             {
                 float jy = y + ((float)random.NextDouble() - 0.5f) * 1.2f;
-                float jx = MapLayout.PlayEastX + 1.4f + (float)random.NextDouble() * 1.4f;
+                bool onStreet = (jy >= -16f && jy <= -8f) || (jy >= -2f && jy <= 6f) || (jy >= 20f && jy <= 29f);
+                float baseX = onStreet ? 67.2f : MapLayout.PlayEastX + 1.4f;
+                float jx = baseX + (float)random.NextDouble() * 1.2f;
                 Tree(parent, shadows, jx, jy, 1.05f + (float)random.NextDouble() * 0.3f, DistrictGreens[random.Next(DistrictGreens.Length)], false);
             }
 
-            foreach (var spot in new[] { new Vector2(65.8f, 20f), new Vector2(66f, 3f), new Vector2(65.5f, -14f), new Vector2(-8f, 44.5f), new Vector2(34f, 45.5f) })
+            foreach (var spot in new[] { new Vector2(65.8f, 20f), new Vector2(66.5f, 9.5f), new Vector2(65.5f, -6f), new Vector2(-8f, 44.5f), new Vector2(34f, 45.5f) })
             {
                 Rock(parent, shadows, spot.x, spot.y, 1.1f);
             }
