@@ -258,7 +258,7 @@ namespace ColonQuest.Game
         public const long TrespassFine = 120_000L;
 
         /// <summary>The fine for crossing the street on a red pedestrian light, in colones. Only an officer who sees it charges it.</summary>
-        public const long RedLightFine = 25_000L;
+        public const long RedLightFine = 5_000L;
 
         public const int RedLightWellbeingLoss = 3;
 
