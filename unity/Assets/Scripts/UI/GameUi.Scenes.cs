@@ -447,7 +447,10 @@ namespace ColonQuest.UI
             var clock = session.Loop.Clock;
             if (!clock.IsNight)
             {
-                return null;
+                // Before the evening it is only a rest: the player lies down a moment and gets up again.
+                Vector2 spot = Here(station);
+                return new Interaction().WalkInto(spot).Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 2.6f)
+                    .Zzz(spot + new Vector2(0.2f, 0.5f), 2f).Wait(0.2f).Apply(then);
             }
 
             // The month moves on only at the bank, so the last week wakes up in the same week with a reminder.
@@ -540,13 +543,18 @@ namespace ColonQuest.UI
                 return null;
             }
 
-            Vector2 me = Here(station);
-            Vector2 pan = Here(station, 0f, 0.7f);
-            return new Interaction().WalkTo(me).Face(pan)
-                .Sound(SoundEffectKind.Sizzle).Pose(PersonPose.Cook, 2.6f).Steam(pan, 2.4f)
-                .Fly("plate", pan, me + new Vector2(0.3f, 0.2f), 0.7f)
-                .Pose(PersonPose.Eat, 2f).Sound(SoundEffectKind.Munch).Wait(1f).Sound(SoundEffectKind.Munch).Wait(1f)
-                .Say(string.Empty, "Cocinar en casa sale más barato que comer afuera.")
+            // The cutting board sits left of the stove on the same worktop, the fridge to its right.
+            Vector2 pan = Here(station, -0.25f, 0.15f);
+            Vector2 board = Here(station, -1.5f, -1f);
+            Vector2 fridge = Here(station, 1.6f, -1f);
+            return new Interaction()
+                .WalkTo(fridge).Face(Here(station, 2f, 0f)).Pose(PersonPose.Reach, 0.6f).Sound(SoundEffectKind.Knock)
+                .Flicker(Here(station, 2f, -0.3f), new Vector2(0.9f, 1.2f), FridgeLight, 0.8f).Wait(0.6f)
+                .WalkTo(board).Face(Here(station, -1.5f, 0f)).Pose(PersonPose.Cook, 1.6f).Sound(SoundEffectKind.Knock).Wait(0.4f).Sound(SoundEffectKind.Knock)
+                .WalkTo(Here(station, 0f, -1f)).Face(pan).Sound(SoundEffectKind.Sizzle).Pose(PersonPose.Cook, 2.6f).Steam(pan, 2.4f)
+                .Pose(PersonPose.Handover, 0.6f).Fly("plate", pan, Here(station, 0f, -0.7f), 0.6f).Wait(0.4f)
+                .Pose(PersonPose.Eat, 2f).Sound(SoundEffectKind.Munch).Wait(1f).Sound(SoundEffectKind.Munch).Wait(0.6f)
+                .Say(string.Empty, Loc.F("Comer afuera me salía unos {0}. Esa plata hoy se queda en mi bolsa.", Money.Format(MarketAssumptions.HomeCookingSaving)))
                 .Apply(() => session.Cook());
         }
 

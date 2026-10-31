@@ -1,11 +1,41 @@
 using System.Collections;
+using System.Linq;
+using System.Reflection;
+using ColonQuest.Api;
+using ColonQuest.Game;
+using ColonQuest.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace ColonQuest.World.PlayModeTests
 {
+    /// <summary>Starts an offline run inside an interior and opens a station's window as pressing E would.</summary>
+    internal static class InteriorUi
+    {
+        public static Transform Root => GameObject.Find("GameUi").transform;
+
+        public static bool ModalOpen => Root.Find("Modal").gameObject.activeSelf;
+
+        public static string ModalText => string.Join("\n", Root.Find("Modal").GetComponentsInChildren<Text>().Select(t => t.text));
+
+        public static IEnumerator StartOfflineRun()
+        {
+            ApiClient.Instance.Configure(new OfflineTransport(), new ApiConfig());
+            GameSession.Instance.StartNewGame();
+            PlayerController.Blocked = false;
+            yield return null;
+        }
+
+        public static void InteractNow(Station station)
+        {
+            var ui = Object.FindFirstObjectByType<GameUi>();
+            typeof(GameUi).GetMethod("InteractNow", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(ui, new object[] { station });
+        }
+    }
+
     /// <summary>Plays the Banco interior: walls, furniture, the station, the vendor and the way back out.</summary>
     public sealed class BancoPlayTests : PlayTestBase
     {
@@ -103,6 +133,33 @@ namespace ColonQuest.World.PlayModeTests
             // Factor 0.88: the layer follows the camera by 88 percent of its position.
             Assert.AreEqual(Cam.transform.position.x * 0.88f, farStars.position.x, 0.05f);
             Assert.AreEqual(Cam.transform.position.y * 0.88f, farStars.position.y, 0.05f);
+        }
+
+        [UnityTest]
+        public IEnumerator Atm_OpensTheWithdrawal()
+        {
+            yield return InteriorUi.StartOfflineRun();
+            var atm = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).First(s => s.Type == StationType.Atm);
+
+            InteriorUi.InteractNow(atm);
+            yield return null;
+
+            Assert.IsTrue(InteriorUi.ModalOpen, "the cash machine opens its window");
+            StringAssert.Contains("Retiro de efectivo", InteriorUi.ModalText);
+        }
+
+        [UnityTest]
+        public IEnumerator Window4_OpensTheDeposit()
+        {
+            yield return InteriorUi.StartOfflineRun();
+            var window = GameObject.Find("Thing_Teller3").GetComponent<Station>();
+
+            InteriorUi.InteractNow(window);
+            yield return null;
+
+            Assert.IsTrue(InteriorUi.ModalOpen, "the deposit window opens");
+            StringAssert.Contains("Caja 4", InteriorUi.ModalText);
+            StringAssert.Contains("Depositar", InteriorUi.ModalText);
         }
 
         [UnityTest]
@@ -216,6 +273,24 @@ namespace ColonQuest.World.PlayModeTests
             {
                 Assert.IsNotNull(GameObject.Find(name), name);
             }
+        }
+
+        [UnityTest]
+        public IEnumerator Shower_IsOfferedInTheBathroomButNotThroughTheKitchenWall()
+        {
+            yield return InteriorUi.StartOfflineRun();
+            var prompt = InteriorUi.Root.Find("Prompt").gameObject;
+
+            Teleport(new Vector2(0.8f, 3.2f));
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsTrue(prompt.activeSelf, "on the bath mat");
+            StringAssert.Contains("Bañarte", prompt.GetComponentInChildren<Text>().text);
+
+            // The kitchen side of the wall at x = 1.6, still inside the zone of the shower.
+            Teleport(new Vector2(2.0f, 3.6f));
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsFalse(prompt.activeSelf && prompt.GetComponentInChildren<Text>().text.Contains("Bañarte"),
+                "the shower cannot be used from the kitchen");
         }
 
         [UnityTest]

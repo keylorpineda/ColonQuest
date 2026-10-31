@@ -308,7 +308,17 @@ namespace ColonQuest.UI
             get
             {
                 inside.RemoveAll(s => s == null);
-                return inside.Count > 0 ? inside[inside.Count - 1] : null;
+                var hero = GameObject.FindWithTag(Station.PlayerTag);
+                for (int i = inside.Count - 1; i >= 0; i--)
+                {
+                    // A wall between rooms hides what is on the other side, even if its zone reaches through.
+                    if (hero == null || inside[i].CanBeReachedFrom(hero.transform.position))
+                    {
+                        return inside[i];
+                    }
+                }
+
+                return null;
             }
         }
 

@@ -21,6 +21,10 @@ namespace ColonQuest.EditorTools
                 "Agua caliente con la ducha eléctrica. Baños cortos, recibo de luz más bajito.");
             BuildThing(things, "Sink", "Lavarte las manos", new Vector2(-1.5f, 2.4f), new Vector2(0.6f, 0.9f),
                 "Cerrás bien el tubo. Una gota que cae todo el día se nota en el recibo del agua.");
+
+            // A little shorter than the bowl and tank, so its zone ends before the one of the sink starts.
+            BuildThing(things, "Toilet", "Usar el servicio", new Vector2(-1.3f, 4.4f), new Vector2(0.7f, 0.8f),
+                "Jalás la cadena y te lavás las manos. Una fuga en el tanque puede botar miles de litros al mes.");
             BuildThing(things, "Stove", "Cocinar", new Vector2(5.5f, 4.7f), new Vector2(1.1f, 0.8f),
                 "Gallo pinto, huevo y café. Cocinar en casa sale mucho más barato que comer afuera todos los días.",
                 "Hacés almuerzo para llevar mañana. Eso son unos ₡3 000 que no salen de la bolsa.");
