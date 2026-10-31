@@ -240,7 +240,7 @@ namespace ColonQuest.World
                 return;
             }
 
-            var go = new GameObject("Censor");
+            var go = new GameObject(PlayerOutfit.CensorName);
             go.transform.SetParent(torso, false);
             go.transform.localPosition = new Vector3(0f, -0.14f, 0f);
             const int columns = 4;

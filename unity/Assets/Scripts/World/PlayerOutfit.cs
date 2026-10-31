@@ -33,6 +33,9 @@ namespace ColonQuest.World
 
         public static int Count => Names.Length;
 
+        /// <summary>The name of the pixel blur of the shower (see <see cref="InteractionProps.Censor"/>).</summary>
+        public const string CensorName = "Censor";
+
         /// <summary>Dresses the player in this outfit. The everyday one brings back the colors the body was built with.</summary>
         public static void Wear(GameObject player, int outfit)
         {
@@ -40,6 +43,15 @@ namespace ColonQuest.World
             if (memory == null)
             {
                 return;
+            }
+
+            // Dressed again: the blur of the shower goes, even if the scene was skipped before it timed out.
+            foreach (var part in player.GetComponentsInChildren<Transform>())
+            {
+                if (part.name == CensorName)
+                {
+                    Object.Destroy(part.gameObject);
+                }
             }
 
             bool everyday = outfit <= Everyday || outfit >= Count;
