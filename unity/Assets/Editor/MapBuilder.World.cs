@@ -465,6 +465,8 @@ namespace ColonQuest.EditorTools
             {
                 Shape(rail, "Rail_Post", roundedSmall, new Vector2(x, 0.2f), new Vector2(0.2f, 0.9f), WoodDark, 2);
             }
+            // Invisible collider along the railing so nobody walks off the deck.
+            Wall(rail, "Rail_Collider", new Vector2(0f, 0.3f), new Vector2(6.8f, 0.3f));
 
             var scope = Root(parent, "Telescope", new Vector2(-1.6f, 20.6f), 20.4f);
             Shape(scope, "Leg_Outline", roundedSmall, new Vector2(0f, 0.4f), new Vector2(0.2f, 0.8f), GamePalette.Outline, 0);
