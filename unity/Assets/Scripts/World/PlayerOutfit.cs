@@ -55,9 +55,23 @@ namespace ColonQuest.World
             }
 
             bool everyday = outfit <= Everyday || outfit >= Count;
+            if (everyday)
+            {
+                // Exactly the colors the body was built with, shades and all.
+                foreach (var pair in memory.Original)
+                {
+                    if (pair.Key != null)
+                    {
+                        pair.Key.color = pair.Value;
+                    }
+                }
+
+                return;
+            }
+
             Color skin = memory.Skin;
-            Color shirt = everyday ? memory.Shirt : (outfit == Swimsuit ? skin : Shirts[outfit]);
-            Color pants = everyday ? memory.Pants : Pants[outfit];
+            Color shirt = outfit == Swimsuit ? skin : Shirts[outfit];
+            Color pants = Pants[outfit];
             Paint(memory, shirt, pants, outfit == Swimsuit);
         }
 
