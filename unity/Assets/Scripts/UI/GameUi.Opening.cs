@@ -114,6 +114,7 @@ namespace ColonQuest.UI
                 .Sound(SoundEffectKind.Beep).Wait(0.25f).Sound(SoundEffectKind.Beep)
                 .Pose(PersonPose.Pocket, 0.3f).HoldProp("phone").Pose(PersonPose.Type, 0.9f)
                 .Say("Mensaje", "¡Te contrataron! Empezás el lunes a las 7:00 en la soda El Muelle.").Wait(3.4f)
+                .Say("Mensaje", "Antes del primer turno: pasá por tu cuarto y sacá el seguro de salud en el hospital.").Wait(3.4f)
                 .Pose(PersonPose.Pocket, 0.25f).ReleaseProp().Pose(PersonPose.HandsUp, 1.2f).Sound(SoundEffectKind.Chime)
                 .Say(string.Empty, "¡Me contrataron, mami!").Wait(1.2f)
                 .NpcPose(Mother, PersonPose.Wave, 3f)

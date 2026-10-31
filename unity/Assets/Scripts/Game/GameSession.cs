@@ -135,6 +135,11 @@ namespace ColonQuest.Game
         /// </summary>
         private void OnSceneChanged(UnityEngine.SceneManagement.Scene from, UnityEngine.SceneManagement.Scene to)
         {
+            if (to.name == SceneNames.Cuarto)
+            {
+                Loop.MarkRoomVisited();
+            }
+
             if (to.name == SceneNames.Menu)
             {
                 if (skipNextMenuSave)

@@ -983,6 +983,18 @@ namespace ColonQuest.World
             { "Todavía no he trabajado hoy. Puedo descansar un rato, pero sin perderme el turno.", "I have not worked yet today. I can rest for a while, but without missing my shift." },
             { "Qué buena siesta. Ya pasaron un par de horas.", "What a good nap. A couple of hours went by." },
             { "Ya terminé por hoy. A dormir temprano.", "I am done for today. Off to bed early." },
+            { "Tareas de hoy  ·  Tab", "Today's tasks  ·  Tab" },
+            { "Conocer tu cuarto de alquiler", "See your rented room" },
+            { "Sacar el seguro de salud en el hospital", "Take out the health insurance at the hospital" },
+            { "Tu primer turno en la soda El Muelle", "Your first shift at the soda El Muelle" },
+            { "Trabajar en la soda (7:00 a 12:00)", "Work at the soda (7:00 to 12:00)" },
+            { "Pagar los recibos en el banco", "Pay the bills at the bank" },
+            { "Ponerte al día con lo que debés", "Catch up on what you owe" },
+            { "Cerrar el mes en el banco", "Close the month at the bank" },
+            { "Dormir en tu cuarto", "Sleep in your room" },
+            { "Antes del primer turno: conocé tu cuarto y sacá el seguro de salud.", "Before the first shift: see your room and take out the health insurance." },
+            { "Antes de empezar, pasá por tu cuarto y sacá el seguro de salud en el hospital. Aquí te espero.", "Before you start, go by your room and take out the health insurance at the hospital. I will wait for you here." },
+            { "Antes del primer turno: pasá por tu cuarto y sacá el seguro de salud en el hospital.", "Before the first shift: go by your room and take out the health insurance at the hospital." },
         };
     }
 }

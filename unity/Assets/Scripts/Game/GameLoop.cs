@@ -96,6 +96,8 @@ namespace ColonQuest.Game
 
         public void NewGame()
         {
+            ArrivalDay = false;
+            VisitedRoom = false;
             State = GameRules.NewPlayer();
             MonthsPlayed = 0;
             TasksDone = 0;
@@ -149,7 +151,9 @@ namespace ColonQuest.Game
                 punctualDays = Job.PunctualDays,
                 jobPosition = (int)Job.Position,
                 attendedToday = Courses.AttendedToday,
-                quincenaPaidThisMonth = QuincenaPaidThisMonth
+                quincenaPaidThisMonth = QuincenaPaidThisMonth,
+                visitedRoom = VisitedRoom,
+                arrivalDay = ArrivalDay
             };
 
             foreach (var course in Career.Courses)
@@ -205,6 +209,9 @@ namespace ColonQuest.Game
             CookedThisMonth = snapshot.cookedThisMonth;
             QuincenaPaidThisMonth = Math.Max(0L, snapshot.quincenaPaidThisMonth);
             Clock.Restore(snapshot.day, snapshot.minutes);
+
+            VisitedRoom = snapshot.visitedRoom;
+            ArrivalDay = snapshot.arrivalDay && snapshot.daysWorked == 0;
             Job.Restore(snapshot.daysWorked, snapshot.latesThisMonth, snapshot.missedThisMonth, snapshot.workedToday, snapshot.punctualDays, (JobPosition)snapshot.jobPosition);
             Courses.AttendedToday = snapshot.attendedToday;
             int courses = Math.Min(Career.Courses.Count, snapshot.courseAfternoons?.Count ?? 0);
@@ -423,11 +430,47 @@ namespace ColonQuest.Game
 
         private float shiftStartMinutes;
 
+        /// <summary>The player has been in their rented room at least once. The first shift waits for it.</summary>
+        public bool VisitedRoom { get; private set; }
+
+        public void MarkRoomVisited()
+        {
+            VisitedRoom = true;
+        }
+
+        /// <summary>
+        /// True in a new story until the first shift: the day of arrival, when the player first sees their room and takes out
+        /// the health insurance. A run made any other way (a test, an old save) starts without it.
+        /// </summary>
+        public bool ArrivalDay { get; private set; }
+
+        public void BeginArrivalDay()
+        {
+            ArrivalDay = true;
+            VisitedRoom = false;
+        }
+
+        /// <summary>Before the first shift of a new story the room is seen and the insurance taken out. After it nothing more is asked.</summary>
+        public bool ReadyForFirstShift => !ArrivalDay || Job.DaysWorked > 0 || (VisitedRoom && Holdings.HasHealthInsurance);
+
         /// <summary>The player clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>
         public ClockInResult ClockIn()
         {
+            if (!Job.WorkedToday && !ReadyForFirstShift)
+            {
+                return ClockInResult.NotReady;
+            }
+
+            // The first shift of a new story forgives the time spent getting ready for it: it is never late.
+            float minutes = ArrivalDay && Job.DaysWorked == 0 ? Math.Min(Clock.Minutes, GameRules.WorkStartHour * 60f) : Clock.Minutes;
+            var result = Job.ClockIn(minutes);
+            if (Job.DaysWorked > 0)
+            {
+                ArrivalDay = false;
+            }
+
             shiftStartMinutes = Clock.Minutes;
-            return Job.ClockIn(Clock.Minutes);
+            return result;
         }
 
         /// <summary>

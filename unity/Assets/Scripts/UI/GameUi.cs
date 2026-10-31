@@ -82,6 +82,7 @@ namespace ColonQuest.UI
             BuildPowerCut();
             BuildHud();
             BuildWorkGuide();
+            BuildTasks();
             BuildPrompt();
             BuildLoading();
             modal = new ModalPanel(canvas.transform);
@@ -367,6 +368,7 @@ namespace ColonQuest.UI
             TickIncidents();
             TickCell();
             TickWorkGuide();
+            TickTasks();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
             TickSpeech();

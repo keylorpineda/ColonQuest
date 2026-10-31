@@ -19,7 +19,10 @@ namespace ColonQuest.Game
         /// <summary>The morning is over: the shift is gone and it counts as a missed day.</summary>
         AfterMorning,
 
-        AlreadyWorked
+        AlreadyWorked,
+
+        /// <summary>Before the first shift ever, the room was not visited or the health insurance not taken out yet.</summary>
+        NotReady
     }
 
     /// <summary>

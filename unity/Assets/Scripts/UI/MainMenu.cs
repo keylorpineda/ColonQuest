@@ -176,6 +176,7 @@ namespace ColonQuest.UI
                 session.StartNewGame();
             }
 
+            session.Loop.BeginArrivalDay();
             session.AssignSlot(slot, runName, characterName, female);
             GameUi.Create(session).PlayOpeningNext();
             CloseWindows();

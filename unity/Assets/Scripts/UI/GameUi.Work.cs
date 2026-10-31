@@ -15,6 +15,8 @@ namespace ColonQuest.UI
     public sealed partial class GameUi
     {
         private const string Boss = "Doña Lucía";
+        private const string NotReadyLine = "Antes del primer turno: conocé tu cuarto y sacá el seguro de salud.";
+        private const string NotReadyBossLine = "Antes de empezar, pasá por tu cuarto y sacá el seguro de salud en el hospital. Aquí te espero.";
         private const int ArrowSize = 48;
 
         private GameObject workGuide;
@@ -90,6 +92,14 @@ namespace ColonQuest.UI
                 return;
             }
 
+            if (toWork && !session.Loop.ReadyForFirstShift)
+            {
+                // The day of arrival: the arrow waits until the room and the insurance are done; the list says what is left.
+                workArrow.gameObject.SetActive(false);
+                workGuideText.text = Loc.T(NotReadyLine);
+                return;
+            }
+
             bool late = JobRecord.IsLate(clock.Minutes);
             string homeScene = CurrentHomeScene;
             if (homeDoor == null)
@@ -140,6 +150,11 @@ namespace ColonQuest.UI
                 return "Ya trabajaste hoy. Tenés el resto del día libre.";
             }
 
+            if (!session.Loop.ReadyForFirstShift)
+            {
+                return NotReadyLine;
+            }
+
             return job.ExpectedAt(session.Loop.Clock.Minutes) ? "[E]  Marcar la entrada" : "Ya pasó la mañana: hoy no marcaste.";
         }
 
@@ -147,6 +162,11 @@ namespace ColonQuest.UI
         private Interaction WorkScene(Station station, Action then)
         {
             var result = session.ClockIn();
+            if (result == ClockInResult.NotReady)
+            {
+                return new Interaction().Face(Here(station, 0f, 1.5f)).Say(Boss, NotReadyBossLine).Wait(2.6f);
+            }
+
             if (result == ClockInResult.AlreadyWorked || result == ClockInResult.AfterMorning)
             {
                 return null;
