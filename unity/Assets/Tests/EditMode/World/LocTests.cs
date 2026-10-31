@@ -130,7 +130,7 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(0.5f, old.Volume, 0.0001f);
             Assert.AreEqual(GameLanguage.Spanish, old.Language);
             Assert.AreEqual(TimeSpeed.Normal, old.Speed);
-            Assert.AreEqual(15f, old.SecondsPerGameHour);
+            Assert.AreEqual(30f, old.SecondsPerGameHour);
         }
 
         [Test]
@@ -138,11 +138,11 @@ namespace ColonQuest.World.Tests
         {
             var settings = new GameSettings { Speed = TimeSpeed.Fast };
             Assert.AreEqual("1;1.00;fast", settings.Serialize());
-            Assert.AreEqual(5f, settings.SecondsPerGameHour);
+            Assert.AreEqual(10f, settings.SecondsPerGameHour);
 
             var parsed = GameSettings.Parse(settings.Serialize());
             Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
-            Assert.AreEqual(5f, parsed.SecondsPerGameHour);
+            Assert.AreEqual(10f, parsed.SecondsPerGameHour);
         }
 
         [Test]
