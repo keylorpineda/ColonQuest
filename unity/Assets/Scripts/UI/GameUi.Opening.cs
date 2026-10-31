@@ -15,8 +15,11 @@ namespace ColonQuest.UI
 
         private static readonly Vector2 OpeningStart = new Vector2(-6.0f, 1.8f);
 
-        /// <summary>Where the mother stands for the present, next to the bed. The rest of the time she is in the living room.</summary>
-        private static readonly Vector2 OpeningMotherAt = new Vector2(-4.0f, 1.7f);
+        /// <summary>
+        /// Where the mother stands for the present: by the foot of the bed, above the player's way to the bedroom door so the
+        /// walk out never has to go through her. The rest of the time she is in the living room.
+        /// </summary>
+        private static readonly Vector2 OpeningMotherAt = new Vector2(-3.3f, 2.6f);
 
         private const string Mother = "Mama";
 
