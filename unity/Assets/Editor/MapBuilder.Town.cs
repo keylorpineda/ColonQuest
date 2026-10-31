@@ -454,7 +454,7 @@ namespace ColonQuest.EditorTools
                 "¡Bienvenido al Banco! Adentro podés abrir tu cuenta de ahorros o consultar tus cuotas.",
                 "Ahorrar aunque sea un poquito cada mes te salva de cualquier imprevisto.");
 
-            var vendedorExt = BuildNpc(parent, "Vendedor", new Vector2(8.5f, 5.45f), new Look { Skin = "#2E86C1" }, true);
+            var vendedorExt = BuildNpc(parent, "Vendedor", new Vector2(10.5f, 5.45f), new Look { Skin = "#2E86C1" }, true);
             BuildThing(vendedorExt, "Talk_Vendedor", "Hablar con Kevin de la Tienda", Vector2.zero, new Vector2(0.8f, 0.8f),
                 "¡Pase adelante! Tenemos fruta fresca afuera y todo para el hogar adentro.",
                 "Eso sí: antes de comprar a crédito, fijate bien cuánto terminás pagando en total.");

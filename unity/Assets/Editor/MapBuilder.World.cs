@@ -587,7 +587,7 @@ namespace ColonQuest.EditorTools
                 Tree(parent, shadows, spot.x, spot.y, 1.15f, "#3FA66A", spot.x < -30f);
             }
 
-            foreach (float x in new[] { -41f, -34f, -32f, -39f })
+            foreach (float x in new[] { -42.8f, -34f, -32f, -39f })
             {
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
@@ -598,7 +598,7 @@ namespace ColonQuest.EditorTools
                 Lamp(parent, x, 4.5f);
             }
 
-            foreach (float x in new[] { -40f, -30f })
+            foreach (float x in new[] { -43.5f, -30f })
             {
                 Lamp(parent, x, -9.3f);
             }
