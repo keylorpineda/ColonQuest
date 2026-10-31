@@ -47,7 +47,11 @@ namespace ColonQuest.UI
             {
                 if (font == null)
                 {
-                    font = SystemFont(new[] { "Trebuchet MS", "Segoe UI", "Verdana" });
+                    font = Resources.Load<Font>("Fonts/ColonQuest-Body");
+                    if (font == null)
+                    {
+                        font = SystemFont(new[] { "Trebuchet MS", "Segoe UI", "Verdana" });
+                    }
                 }
 
                 return font;
@@ -61,7 +65,11 @@ namespace ColonQuest.UI
             {
                 if (titleFont == null)
                 {
-                    titleFont = SystemFont(new[] { "Segoe UI Black", "Arial Black", "Impact", "Trebuchet MS" });
+                    titleFont = Resources.Load<Font>("Fonts/ColonQuest-Display");
+                    if (titleFont == null)
+                    {
+                        titleFont = SystemFont(new[] { "Segoe UI Black", "Arial Black", "Impact", "Trebuchet MS" });
+                    }
                 }
 
                 return titleFont;
@@ -164,11 +172,21 @@ namespace ColonQuest.UI
             return image;
         }
 
-        /// <summary>A card: a dark outline with the colored body inside it. Returns the body.</summary>
+        /// <summary>A card: a soft drop shadow, a dark outline, and the colored body with a warm top bevel inside it. Returns the body.</summary>
         public static RectTransform Card(Transform parent, string name, Color color, Vector2 size, Vector2 anchor, Vector2 position)
         {
             var outline = Fill(parent, name, Ink, size, anchor, position);
-            var body = Fill(outline.transform, "Body", color, size - new Vector2(Outline * 2f, Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var shadow = Fill(outline.transform, "DropShadow", new Color(0.05f, 0.06f, 0.14f, 0.28f), size, new Vector2(0.5f, 0.5f), new Vector2(4f, -6f));
+            shadow.transform.SetAsFirstSibling();
+            var bodySize = size - new Vector2(Outline * 2f, Outline * 2f);
+            var body = Fill(outline.transform, "Body", color, bodySize, new Vector2(0.5f, 0.5f), Vector2.zero);
+            if (bodySize.y >= 48f)
+            {
+                var bevelColor = Color.Lerp(color, Color.white, 0.35f);
+                bevelColor.a = 0.55f;
+                Fill(body.transform, "TopBevel", bevelColor, new Vector2(Mathf.Max(24f, bodySize.x - 16f), 8f), new Vector2(0.5f, 1f), new Vector2(0f, -4f));
+            }
+
             return (RectTransform)body.transform;
         }
 

@@ -79,16 +79,48 @@ namespace ColonQuest.World
     /// </summary>
     public sealed class PoliceOfficer : MonoBehaviour
     {
-        [SerializeField] private float speed = 3.6f;
+        private static readonly System.Collections.Generic.List<PoliceOfficer> activeOfficers = new System.Collections.Generic.List<PoliceOfficer>();
+
+        [SerializeField] private float speed = 4.6f;
 
         private Transform player;
         private bool called;
         private bool stopped;
+        private bool pursuingRedLight;
 
         /// <summary>Raised once, when the officer reaches the player and stops them for this offense.</summary>
         public static event Action<OffenseKind> StoppedPlayer;
 
         public bool HasStopped => stopped;
+
+        public bool IsPursuingRedLight => pursuingRedLight && !stopped;
+
+        public static bool IsAnyPursuingRedLight()
+        {
+            for (int i = 0; i < activeOfficers.Count; i++)
+            {
+                if (activeOfficers[i] != null && activeOfficers[i].IsPursuingRedLight)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void OnEnable()
+        {
+            if (!activeOfficers.Contains(this))
+            {
+                activeOfficers.Add(this);
+            }
+        }
+
+        private void OnDisable()
+        {
+            activeOfficers.Remove(this);
+            pursuingRedLight = false;
+        }
 
         /// <summary>The owner called the police: the officer appears and heads straight for the player.</summary>
         public void Alert()
@@ -106,6 +138,7 @@ namespace ColonQuest.World
                 if (!called && Offenses.Current == OffenseKind.None)
                 {
                     stopped = false;
+                    pursuingRedLight = false;
                 }
 
                 return;
@@ -113,6 +146,7 @@ namespace ColonQuest.World
 
             if (SceneTransition.IsBusy)
             {
+                pursuingRedLight = false;
                 return;
             }
 
@@ -126,15 +160,28 @@ namespace ColonQuest.World
                 }
             }
 
-            var action = OfficerLogic.Decide(transform.position, player.position, Offenses.Current, called);
+            var offense = Offenses.Current;
+            if (offense == OffenseKind.None && pursuingRedLight)
+            {
+                offense = OffenseKind.RedLight;
+            }
+
+            var action = OfficerLogic.Decide(transform.position, player.position, offense, called || pursuingRedLight);
             if (action == OfficerAction.Pursue)
             {
+                if (offense == OffenseKind.RedLight)
+                {
+                    pursuingRedLight = true;
+                    Offenses.Raise(OffenseKind.RedLight);
+                }
+
                 transform.position = Vector2.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
             }
             else if (action == OfficerAction.Stop)
             {
                 stopped = true;
-                StoppedPlayer?.Invoke(Offenses.Current);
+                pursuingRedLight = false;
+                StoppedPlayer?.Invoke(offense);
             }
         }
     }

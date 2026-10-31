@@ -21,12 +21,19 @@ namespace ColonQuest.EditorTools
             // Counter separating kitchen from customer area
             var counter = IL(parts.Props, "DinerCounter");
             Solid(counter, "Counter", rounded, 0f, 0.5f, 9.2f, 0.9f, "#8B5A3C");
+            for (float sx = -4.0f; sx <= 4.0f; sx += 0.8f)
+            {
+                Deco(counter, "Counter_Slat", square, sx, 0.32f, 0.04f, 0.42f, "#6E442B", 0.7f, 7);
+            }
             Deco(counter, "CounterTop", roundedSmall, 0f, 0.55f, 9.4f, 0.35f, "#E8D8B8", 1f, 8);
             Solid(counter, "Register", roundedSmall, -1.8f, 0.72f, 0.8f, 0.6f, "#333A48");
             Deco(counter, "Screen", roundedSmall, -1.8f, 0.82f, 0.5f, 0.28f, "#55E08F", 1f, 9);
             Deco(counter, "CoffeeMachine", roundedSmall, 2.2f, 0.8f, 1.2f, 0.7f, "#C0392B", 1f, 8);
             Deco(counter, "Pot", circle, 2.2f, 0.75f, 0.35f, 0.35f, "#1D2230", 1f, 9);
             Deco(counter, "MenuBoard", roundedSmall, 0f, 0.82f, 1.5f, 0.3f, "#2A3342", 1f, 8);
+            Deco(counter, "PastryCase", roundedSmall, 3.6f, 0.72f, 1.1f, 0.42f, "#BFE3F5", 0.85f, 8);
+            Deco(counter, "Empanada1", circle, 3.4f, 0.72f, 0.24f, 0.16f, "#E09A3E", 1f, 9);
+            Deco(counter, "Empanada2", circle, 3.8f, 0.72f, 0.24f, 0.16f, "#E09A3E", 1f, 9);
 
             // Counter stools
             var stools = IL(parts.Props, "Stools");
@@ -65,6 +72,9 @@ namespace ColonQuest.EditorTools
             // Left Table
             Solid(dining, "TableLeft", rounded, -5.2f, -2.6f, 2.2f, 1.4f, "#A67243");
             Deco(dining, "NapkinsL", roundedSmall, -5.2f, -2.6f, 0.35f, 0.35f, "#FFFFFF", 1f, 8);
+            Deco(dining, "SauceBottleL", roundedSmall, -4.9f, -2.55f, 0.14f, 0.24f, "#6E4726", 1f, 9);
+            Deco(dining, "SauceCapL", circle, -4.9f, -2.41f, 0.12f, 0.08f, "#2E8B57", 1f, 10);
+            Deco(dining, "PlateL", circle, -5.65f, -2.6f, 0.36f, 0.36f, "#F8F5E8", 1f, 8);
             Solid(dining, "ChairL1", roundedSmall, -6.8f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairL2", roundedSmall, -3.6f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairL3", roundedSmall, -5.2f, -1.4f, 0.7f, 0.7f, "#8B5A3C");
@@ -73,6 +83,9 @@ namespace ColonQuest.EditorTools
             // Right Table
             Solid(dining, "TableRight", rounded, 5.2f, -2.6f, 2.2f, 1.4f, "#A67243");
             Deco(dining, "NapkinsR", roundedSmall, 5.2f, -2.6f, 0.35f, 0.35f, "#FFFFFF", 1f, 8);
+            Deco(dining, "SauceBottleR", roundedSmall, 4.9f, -2.55f, 0.14f, 0.24f, "#6E4726", 1f, 9);
+            Deco(dining, "SauceCapR", circle, 4.9f, -2.41f, 0.12f, 0.08f, "#2E8B57", 1f, 10);
+            Deco(dining, "PlateR", circle, 5.65f, -2.6f, 0.36f, 0.36f, "#F8F5E8", 1f, 8);
             Solid(dining, "ChairR1", roundedSmall, 3.6f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairR2", roundedSmall, 6.8f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairR3", roundedSmall, 5.2f, -1.4f, 0.7f, 0.7f, "#8B5A3C");

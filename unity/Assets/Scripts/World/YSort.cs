@@ -18,7 +18,7 @@ namespace ColonQuest.World
         /// <summary>Sorting order for an object whose feet are at this height. Lower on screen wins.</summary>
         public static int OrderFor(float footY)
         {
-            return -Mathf.RoundToInt(footY * 100f);
+            return -Mathf.RoundToInt(footY * 200f);
         }
 
         /// <summary>Where the feet are relative to the object's position (usually negative).</summary>

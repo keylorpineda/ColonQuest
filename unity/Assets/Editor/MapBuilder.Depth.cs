@@ -35,22 +35,22 @@ namespace ColonQuest.EditorTools
             BuildHighClouds(parent, random);
         }
 
-        /// <summary>The farther north, the paler and bluer, as far things look through the air.</summary>
+        /// <summary>Warm golden-hour horizon glow only at the very far north edge, keeping the town crisp and vivid.</summary>
         private static void BuildDistanceHaze(Transform parent)
         {
             string previous = currentLayer;
             currentLayer = LayerForeground;
 
-            var haze = GamePalette.Hex("#BFD9EE");
-            const float bottom = -4f;
+            var haze = GamePalette.Hex("#FFEBB8");
+            const float bottom = 24f;
             const float top = 34f + MapLayout.NorthShift;
-            const int bands = 63;
+            const int bands = 24;
             float step = (top - bottom) / bands;
             for (int i = 0; i < bands; i++)
             {
                 float t = (i + 1f) / bands;
                 var color = haze;
-                color.a = 0.24f * t * t;
+                color.a = 0.10f * t * t;
                 Shape(parent, "Haze", square, new Vector2(MapLayout.TownBounds.center.x, bottom + step * (i + 0.5f)), new Vector2(MapLayout.TownBounds.width + 20f, step + 0.02f), color, 3);
             }
 

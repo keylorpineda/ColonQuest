@@ -11,15 +11,17 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildCrossings(Transform parent)
         {
-            // The two crosswalks of the plaza share one officer; the other two have their own.
+            // Every crosswalk on the main streets has its pedestrian signal and an officer watching within sight range.
             BuildSignal(parent, "Signal_PlazaEast", 3.6f, 0f, 4f, 0f);
             BuildSignal(parent, "Signal_PlazaWest", -3.6f, 0f, 4f, 0f);
             BuildSignal(parent, "Signal_South", 3.6f, -14f, -10f, 7f);
             BuildSignal(parent, "Signal_East", 62f, 0f, 4f, 3f);
+            BuildSignal(parent, "Signal_NorthAvenue", MapLayout.NorthPathX, AvenueRoadY, AvenueRoadY + 4f, 5f);
 
-            BuildStreetOfficer(parent, "Oficial_Plaza", new Vector2(0.4f, 5.2f));
-            BuildStreetOfficer(parent, "Oficial_Sur", new Vector2(6.2f, -8.9f));
-            BuildStreetOfficer(parent, "Oficial_Este", new Vector2(60.2f, 5.0f));
+            BuildStreetOfficer(parent, "Oficial_Plaza", new Vector2(0.4f, 4.4f));
+            BuildStreetOfficer(parent, "Oficial_Sur", new Vector2(5.2f, -9.4f));
+            BuildStreetOfficer(parent, "Oficial_Este", new Vector2(60.4f, 4.4f));
+            BuildStreetOfficer(parent, "Oficial_Norte", new Vector2(MapLayout.NorthPathX - 1.8f, AvenueRoadY + 4.4f));
         }
 
         private static void BuildSignal(Transform parent, string name, float x, float yMin, float yMax, float phase)

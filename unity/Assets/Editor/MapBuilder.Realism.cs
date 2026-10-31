@@ -29,12 +29,12 @@ namespace ColonQuest.EditorTools
                 float centerX = footprint.center.x;
 
                 var core = GamePalette.Outline;
-                core.a = 0.2f;
-                OnGround(shadows, "Cast", rounded, new Vector2(centerX + 1.4f, baseY - 0.6f), new Vector2(width + 1.2f, 1.5f), core, TownShadow + 2);
+                core.a = 0.14f;
+                OnGround(shadows, "Cast", softCircle, new Vector2(centerX + 0.45f, baseY - 0.18f), new Vector2(width + 0.8f, 0.95f), core, TownShadow + 2);
 
                 var penumbra = GamePalette.Outline;
-                penumbra.a = 0.12f;
-                OnGround(shadows, "CastSoft", softCircle, new Vector2(centerX + 2.2f, baseY - 0.9f), new Vector2(width * 1.35f, 3.4f), penumbra, TownShadow + 2);
+                penumbra.a = 0.08f;
+                OnGround(shadows, "CastSoft", softCircle, new Vector2(centerX + 0.85f, baseY - 0.35f), new Vector2(width * 1.15f, 1.6f), penumbra, TownShadow + 2);
             }
         }
 
@@ -50,7 +50,7 @@ namespace ColonQuest.EditorTools
             renderer.drawMode = SpriteDrawMode.Tiled;
             renderer.size = MapLayout.TownBounds.size + Vector2.one * 24f;
             var color = GamePalette.Hex("#1C2233");
-            color.a = 0.075f;
+            color.a = 0.022f;
             renderer.color = color;
             renderer.sortingLayerName = LayerForeground;
             renderer.sortingOrder = 2;
