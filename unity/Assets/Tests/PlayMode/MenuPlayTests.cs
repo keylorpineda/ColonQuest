@@ -250,17 +250,17 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsTrue(Active("NewGame"), "a new life first asks who the player is");
             yield return StartLifeAndSkipOpening();
 
-            Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name);
+            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "after the goodbye the player stays in the house");
             Assert.IsNotNull(GameSession.Instance);
             Assert.AreEqual(0, GameSession.Instance.Loop.TasksDone, "a new life starts from zero");
             Assert.AreEqual(0, GameSession.Instance.Loop.MonthsPlayed);
             Assert.AreEqual(0, GameSession.Instance.ActiveSlot);
             Assert.IsNotNull(GameSession.Slots.Load(0), "a new game is saved from the start");
             Assert.IsNotNull(GameObject.Find("GameUi"));
-            Assert.IsTrue(GameObject.Find("GameUi").GetComponent<Canvas>().enabled, "the overlay is back in the town");
+            Assert.IsTrue(GameObject.Find("GameUi").GetComponent<Canvas>().enabled, "the overlay is back after the opening");
         }
 
-        /// <summary>Presses Empezar in the new game window, waits for the opening in the house and skips it to the town.</summary>
+        /// <summary>Presses Empezar in the new game window, waits for the opening in the house and skips it.</summary>
         private static IEnumerator StartLifeAndSkipOpening()
         {
             var nameBox = Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>();
@@ -278,8 +278,17 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.IsTrue(Interaction.Playing, "the opening plays in the house");
             Assert.IsNotNull(GameObject.Find("Mama"), "the mother is there for the opening");
+            Vector3 before = GameObject.FindWithTag(Station.PlayerTag).transform.position;
             Interaction.SkipCurrent();
-            yield return WaitFor(SceneNames.Town);
+            for (float waited = 0f; waited < 10f && Interaction.Playing; waited += Time.unscaledDeltaTime)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "the goodbye does not walk the player out");
+            Assert.Less(Vector2.Distance(before, GameObject.FindWithTag(Station.PlayerTag).transform.position), 0.5f,
+                "the player stays standing where the goodbye ended");
         }
 
         [UnityTest]
