@@ -313,6 +313,10 @@ namespace ColonQuest.World
                 PlayerController.Frozen = true;
 
                 var body = player.GetComponent<Rigidbody2D>();
+                if (body != null)
+                {
+                    body.linearVelocity = Vector2.zero;
+                }
                 var collider = player.GetComponent<Collider2D>();
                 var controller = player.GetComponent<PlayerController>();
                 var bob = player.transform.Find("Bob");

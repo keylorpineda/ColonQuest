@@ -894,6 +894,12 @@ namespace ColonQuest.World
             { "Evaluación de Salud Financiera:", "Financial Health Evaluation:" },
             { "Bienes adquiridos:", "Acquired Assets:" },
             { "Ver reporte final", "View final report" },
+            { "Cerrar", "Close" },
+            { "Personaje: {0}", "Character: {0}" },
+            { "Efectivo final: {0}   |   Ahorros: {1}", "Final cash: {0}   |   Savings: {1}" },
+            { "Deuda total: {0}   |   Patrimonio neto: {1}", "Total debt: {0}   |   Net worth: {1}" },
+            { "Bienestar emocional: {0}/100", "Emotional wellbeing: {0}/100" },
+            { "Decisiones financieras tomadas: {0}", "Financial decisions made: {0}" },
         };
     }
 }

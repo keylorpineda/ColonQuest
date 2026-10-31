@@ -80,8 +80,13 @@ namespace ColonQuest.World
 
         private void FixedUpdate()
         {
-            if (Frozen)
+            if (Frozen || Blocked || !InputEnabled)
             {
+                if (body != null)
+                {
+                    body.linearVelocity = Vector2.zero;
+                }
+
                 return;
             }
 
