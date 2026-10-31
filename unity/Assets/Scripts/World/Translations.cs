@@ -976,6 +976,13 @@ namespace ColonQuest.World
 
             // Playtest batch 3 of the 31st (senior)
             { "Sí", "Yes" },
+            { "La cama", "The bed" },
+            { "1.  Descansar un par de horas", "1.  Rest for a couple of hours" },
+            { "2.  Dormir hasta mañana", "2.  Sleep until tomorrow" },
+            { "Ya terminé de trabajar. Puedo descansar un rato o dormir de una vez hasta mañana.", "I am done with work. I can rest for a while or sleep right through until tomorrow." },
+            { "Todavía no he trabajado hoy. Puedo descansar un rato, pero sin perderme el turno.", "I have not worked yet today. I can rest for a while, but without missing my shift." },
+            { "Qué buena siesta. Ya pasaron un par de horas.", "What a good nap. A couple of hours went by." },
+            { "Ya terminé por hoy. A dormir temprano.", "I am done for today. Off to bed early." },
         };
     }
 }

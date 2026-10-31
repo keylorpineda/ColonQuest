@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.World;
@@ -470,19 +471,57 @@ namespace ColonQuest.UI
         private Interaction BedScene(Station station, Action then)
         {
             var clock = session.Loop.Clock;
+            Vector2 bed = Here(station);
             if (!clock.IsNight)
             {
-                // Before the evening it is only a rest: the player lies down a moment and gets up again.
-                Vector2 spot = Here(station);
-                return new Interaction().WalkInto(spot).Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 2.6f)
-                    .Zzz(spot + new Vector2(0.2f, 0.5f), 2f).Wait(0.2f).Apply(then);
+                // Before the evening the bed asks what to do, so the free afternoon does not have to be waited out.
+                return new Interaction().WalkInto(bed).Apply(() => ShowBedChoices(bed));
             }
+
+            return NightSleepScene(bed);
+        }
+
+        private const string NapThought = "Qué buena siesta. Ya pasaron un par de horas.";
+
+        /// <summary>The bed during the day: a rest of two hours, the night already if the work is done, or nothing.</summary>
+        private void ShowBedChoices(Vector2 bed)
+        {
+            var options = new List<ModalOption>
+            {
+                new ModalOption
+                {
+                    Label = Loc.T("1.  Descansar un par de horas"), Color = GameUiColors.Yellow,
+                    OnPress = () => new Interaction().Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 1.2f)
+                        .Zzz(bed + new Vector2(0.2f, 0.5f), 1.6f).Fade(Night, 0.6f).Wait(0.4f)
+                        .Apply(() => { session.Loop.Nap(); Refresh(); })
+                        .Fade(Dawn, 0.6f).Pose(PersonPose.None, 0.3f).Say(string.Empty, NapThought).Play()
+                }
+            };
+
+            if (session.Loop.CanSleepEarly)
+            {
+                options.Add(new ModalOption { Label = Loc.T("2.  Dormir hasta mañana"), Color = GameUiColors.Green, OnPress = () => NightSleepScene(bed).Play() });
+            }
+
+            options.Add(Back(Loc.F("{0}.  Salir", options.Count + 1)));
+            string body = session.Loop.CanSleepEarly
+                ? "Ya terminé de trabajar. Puedo descansar un rato o dormir de una vez hasta mañana."
+                : "Todavía no he trabajado hoy. Puedo descansar un rato, pero sin perderme el turno.";
+            modal.Show(Loc.T("La cama"), session.Loop.Clock.Time, Loc.T(body), options);
+        }
+
+        /// <summary>
+        /// Sleeping for the night: the player lies down, the Z letters rise, the screen goes dark, the alarm rings and the
+        /// morning comes back.
+        /// </summary>
+        private Interaction NightSleepScene(Vector2 bed)
+        {
+            var clock = session.Loop.Clock;
 
             // The month moves on only at the bank, so the last week wakes up in the same week with a reminder.
             bool lastWeek = clock.Day + 1 >= GameRules.DaysPerMonth;
             bool missedWork = !session.Loop.Job.WorkedToday && !clock.IsLastDay;
-            Vector2 bed = Here(station);
-            return new Interaction().WalkInto(bed).Say(string.Empty, "Ya es tarde. Toca dormir.")
+            return new Interaction().WalkInto(bed).Say(string.Empty, clock.IsNight ? "Ya es tarde. Toca dormir." : "Ya terminé por hoy. A dormir temprano.")
                 .Pose(PersonPose.Sleep, 0.8f).Zzz(bed + new Vector2(0.2f, 0.5f), 3f)
                 .Fade(Night, 1.4f).Wait(1.4f)
                 .Apply(() => session.Sleep())

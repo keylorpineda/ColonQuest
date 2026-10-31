@@ -409,6 +409,18 @@ namespace ColonQuest.Game
             return OutcomeFrom(before, Loc.T(PlayerProfile.Pick("Te quedaste dormido fuera de la cama", "Te quedaste dormida fuera de la cama")));
         }
 
+        /// <summary>
+        /// The player may go to bed for the night before the evening once the morning of work is over: they worked today, or
+        /// the shift is already past. Never in the middle of a shift.
+        /// </summary>
+        public bool CanSleepEarly => !Job.OnShift && (Job.WorkedToday || Clock.Hour >= GameRules.WorkEndHour);
+
+        /// <summary>A rest in bed during the day: the clock moves on by <see cref="GameRules.NapMinutes"/>, never past the end of the day.</summary>
+        public void Nap()
+        {
+            Clock.SkipTo(Clock.Minutes + GameRules.NapMinutes);
+        }
+
         private float shiftStartMinutes;
 
         /// <summary>The player clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>

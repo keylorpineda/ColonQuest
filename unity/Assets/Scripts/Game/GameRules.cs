@@ -45,6 +45,9 @@ namespace ColonQuest.Game
         /// <summary>About how long the shift scene lasts, in real seconds: the clock goes from clocking in to the end of the shift over it.</summary>
         public const float ShiftRealSeconds = 26f;
 
+        /// <summary>A rest in bed during the day moves the clock on by this many minutes, so the free afternoon is not spent waiting.</summary>
+        public const float NapMinutes = 120f;
+
         /// <summary>
         /// The legal minimum for a worker in an unskilled occupation (generic), in force since January 1, 2026: Executive Decree
         /// 45303-MTSS sets ₡12 436.41 per ordinary day, ₡373 092.30 per month. Rounded to whole colones: money here has no cents.
