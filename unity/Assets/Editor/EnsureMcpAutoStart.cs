@@ -20,6 +20,12 @@ namespace ColonQuest.EditorTools
 
         static EnsureMcpAutoStart()
         {
+            // Tests and builds run in batch mode: no bridge to connect, and its connection errors would fail every play mode test.
+            if (Application.isBatchMode)
+            {
+                return;
+            }
+
             EditorPrefs.SetBool(AutoStartOnLoadKey, true);
             EditorPrefs.SetBool(UseHttpTransportKey, true);
             EditorApplication.update += OnUpdate;
