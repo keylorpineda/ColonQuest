@@ -549,7 +549,8 @@ namespace ColonQuest.EditorTools
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
 
-            foreach (float x in new[] { -41f, -33f, -26f })
+            // The lamp that stood in front of the cooperative door (x = -31.5) moved to the left, out of the way.
+            foreach (float x in new[] { -41f, -34.5f, -26f })
             {
                 Lamp(parent, x, 4.5f);
             }
