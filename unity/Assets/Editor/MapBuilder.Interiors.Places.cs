@@ -222,6 +222,22 @@ namespace ColonQuest.EditorTools
                 }
             }
 
+            // Inmates in non-player cells (sitting on the cot, standing at the bars, resting in the cell)
+            BuildNpc(parts.People, "Reo1", new Vector2(-3.5f, 4.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Neutral, Hair = HairStyle.Buzz, HairColor = "#3D2B1F"
+            }, false);
+
+            BuildNpc(parts.People, "Reo2", new Vector2(2.6f, 1.4f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Bald, Mustache = true
+            }, false);
+
+            BuildNpc(parts.People, "Reo3", new Vector2(7.0f, 3.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Spiky, HairColor = "#1F242D"
+            }, false);
+
             WallPlate(parts.Labels, "CELDAS", new Vector2(0f, 6.1f), 1.6f, "#2A3345", GamePalette.White, 0.028f);
 
             // The counter of the officer, in the middle of the room.
