@@ -309,7 +309,7 @@ namespace ColonQuest.EditorTools
         {
             Building(parent, shadows, new BuildingSpec
             {
-                Name = "Casa", Sign = "TU CASA", Roof = "#C0504D", Wall = "#F2D7B6",
+                Name = "Casa", Sign = "CASA DE MAMÁ", Roof = "#C0504D", Wall = "#F2D7B6",
                 XMin = -24f, XMax = -16f, YBottom = 6f, YTop = 12.6f, DoorX = -19.5f, FacadeHeight = 2.8f, Entrance = Entrance.Door
             });
             var banco = Building(parent, shadows, new BuildingSpec

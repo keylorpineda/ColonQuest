@@ -411,7 +411,7 @@ namespace ColonQuest.UI
         private static bool splashShown;
 
         private const float SplashFadeIn = 0.7f;
-        private const float SplashHold = 2.2f;
+        private const float SplashHold = 4.0f;
         private const float SplashFadeOut = 0.7f;
 
         private CanvasGroup splash;

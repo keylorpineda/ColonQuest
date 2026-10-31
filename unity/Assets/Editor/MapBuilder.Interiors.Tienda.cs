@@ -30,6 +30,22 @@ namespace ColonQuest.EditorTools
             SecurityCamera(cameras, new Vector2(-8.6f, 5.9f));
             SecurityCamera(cameras, new Vector2(8.6f, 5.9f));
 
+            // Interior commercial details: wall clock, fire extinguisher, water cooler dispenser, trash bin
+            var details = IL(parts.Props, "StoreDetails");
+            Deco(details, "Clock_Out", circle, -8.6f, 3.8f, 0.65f, 0.65f, "#2A3345", 1f, 8);
+            Deco(details, "Clock_Face", circle, -8.6f, 3.8f, 0.52f, 0.52f, "#FFFFFF", 1f, 9);
+            Deco(details, "Clock_Hands", square, -8.6f, 3.8f, 0.04f, 0.22f, "#1D2238", 1f, 10);
+
+            Solid(details, "WaterCooler", roundedSmall, 8.4f, -1.2f, 0.65f, 1.15f, "#E3E9F2");
+            Deco(details, "WaterBottle", roundedSmall, 8.4f, -0.45f, 0.45f, 0.55f, "#4DA3FF", 0.85f, 9);
+            Deco(details, "WaterSpigot", square, 8.4f, -1.05f, 0.12f, 0.10f, "#2563EB", 1f, 9);
+
+            Deco(details, "FireExtinguisher", roundedSmall, -1.6f, -5.5f, 0.28f, 0.65f, "#DC2626", 1f, 8);
+            Deco(details, "ExtingGauge", circle, -1.6f, -5.1f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
+
+            Solid(details, "TrashBin", roundedSmall, 8.4f, 1.2f, 0.45f, 0.55f, "#64748B");
+            Deco(details, "TrashRim", roundedSmall, 8.4f, 1.48f, 0.50f, 0.10f, "#475569", 1f, 9);
+
             var plants = IL(parts.Props, "Plants");
             Plant(plants, -8.3f, -5.5f);
             Plant(plants, 8.3f, -5.5f);

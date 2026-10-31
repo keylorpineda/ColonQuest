@@ -65,6 +65,14 @@ namespace ColonQuest.EditorTools
             }
 
             WallPlate(parts.Labels, "AUTOS DON CHEPE", new Vector2(-5.0f, 6.0f), 3.2f, "#C0504D", GamePalette.White, 0.03f);
+            // Agency wall clock and dealership promo banner (Deco only)
+            Deco(show, "WallClock", circle, -0.6f, 5.9f, 0.75f, 0.75f, "#1E293B", 1f, 8);
+            Deco(show, "ClockFace", circle, -0.6f, 5.9f, 0.62f, 0.62f, "#F8FAFC", 1f, 9);
+            Deco(show, "ClockHour", square, -0.6f, 5.96f, 0.04f, 0.22f, "#0F172A", 1f, 10);
+            Deco(show, "ClockMin", square, -0.53f, 5.9f, 0.22f, 0.04f, "#0F172A", 1f, 10);
+            Deco(show, "PromoBanner", roundedSmall, -5.0f, 5.2f, 4.0f, 0.35f, "#1E293B", 1f, 8);
+            Deco(show, "PromoStripeRed", square, -6.0f, 5.2f, 0.6f, 0.25f, "#EF4444", 1f, 9);
+            Deco(show, "PromoStripeBlue", square, -4.0f, 5.2f, 0.6f, 0.25f, "#3B82F6", 1f, 9);
 
             // Two salesmen's desks in the middle of the floor.
             foreach (float x in new[] { -6.4f, -2.4f })
@@ -94,6 +102,13 @@ namespace ColonQuest.EditorTools
             Deco(reception, "Bell", circle, 1.1f, -3.5f, 0.2f, 0.2f, "#FFD23F", 1f, 9);
             Deco(reception, "Contract", roundedSmall, 2.6f, -3.55f, 0.6f, 0.42f, "#FFFFFF", 1f, 8);
             Deco(reception, "Pen", roundedSmall, 2.2f, -3.55f, 0.06f, 0.3f, "#1D4F8C", 1f, 9);
+            Deco(reception, "Brochure1", roundedSmall, 2.95f, -3.45f, 0.3f, 0.4f, "#3B82F6", 1f, 9);
+            Deco(reception, "Brochure2", roundedSmall, 2.8f, -3.48f, 0.3f, 0.4f, "#EF4444", 1f, 9);
+            Deco(reception, "EntranceMat", roundedSmall, 0f, -6.2f, 2.2f, 0.6f, "#334155", 1f, 4);
+            Deco(reception, "EntranceMatInner", roundedSmall, 0f, -6.2f, 1.9f, 0.45f, "#475569", 1f, 5);
+            Deco(reception, "ExtinguisherBody", roundedSmall, 0.2f, -5.5f, 0.32f, 0.75f, "#EF4444", 1f, 8);
+            Deco(reception, "ExtinguisherGauge", circle, 0.2f, -5.05f, 0.14f, 0.14f, "#E2E8F0", 1f, 9);
+            Deco(reception, "ExtinguisherHose", square, 0.35f, -5.25f, 0.05f, 0.35f, "#1E293B", 1f, 9);
             BuildNpc(parts.People, "DonChepe", new Vector2(1.9f, -2.65f), new Look { Skin = "#F2994A", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, false);
             BuildThing(parts.Stations, "DonChepe", "Saludar a Don Chepe", new Vector2(1.9f, -4.8f), new Vector2(1.6f, 0.4f),
                 "\"¡Pase adelante! Vea los carros con calma. Para sacarlo en cuotas, pase a financiamiento, al fondo a la derecha.\"",
@@ -160,6 +175,10 @@ namespace ColonQuest.EditorTools
             Solid(waiting, "CoffeeTable", rounded, -6.9f, -4.5f, 0.9f, 0.9f, "#E8E2D6");
             Deco(waiting, "Cup", circle, -6.9f, -4.45f, 0.22f, 0.22f, "#FFFFFF", 1f, 8);
             Deco(waiting, "Magazine", roundedSmall, -7.15f, -4.6f, 0.3f, 0.22f, "#FFD23F", 1f, 8);
+            // Water dispenser in waiting room corner (Deco only)
+            Deco(waiting, "WaterDispenserBase", roundedSmall, -5.6f, -5.5f, 0.5f, 0.9f, "#F1F5F9", 1f, 7);
+            Deco(waiting, "WaterBottle", circle, -5.6f, -4.95f, 0.44f, 0.5f, "#38BDF8", 0.85f, 8);
+            Deco(waiting, "DispenserTap", square, -5.6f, -5.35f, 0.14f, 0.06f, "#3B82F6", 1f, 9);
 
             var coffee = IL(parts.Props, "CoffeeCorner");
             Solid(coffee, "Counter", rounded, -10.0f, -2.2f, 1.0f, 1.8f, "#D6B656");
@@ -234,6 +253,22 @@ namespace ColonQuest.EditorTools
                     BuildThing(parts.Stations, "CellCot", "Dormir en la litera", new Vector2(x - 0.9f, 4.3f), new Vector2(1.8f, 1.2f));
                 }
             }
+
+            // Inmates in non-player cells (sitting on the cot, standing at the bars, resting in the cell)
+            BuildNpc(parts.People, "Reo1", new Vector2(-3.5f, 4.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Neutral, Hair = HairStyle.Buzz, HairColor = "#3D2B1F"
+            }, false);
+
+            BuildNpc(parts.People, "Reo2", new Vector2(2.6f, 1.4f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Bald, Mustache = true
+            }, false);
+
+            BuildNpc(parts.People, "Reo3", new Vector2(7.0f, 3.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Spiky, HairColor = "#1F242D"
+            }, false);
 
             WallPlate(parts.Labels, "CELDAS", new Vector2(0f, 6.1f), 1.6f, "#2A3345", GamePalette.White, 0.028f);
 
@@ -381,6 +416,13 @@ namespace ColonQuest.EditorTools
             Deco(reception, "Cross", square, -6.8f, -3.4f, 0.14f, 0.5f, "#E8505B", 1f, 9);
             Deco(reception, "Computer", roundedSmall, -8.0f, -3.3f, 0.7f, 0.45f, "#2A3040", 1f, 8);
             Deco(reception, "Screen", roundedSmall, -8.0f, -3.28f, 0.56f, 0.3f, "#4DA3FF", 1f, 9);
+            // Hospital reception atmospheric details (Deco only)
+            Deco(reception, "HandSanitizerBase", roundedSmall, -4.8f, -3.4f, 0.22f, 0.5f, "#E2E8F0", 1f, 8);
+            Deco(reception, "HandSanitizerBottle", roundedSmall, -4.8f, -3.35f, 0.18f, 0.3f, "#38BDF8", 0.9f, 9);
+            Deco(reception, "ExtinguisherBody", roundedSmall, -4.0f, -5.5f, 0.32f, 0.75f, "#EF4444", 1f, 8);
+            Deco(reception, "ExtinguisherGauge", circle, -4.0f, -5.05f, 0.14f, 0.14f, "#E2E8F0", 1f, 9);
+            Deco(reception, "ExtinguisherHose", square, -3.85f, -5.25f, 0.05f, 0.35f, "#1E293B", 1f, 9);
+            Deco(reception, "TrashBinDeco", roundedSmall, -5.2f, -2.5f, 0.45f, 0.55f, "#64748B", 1f, 8);
             BuildNpc(parts.People, "Enfermera", new Vector2(-6.8f, -2.4f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#FFFFFF" }, false);
             BuildStation(parts.Stations, "Station_HealthDesk", StationType.HealthDesk, "Hablar de un seguro de salud", new Vector2(-6.8f, -4.6f));
             WallPlate(parts.Labels, "RECEPCIÓN Y SEGURO", new Vector2(-6.8f, -4.15f), 2.8f, "#1D4F8C", GamePalette.White, 0.024f);
@@ -393,6 +435,19 @@ namespace ColonQuest.EditorTools
                 Solid(waiting, "Chair", rounded, -10.6f + i * 1.4f, 1.1f, 1.0f, 0.6f, "#4DA3FF");
                 Solid(waiting, "Chair", rounded, -10.6f + i * 1.4f, -0.5f, 1.0f, 0.6f, "#4DA3FF");
             }
+            // Hospital waiting area details: Snellen chart, wall clock, water cooler (Deco only)
+            Deco(waiting, "EyeChartBack", roundedSmall, -10.6f, 2.5f, 0.7f, 1.0f, "#F8FAFC", 1f, 8);
+            Deco(waiting, "EyeChartE", square, -10.6f, 2.8f, 0.35f, 0.18f, "#0F172A", 1f, 9);
+            Deco(waiting, "EyeChartLines", square, -10.6f, 2.45f, 0.45f, 0.05f, "#0F172A", 1f, 9);
+            Deco(waiting, "EyeChartRed", square, -10.6f, 2.25f, 0.5f, 0.03f, "#EF4444", 1f, 9);
+            Deco(waiting, "EyeChartGreen", square, -10.6f, 2.15f, 0.5f, 0.03f, "#22C55E", 1f, 9);
+            Deco(waiting, "WallClock", circle, -8.0f, 2.6f, 0.7f, 0.7f, "#1E293B", 1f, 8);
+            Deco(waiting, "ClockFace", circle, -8.0f, 2.6f, 0.58f, 0.58f, "#F8FAFC", 1f, 9);
+            Deco(waiting, "ClockHand1", square, -8.0f, 2.65f, 0.04f, 0.2f, "#0F172A", 1f, 10);
+            Deco(waiting, "ClockHand2", square, -7.94f, 2.6f, 0.2f, 0.04f, "#0F172A", 1f, 10);
+            Deco(waiting, "WaterCoolerBase", roundedSmall, -6.5f, 0.3f, 0.5f, 0.9f, "#F1F5F9", 1f, 7);
+            Deco(waiting, "WaterJug", circle, -6.5f, 0.85f, 0.44f, 0.5f, "#38BDF8", 0.85f, 8);
+            Deco(waiting, "WaterTap", square, -6.5f, 0.45f, 0.12f, 0.06f, "#3B82F6", 1f, 9);
 
             // The emergency ward on the right: four beds with curtains and monitors.
             var ward = IL(parts.Props, "EmergencyWard");

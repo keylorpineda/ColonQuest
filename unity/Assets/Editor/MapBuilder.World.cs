@@ -382,6 +382,7 @@ namespace ColonQuest.EditorTools
             BuildNeighborhood(parent, shadows, random);
             BuildEastFarm(parent, shadows, random);
             BuildBeach(parent, shadows, random);
+            BuildEastTreeline(parent, shadows);
 
             foreach (float x in new[] { -36f, -27f, -18f, -9f, 0f, 9f, 18f, 36f, 39.5f })
             {
@@ -465,6 +466,8 @@ namespace ColonQuest.EditorTools
             {
                 Shape(rail, "Rail_Post", roundedSmall, new Vector2(x, 0.2f), new Vector2(0.2f, 0.9f), WoodDark, 2);
             }
+            // Invisible collider along the railing so nobody walks off the deck.
+            Wall(rail, "Rail_Collider", new Vector2(0f, 0.3f), new Vector2(6.8f, 0.3f));
 
             var scope = Root(parent, "Telescope", new Vector2(-1.6f, 20.6f), 20.4f);
             Shape(scope, "Leg_Outline", roundedSmall, new Vector2(0f, 0.4f), new Vector2(0.2f, 0.8f), GamePalette.Outline, 0);
@@ -521,6 +524,22 @@ namespace ColonQuest.EditorTools
 
         // ---------------------------------------------------------------- neighborhood (west)
 
+        /// <summary>Three staggered rows of big trees along the east edge, hiding where the roads meet the rock face.</summary>
+        private static void BuildEastTreeline(Transform parent, Transform shadows)
+        {
+            // Its own random so the rest of the world keeps the layout it had.
+            var random = new System.Random(31);
+            for (int row = 0; row < 3; row++)
+            {
+                for (float y = -23f + row * 0.8f; y < MapLayout.WorldNorthEdgeY + 3f; y += 2.4f)
+                {
+                    float jx = 68.2f + row * 2.5f + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    float jy = y + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    Tree(parent, shadows, jx, jy, 1.5f + (float)random.NextDouble() * 0.25f, DistrictGreens[random.Next(DistrictGreens.Length)], false);
+                }
+            }
+        }
+
         private static void BuildNeighborhood(Transform parent, Transform shadows, System.Random random)
         {
             // North row.
@@ -547,7 +566,8 @@ namespace ColonQuest.EditorTools
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
 
-            foreach (float x in new[] { -41f, -33f, -26f })
+            // The lamp that stood in front of the cooperative door (x = -31.5) moved to the left, out of the way.
+            foreach (float x in new[] { -41f, -34.5f, -26f })
             {
                 Lamp(parent, x, 4.5f);
             }
@@ -618,11 +638,22 @@ namespace ColonQuest.EditorTools
             });
             Silo(parent, shadows, 38f, 9f);
 
-            // Coffee rows.
-            for (float y = 15f; y < 22f; y += 2.3f)
+            // Coffee rows: each row of bushes sits on a furrow of dark soil, with a big shade tree every few bushes.
+            int coffeeRow = 0;
+            for (float y = 15f; y < 22f; y += 2.3f, coffeeRow++)
             {
-                for (float x = 32.8f; x < 43f; x += 1.7f)
+                OnGround(parent, "Furrow_Outline", rounded, new Vector2(37.9f, y + 0.02f), new Vector2(11.4f, 0.62f), GamePalette.Shade(GamePalette.Hex("#6B4A2E"), 0.6f), 5);
+                OnGround(parent, "Furrow", rounded, new Vector2(37.9f, y + 0.02f), new Vector2(11.2f, 0.5f), GamePalette.Hex("#6B4A2E"), 6);
+                int coffeeCol = 0;
+                for (float x = 32.8f; x < 43f; x += 1.7f, coffeeCol++)
                 {
+                    if ((coffeeRow == 1 && coffeeCol == 1) || (coffeeRow == 2 && coffeeCol == 4))
+                    {
+                        // Shade tree (poro) among the coffee.
+                        Tree(parent, shadows, x, y, 1.4f, "#3B9660", false);
+                        continue;
+                    }
+
                     CoffeeBush(parent, shadows, x, y);
                 }
             }
@@ -646,31 +677,57 @@ namespace ColonQuest.EditorTools
             Tree(parent, shadows, 41.5f, 6.4f, 1.0f, "#3B9660", false);
         }
 
+        /// <summary>A coffee bush in cartoon style: tall and cone-shaped, dark glossy leaves in pairs, red and green berries.</summary>
         private static void CoffeeBush(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Coffee", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.12f, y), new Vector2(1.06f, 0.42f), 0.22f);
+            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.1f, 0.4f), 0.24f);
 
             var rig = new GameObject("CoffeeRig").transform;
             rig.SetParent(root, false);
             rig.localPosition = new Vector2(0f, 0.1f);
             rig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 2.0f, x * 1.1f + y * 0.7f, 0.025f, true, 1.5f, 12f);
 
-            var leafColor = GamePalette.Hex("#2F8A58");
-            Shape(rig, "Outline", circle, new Vector2(0f, 0.28f), Vector2.one * 1.02f, GamePalette.Outline, 0);
-            Shape(rig, "Bush_Deep", circle, new Vector2(0.06f, 0.24f), Vector2.one * 0.86f, GamePalette.Shade(leafColor, 0.84f), 1);
-            Shape(rig, "Bush", circle, new Vector2(-0.03f, 0.30f), Vector2.one * 0.78f, leafColor, 1);
-            Shape(rig, "Bush_Crown", circle, new Vector2(-0.08f, 0.40f), new Vector2(0.52f, 0.42f), GamePalette.Shade(leafColor, 1.18f), 2);
+            var dark = GamePalette.Hex("#1F5E33");
+            var mid = GamePalette.Hex("#2E7D46");
+            var light = GamePalette.Hex("#4FA36A");
 
-            Shape(rig, "Berry_Outline", circle, new Vector2(0.18f, 0.38f), Vector2.one * 0.17f, GamePalette.Outline, 2);
-            Shape(rig, "Berry", circle, new Vector2(0.18f, 0.38f), Vector2.one * 0.13f, GamePalette.Hex("#E8505B"), 3);
-            Shape(rig, "Berry_Outline", circle, new Vector2(-0.16f, 0.22f), Vector2.one * 0.17f, GamePalette.Outline, 2);
-            Shape(rig, "Berry", circle, new Vector2(-0.16f, 0.22f), Vector2.one * 0.13f, GamePalette.Hex("#E8505B"), 3);
-            Shape(rig, "Berry_Gold", circle, new Vector2(0.02f, 0.18f), Vector2.one * 0.11f, GamePalette.Hex("#FFD23F"), 3);
-            Shape(rig, "Blossom", circle, new Vector2(-0.12f, 0.44f), Vector2.one * 0.09f, GamePalette.White, 3);
+            // Tall body: three stacked rounded layers, wide at the bottom and narrower at the top, each with its outline.
+            Shape(rig, "Outline_Base", circle, new Vector2(0f, 0.28f), new Vector2(1.06f, 0.64f), GamePalette.Outline, 0);
+            Shape(rig, "Outline_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.94f, 0.62f), GamePalette.Outline, 0);
+            Shape(rig, "Outline_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.68f, 0.56f), GamePalette.Outline, 0);
+            Shape(rig, "Cone_Base", circle, new Vector2(0f, 0.28f), new Vector2(0.98f, 0.56f), dark, 1);
+            Shape(rig, "Cone_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.86f, 0.54f), mid, 1);
+            Shape(rig, "Cone_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.6f, 0.48f), mid, 1);
+            Shape(rig, "Cone_Shine", circle, new Vector2(-0.12f, 1.0f), new Vector2(0.22f, 0.18f), light, 2);
+
+            // Pairs of oval leaves along three horizontal branches, drooping a little at the tips.
+            foreach (float by in new[] { 0.3f, 0.62f, 0.92f })
+            {
+                float reach = 0.36f - (by - 0.3f) * 0.22f;
+                Shape(rig, "Branch", square, new Vector2(0f, by), new Vector2(reach * 2f, 0.04f), GamePalette.Outline, 2);
+                foreach (float side in new[] { -1f, 1f })
+                {
+                    var leaf = Shape(rig, "Leaf", circle, new Vector2(side * reach, by + 0.02f), new Vector2(0.34f, 0.14f), side < 0f ? light : GamePalette.Shade(mid, 1.1f), 3);
+                    Tilt(leaf, side * -18f);
+                }
+            }
+            // Berry clusters stuck to the branches: mostly red, a few green and yellow.
+            var berries = new[]
+            {
+                new Vector3(0.30f, 0.26f, 0f), new Vector3(0.36f, 0.31f, 1f), new Vector3(-0.30f, 0.28f, 0f), new Vector3(-0.24f, 0.22f, 2f),
+                new Vector3(0.22f, 0.58f, 1f), new Vector3(0.27f, 0.62f, 0f), new Vector3(-0.22f, 0.6f, 0f), new Vector3(-0.28f, 0.56f, 3f),
+                new Vector3(0.12f, 0.9f, 0f), new Vector3(-0.1f, 0.88f, 1f)
+            };
+            var berryColors = new[] { "#C0392B", "#E74C3C", "#7FB241", "#F1C40F" };
+            foreach (var berry in berries)
+            {
+                float size = (berry.x * 37f + berry.y * 11f) % 1f > 0.5f ? 0.08f : 0.07f;
+                Shape(rig, "Berry", circle, new Vector2(berry.x, berry.y), Vector2.one * size, GamePalette.Hex(berryColors[(int)berry.z]), 4);
+            }
+
             root.gameObject.AddComponent<CircleCollider2D>().radius = 0.3f;
         }
-
         private static void Silo(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Silo", new Vector2(x, y), y);
@@ -799,6 +856,8 @@ namespace ColonQuest.EditorTools
         private static void CoursesBoard(Transform parent, float x, float y)
         {
             var root = Root(parent, "CoursesBoard", new Vector2(x, y), y);
+            // Solid base so the easel cannot be walked through; the station stays in front of it.
+            Wall(root, "Board_Collider", new Vector2(0f, 0.2f), new Vector2(1.3f, 0.4f));
             foreach (float post in new[] { -0.55f, 0.55f })
             {
                 Shape(root, "Post_Outline", roundedSmall, new Vector2(post, 0.52f), new Vector2(0.18f, 1.12f), GamePalette.Outline, 0);

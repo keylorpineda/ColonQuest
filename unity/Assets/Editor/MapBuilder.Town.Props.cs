@@ -121,6 +121,26 @@ namespace ColonQuest.EditorTools
                 Shape(root, "MarbleStep_Out", roundedSmall, new Vector2(0f, 0.08f), new Vector2(w + 0.46f, 0.28f), GamePalette.Outline, 3);
                 Shape(root, "MarbleStep", roundedSmall, new Vector2(0f, 0.08f), new Vector2(w + 0.34f, 0.18f), GamePalette.Hex("#E2E8F4"), 4);
             }
+            else if (b.Name == "Comisaria")
+            {
+                float wainscotH = Mathf.Min(1.02f, fh * 0.36f);
+                Shape(root, "Wainscot_Outline", roundedSmall, new Vector2(0f, wainscotH * 0.5f + 0.02f), new Vector2(w + 0.08f, wainscotH + 0.10f), GamePalette.Outline, 2);
+                Shape(root, "Wainscot_Base", roundedSmall, new Vector2(0f, wainscotH * 0.5f), new Vector2(w - 0.04f, wainscotH), GamePalette.Hex("#475569"), 3);
+                for (float bx = -w * 0.45f; bx < w * 0.45f; bx += 1.8f)
+                {
+                    Shape(root, "StoneJoint", square, new Vector2(bx, wainscotH * 0.5f), new Vector2(0.04f, wainscotH - 0.08f), GamePalette.Hex("#334155"), 4);
+                }
+                Shape(root, "Wainscot_LedgeOut", roundedSmall, new Vector2(0f, wainscotH + 0.04f), new Vector2(w + 0.14f, 0.18f), GamePalette.Outline, 3);
+                Shape(root, "Wainscot_Ledge", roundedSmall, new Vector2(0f, wainscotH + 0.04f), new Vector2(w + 0.04f, 0.10f), GamePalette.Hex("#64748B"), 4);
+            }
+            else if (b.Name == "Hospital")
+            {
+                float wainscotH = Mathf.Min(1.02f, fh * 0.36f);
+                Shape(root, "Wainscot_Outline", roundedSmall, new Vector2(0f, wainscotH * 0.5f + 0.02f), new Vector2(w + 0.08f, wainscotH + 0.10f), GamePalette.Outline, 2);
+                Shape(root, "Wainscot_Base", roundedSmall, new Vector2(0f, wainscotH * 0.5f), new Vector2(w - 0.04f, wainscotH), GamePalette.Hex("#CBD5E1"), 3);
+                Shape(root, "Wainscot_LedgeOut", roundedSmall, new Vector2(0f, wainscotH + 0.04f), new Vector2(w + 0.14f, 0.18f), GamePalette.Outline, 3);
+                Shape(root, "Wainscot_Ledge", roundedSmall, new Vector2(0f, wainscotH + 0.04f), new Vector2(w + 0.04f, 0.10f), GamePalette.Hex("#E2E8F0"), 4);
+            }
             else
             {
                 float wainscotH = Mathf.Min(1.02f, fh * 0.36f);
@@ -177,7 +197,7 @@ namespace ColonQuest.EditorTools
                 DrawAwning(root, w, fh, b.AwningA, b.AwningB);
             }
 
-            // Custom landmark architecture for Casa, Banco, and Tienda
+            // Custom landmark architecture for Casa, Banco, Tienda, Inmobiliaria, Agencia, Hospital, and Comisaria
             if (b.Name == "Casa")
             {
                 DecorateCasaArchitecture(root, w, fh, h, dx, wall, roof);
@@ -189,6 +209,22 @@ namespace ColonQuest.EditorTools
             else if (b.Name == "Tienda")
             {
                 DecorateTiendaArchitecture(root, w, fh, h, dx, wall, roof);
+            }
+            else if (b.Name == "Inmobiliaria")
+            {
+                DecorateInmobiliariaArchitecture(root, w, fh, h, dx, wall, roof);
+            }
+            else if (b.Name == "AgenciaDeCarros")
+            {
+                DecorateAgenciaArchitecture(root, w, fh, h, dx, wall, roof);
+            }
+            else if (b.Name == "Hospital")
+            {
+                DecorateHospitalArchitecture(root, w, fh, h, dx, wall, roof);
+            }
+            else if (b.Name == "Comisaria")
+            {
+                DecorateComisariaArchitecture(root, w, fh, h, dx, wall, roof);
             }
             else if (!string.IsNullOrEmpty(b.Sign))
             {
@@ -209,8 +245,8 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// Transforms "TU CASA" into the L-shaped colonial Costa Rican home from the concept art:
-        /// protruding right gable roof with diagonal terracotta ridge tiles, wooden plank sign "TU CASA",
+        /// Transforms "CASA DE MAMÁ" into the L-shaped colonial Costa Rican home from the concept art:
+        /// protruding right gable roof with diagonal terracotta ridge tiles, wooden plank sign "CASA DE MAMÁ",
         /// and a recessed left garden alcove with potted Monstera and Parlour Palm plants.
         /// </summary>
         private static void DecorateCasaArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
@@ -249,8 +285,8 @@ namespace ColonQuest.EditorTools
                 Tilt(tileRB, -38f);
             }
 
-            // Large weathered wooden plank sign "TU CASA" mounted on the gable
-            DrawWoodenPlankSign(root, "TU CASA", new Vector2(gableX, fh + 0.68f), 3.3f, 0.88f, 10);
+            // Large weathered wooden plank sign "CASA DE MAMÁ" mounted on the gable
+            DrawWoodenPlankSign(root, "CASA DE MAMÁ", new Vector2(gableX, fh + 0.68f), 4.4f, 0.88f, 10);
 
             // Potted Monstera deliciosa & Parlour Palms in terracotta pots flanking the house and garden
             BuildMonsteraPot(root, new Vector2(-3.55f, -0.15f), 1.05f, 12);
@@ -330,6 +366,427 @@ namespace ColonQuest.EditorTools
             // Wooden produce display crates flanking the storefront entrance (non-blocking visual props)
             BuildProduceCrate(root, new Vector2(dx - 2.35f, -0.05f), new Vector2(1.75f, 0.95f), true, 12);
             BuildProduceCrate(root, new Vector2(dx + 2.15f, -0.05f), new Vector2(1.85f, 1.05f), false, 12);
+        }
+
+        /// <summary>
+        /// Transforms "INMOBILIARIA" into a contemporary real estate office:
+        /// corporate teal and gold signplate with house emblems, commercial glass entrance door,
+        /// large storefront showcase windows displaying architectural house floor plans and property listing cards,
+        /// and manicured spherical topiary shrub planters flanking the facade.
+        /// </summary>
+        private static void DecorateInmobiliariaArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
+        {
+            // Corporate Teal & Gold Signplate
+            float signY = fh + 0.62f;
+            Shape(root, "Sign_Shadow", roundedSmall, new Vector2(dx, signY - 0.05f), new Vector2(4.8f, 0.90f), new Color(0f, 0f, 0f, 0.32f), 9);
+            Shape(root, "Sign_Outline", roundedSmall, new Vector2(dx, signY), new Vector2(4.8f, 0.86f), GamePalette.Outline, 10);
+            Shape(root, "Sign_Back", roundedSmall, new Vector2(dx, signY), new Vector2(4.64f, 0.70f), GamePalette.Hex("#1A5A65"), 11);
+            Shape(root, "Sign_GoldBezel", roundedSmall, new Vector2(dx, signY), new Vector2(4.44f, 0.52f), GamePalette.Hex("#D4AF37"), 12);
+            Shape(root, "Sign_Face", roundedSmall, new Vector2(dx, signY), new Vector2(4.30f, 0.40f), GamePalette.Hex("#226E7C"), 13);
+            Label(root, "INMOBILIARIA", new Vector2(dx, signY), GamePalette.Hex("#FFFBF0"), 0.038f, TextAnchor.MiddleCenter, 15);
+
+            // Mini gold house emblems flanking the text
+            foreach (float side in new[] { -1.65f, 1.65f })
+            {
+                if (triangle != null)
+                {
+                    Shape(root, "HouseIcon_Roof", triangle, new Vector2(dx + side, signY + 0.07f), new Vector2(0.36f, 0.22f), GamePalette.Hex("#FFD23F"), 14);
+                }
+                Shape(root, "HouseIcon_Body", square, new Vector2(dx + side, signY - 0.06f), new Vector2(0.24f, 0.16f), GamePalette.Hex("#FFD23F"), 14);
+                Shape(root, "HouseIcon_Door", square, new Vector2(dx + side, signY - 0.09f), new Vector2(0.08f, 0.10f), GamePalette.Hex("#1A5A65"), 15);
+            }
+
+            // Commercial Glass Entrance Door at dx
+            Shape(root, "Step_Outline", roundedSmall, new Vector2(dx, 0.10f), new Vector2(2.10f, 0.26f), GamePalette.Outline, 5);
+            Shape(root, "Step", roundedSmall, new Vector2(dx, 0.10f), new Vector2(1.98f, 0.18f), GamePalette.Hex("#CBD5E1"), 5);
+            Shape(root, "WelcomeMat_Out", roundedSmall, new Vector2(dx, -0.08f), new Vector2(1.36f, 0.32f), GamePalette.Outline, 5);
+            Shape(root, "WelcomeMat", roundedSmall, new Vector2(dx, -0.08f), new Vector2(1.22f, 0.22f), GamePalette.Hex("#1A5A65"), 5);
+
+            Shape(root, "DoorFrame_Out", roundedSmall, new Vector2(dx, 1.10f), new Vector2(1.64f, 2.16f), GamePalette.Outline, 5);
+            Shape(root, "DoorFrame", roundedSmall, new Vector2(dx, 1.10f), new Vector2(1.50f, 2.02f), GamePalette.Hex("#2C3E50"), 6);
+            Shape(root, "DoorGlass_Out", roundedSmall, new Vector2(dx, 1.10f), new Vector2(1.30f, 1.84f), GamePalette.Outline, 6);
+            Shape(root, "DoorGlass", roundedSmall, new Vector2(dx, 1.10f), new Vector2(1.20f, 1.74f), GamePalette.Hex("#8EC5DF"), 7);
+            Shape(root, "DoorKickplate", square, new Vector2(dx, 0.38f), new Vector2(1.20f, 0.36f), GamePalette.Hex("#2A7F8C"), 8);
+            Shape(root, "DoorTransom", square, new Vector2(dx, 1.68f), new Vector2(1.20f, 0.06f), GamePalette.Hex("#2C3E50"), 8);
+            Shape(root, "DoorHandle_Out", roundedSmall, new Vector2(dx + 0.42f, 1.05f), new Vector2(0.12f, 0.58f), GamePalette.Outline, 8);
+            Shape(root, "DoorHandle", roundedSmall, new Vector2(dx + 0.42f, 1.05f), new Vector2(0.06f, 0.52f), GamePalette.Hex("#E2E8F0"), 9);
+            var dShine = Shape(root, "DoorShine", roundedSmall, new Vector2(dx - 0.16f, 1.25f), new Vector2(0.18f, 1.10f), new Color(1f, 1f, 1f, 0.42f), 8);
+            Tilt(dShine, -20f);
+
+            // Large Vitrinas / Showcase Windows flanking the door
+            foreach (float side in new[] { -2.75f, 2.75f })
+            {
+                float wx = dx + side;
+                Shape(root, "Vitrina_Out", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.54f, 1.54f), GamePalette.Outline, 5);
+                Shape(root, "Vitrina_Frame", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.40f, 1.40f), GamePalette.Hex("#2C3E50"), 6);
+                Shape(root, "Vitrina_Glass", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.24f, 1.24f), GamePalette.Hex("#96CCE3"), 7);
+
+                var vitShine = Shape(root, "Vitrina_Shine", roundedSmall, new Vector2(wx - 0.45f, 1.75f), new Vector2(0.24f, 0.85f), new Color(1f, 1f, 1f, 0.45f), 9);
+                Tilt(vitShine, -20f);
+            }
+
+            // Left Window (dx - 2.75f): Architectural House Blueprint Floor Plan + Listing
+            float leftWx = dx - 2.75f;
+            Shape(root, "Blueprint_Sheet", roundedSmall, new Vector2(leftWx - 0.42f, 1.58f), new Vector2(1.05f, 0.90f), GamePalette.Hex("#1E4A84"), 8);
+            Shape(root, "BP_RoomA", square, new Vector2(leftWx - 0.62f, 1.72f), new Vector2(0.40f, 0.36f), new Color(0.85f, 0.95f, 1f, 0.75f), 9);
+            Shape(root, "BP_RoomB", square, new Vector2(leftWx - 0.22f, 1.72f), new Vector2(0.32f, 0.36f), new Color(0.85f, 0.95f, 1f, 0.75f), 9);
+            Shape(root, "BP_RoomC", square, new Vector2(leftWx - 0.42f, 1.42f), new Vector2(0.72f, 0.28f), new Color(0.85f, 0.95f, 1f, 0.75f), 9);
+            Shape(root, "BP_Pin", circle, new Vector2(leftWx - 0.42f, 1.98f), Vector2.one * 0.10f, GamePalette.Hex("#E8453C"), 10);
+
+            Shape(root, "PropCard1_Out", roundedSmall, new Vector2(leftWx + 0.52f, 1.58f), new Vector2(0.68f, 0.84f), GamePalette.Outline, 8);
+            Shape(root, "PropCard1", roundedSmall, new Vector2(leftWx + 0.52f, 1.58f), new Vector2(0.62f, 0.78f), Color.white, 9);
+            Shape(root, "PropCard1_Header", square, new Vector2(leftWx + 0.52f, 1.84f), new Vector2(0.56f, 0.16f), GamePalette.Hex("#2E7D32"), 10);
+            Shape(root, "PropCard1_Photo", square, new Vector2(leftWx + 0.52f, 1.56f), new Vector2(0.52f, 0.28f), GamePalette.Hex("#8AB8D0"), 10);
+            Shape(root, "PropCard1_Line", square, new Vector2(leftWx + 0.52f, 1.32f), new Vector2(0.46f, 0.05f), GamePalette.Hex("#475569"), 10);
+            Shape(root, "PropCard1_Pin", circle, new Vector2(leftWx + 0.52f, 1.94f), Vector2.one * 0.08f, GamePalette.Hex("#FFD23F"), 11);
+
+            // Right Window (dx + 2.75f): Property Listings
+            float rightWx = dx + 2.75f;
+            Shape(root, "PropCard2_Out", roundedSmall, new Vector2(rightWx - 0.46f, 1.58f), new Vector2(0.72f, 0.88f), GamePalette.Outline, 8);
+            Shape(root, "PropCard2", roundedSmall, new Vector2(rightWx - 0.46f, 1.58f), new Vector2(0.66f, 0.82f), Color.white, 9);
+            Shape(root, "PropCard2_Header", square, new Vector2(rightWx - 0.46f, 1.86f), new Vector2(0.58f, 0.16f), GamePalette.Hex("#DC2626"), 10);
+            Shape(root, "PropCard2_Photo", square, new Vector2(rightWx - 0.46f, 1.56f), new Vector2(0.54f, 0.30f), GamePalette.Hex("#F4B266"), 10);
+            Shape(root, "PropCard2_Line", square, new Vector2(rightWx - 0.46f, 1.30f), new Vector2(0.48f, 0.05f), GamePalette.Hex("#475569"), 10);
+            Shape(root, "PropCard2_Pin", circle, new Vector2(rightWx - 0.46f, 1.95f), Vector2.one * 0.08f, GamePalette.Hex("#E8453C"), 11);
+
+            Shape(root, "PropCard3_Out", roundedSmall, new Vector2(rightWx + 0.46f, 1.58f), new Vector2(0.72f, 0.88f), GamePalette.Outline, 8);
+            Shape(root, "PropCard3", roundedSmall, new Vector2(rightWx + 0.46f, 1.58f), new Vector2(0.66f, 0.82f), Color.white, 9);
+            Shape(root, "PropCard3_Header", square, new Vector2(rightWx + 0.46f, 1.86f), new Vector2(0.58f, 0.16f), GamePalette.Hex("#2563EB"), 10);
+            Shape(root, "PropCard3_Photo", square, new Vector2(rightWx + 0.46f, 1.56f), new Vector2(0.54f, 0.30f), GamePalette.Hex("#8AB8D0"), 10);
+            Shape(root, "PropCard3_Line", square, new Vector2(rightWx + 0.46f, 1.30f), new Vector2(0.48f, 0.05f), GamePalette.Hex("#475569"), 10);
+            Shape(root, "PropCard3_Pin", circle, new Vector2(rightWx + 0.46f, 1.95f), Vector2.one * 0.08f, GamePalette.Hex("#FFD23F"), 11);
+
+            // Modern Topiary Shrub Planters
+            foreach (float side in new[] { -4.35f, 4.35f })
+            {
+                float px = dx + side;
+                Shape(root, "Topiary_PlanterOut", roundedSmall, new Vector2(px, 0.28f), new Vector2(0.82f, 0.54f), GamePalette.Outline, 8);
+                Shape(root, "Topiary_Planter", roundedSmall, new Vector2(px, 0.28f), new Vector2(0.72f, 0.44f), GamePalette.Hex("#CBD5E1"), 9);
+                Shape(root, "Topiary_Soil", roundedSmall, new Vector2(px, 0.46f), new Vector2(0.64f, 0.14f), GamePalette.Hex("#473223"), 10);
+                Shape(root, "Topiary_BushOut", circle, new Vector2(px, 0.82f), Vector2.one * 0.78f, GamePalette.Outline, 11);
+                Shape(root, "Topiary_Bush", circle, new Vector2(px, 0.82f), Vector2.one * 0.70f, GamePalette.Hex("#2E7D32"), 12);
+                Shape(root, "Topiary_BushHi", circle, new Vector2(px - 0.08f, 0.90f), Vector2.one * 0.40f, GamePalette.Hex("#4CAF50"), 13);
+            }
+        }
+
+        /// <summary>
+        /// Transforms "AGENCIA DE CARROS" (Autos Don Chepe) into an energetic automotive dealership:
+        /// chrome marquee signplate with bold red inlay, festive pennant bunting strung along the eave,
+        /// industrial garage door with yellow/black hazard warning stripes, wide showroom plate-glass windows
+        /// showcasing promotional deal badges and vehicle silhouettes, and stacked auto tires.
+        /// </summary>
+        private static void DecorateAgenciaArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
+        {
+            // Dealership Chrome Marquee Signplate for "AUTOS DON CHEPE"
+            float signY = fh + 0.62f;
+            Shape(root, "AgencySign_Shadow", roundedSmall, new Vector2(dx, signY - 0.05f), new Vector2(5.8f, 0.96f), new Color(0f, 0f, 0f, 0.35f), 9);
+            Shape(root, "AgencySign_Out", roundedSmall, new Vector2(dx, signY), new Vector2(5.8f, 0.92f), GamePalette.Outline, 10);
+            Shape(root, "AgencySign_Chrome", roundedSmall, new Vector2(dx, signY), new Vector2(5.64f, 0.76f), GamePalette.Hex("#E5E7EB"), 11);
+            Shape(root, "AgencySign_RedInlay", roundedSmall, new Vector2(dx, signY), new Vector2(5.38f, 0.56f), GamePalette.Hex("#B91C1C"), 12);
+            Shape(root, "AgencySign_Face", roundedSmall, new Vector2(dx, signY), new Vector2(5.24f, 0.44f), GamePalette.Hex("#DC2626"), 13);
+            Label(root, "AUTOS DON CHEPE", new Vector2(dx, signY), Color.white, 0.040f, TextAnchor.MiddleCenter, 15);
+
+            // Metallic bolt studs on sign
+            foreach (float bx in new[] { dx - 2.58f, dx + 2.58f })
+            {
+                Shape(root, "AgencySign_Bolt", circle, new Vector2(bx, signY), Vector2.one * 0.16f, GamePalette.Hex("#CBD5E1"), 14);
+                Shape(root, "AgencySign_BoltDot", circle, new Vector2(bx, signY), Vector2.one * 0.08f, GamePalette.Hex("#374151"), 15);
+            }
+
+            // Dealership Festive Pennant Bunting (Banderines Triangulares de Concesionario)
+            if (triangle != null)
+            {
+                string[] pennantColors = { "#DC2626", "#FFFFFF", "#FBBF24", "#2563EB", "#1F2937" };
+                float pennantY = fh - 0.06f;
+                Shape(root, "PennantCable", square, new Vector2(0f, pennantY + 0.08f), new Vector2(w + 0.4f, 0.03f), GamePalette.Outline, 9);
+                int pCount = 13;
+                float pSpan = (w - 1.2f) / (pCount - 1);
+                for (int i = 0; i < pCount; i++)
+                {
+                    float px = -w * 0.5f + 0.6f + i * pSpan;
+                    string col = pennantColors[i % pennantColors.Length];
+                    var pennantOut = Shape(root, "Pennant_Out", triangle, new Vector2(px, pennantY - 0.06f), new Vector2(0.42f, 0.36f), GamePalette.Outline, 9);
+                    var pennant = Shape(root, "Pennant", triangle, new Vector2(px, pennantY - 0.06f), new Vector2(0.34f, 0.28f), GamePalette.Hex(col), 10);
+                    Tilt(pennantOut, 180f);
+                    Tilt(pennant, 180f);
+                }
+            }
+
+            // Enhanced Industrial Roller Garage Door
+            float hazardY = 0.08f;
+            Shape(root, "HazardBase_Out", roundedSmall, new Vector2(dx, hazardY), new Vector2(3.18f, 0.24f), GamePalette.Outline, 8);
+            Shape(root, "HazardBase", roundedSmall, new Vector2(dx, hazardY), new Vector2(3.08f, 0.18f), GamePalette.Hex("#1F2937"), 9);
+            for (float hx = dx - 1.35f; hx <= dx + 1.35f; hx += 0.38f)
+            {
+                var stripe = Shape(root, "HazardStripe", square, new Vector2(hx, hazardY), new Vector2(0.18f, 0.18f), GamePalette.Hex("#FBBF24"), 10);
+                Tilt(stripe, 30f);
+            }
+            Shape(root, "GarageLintel_Out", roundedSmall, new Vector2(dx, 2.15f), new Vector2(3.26f, 0.22f), GamePalette.Outline, 8);
+            Shape(root, "GarageLintel", roundedSmall, new Vector2(dx, 2.15f), new Vector2(3.16f, 0.14f), GamePalette.Hex("#475569"), 9);
+            Shape(root, "GarageHandle_Out", roundedSmall, new Vector2(dx, 0.32f), new Vector2(0.52f, 0.14f), GamePalette.Outline, 8);
+            Shape(root, "GarageHandle", roundedSmall, new Vector2(dx, 0.32f), new Vector2(0.44f, 0.08f), GamePalette.Hex("#E2E8F0"), 9);
+
+            // Showroom Panoramic Plate Glass Windows flanking the garage
+            foreach (float side in new[] { -4.5f, 4.5f })
+            {
+                float wx = dx + side;
+                Shape(root, "Showroom_Out", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.74f, 1.54f), GamePalette.Outline, 5);
+                Shape(root, "Showroom_Frame", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.60f, 1.40f), GamePalette.Hex("#374151"), 6);
+                Shape(root, "Showroom_Glass", roundedSmall, new Vector2(wx, 1.58f), new Vector2(2.44f, 1.24f), GamePalette.Hex("#90C4DC"), 7);
+
+                var sShine = Shape(root, "Showroom_Shine", roundedSmall, new Vector2(wx - 0.5f, 1.76f), new Vector2(0.26f, 0.82f), new Color(1f, 1f, 1f, 0.45f), 9);
+                Tilt(sShine, -20f);
+            }
+
+            // Left Window: Dealership Starburst Sticker & Car Silhouette
+            float lWx = dx - 4.5f;
+            Shape(root, "DealBadge_Out", circle, new Vector2(lWx - 0.45f, 1.58f), Vector2.one * 0.72f, GamePalette.Outline, 8);
+            Shape(root, "DealBadge_Gold", circle, new Vector2(lWx - 0.45f, 1.58f), Vector2.one * 0.66f, GamePalette.Hex("#FBBF24"), 9);
+            Shape(root, "DealBadge_Red", circle, new Vector2(lWx - 0.45f, 1.58f), Vector2.one * 0.54f, GamePalette.Hex("#DC2626"), 10);
+            Label(root, "0%", new Vector2(lWx - 0.45f, 1.68f), Color.white, 0.034f, TextAnchor.MiddleCenter, 11);
+            Label(root, "PRIMA", new Vector2(lWx - 0.45f, 1.48f), GamePalette.Hex("#FDE68A"), 0.024f, TextAnchor.MiddleCenter, 11);
+
+            Shape(root, "ShowroomCar_Cabin", roundedSmall, new Vector2(lWx + 0.48f, 1.62f), new Vector2(0.65f, 0.38f), GamePalette.Hex("#1E293B"), 8);
+            Shape(root, "ShowroomCar_Body", roundedSmall, new Vector2(lWx + 0.48f, 1.44f), new Vector2(1.05f, 0.32f), GamePalette.Hex("#2563EB"), 8);
+            Shape(root, "ShowroomCar_WheelL", circle, new Vector2(lWx + 0.22f, 1.30f), Vector2.one * 0.20f, GamePalette.Hex("#0F172A"), 9);
+            Shape(root, "ShowroomCar_WheelR", circle, new Vector2(lWx + 0.74f, 1.30f), Vector2.one * 0.20f, GamePalette.Hex("#0F172A"), 9);
+
+            // Right Window: Dealership Warranty Poster & Spec Sheet
+            float rWx = dx + 4.5f;
+            Shape(root, "SpecPoster_Out", roundedSmall, new Vector2(rWx, 1.58f), new Vector2(1.25f, 0.95f), GamePalette.Outline, 8);
+            Shape(root, "SpecPoster_Card", roundedSmall, new Vector2(rWx, 1.58f), new Vector2(1.18f, 0.88f), Color.white, 9);
+            Shape(root, "SpecPoster_Header", square, new Vector2(rWx, 1.88f), new Vector2(1.08f, 0.18f), GamePalette.Hex("#DC2626"), 10);
+            Label(root, "GARANTIA 100%", new Vector2(rWx, 1.88f), Color.white, 0.022f, TextAnchor.MiddleCenter, 11);
+            for (int li = 0; li < 3; li++)
+            {
+                Shape(root, "SpecLine", square, new Vector2(rWx, 1.68f - li * 0.14f), new Vector2(0.96f, 0.04f), GamePalette.Hex("#64748B"), 10);
+            }
+
+            // Stack of 3 racing/auto tires on far left
+            float tireX = -w * 0.46f;
+            for (int ti = 0; ti < 3; ti++)
+            {
+                float ty = 0.22f + ti * 0.28f;
+                Shape(root, "Tire_Out", roundedSmall, new Vector2(tireX, ty), new Vector2(0.82f, 0.28f), GamePalette.Outline, 11);
+                Shape(root, "Tire_Rubber", roundedSmall, new Vector2(tireX, ty), new Vector2(0.74f, 0.22f), GamePalette.Hex("#1F2937"), 12);
+                Shape(root, "Tire_Rim", roundedSmall, new Vector2(tireX, ty), new Vector2(0.42f, 0.10f), GamePalette.Hex("#9CA3AF"), 13);
+            }
+        }
+
+        /// <summary>
+        /// Transforms "HOSPITAL" into a modern public clinical facility:
+        /// backlit medical lightbox sign with red cross emblems, horizontal architectural belt molding dividing floors,
+        /// upper floor clinical ribbon windows flanking a prominent central raised medical emblem disc,
+        /// ground floor observation windows with privacy frosted cross decals, automatic double sliding glass doors,
+        /// pulsing red emergency beacon lamp over the entrance, and rooftop industrial HVAC ventilation equipment.
+        /// </summary>
+        private static void DecorateHospitalArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
+        {
+            // Backlit Medical Lightbox Sign for "HOSPITAL"
+            float signY = fh + 0.62f;
+            Shape(root, "HospSign_Shadow", roundedSmall, new Vector2(dx, signY - 0.05f), new Vector2(4.6f, 0.88f), new Color(0f, 0f, 0f, 0.32f), 9);
+            Shape(root, "HospSign_Out", roundedSmall, new Vector2(dx, signY), new Vector2(4.6f, 0.82f), GamePalette.Outline, 10);
+            Shape(root, "HospSign_Box", roundedSmall, new Vector2(dx, signY), new Vector2(4.44f, 0.68f), GamePalette.Hex("#1E293B"), 11);
+            Shape(root, "HospSign_Face", roundedSmall, new Vector2(dx, signY), new Vector2(4.28f, 0.54f), Color.white, 12);
+            Label(root, "HOSPITAL", new Vector2(dx, signY), GamePalette.Hex("#0F172A"), 0.040f, TextAnchor.MiddleCenter, 15);
+
+            foreach (float side in new[] { -1.68f, 1.68f })
+            {
+                Shape(root, "SignCrossH", square, new Vector2(dx + side, signY), new Vector2(0.36f, 0.12f), GamePalette.Hex("#DC2626"), 14);
+                Shape(root, "SignCrossV", square, new Vector2(dx + side, signY), new Vector2(0.12f, 0.36f), GamePalette.Hex("#DC2626"), 14);
+            }
+
+            // Horizontal belt cornice dividing floor 1 and floor 2
+            float beltY = 2.70f;
+            Shape(root, "Belt_Shadow", square, new Vector2(0f, beltY - 0.10f), new Vector2(w + 0.08f, 0.08f), new Color(0f, 0f, 0f, 0.25f), 4);
+            Shape(root, "Belt_Out", roundedSmall, new Vector2(0f, beltY), new Vector2(w + 0.12f, 0.18f), GamePalette.Outline, 4);
+            Shape(root, "Belt_Molding", roundedSmall, new Vector2(0f, beltY), new Vector2(w + 0.04f, 0.12f), GamePalette.Hex("#CBD5E1"), 5);
+
+            // UPPER FLOOR (2nd Story) - Clinical Ribbon Windows & Raised Hospital Emblem
+            float emblemY = 4.25f;
+            Shape(root, "Emblem_Shadow", circle, new Vector2(0f, emblemY - 0.06f), Vector2.one * 1.76f, new Color(0f, 0f, 0f, 0.30f), 5);
+            Shape(root, "Emblem_Out", circle, new Vector2(0f, emblemY), Vector2.one * 1.72f, GamePalette.Outline, 5);
+            Shape(root, "Emblem_SilverRim", circle, new Vector2(0f, emblemY), Vector2.one * 1.58f, GamePalette.Hex("#CBD5E1"), 6);
+            Shape(root, "Emblem_Porcelain", circle, new Vector2(0f, emblemY), Vector2.one * 1.38f, Color.white, 7);
+
+            Shape(root, "MedCrossH_Out", roundedSmall, new Vector2(0f, emblemY), new Vector2(1.06f, 0.40f), GamePalette.Outline, 8);
+            Shape(root, "MedCrossH", roundedSmall, new Vector2(0f, emblemY), new Vector2(0.96f, 0.32f), GamePalette.Hex("#DC2626"), 9);
+            Shape(root, "MedCrossV_Out", roundedSmall, new Vector2(0f, emblemY), new Vector2(0.40f, 1.06f), GamePalette.Outline, 8);
+            Shape(root, "MedCrossV", roundedSmall, new Vector2(0f, emblemY), new Vector2(0.32f, 0.96f), GamePalette.Hex("#DC2626"), 9);
+
+            foreach (float side in new[] { -3.2f, 3.2f })
+            {
+                float wx = dx + side;
+                Shape(root, "RibbonWin_Out", roundedSmall, new Vector2(wx, 4.25f), new Vector2(2.15f, 1.35f), GamePalette.Outline, 5);
+                Shape(root, "RibbonWin_Frame", roundedSmall, new Vector2(wx, 4.25f), new Vector2(2.02f, 1.22f), GamePalette.Hex("#CBD5E1"), 6);
+                Shape(root, "RibbonWin_Glass", roundedSmall, new Vector2(wx, 4.25f), new Vector2(1.88f, 1.08f), GamePalette.Hex("#82BAD8"), 7);
+
+                for (int li = -1; li <= 1; li++)
+                {
+                    Shape(root, "RibbonWin_Louver", square, new Vector2(wx, 4.25f + li * 0.28f), new Vector2(1.84f, 0.04f), GamePalette.Hex("#E2E8F0"), 8);
+                }
+
+                var rShine = Shape(root, "RibbonWin_Shine", roundedSmall, new Vector2(wx - 0.40f, 4.45f), new Vector2(0.20f, 0.70f), new Color(1f, 1f, 1f, 0.45f), 9);
+                Tilt(rShine, -20f);
+            }
+
+            // GROUND FLOOR - Clinical Observation Windows & Emergency Entrance
+            foreach (float side in new[] { -2.85f, 2.85f })
+            {
+                float wx = dx + side;
+                Shape(root, "HospWin_Out", roundedSmall, new Vector2(wx, 1.52f), new Vector2(2.15f, 1.45f), GamePalette.Outline, 5);
+                Shape(root, "HospWin_Frame", roundedSmall, new Vector2(wx, 1.52f), new Vector2(2.02f, 1.32f), GamePalette.Hex("#CBD5E1"), 6);
+                Shape(root, "HospWin_Glass", roundedSmall, new Vector2(wx, 1.52f), new Vector2(1.88f, 1.18f), GamePalette.Hex("#99D5E8"), 7);
+
+                Shape(root, "HospWin_Frost", square, new Vector2(wx, 1.45f), new Vector2(1.88f, 0.50f), new Color(1f, 1f, 1f, 0.35f), 8);
+                Shape(root, "HospWin_CrossH", square, new Vector2(wx, 1.45f), new Vector2(0.42f, 0.12f), GamePalette.Hex("#DC2626"), 9);
+                Shape(root, "HospWin_CrossV", square, new Vector2(wx, 1.45f), new Vector2(0.12f, 0.42f), GamePalette.Hex("#DC2626"), 9);
+
+                var hwShine = Shape(root, "HospWin_Shine", roundedSmall, new Vector2(wx - 0.38f, 1.72f), new Vector2(0.20f, 0.75f), new Color(1f, 1f, 1f, 0.50f), 9);
+                Tilt(hwShine, -20f);
+            }
+
+            // Automatic Double Sliding Glass Entrance Doors
+            Shape(root, "Ramp_Out", roundedSmall, new Vector2(dx, 0.10f), new Vector2(2.35f, 0.28f), GamePalette.Outline, 5);
+            Shape(root, "Ramp", roundedSmall, new Vector2(dx, 0.10f), new Vector2(2.22f, 0.20f), GamePalette.Hex("#D1D5DB"), 5);
+
+            Shape(root, "AutoDoor_Out", roundedSmall, new Vector2(dx, 1.12f), new Vector2(2.00f, 2.18f), GamePalette.Outline, 5);
+            Shape(root, "AutoDoor_Frame", roundedSmall, new Vector2(dx, 1.12f), new Vector2(1.86f, 2.04f), GamePalette.Hex("#475569"), 6);
+
+            foreach (float side in new[] { -0.44f, 0.44f })
+            {
+                Shape(root, "DoorLeaf_Out", roundedSmall, new Vector2(dx + side, 1.10f), new Vector2(0.86f, 1.84f), GamePalette.Outline, 6);
+                Shape(root, "DoorLeaf_Glass", roundedSmall, new Vector2(dx + side, 1.10f), new Vector2(0.76f, 1.74f), GamePalette.Hex("#99D5E8"), 7);
+                Shape(root, "DoorCrossH", square, new Vector2(dx + side, 1.25f), new Vector2(0.32f, 0.10f), Color.white, 8);
+                Shape(root, "DoorCrossV", square, new Vector2(dx + side, 1.25f), new Vector2(0.10f, 0.32f), Color.white, 8);
+                Shape(root, "DoorRail", roundedSmall, new Vector2(dx + side * 0.28f, 1.10f), new Vector2(0.06f, 0.65f), GamePalette.Hex("#E2E8F0"), 8);
+            }
+            Shape(root, "DoorSensor_Out", roundedSmall, new Vector2(dx, 2.08f), new Vector2(1.84f, 0.18f), GamePalette.Outline, 8);
+            Shape(root, "DoorSensor", roundedSmall, new Vector2(dx, 2.08f), new Vector2(1.74f, 0.12f), GamePalette.Hex("#334155"), 9);
+
+            // Red Emergency Beacon Lamp (Luz de Emergencia)
+            float beaconY = 2.36f;
+            Shape(root, "Beacon_Bracket", square, new Vector2(dx, beaconY - 0.08f), new Vector2(0.18f, 0.12f), GamePalette.Hex("#1E293B"), 9);
+            Shape(root, "Beacon_Out", roundedSmall, new Vector2(dx, beaconY + 0.08f), new Vector2(0.36f, 0.38f), GamePalette.Outline, 10);
+            Shape(root, "Beacon_Dome", roundedSmall, new Vector2(dx, beaconY + 0.08f), new Vector2(0.28f, 0.30f), GamePalette.Hex("#DC2626"), 11);
+            Shape(root, "Beacon_Core", circle, new Vector2(dx - 0.04f, beaconY + 0.12f), Vector2.one * 0.12f, Color.white, 12);
+            Flickering(Glow(root, "BeaconGlow", new Vector2(dx, beaconY + 0.08f), 2.2f, "#EF4444", 0.35f, 13), 0.15f, 1.6f, dx + 1.7f);
+
+            // Rooftop Industrial HVAC Ventilation Unit
+            float hvacX = 3.2f;
+            float hvacY = h - 0.38f;
+            Shape(root, "HVAC_Shadow", roundedSmall, new Vector2(hvacX, hvacY - 0.06f), new Vector2(1.68f, 0.88f), new Color(0f, 0f, 0f, 0.35f), 6);
+            Shape(root, "HVAC_Out", roundedSmall, new Vector2(hvacX, hvacY), new Vector2(1.68f, 0.84f), GamePalette.Outline, 7);
+            Shape(root, "HVAC_Body", roundedSmall, new Vector2(hvacX, hvacY), new Vector2(1.56f, 0.72f), GamePalette.Hex("#94A3B8"), 8);
+            Shape(root, "HVAC_FanOut", circle, new Vector2(hvacX - 0.35f, hvacY), Vector2.one * 0.54f, GamePalette.Outline, 9);
+            Shape(root, "HVAC_Fan", circle, new Vector2(hvacX - 0.35f, hvacY), Vector2.one * 0.46f, GamePalette.Hex("#475569"), 10);
+            Shape(root, "HVAC_GrillH", square, new Vector2(hvacX - 0.35f, hvacY), new Vector2(0.42f, 0.06f), GamePalette.Hex("#1E293B"), 11);
+            Shape(root, "HVAC_GrillV", square, new Vector2(hvacX - 0.35f, hvacY), new Vector2(0.06f, 0.42f), GamePalette.Hex("#1E293B"), 11);
+            for (int vi = -1; vi <= 1; vi++)
+            {
+                Shape(root, "HVAC_Louver", square, new Vector2(hvacX + 0.38f, hvacY + vi * 0.16f), new Vector2(0.50f, 0.05f), GamePalette.Hex("#334155"), 9);
+            }
+        }
+
+        /// <summary>
+        /// Transforms "COMISARIA" (Policía) into a reinforced law enforcement precinct:
+        /// official navy and gold police signplate with law enforcement star badges,
+        /// heavy reinforced steel door with perimeter steel rivets and armored barred peep slit,
+        /// pulsing blue police beacon siren mounted over the entrance, gold star badge shield emblem,
+        /// reinforced security barred windows with heavy stone sills, and a CCTV surveillance camera under the eave.
+        /// </summary>
+        private static void DecorateComisariaArchitecture(Transform root, float w, float fh, float h, float dx, Color wall, Color roof)
+        {
+            // Official Navy & Gold Police Precinct Signplate
+            float signY = fh + 0.62f;
+            Shape(root, "PoliceSign_Shadow", roundedSmall, new Vector2(dx, signY - 0.05f), new Vector2(4.8f, 0.90f), new Color(0f, 0f, 0f, 0.35f), 9);
+            Shape(root, "PoliceSign_Out", roundedSmall, new Vector2(dx, signY), new Vector2(4.8f, 0.86f), GamePalette.Outline, 10);
+            Shape(root, "PoliceSign_Navy", roundedSmall, new Vector2(dx, signY), new Vector2(4.64f, 0.70f), GamePalette.Hex("#0F2942"), 11);
+            Shape(root, "PoliceSign_GoldBezel", roundedSmall, new Vector2(dx, signY), new Vector2(4.40f, 0.52f), GamePalette.Hex("#D4AF37"), 12);
+            Shape(root, "PoliceSign_Face", roundedSmall, new Vector2(dx, signY), new Vector2(4.26f, 0.40f), GamePalette.Hex("#1A3A5C"), 13);
+            Label(root, "POLICÍA", new Vector2(dx, signY), GamePalette.Hex("#FFFDF0"), 0.040f, TextAnchor.MiddleCenter, 15);
+
+            foreach (float side in new[] { -1.55f, 1.55f })
+            {
+                Shape(root, "BadgeStar_Disc", circle, new Vector2(dx + side, signY), Vector2.one * 0.32f, GamePalette.Hex("#D4AF37"), 14);
+                Shape(root, "BadgeStar_Dot", circle, new Vector2(dx + side, signY), Vector2.one * 0.14f, GamePalette.Hex("#0F2942"), 15);
+            }
+
+            // Heavy Reinforced Steel Police Door at dx
+            Shape(root, "Step_Out", roundedSmall, new Vector2(dx, 0.10f), new Vector2(1.95f, 0.24f), GamePalette.Outline, 5);
+            Shape(root, "Step", roundedSmall, new Vector2(dx, 0.10f), new Vector2(1.85f, 0.16f), GamePalette.Hex("#64748B"), 5);
+
+            Shape(root, "PDoor_Out", roundedSmall, new Vector2(dx, 1.08f), new Vector2(1.58f, 2.14f), GamePalette.Outline, 5);
+            Shape(root, "PDoor_Frame", roundedSmall, new Vector2(dx, 1.08f), new Vector2(1.44f, 2.00f), GamePalette.Hex("#334155"), 6);
+            Shape(root, "PDoor_Leaf", roundedSmall, new Vector2(dx, 1.08f), new Vector2(1.28f, 1.86f), GamePalette.Hex("#1E293B"), 7);
+
+            for (int ri = 0; ri < 6; ri++)
+            {
+                float ry = 0.35f + ri * 0.28f;
+                Shape(root, "RivetL", circle, new Vector2(dx - 0.52f, ry), Vector2.one * 0.08f, GamePalette.Hex("#94A3B8"), 8);
+                Shape(root, "RivetR", circle, new Vector2(dx + 0.52f, ry), Vector2.one * 0.08f, GamePalette.Hex("#94A3B8"), 8);
+            }
+
+            // Armored View Slit
+            Shape(root, "Slit_Out", roundedSmall, new Vector2(dx, 1.52f), new Vector2(0.56f, 0.38f), GamePalette.Outline, 8);
+            Shape(root, "Slit_Frame", roundedSmall, new Vector2(dx, 1.52f), new Vector2(0.48f, 0.30f), GamePalette.Hex("#475569"), 9);
+            Shape(root, "Slit_Glass", roundedSmall, new Vector2(dx, 1.52f), new Vector2(0.38f, 0.22f), GamePalette.Hex("#0F172A"), 10);
+            Shape(root, "Slit_Bar", square, new Vector2(dx, 1.52f), new Vector2(0.04f, 0.22f), GamePalette.Hex("#94A3B8"), 11);
+
+            Shape(root, "PDoor_HandleOut", roundedSmall, new Vector2(dx + 0.40f, 1.02f), new Vector2(0.12f, 0.44f), GamePalette.Outline, 8);
+            Shape(root, "PDoor_Handle", roundedSmall, new Vector2(dx + 0.40f, 1.02f), new Vector2(0.06f, 0.38f), GamePalette.Hex("#E2E8F0"), 9);
+
+            // Blue Police Beacon Siren (Baliza Policial) directly over the entrance
+            float beaconY = 2.36f;
+            Shape(root, "Siren_Bracket", square, new Vector2(dx, beaconY - 0.08f), new Vector2(0.20f, 0.12f), GamePalette.Hex("#0F172A"), 11);
+            Shape(root, "Siren_Out", roundedSmall, new Vector2(dx, beaconY + 0.08f), new Vector2(0.38f, 0.42f), GamePalette.Outline, 12);
+            Shape(root, "Siren_Dome", roundedSmall, new Vector2(dx, beaconY + 0.08f), new Vector2(0.28f, 0.34f), GamePalette.Hex("#2563EB"), 13);
+            Shape(root, "Siren_Core", circle, new Vector2(dx - 0.04f, beaconY + 0.12f), Vector2.one * 0.14f, GamePalette.Hex("#BAE6FD"), 14);
+            Flickering(Glow(root, "SirenGlow", new Vector2(dx, beaconY + 0.08f), 2.4f, "#3B82F6", 0.35f, 15), 0.12f, 1.5f, dx + 2.5f);
+
+            // Official Police Shield Badge Emblem mounted above the door
+            float shieldY = 2.82f;
+            Shape(root, "Shield_Out", roundedSmall, new Vector2(dx, shieldY), new Vector2(0.92f, 1.08f), GamePalette.Outline, 11);
+            Shape(root, "Shield_Gold", roundedSmall, new Vector2(dx, shieldY), new Vector2(0.82f, 0.98f), GamePalette.Hex("#D4AF37"), 12);
+            Shape(root, "Shield_Navy", roundedSmall, new Vector2(dx, shieldY), new Vector2(0.68f, 0.84f), GamePalette.Hex("#0F2942"), 13);
+            Shape(root, "Shield_Star", circle, new Vector2(dx, shieldY), Vector2.one * 0.38f, GamePalette.Hex("#FBBF24"), 14);
+            Shape(root, "Shield_Dot", circle, new Vector2(dx, shieldY), Vector2.one * 0.14f, GamePalette.Hex("#0F2942"), 15);
+
+            // Barred Security Windows flanking the door
+            foreach (float side in new[] { -2.75f, 2.75f })
+            {
+                float wx = dx + side;
+                float wy = 1.62f;
+
+                Shape(root, "SecSill_Out", roundedSmall, new Vector2(wx, 0.90f), new Vector2(1.92f, 0.24f), GamePalette.Outline, 6);
+                Shape(root, "SecSill", roundedSmall, new Vector2(wx, 0.90f), new Vector2(1.82f, 0.16f), GamePalette.Hex("#94A3B8"), 7);
+
+                Shape(root, "SecWin_Out", roundedSmall, new Vector2(wx, wy), new Vector2(1.78f, 1.44f), GamePalette.Outline, 5);
+                Shape(root, "SecWin_Frame", roundedSmall, new Vector2(wx, wy), new Vector2(1.66f, 1.32f), GamePalette.Hex("#1E293B"), 6);
+                Shape(root, "SecWin_Glass", roundedSmall, new Vector2(wx, wy), new Vector2(1.50f, 1.18f), GamePalette.Hex("#64748B"), 7);
+
+                var secShine = Shape(root, "SecWin_Shine", roundedSmall, new Vector2(wx - 0.32f, wy + 0.18f), new Vector2(0.18f, 0.65f), new Color(1f, 1f, 1f, 0.30f), 8);
+                Tilt(secShine, -20f);
+
+                for (int bi = -2; bi <= 2; bi++)
+                {
+                    float bx = wx + bi * 0.28f;
+                    Shape(root, "SecBar_Out", square, new Vector2(bx, wy), new Vector2(0.09f, 1.28f), GamePalette.Outline, 8);
+                    Shape(root, "SecBar", square, new Vector2(bx, wy), new Vector2(0.05f, 1.26f), GamePalette.Hex("#1E293B"), 9);
+                    Shape(root, "SecBar_Hi", square, new Vector2(bx - 0.015f, wy), new Vector2(0.02f, 1.24f), GamePalette.Hex("#94A3B8"), 10);
+                }
+
+                Shape(root, "SecTie_Out", square, new Vector2(wx, wy), new Vector2(1.54f, 0.08f), GamePalette.Outline, 10);
+                Shape(root, "SecTie", square, new Vector2(wx, wy), new Vector2(1.52f, 0.04f), GamePalette.Hex("#334155"), 11);
+            }
+
+            // Security CCTV Camera mounted under the left roof eave
+            float camX = -w * 0.42f;
+            float camY = fh - 0.12f;
+            Shape(root, "CCTV_Mount", square, new Vector2(camX, camY + 0.08f), new Vector2(0.10f, 0.14f), GamePalette.Hex("#334155"), 12);
+            var cam = Shape(root, "CCTV_Body", roundedSmall, new Vector2(camX + 0.10f, camY), new Vector2(0.32f, 0.18f), GamePalette.Hex("#E2E8F0"), 13);
+            Tilt(cam, -25f);
+            Shape(root, "CCTV_LED", circle, new Vector2(camX + 0.22f, camY - 0.06f), Vector2.one * 0.06f, GamePalette.Hex("#DC2626"), 14);
         }
 
         private static void BuildProduceCrate(Transform root, Vector2 pos, Vector2 size, bool leftStyle, int order)
@@ -459,7 +916,7 @@ namespace ColonQuest.EditorTools
 
         private static void DrawEntrance(Transform root, BuildingSpec b, float dx, Color wall)
         {
-            if (b.Name == "Banco")
+            if (b.Name == "Banco" || b.Name == "Hospital" || b.Name == "Inmobiliaria" || b.Name == "Comisaria")
             {
                 return;
             }
@@ -507,9 +964,9 @@ namespace ColonQuest.EditorTools
 
         private static void DrawFacadeWindows(Transform root, BuildingSpec b, float w, float dx, Color wall)
         {
-            if (b.Name == "Banco")
+            if (b.Name == "Banco" || b.Name == "Hospital" || b.Name == "Comisaria" || b.Name == "Inmobiliaria" || b.Name == "AgenciaDeCarros")
             {
-                return; // Banco uses tall classical columns and double glass doors
+                return; // Custom storefronts and public landmark architecture
             }
 
             float offset = FacadeWindowOffset(b);

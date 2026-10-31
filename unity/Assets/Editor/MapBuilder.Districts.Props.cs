@@ -74,8 +74,6 @@ namespace ColonQuest.EditorTools
                 XMin = HospitalX - 5f, XMax = HospitalX + 5f, YBottom = HospitalY, YTop = HospitalY + 8.4f, DoorX = HospitalX, FacadeHeight = 5.6f, Entrance = Entrance.Door
             });
             Banner(hospital, "URGENCIAS", 0f, 5.6f + 1.4f, "#E8505B");
-            Shape(hospital, "CrossBar", square, new Vector2(4.2f, 3.9f), new Vector2(1.1f, 0.34f), GamePalette.Hex("#E8505B"), 6);
-            Shape(hospital, "CrossBar", square, new Vector2(4.2f, 3.9f), new Vector2(0.34f, 1.1f), GamePalette.Hex("#E8505B"), 6);
 
             // Two cars on show in front of the agency, on either side of the place where the player talks.
             Car(parent, shadows, 4f, 32f, "#E8505B");
