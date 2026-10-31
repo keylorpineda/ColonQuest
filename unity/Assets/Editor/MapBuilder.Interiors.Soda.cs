@@ -43,6 +43,14 @@ namespace ColonQuest.EditorTools
                 Deco(stools, "StoolRim", circle, x, -0.4f, 0.76f, 0.76f, "#8B251B", 1f, 7);
             }
 
+            // Customer seated at counter stool (right side, clear of service station)
+            BuildNpc(parts.People, "ClienteBarra", new Vector2(3.4f, -0.3f), new Look
+            {
+                Skin = "#F2C94C", Pants = "#2C3E50", Hat = Hat.Cap, HatColor = "#2A3342", Face = Expression.Smirk
+            }, true);
+            Deco(counter, "CoffeeStool", circle, 3.4f, 0.52f, 0.24f, 0.24f, "#FFFFFF", 1f, 9);
+            Deco(counter, "CoffeeStoolIn", circle, 3.4f, 0.52f, 0.16f, 0.16f, "#4A2E1B", 1f, 10);
+
             // Doña Lucía NPC behind the counter
             BuildNpc(parts.People, "DonaLucia", new Vector2(0f, 1.6f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#00A8A8" }, true);
 
@@ -75,21 +83,45 @@ namespace ColonQuest.EditorTools
             Deco(dining, "SauceBottleL", roundedSmall, -4.9f, -2.55f, 0.14f, 0.24f, "#6E4726", 1f, 9);
             Deco(dining, "SauceCapL", circle, -4.9f, -2.41f, 0.12f, 0.08f, "#2E8B57", 1f, 10);
             Deco(dining, "PlateL", circle, -5.65f, -2.6f, 0.36f, 0.36f, "#F8F5E8", 1f, 8);
+            Deco(dining, "FoodL", circle, -5.65f, -2.6f, 0.24f, 0.24f, "#8B5A3C", 1f, 9);
+            Deco(dining, "GlassL", roundedSmall, -5.85f, -2.3f, 0.15f, 0.24f, "#4DA3FF", 0.9f, 9);
+            Deco(dining, "CoffeeCupL4", circle, -5.2f, -3.05f, 0.24f, 0.24f, "#FFFFFF", 1f, 9);
+            Deco(dining, "CoffeeL4", circle, -5.2f, -3.05f, 0.16f, 0.16f, "#4A2E1B", 1f, 10);
+
             Solid(dining, "ChairL1", roundedSmall, -6.8f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairL2", roundedSmall, -3.6f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairL3", roundedSmall, -5.2f, -1.4f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairL4", roundedSmall, -5.2f, -3.8f, 0.7f, 0.7f, "#8B5A3C");
+
+            // Customers at Left Table
+            BuildNpc(parts.People, "ClienteMesa1", new Vector2(-6.8f, -2.5f), new Look
+            {
+                Skin = "#4DA3FF", Pants = "#2C3E50", Hair = HairStyle.Curly, Face = Expression.Smile
+            }, true);
+            BuildNpc(parts.People, "ClienteMesa2", new Vector2(-5.2f, -3.7f), new Look
+            {
+                Skin = "#E07A5F", Pants = "#3D4452", Hair = HairStyle.Side, Face = Expression.Warm
+            }, true);
 
             // Right Table
             Solid(dining, "TableRight", rounded, 5.2f, -2.6f, 2.2f, 1.4f, "#A67243");
             Deco(dining, "NapkinsR", roundedSmall, 5.2f, -2.6f, 0.35f, 0.35f, "#FFFFFF", 1f, 8);
             Deco(dining, "SauceBottleR", roundedSmall, 4.9f, -2.55f, 0.14f, 0.24f, "#6E4726", 1f, 9);
             Deco(dining, "SauceCapR", circle, 4.9f, -2.41f, 0.12f, 0.08f, "#2E8B57", 1f, 10);
-            Deco(dining, "PlateR", circle, 5.65f, -2.6f, 0.36f, 0.36f, "#F8F5E8", 1f, 8);
+            Deco(dining, "PlateR", circle, 4.55f, -2.6f, 0.38f, 0.38f, "#F8F5E8", 1f, 8);
+            Deco(dining, "FoodR", roundedSmall, 4.55f, -2.6f, 0.24f, 0.16f, "#E09A3E", 1f, 9);
+            Deco(dining, "GlassR", roundedSmall, 4.75f, -2.3f, 0.15f, 0.24f, "#E8505B", 0.9f, 9);
+
             Solid(dining, "ChairR1", roundedSmall, 3.6f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairR2", roundedSmall, 6.8f, -2.6f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairR3", roundedSmall, 5.2f, -1.4f, 0.7f, 0.7f, "#8B5A3C");
             Solid(dining, "ChairR4", roundedSmall, 5.2f, -3.8f, 0.7f, 0.7f, "#8B5A3C");
+
+            // Customer at Right Table
+            BuildNpc(parts.People, "ClienteMesa3", new Vector2(3.6f, -2.5f), new Look
+            {
+                Skin = "#56CCF2", Pants = "#2C3E50", Hair = HairStyle.Ponytail, Face = Expression.Smile
+            }, true);
 
             // Warm diner lighting
             foreach (var at in new[] { new Vector2(-5f, 2f), new Vector2(5f, 2f), new Vector2(0f, -2.5f) })
