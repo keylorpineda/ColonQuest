@@ -27,19 +27,23 @@ namespace ColonQuest.UI
 
         private void ShowCourses()
         {
+            var ina = Career.Course(CourseKind.Ina);
+            var una = Career.Course(CourseKind.Una);
+            var books = session.Loop.Courses;
+
+            string progressIna = books.Done(CourseKind.Ina) ? Loc.T("completado") : Loc.F("{0}/{1} tardes", books.Attended(CourseKind.Ina), ina.Afternoons);
+            string progressUna = books.Done(CourseKind.Una) ? Loc.T("completado") : Loc.F("{0}/{1} tardes", books.Attended(CourseKind.Una), una.Afternoons);
+
             var text = new StringBuilder();
-            text.AppendLine(Loc.T("Estudiar cuesta plata y tardes libres, pero abre mejores puestos en el trabajo."));
-            text.AppendLine();
-            text.AppendLine(Loc.F("Tienes {0} en efectivo.", Money.Format(session.State.Cash)));
-            text.AppendLine();
-            text.Append(Loc.T(MarketAssumptions.ShortDisclaimer));
+            text.AppendLine(Loc.F("• Horario de clases: de {0}:00 a {1}:00. Efectivo: {2}.", Career.AfternoonStartHour, Career.AfternoonEndHour, Money.Format(session.State.Cash)));
+            text.AppendLine(Loc.F("• INA ({0}, {1} tardes): abre cajero. UNA ({2}, {3} tardes): abre encargado.", Money.Format(ina.Price), ina.Afternoons, Money.Format(una.Price), una.Afternoons));
+            text.Append(Loc.F("• Tu avance: INA ({0}) · UNA ({1}).", progressIna, progressUna));
 
             var options = new List<ModalOption>();
             int index = 0;
             foreach (var course in Career.Courses)
             {
                 var info = course;
-                var books = session.Loop.Courses;
                 if (books.Done(info.Kind))
                 {
                     continue;
@@ -63,7 +67,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", index + 1)));
-            modal.Show(Loc.T("Cursos"), "INA  ·  UNA", text.ToString(), options, null, MarketFont, MarketBodyHeight);
+            modal.Show(Loc.T("Cursos"), "INA · CURSOS", text.ToString(), options, null, MarketFont, MarketBodyHeight);
         }
 
         private void TryClass(CourseInfo course)

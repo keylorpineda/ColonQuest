@@ -574,6 +574,12 @@ namespace ColonQuest.EditorTools
             // South row.
             House(parent, shadows, "Casa_Vecina_B", -43f, -37.5f, -8f, -3f, "#4D9DE0", "#F7E8D0");
             House(parent, shadows, "Casa_Vecina_C", -35.5f, -29.5f, -8f, -3f, "#E1BC29", "#FBE3C4");
+            Building(parent, shadows, new BuildingSpec
+            {
+                Name = "InaCursos", Sign = "INA · CURSOS", Roof = "#1D4F8C", Wall = "#F2E3C8",
+                XMin = -29.2f, XMax = -24.8f, YBottom = -8f, YTop = -2.6f, DoorX = -27.0f, FacadeHeight = 2.8f, Entrance = Entrance.Door,
+                AwningA = "#1D4F8C", AwningB = "#F8F5E8"
+            });
             YardSign(parent, shadows, -38.2f, -8.7f, "SE VENDE", "#E8505B");
 
             foreach (var spot in new[] { new Vector2(-26f, 8.8f), new Vector2(-44.4f, 14f), new Vector2(-39f, 14.5f), new Vector2(-33f, 15f), new Vector2(-27f, 14.5f), new Vector2(-28f, -3.2f), new Vector2(-44.4f, -3f) })
@@ -885,7 +891,7 @@ namespace ColonQuest.EditorTools
                 XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Door,
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
-            CoursesBoard(parent, -2.5f, 6.2f);
+            CoursesBoard(parent, -25.2f, -8.7f);
             Bench(parent, shadows, 17.8f, -23.2f);
         }
 
