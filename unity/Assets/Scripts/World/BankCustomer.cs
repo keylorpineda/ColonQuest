@@ -72,26 +72,36 @@ namespace ColonQuest.World
         /// <summary>The errands a customer can run, each from the door and back to it. Paths go around the furniture.</summary>
         public static List<Stop[]> Errands()
         {
+            // The roped queue is open at both ends: in by the left, along the front lane to the window, out by the right.
+            var aisle = new Vector2(1.6f, -3.0f);
+            var belowQueue = new Vector2(-4.4f, 0.2f);
             var queueIn = new Vector2(-4.6f, 1.8f);
             var queueTop = new Vector2(-4.6f, 3.0f);
-            var aisle = new Vector2(1.6f, -3.0f);
+            var outRight = new Vector2(4.4f, 3.0f);
+            var outDown = new Vector2(4.4f, 0.4f);
+            var pastTickets = new Vector2(-1.6f, -4.6f);
             return new List<Stop[]>
             {
                 // The cash machine.
                 new[] { new Stop(aisle), new Stop(new Vector2(9.9f, -2.6f), 4f, 8f), new Stop(aisle) },
 
                 // A window, after the queue: window 2 pays and window 4 takes deposits.
-                new[] { new Stop(aisle), new Stop(queueIn, 1f, 3f), new Stop(queueTop), new Stop(Window2, 5f, 10f), new Stop(new Vector2(-1.8f, 1.8f)), new Stop(aisle) },
-                new[] { new Stop(aisle), new Stop(queueIn, 1f, 3f), new Stop(queueTop), new Stop(Window4, 5f, 9f), new Stop(new Vector2(6.4f, 1.8f)), new Stop(new Vector2(8.6f, -2.6f)), new Stop(aisle) },
+                new[] { new Stop(aisle), new Stop(belowQueue), new Stop(queueIn, 1f, 3f), new Stop(queueTop), new Stop(Window2, 5f, 10f), new Stop(outRight), new Stop(outDown), new Stop(aisle) },
+                new[] { new Stop(aisle), new Stop(belowQueue), new Stop(queueIn, 1f, 3f), new Stop(queueTop), new Stop(Window4, 5f, 9f), new Stop(new Vector2(6.4f, 1.8f)), new Stop(new Vector2(8.6f, -2.6f)), new Stop(aisle) },
 
                 // The information desk.
                 new[] { new Stop(new Vector2(5.6f, -5.7f), 4f, 7f) },
 
-                // A ticket, a wait on the chairs and then the window.
-                new[] { new Stop(new Vector2(-2.6f, -5.2f), 1f, 2f), new Stop(new Vector2(-7.3f, -0.6f), 6f, 12f), new Stop(queueIn, 1f, 2f), new Stop(queueTop), new Stop(Window2, 5f, 9f), new Stop(new Vector2(-1.8f, 1.8f)), new Stop(aisle) },
+                // A ticket from the front of the machine, a wait on the chairs and then the window.
+                new[]
+                {
+                    new Stop(new Vector2(-2.6f, -6.95f), 1f, 2f), new Stop(new Vector2(-1.6f, -6.95f)), new Stop(pastTickets),
+                    new Stop(new Vector2(-5.6f, -1.9f)), new Stop(new Vector2(-5.6f, -0.5f)), new Stop(new Vector2(-7.3f, -0.5f), 6f, 12f),
+                    new Stop(queueIn, 1f, 2f), new Stop(queueTop), new Stop(Window2, 5f, 9f), new Stop(outRight), new Stop(outDown), new Stop(aisle)
+                },
 
                 // A look at the board of the exchange rate and out.
-                new[] { new Stop(new Vector2(-10.6f, -5.5f), 3f, 5f), new Stop(new Vector2(-2.6f, -6.6f)) }
+                new[] { new Stop(pastTickets), new Stop(new Vector2(-10.6f, -5.0f), 3f, 5f), new Stop(pastTickets) }
             };
         }
 
