@@ -102,8 +102,10 @@ Lista de la tercera prueba, tal cual la pasó Jefferson. Rama `fix/SCRUM-58-play
 Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
 
 ### Interfaz y experiencia de usuario
-- [ ] T3-01 (A) Créditos de desarrolladores: en la pantalla que dice "Diseñado por DoWhile Team" se deben ocultar o eliminar los nombres individuales de los desarrolladores.
-- [ ] T3-02 (A) Transparencia del HUD: aplicar un poco de opacidad/transparencia al HUD general, ya que su opacidad total tapa información importante del juego.
+- [x] T3-01 (A) Créditos de desarrolladores: en la pantalla que dice "Diseñado por DoWhile Team" se deben ocultar o eliminar los nombres individuales de los desarrolladores.
+  Hecho (Antigravity): créditos solo con "DoWhile Team".
+- [x] T3-02 (A) Transparencia del HUD: aplicar un poco de opacidad/transparencia al HUD general, ya que su opacidad total tapa información importante del juego.
+  Hecho (Antigravity): fondo de la tarjeta del HUD semitransparente.
 - [x] T3-03 (S) Sistema de misiones/tareas: implementar un menú o apartado visual en pantalla donde el jugador pueda revisar las tareas pendientes, ya que el flujo actual es poco intuitivo.
   Hecho: lista "Tareas de hoy" bajo el HUD (Tab la esconde), leída de la partida: día de llegada, trabajo, recibos, deudas, cierre del mes y dormir.
 - [x] T3-04 (S) Gestión del tiempo muerto: como las tareas se completan rápido, implementar una mecánica para adelantar el tiempo o irse a dormir sin tener que esperar de forma pasiva a que termine el día después de trabajar.
@@ -114,31 +116,42 @@ Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
   Hecho: al despedirse el personaje se queda parado en el cuarto; ya no camina solo ni pasa al pueblo.
 - [x] T3-06 (S) Paso del tiempo laboral: el tiempo del juego debe avanzar de manera progresiva y realista mientras el personaje está trabajando, no dar un salto repentino de horas únicamente al finalizar el turno.
   Hecho: el reloj avanza poco a poco durante la escena del turno, de la entrada a las 12:00.
-- [ ] T3-07 (A) Multas de tránsito: ajustar el valor exacto de la multa por saltarse un semáforo en rojo a 5,000 colones.
+- [x] T3-07 (A) Multas de tránsito: ajustar el valor exacto de la multa por saltarse un semáforo en rojo a 5,000 colones.
+  Hecho (Antigravity): multa del semáforo en rojo de ₡5 000.
 - [x] T3-08 (S) Día de introducción/rutina previa: lógica obligatoria en el día a día donde el jugador deba cumplir ciertos requisitos previos antes de iniciar su jornada laboral (por ejemplo: pagar el seguro, ir a visitar su nuevo cuarto de alquiler, etc.).
   Hecho: día de llegada en una partida nueva: el primer turno espera a conocer el cuarto y sacar el seguro de salud; ese turno nunca cuenta como tarde.
-- [ ] T3-09 (A) Sistema de cursos: rediseñar la lógica para llevar los cursos, haciéndola más fácil de entender. Crear o asignar un espacio/edificio físico específico para ir a recibirlos.
-- [ ] T3-10 (J→A) Puertas bloqueadas: revisar las casas del mapa, ya que algunas puertas están bloqueadas y no permiten la entrada.
+- [x] T3-09 (A) Sistema de cursos: rediseñar la lógica para llevar los cursos, haciéndola más fácil de entender. Crear o asignar un espacio/edificio físico específico para ir a recibirlos.
+  Hecho (Antigravity): edificio "INA · CURSOS" en la acera sur con su estación en la puerta; modal más claro.
+- [x] T3-10 (J→A) Puertas bloqueadas: revisar las casas del mapa, ya que algunas puertas están bloqueadas y no permiten la entrada.
+  Hecho (Antigravity): puertas de casas desbloqueadas y triggers ajustados.
 
 ### Entorno, objetos y colisiones
 - [x] T3-11 (S) Error crítico de colisión (barco): un barco pequeño está atravesando el muelle por encima. Corregir de inmediato ajustando las rutas o colisiones del barco.
   Hecho: los barcos van y vuelven, dos al oeste y uno al este del muelle, y dan la vuelta antes de llegar a él.
-- [ ] T3-12 (A) Poste en la Cooperativa: el poste de luz sigue apareciendo justo frente a la cooperativa y su colisión bloquea completamente la entrada al jugador.
-- [ ] T3-13 (A) Muro del límite derecho: el muro que delimita el lado derecho del mapa sigue visible y mal posicionado, cortando de forma poco natural áreas como la calle.
-- [ ] T3-14 (A) Posicionamiento de las mascotas: los perros en los interiores de las casas aparecen encima de las mesas. Deben spawnear en el suelo o en camas para perros.
+- [x] T3-12 (A) Poste en la Cooperativa: el poste de luz sigue apareciendo justo frente a la cooperativa y su colisión bloquea completamente la entrada al jugador.
+  Hecho (Antigravity): el poste se movió fuera de la puerta de la Cooperativa.
+- [x] T3-13 (A) Muro del límite derecho: el muro que delimita el lado derecho del mapa sigue visible y mal posicionado, cortando de forma poco natural áreas como la calle.
+  Hecho (Antigravity): las calles del este terminan antes del acantilado.
+- [x] T3-14 (A) Posicionamiento de las mascotas: los perros en los interiores de las casas aparecen encima de las mesas. Deben spawnear en el suelo o en camas para perros.
+  Hecho (Antigravity): el perro descansa en el piso, fuera de la mesa.
 
 ### NPC e inteligencia artificial
-- [ ] T3-15 (A) Desaparición de NPC: al terminar sus turnos laborales, los NPC desaparecen de golpe. Programar que caminen físicamente hasta su casa asignada.
+- [x] T3-15 (A) Desaparición de NPC: al terminar sus turnos laborales, los NPC desaparecen de golpe. Programar que caminen físicamente hasta su casa asignada.
+  Hecho (Antigravity): los peatones caminan a la puerta de su casa al anochecer y vuelven en la mañana.
 - [x] T3-16 (S) Interacciones y negociaciones: sistema de diálogo para negociar con NPC clave del pueblo.
   Hecho: en el prestamista y en Invierte Ya sale "Hablar y negociar (texto o voz)" antes de escuchar la oferta.
   - [x] T3-16a (S) Invertir Ya (300%): actualmente no hay opción de negociar con ellos.
     Hecho: Invierte Ya responde por reglas: admite de dónde sale la plata, que no hay contrato ni SUGEF, solo si le preguntan.
   - [x] T3-16b (S) Prestamista de dinero rápido: habilitar opciones de negociación o pago para el NPC que presta con intereses excesivos.
     Hecho: el prestamista dice la tasa (20% al mes) y el total real (₡100 000 se vuelven ₡172 800 en 3 meses) cuando le preguntan.
-- [ ] T3-17 (A) Vida en el mapa:
-  - [ ] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros jugando en la cancha de fútbol.
-  - [ ] T3-17b (A) Torre de salvavidas: el NPC salvavidas no está en su puesto, la torre está vacía.
-- [ ] T3-18 (A) Animación de las gaviotas: las gaviotas de la playa están estáticas y parecen piedras. Agregarles animaciones de movimiento o vuelo.
+- [x] T3-17 (A) Vida en el mapa:
+  Hecho (Antigravity).
+  - [x] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros jugando en la cancha de fútbol.
+    Hecho (Antigravity): gente en la playa y jugadores en la cancha.
+  - [x] T3-17b (A) Torre de salvavidas: el NPC salvavidas no está en su puesto, la torre está vacía.
+    Hecho (Antigravity): salvavidas en la torre.
+- [x] T3-18 (A) Animación de las gaviotas: las gaviotas de la playa están estáticas y parecen piedras. Agregarles animaciones de movimiento o vuelo.
+  Hecho (Antigravity): gaviotas que picotean y vuelan cuando te acercás.
 
 ### Evento de cobradores y sistema de negociación
 - [x] T3-19 (S) Animación y sincronización con el prólogo: el evento de los cobradores debe ejecutarse literalmente como lo describe el texto: un carro negro polarizado frena físicamente frente al jugador, se bajan dos hombres y caminan hacia el personaje para realizar el cobro.
