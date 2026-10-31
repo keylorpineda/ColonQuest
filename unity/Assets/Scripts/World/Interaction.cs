@@ -562,6 +562,7 @@ namespace ColonQuest.World
 
                 Vector2 last = body.position;
                 float still = 0f;
+                Collider2D ghost = null;
                 for (float t = 0f; t < WalkTimeout && !skip; t += Time.deltaTime)
                 {
                     Vector2 toTarget = target - body.position;
@@ -570,12 +571,21 @@ namespace ColonQuest.World
                         break;
                     }
 
-                    // Pressed against something for a moment: stop pushing instead of walking into it for seconds.
+                    // Pressed against something for a moment: the feet stop colliding and the player walks on past the
+                    // corner of the furniture, instead of jumping to the end of the walk.
                     still = t > 0.1f && (body.position - last).sqrMagnitude < 0.00002f ? still + Time.deltaTime : 0f;
                     last = body.position;
                     if (still > StuckSeconds)
                     {
-                        break;
+                        var feet = body.GetComponent<Collider2D>();
+                        if (ghost != null || feet == null || !feet.enabled)
+                        {
+                            break;
+                        }
+
+                        ghost = feet;
+                        ghost.enabled = false;
+                        still = 0f;
                     }
 
                     body.linearVelocity = toTarget.normalized * WalkSpeed;
@@ -591,9 +601,14 @@ namespace ColonQuest.World
                 body.linearVelocity = Vector2.zero;
                 if (skip || (target - body.position).magnitude >= 0.12f)
                 {
-                    // Skipped, or something blocked the way: the player ends where the scene meant.
+                    // Skipped, or still blocked after walking through: the player ends where the scene meant.
                     body.position = target;
                     body.transform.position = target;
+                }
+
+                if (ghost != null)
+                {
+                    ghost.enabled = true;
                 }
             }
 
