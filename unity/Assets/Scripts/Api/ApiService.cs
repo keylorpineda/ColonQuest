@@ -18,6 +18,13 @@ namespace ColonQuest.Api
         private readonly ApiConfig config;
         private readonly HashSet<string> seenEvents = new HashSet<string>();
 
+        /// <summary>
+        /// True while the texts written by the models cannot be shown: the backend writes them only in Spanish, so in English
+        /// the local events, seller and summary answer instead, all of them translated. The game sets this (to "the game is in
+        /// English"); the telemetry and the voice transcription still go to the backend.
+        /// </summary>
+        public static Func<bool> LocalTextsOnly = () => false;
+
         public ApiService(IHttpTransport transport, ApiConfig config)
         {
             this.transport = transport;
@@ -63,7 +70,7 @@ namespace ColonQuest.Api
         {
             ApiResult<GameEvent> result = null;
 
-            if (HasSession)
+            if (HasSession && !LocalTextsOnly())
             {
                 string body = JsonUtility.ToJson(ApiMapper.ToDto(state));
                 HttpResponseData response = null;
@@ -105,9 +112,9 @@ namespace ColonQuest.Api
         /// <summary>One negotiation turn with typed text, the fallback that always exists next to voice.</summary>
         public IEnumerator SendNegotiationText(string offerId, string text, Action<ApiResult<NegotiationReply>> done)
         {
-            if (!HasSession)
+            if (!HasSession || LocalTextsOnly())
             {
-                done(ApiResult<NegotiationReply>.Failure("no session"));
+                done(ApiResult<NegotiationReply>.Failure(HasSession ? "local texts only" : "no session"));
                 yield break;
             }
 
@@ -162,9 +169,9 @@ namespace ColonQuest.Api
         /// <summary>Closes the session: the backend needs the final state to compute net worth and debt.</summary>
         public IEnumerator RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
         {
-            if (!HasSession)
+            if (!HasSession || LocalTextsOnly())
             {
-                done(ApiResult<SessionSummary>.Failure("no session"));
+                done(ApiResult<SessionSummary>.Failure(HasSession ? "local texts only" : "no session"));
                 yield break;
             }
 

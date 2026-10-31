@@ -437,7 +437,12 @@ namespace ColonQuest.Game
                 Busy = false;
                 if (CurrentNegotiation == negotiation)
                 {
-                    if (result.Ok)
+                    if (result.Ok && ApiService.LocalTextsOnly())
+                    {
+                        // The voice was understood, but the seller of the backend answers in Spanish: the local one replies.
+                        negotiation.Record(result.Value.Transcript, LocalSeller.Reply(negotiation.Offer, result.Value.Transcript), true);
+                    }
+                    else if (result.Ok)
                     {
                         negotiation.Record(result.Value.Transcript, result.Value, false);
                     }
