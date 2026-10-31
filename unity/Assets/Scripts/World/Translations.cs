@@ -51,7 +51,7 @@ namespace ColonQuest.World
             { "Pausa", "Paused" },
             { "Reanudar", "Resume" },
             { "Volver al menú", "Back to the menu" },
-            { "¿Seguro? Se pierde la partida", "Sure? This run will be lost" },
+            { "¿Seguro? Se pierde la partida, ¿quieres guardar?", "Sure? This run will be lost. Do you want to save it?" },
 
             // ---- the HUD
             { "Efectivo", "Cash" },
@@ -973,6 +973,9 @@ namespace ColonQuest.World
             { "Financiamiento", "Financing" },
             { "Siéntese. Le explico la cuota, la prima, el seguro y el costo total antes de firmar.", "Have a seat. I will explain the payment, the down payment, the insurance and the total cost before you sign." },
             { "Esta casa no es mía. Si la alquilo o la compro, puedo usarla.", "This house is not mine. If I rent it or buy it, I can use it." },
+
+            // Playtest batch 3 of the 31st (senior)
+            { "Sí", "Yes" },
         };
     }
 }

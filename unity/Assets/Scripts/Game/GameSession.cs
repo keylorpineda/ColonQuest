@@ -127,13 +127,30 @@ namespace ColonQuest.Game
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChanged;
         }
 
-        /// <summary>Going back to the main menu saves the run, so nothing played is lost.</summary>
+        private bool skipNextMenuSave;
+
+        /// <summary>
+        /// Going back to the main menu saves the run, so nothing played is lost, unless the player chose to leave
+        /// without saving (<see cref="LeaveWithoutSaving"/>).
+        /// </summary>
         private void OnSceneChanged(UnityEngine.SceneManagement.Scene from, UnityEngine.SceneManagement.Scene to)
         {
             if (to.name == SceneNames.Menu)
             {
+                if (skipNextMenuSave)
+                {
+                    skipNextMenuSave = false;
+                    return;
+                }
+
                 SaveNow();
             }
+        }
+
+        /// <summary>The player leaves to the menu and says no to saving: the slot keeps what it had before.</summary>
+        public void LeaveWithoutSaving()
+        {
+            skipNextMenuSave = true;
         }
 
         /// <summary>Ties the run that just started to a slot and writes it there at once.</summary>

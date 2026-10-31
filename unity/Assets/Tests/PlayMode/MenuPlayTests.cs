@@ -492,18 +492,34 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
-        public IEnumerator Pause_BackToMenuNeedsASecondPress()
+        public IEnumerator Pause_BackToMenuAsksToSaveAndYesSaves()
         {
+            yield return LeaveFromPause(true);
+            Assert.IsNotNull(GameSession.Slots.Load(0), "Sí writes the run in its slot");
+        }
+
+        [UnityTest]
+        public IEnumerator Pause_BackToMenuAsksToSaveAndNoLeavesWithoutSaving()
+        {
+            yield return LeaveFromPause(false);
+            Assert.IsNull(GameSession.Slots.Load(0), "No leaves the slot as it was");
+        }
+
+        private IEnumerator LeaveFromPause(bool save)
+        {
+            GameSession.Instance.AssignSlot(0, "Prueba", "Ana", true);
+            GameSession.Slots = new SaveSlots(new MemorySaveStore());
             GameUiComponent.OpenPause();
             yield return null;
-            string path = "Pause/Card/Body/Button_" + PauseMenu.MenuLabel;
 
-            Click(path);
+            Click("Pause/Card/Body/Button_" + PauseMenu.MenuLabel);
             yield return null;
             Assert.AreEqual(SceneNames.Town, SceneManager.GetActiveScene().name, "one press only asks");
-            Assert.AreEqual(PauseMenu.SureLabel, Ui.Find(path + "/Body/Text").GetComponent<Text>().text);
+            Assert.IsFalse(Ui.Find("Pause").gameObject.activeSelf);
+            Assert.IsTrue(Ui.Find("PauseConfirm").gameObject.activeSelf);
+            Assert.AreEqual(PauseMenu.SureLabel, Ui.Find("PauseConfirm/Card/Body/Label_" + PauseMenu.SureLabel).GetComponent<Text>().text);
 
-            Click(path);
+            Click("PauseConfirm/Card/Body/Button_" + (save ? PauseMenu.YesLabel : PauseMenu.NoLabel));
             for (float waited = 0f; waited < 10f && SceneManager.GetActiveScene().name != SceneNames.Menu; waited += Time.unscaledDeltaTime)
             {
                 yield return null;

@@ -92,7 +92,7 @@ namespace ColonQuest.UI
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             negotiationPanel.SignContract = PlayContract;
             phone = new PhoneUi(canvas.transform, session);
-            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu);
+            pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu, () => session.SaveNow(), () => session.LeaveWithoutSaving());
             BuildIncidents();
             BuildCell();
 
