@@ -49,7 +49,7 @@ namespace ColonQuest.UI
                 warningText.text = watch.PoliceCalled ? watch.CalledWarning : watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
             }
 
-            CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
+            CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
         }
 
         // ---------------------------------------------------------------- the law
@@ -346,14 +346,14 @@ namespace ColonQuest.UI
             text.AppendLine();
             text.AppendLine(Loc.F("«Mae, usted debe plata. Hoy venimos por {0}.»", Money.Format(demand)));
             text.AppendLine();
-            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar paga la mitad hoy y deja el resto como un préstamo nuevo con recargo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
+            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar es hablarles, por texto o por voz: preguntá y pedí un arreglo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
             text.AppendLine();
             text.Append(Loc.T("Cifras de ejemplo del juego."));
 
             var options = new List<ModalOption>
             {
                 new ModalOption { Label = Loc.F("1.  Pagar  ·  {0}", Money.Format(demand)), Color = GameUiColors.Green, OnPress = () => { CollectorsLeave(); session.PayCollectors(); } },
-                new ModalOption { Label = Loc.F("2.  Negociar  ·  pagar {0} hoy", Money.Format(demand / 2L)), Color = GameUiColors.Yellow, OnPress = () => { CollectorsLeave(); session.NegotiateCollectors(); } },
+                new ModalOption { Label = Loc.T("2.  Negociar con tus palabras"), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(TalkPartner.Collectors) },
                 new ModalOption { Label = Loc.T("3.  Ignorarlos"), Color = GameUiColors.Pink, OnPress = () => { CollectorsLeave(); session.IgnoreCollectors(); } }
             };
 

@@ -27,6 +27,7 @@ namespace ColonQuest.UI
         private SubtitleBar subtitles;
         private ScreenEffects effects;
         private NegotiationPanel negotiationPanel;
+        private TalkPanel talkPanel;
         private PhoneUi phone;
         private PauseMenu pause;
         private Negotiation spokenNegotiation;
@@ -92,6 +93,7 @@ namespace ColonQuest.UI
             Interaction.Spoke += OnSpoke;
             negotiationPanel = new NegotiationPanel(canvas.transform, session);
             negotiationPanel.SignContract = PlayContract;
+            talkPanel = new TalkPanel(canvas.transform, session, TalkActions);
             phone = new PhoneUi(canvas.transform, session);
             pause = new PauseMenu(canvas.transform, ResumeFromPause, GoToMenu, () => session.SaveNow(), () => session.LeaveWithoutSaving());
             BuildIncidents();
@@ -103,6 +105,7 @@ namespace ColonQuest.UI
             session.Changed += Refresh;
             session.NegotiationStarted += OnNegotiationChanged;
             session.NegotiationUpdated += OnNegotiationChanged;
+            session.TalkUpdated += OnTalkChanged;
             session.NewGameStarted += CloseWindows;
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
@@ -138,6 +141,7 @@ namespace ColonQuest.UI
                 session.Changed -= Refresh;
                 session.NegotiationStarted -= OnNegotiationChanged;
                 session.NegotiationUpdated -= OnNegotiationChanged;
+                session.TalkUpdated -= OnTalkChanged;
                 session.NewGameStarted -= CloseWindows;
                 session.EventReady -= ShowEvent;
                 session.ChoiceApplied -= ShowOutcome;
@@ -386,6 +390,16 @@ namespace ColonQuest.UI
                 return;
             }
 
+            if (talkPanel.IsOpen)
+            {
+                // The talk takes the keyboard like the seller's window: the text box needs every key.
+                PlayerController.Blocked = true;
+                loadingCard.SetActive(false);
+                promptCard.SetActive(false);
+                talkPanel.Tick();
+                return;
+            }
+
             if (negotiationPanel.IsOpen)
             {
                 // The seller's window takes the keyboard: the text box needs every key.
@@ -616,6 +630,10 @@ namespace ColonQuest.UI
                     break;
                 case StationType.Work:
                     session.FinishShift();
+                    break;
+                case StationType.Lender:
+                case StationType.Pyramid:
+                    AskHowToTalk(station.Type);
                     break;
                 default:
                     if (session.Loop.CanDoTask(station.Type))
