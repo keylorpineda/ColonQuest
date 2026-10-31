@@ -5,6 +5,7 @@ namespace ColonQuest.World
     /// <summary>
     /// A pedestrian that walks back and forth between two points and rests at each end.
     /// Expects the usual character layout: Bob (PlayerAnimator) containing Visual.
+    /// At nightfall, pedestrians with a registered home walk to their door and retire until morning.
     /// </summary>
     public sealed class Patrol : MonoBehaviour
     {
@@ -12,6 +13,8 @@ namespace ColonQuest.World
         [SerializeField] private Vector2 pointB;
         [SerializeField] private float speed = 1.3f;
         [SerializeField] private float pause = 1.6f;
+        [SerializeField] private bool hasHome;
+        [SerializeField] private Vector2 homePoint;
 
         private Transform visual;
         private PlayerAnimator animator;
@@ -19,6 +22,11 @@ namespace ColonQuest.World
         private Vector2 target;
         private float waitUntil;
         private float chatUntil;
+        private bool isHome;
+
+        public bool HasHome => hasHome;
+        public Vector2 HomePoint => homePoint;
+        public bool IsHome => isHome;
 
         public void Configure(Vector2 a, Vector2 b, float walkSpeed, float restSeconds)
         {
@@ -26,6 +34,17 @@ namespace ColonQuest.World
             pointB = b;
             speed = walkSpeed;
             pause = restSeconds;
+            hasHome = false;
+        }
+
+        public void Configure(Vector2 a, Vector2 b, float walkSpeed, float restSeconds, Vector2 home)
+        {
+            pointA = a;
+            pointB = b;
+            speed = walkSpeed;
+            pause = restSeconds;
+            hasHome = true;
+            homePoint = home;
         }
 
         /// <summary>The player talks to this walker: it stops where it is and turns to face them for a while.</summary>
@@ -55,24 +74,91 @@ namespace ColonQuest.World
             {
                 talkCollider = talk.GetComponent<Collider2D>();
             }
+
+            if (DayTint.IsNight && hasHome)
+            {
+                isHome = true;
+                transform.position = homePoint;
+                if (visual != null) visual.gameObject.SetActive(false);
+                if (talkCollider != null) talkCollider.enabled = false;
+                SetWalking(0f);
+            }
         }
 
         private void Update()
         {
             bool night = DayTint.IsNight;
-            if (visual != null && visual.gameObject.activeSelf == night)
+
+            if (hasHome)
             {
-                visual.gameObject.SetActive(!night);
-                if (talkCollider != null)
+                if (night)
                 {
-                    talkCollider.enabled = !night;
+                    if (isHome)
+                    {
+                        if (visual != null && visual.gameObject.activeSelf)
+                        {
+                            visual.gameObject.SetActive(false);
+                            if (talkCollider != null) talkCollider.enabled = false;
+                        }
+                        SetWalking(0f);
+                        return;
+                    }
+
+                    // Walking home
+                    if (visual != null && !visual.gameObject.activeSelf)
+                    {
+                        visual.gameObject.SetActive(true);
+                    }
+
+                    Vector2 currentPos = transform.position;
+                    Vector2 nextPos = Vector2.MoveTowards(currentPos, homePoint, speed * Time.deltaTime);
+                    float dirX = nextPos.x - currentPos.x;
+                    transform.position = nextPos;
+
+                    if (visual != null && Mathf.Abs(dirX) > 0.0001f)
+                    {
+                        visual.localScale = new Vector3(dirX > 0f ? 1f : -1f, 1f, 1f);
+                    }
+
+                    SetWalking(1f);
+
+                    if ((nextPos - homePoint).sqrMagnitude < 0.0001f)
+                    {
+                        isHome = true;
+                        if (visual != null) visual.gameObject.SetActive(false);
+                        if (talkCollider != null) talkCollider.enabled = false;
+                        SetWalking(0f);
+                    }
+                    return;
+                }
+                else // Daytime
+                {
+                    if (isHome)
+                    {
+                        isHome = false;
+                        transform.position = homePoint;
+                        if (visual != null) visual.gameObject.SetActive(true);
+                        if (talkCollider != null) talkCollider.enabled = true;
+                        target = (homePoint - pointA).sqrMagnitude < (homePoint - pointB).sqrMagnitude ? pointA : pointB;
+                    }
                 }
             }
-
-            if (night)
+            else
             {
-                SetWalking(0f);
-                return;
+                if (visual != null && visual.gameObject.activeSelf == night)
+                {
+                    visual.gameObject.SetActive(!night);
+                    if (talkCollider != null)
+                    {
+                        talkCollider.enabled = !night;
+                    }
+                }
+
+                if (night)
+                {
+                    SetWalking(0f);
+                    return;
+                }
             }
 
             if (Time.time < waitUntil || Time.time < chatUntil)

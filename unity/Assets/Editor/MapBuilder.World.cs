@@ -332,6 +332,26 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Line_Bottom", square, center - new Vector2(0f, size.y * 0.5f - 0.4f), new Vector2(size.x - 0.8f, 0.1f), line, 8);
             Shape(parent, "Line_Left", square, center - new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
             Shape(parent, "Line_Right", square, center + new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
+
+            // Ball and players running within the pitch
+            Shape(parent, "SoccerBall", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.35f, GamePalette.Hex("#F8F5E8"), 9);
+            Shape(parent, "SoccerBallSpot", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.12f, GamePalette.Hex("#1D2238"), 10);
+
+            var teamRed = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Buzz, HairColor = "#1D2238" };
+            var teamRed2 = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Side, HairColor = "#555A66" };
+            var teamRed3 = new Look { Skin = "#E8505B", Pants = "#FFFFFF", Hair = HairStyle.Spiky, HairColor = "#2A1810" };
+
+            var teamBlue = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Buzz, HairColor = "#2A1810" };
+            var teamBlue2 = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Side, HairColor = "#1D2238" };
+            var teamBlue3 = new Look { Skin = "#4DA3FF", Pants = "#1D2238", Hair = HairStyle.Afro, HairColor = "#1D2238" };
+
+            BuildPedestrian(parent, "JugadorRojo1", new Vector2(-34f, -22f), new Vector2(-30.5f, -21.6f), teamRed, 2.2f);
+            BuildPedestrian(parent, "JugadorRojo2", new Vector2(-38f, -24.2f), new Vector2(-33.5f, -24.0f), teamRed2, 2.0f);
+            BuildPedestrian(parent, "JugadorRojo3", new Vector2(-40f, -23.0f), new Vector2(-37.0f, -23.5f), teamRed3, 1.8f);
+
+            BuildPedestrian(parent, "JugadorAzul1", new Vector2(-36f, -22.4f), new Vector2(-39.0f, -22.0f), teamBlue, 2.2f);
+            BuildPedestrian(parent, "JugadorAzul2", new Vector2(-32f, -24.0f), new Vector2(-36.0f, -24.5f), teamBlue2, 2.0f);
+            BuildPedestrian(parent, "JugadorAzul3", new Vector2(-29f, -23.0f), new Vector2(-32.0f, -23.4f), teamBlue3, 1.8f);
         }
 
         // ---------------------------------------------------------------- borders
@@ -554,6 +574,12 @@ namespace ColonQuest.EditorTools
             // South row.
             House(parent, shadows, "Casa_Vecina_B", -43f, -37.5f, -8f, -3f, "#4D9DE0", "#F7E8D0");
             House(parent, shadows, "Casa_Vecina_C", -35.5f, -29.5f, -8f, -3f, "#E1BC29", "#FBE3C4");
+            Building(parent, shadows, new BuildingSpec
+            {
+                Name = "InaCursos", Sign = "INA · CURSOS", Roof = "#1D4F8C", Wall = "#F2E3C8",
+                XMin = -29.2f, XMax = -24.8f, YBottom = -8f, YTop = -2.6f, DoorX = -27.0f, FacadeHeight = 2.8f, Entrance = Entrance.Door,
+                AwningA = "#1D4F8C", AwningB = "#F8F5E8"
+            });
             YardSign(parent, shadows, -38.2f, -8.7f, "SE VENDE", "#E8505B");
 
             foreach (var spot in new[] { new Vector2(-26f, 8.8f), new Vector2(-44.4f, 14f), new Vector2(-39f, 14.5f), new Vector2(-33f, 15f), new Vector2(-27f, 14.5f), new Vector2(-28f, -3.2f), new Vector2(-44.4f, -3f) })
@@ -561,7 +587,7 @@ namespace ColonQuest.EditorTools
                 Tree(parent, shadows, spot.x, spot.y, 1.15f, "#3FA66A", spot.x < -30f);
             }
 
-            foreach (float x in new[] { -41f, -34f, -32f, -39f })
+            foreach (float x in new[] { -42.8f, -34f, -32f, -39f })
             {
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
@@ -572,7 +598,7 @@ namespace ColonQuest.EditorTools
                 Lamp(parent, x, 4.5f);
             }
 
-            foreach (float x in new[] { -40f, -30f })
+            foreach (float x in new[] { -43.5f, -30f })
             {
                 Lamp(parent, x, -9.3f);
             }
@@ -842,13 +868,30 @@ namespace ColonQuest.EditorTools
                 Rock(parent, shadows, spot.x, spot.y, 0.7f);
             }
 
+            // People relaxing on the beach and walking the shore
+            Shape(parent, "BeachTowel1", roundedSmall, new Vector2(-13.8f, -24.2f), new Vector2(1.5f, 0.85f), GamePalette.Hex("#FF8A3D"), 6);
+            Shape(parent, "BeachTowelStripe1", square, new Vector2(-13.8f, -24.2f), new Vector2(1.5f, 0.22f), GamePalette.Hex("#FFFFFF"), 7);
+            var lookBeach1 = new Look { Skin = "#4DA3FF", Pants = "#FFD23F", Hair = HairStyle.Side, Extra = Accessory.Cap, ExtraColor = "#E8505B" };
+            BuildNpc(parent, "PlayeroTowel", new Vector2(-13.8f, -24.1f), lookBeach1, true);
+
+            Shape(parent, "BeachTowel2", roundedSmall, new Vector2(31.5f, -24.5f), new Vector2(1.5f, 0.85f), GamePalette.Hex("#2E8B57"), 6);
+            Shape(parent, "BeachTowelStripe2", square, new Vector2(31.5f, -24.5f), new Vector2(1.5f, 0.22f), GamePalette.Hex("#FFFFFF"), 7);
+            var lookBeach2 = new Look { Skin = "#FFD23F", Pants = "#E8505B", Hair = HairStyle.Bun, HairColor = "#555A66" };
+            BuildNpc(parent, "PlayeraTowel", new Vector2(31.5f, -24.4f), lookBeach2, true);
+
+            var lookBeach3 = new Look { Skin = "#E07A5F", Pants = "#3D2B1F", Hair = HairStyle.Side, Extra = Accessory.Cap, ExtraColor = "#4DA3FF" };
+            BuildNpc(parent, "PlayeroSombra", new Vector2(-1.6f, -23.4f), lookBeach3, true);
+
+            var lookWalker = new Look { Skin = "#55E08F", Pants = "#FFFFFF", Hair = HairStyle.Buzz, HairColor = "#1D2238" };
+            BuildPedestrian(parent, "PaseantePlaya", new Vector2(-9.0f, -26.3f), new Vector2(0.5f, -26.3f), lookWalker, 1.3f);
+
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "SodaElMuelle", Sign = "SODA EL MUELLE", Roof = "#00A8A8", Wall = "#FFF1C9",
                 XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Door,
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
-            CoursesBoard(parent, -2.5f, 6.2f);
+            CoursesBoard(parent, -25.2f, -8.7f);
             Bench(parent, shadows, 17.8f, -23.2f);
         }
 
@@ -991,15 +1034,25 @@ namespace ColonQuest.EditorTools
             Shape(root, "Cabin_Outline", rounded, new Vector2(0f, 2.3f), new Vector2(2.4f, 1.5f), GamePalette.Outline, 2);
             Shape(root, "Cabin", rounded, new Vector2(0f, 2.3f), new Vector2(2.24f, 1.34f), GamePalette.Hex("#FFF1C9"), 3);
             Shape(root, "Window", roundedSmall, new Vector2(0f, 2.35f), new Vector2(1.1f, 0.5f), GamePalette.Hex("#BFE3F5"), 4);
-            Shape(root, "Roof_Outline", rounded, new Vector2(0f, 3.25f), new Vector2(2.9f, 0.6f), GamePalette.Outline, 4);
-            Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 5);
+
+            var guardLook = new Look
+            {
+                Skin = "#E8505B", SkinTone = "#D9A47A", HairColor = "#1D2238", Hair = HairStyle.Buzz,
+                Pants = "#C0392B", Extra = Accessory.Cap, ExtraColor = "#FFD23F"
+            };
+            BuildNpc(root, "Salvavidas", new Vector2(x, y + 2.05f), guardLook, false);
+            BuildThing(root, "Salvavidas", "Hablar con el salvavidas", new Vector2(0f, 0.4f), new Vector2(2.2f, 1.6f),
+                "¡Ojo con la corriente, mae!");
+
+            Shape(root, "Roof_Outline", rounded, new Vector2(0f, 3.25f), new Vector2(2.9f, 0.6f), GamePalette.Outline, 35);
+            Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 36);
 
             var flagRig = new GameObject("FlagRig").transform;
             flagRig.SetParent(root, false);
             flagRig.localPosition = new Vector2(0.85f, 3.8f);
             flagRig.gameObject.AddComponent<FoliagePhysics>().Configure(6.5f, 2.8f, x, 0.03f, false);
-            Shape(flagRig, "Flag_Outline", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.58f, 0.38f), GamePalette.Outline, 5);
-            Shape(flagRig, "Flag", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 6);
+            Shape(flagRig, "Flag_Outline", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.58f, 0.38f), GamePalette.Outline, 37);
+            Shape(flagRig, "Flag", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 38);
             root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.0f, 0.5f);
         }
 

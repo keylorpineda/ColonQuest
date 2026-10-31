@@ -840,6 +840,7 @@ namespace ColonQuest.EditorTools
                 Part(root, circle, new Vector2(0.2f, 0.28f), new Vector2(0.2f, 0.18f), "#F8F5E8", 1);
                 Shape(root, "Beak", roundedSmall, new Vector2(0.34f, 0.27f), new Vector2(0.12f, 0.06f), Hex("#FFD23F"), 6);
                 Shape(root, "Wing", circle, new Vector2(-0.06f, 0.18f), new Vector2(0.28f, 0.14f), Hex("#9AA3B8"), 5);
+                root.gameObject.AddComponent<Seagull>();
             });
 
             Scatter(CityGroup(parent, "Crabs"), random, 8, new Rect(-46f, -27f, 92f, 8f), (x, y) => OnSand(x, y), 2f, (g, x, y) =>

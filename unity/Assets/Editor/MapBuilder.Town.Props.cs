@@ -1590,7 +1590,7 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildOverheadPowerNetwork(Transform parent, Transform shadows)
         {
-            Vector2 poleWest = new Vector2(-31.5f, 5.45f);
+            Vector2 poleWest = new Vector2(-34.3f, 5.45f);
             Vector2 poleCasa = new Vector2(-21.25f, 5.45f);
             Vector2 poleEast = new Vector2(-13.85f, 5.45f);
 
@@ -1773,7 +1773,7 @@ namespace ColonQuest.EditorTools
             BuildStation(parent, "Station_Pyramid", StationType.Pyramid, "Inversiones Seguras", new Vector2(7f, -6.9f));
             Doorway(parent, new Vector2(-31.5f, 5.7f), SceneNames.Cooperativa, true);
             BuildSpawnPoint(parent, SpawnIds.TownFromCooperativa, new Vector2(-31.5f, 4.3f));
-            BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(0f, 4.6f));
+            BuildStation(parent, "Station_Courses", StationType.Courses, "Ver los cursos", new Vector2(-27.0f, -9.0f));
             currentLayer = LayerWorld;
         }
 

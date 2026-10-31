@@ -12,6 +12,17 @@ namespace ColonQuest.World
     {
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
+            // Playtest batch 3 of the 31st
+            { "INA · CURSOS", "INA · COURSES" },
+            { "• Horario de clases: de {0}:00 a {1}:00. Efectivo: {2}.", "• Class hours: {0}:00 to {1}:00. Cash: {2}." },
+            { "• INA ({0}, {1} tardes): abre cajero. UNA ({2}, {3} tardes): abre encargado.", "• INA ({0}, {1} afternoons): unlocks cashier. UNA ({2}, {3} afternoons): unlocks manager." },
+            { "• Tu avance: INA ({0}) · UNA ({1}).", "• Your progress: INA ({0}) · UNA ({1})." },
+            { "completado", "completed" },
+            { "{0}/{1} tardes", "{0}/{1} afternoons" },
+            { "Hablar con el salvavidas", "Talk to the lifeguard" },
+            { "¡Ojo con la corriente, mae!", "Watch out for the current, mate!" },
+            { "Diseño y desarrollo: DoWhile Team", "Design and development: DoWhile Team" },
+
             // Visual polish of the 31st
             { "CASA DE MAMÁ", "MOM'S HOUSE" },
 

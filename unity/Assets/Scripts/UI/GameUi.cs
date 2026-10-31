@@ -177,7 +177,8 @@ namespace ColonQuest.UI
         private void BuildHud()
         {
             var topLeft = new Vector2(0f, 1f);
-            var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
+            var hudPaper = new Color(UiKit.Paper.r, UiKit.Paper.g, UiKit.Paper.b, 0.8f);
+            var card = UiKit.Card(canvas.transform, "Hud", hudPaper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
             // Warm header band under the month and clock.
             UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.65f), new Vector2(434f, 48f), topLeft, new Vector2(12f, -10f));
