@@ -80,6 +80,14 @@ namespace ColonQuest.EditorTools
             BuildNpc(parts.People, "Vendedor1", new Vector2(-6.4f, 0.55f), new Look { Skin = "#4DA3FF", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, false);
             BuildNpc(parts.People, "Vendedor2", new Vector2(-2.4f, 0.55f), new Look { Skin = "#B28DFF", Extra = Accessory.Tie, ExtraColor = "#2A7F8C" }, false);
 
+            // The salesmen talk from the customer side of their desks. They sell the car; the payments are set in financing.
+            BuildThing(parts.Stations, "Salesman1", "Hablar con el vendedor", new Vector2(-6.4f, -1.75f), new Vector2(1.6f, 0.4f),
+                "\"El compacto gasta poquito. Para la ciudad es lo que más conviene.\"",
+                "\"Antes de enamorarse de un carro, sume marchamo, seguro y gasolina. Eso se paga aunque esté parqueado.\"");
+            BuildThing(parts.Stations, "Salesman2", "Hablar con el vendedor", new Vector2(-2.4f, -1.75f), new Vector2(1.6f, 0.4f),
+                "\"La SUV es linda, pero el marchamo y el seguro son más caros. Pregúnteme cuánto sale al año.\"",
+                "\"Si le gusta uno, pase a financiamiento: allá le hacen las cuotas con la prima y el seguro.\"");
+
             // Don Chepe's reception desk, by the way in: he welcomes the player here and the car negotiation opens here.
             var reception = IL(parts.Props, "Reception");
             Solid(reception, "Desk", rounded, 1.9f, -3.6f, 3.0f, 0.9f, "#8B5A3C");
@@ -87,7 +95,9 @@ namespace ColonQuest.EditorTools
             Deco(reception, "Contract", roundedSmall, 2.6f, -3.55f, 0.6f, 0.42f, "#FFFFFF", 1f, 8);
             Deco(reception, "Pen", roundedSmall, 2.2f, -3.55f, 0.06f, 0.3f, "#1D4F8C", 1f, 9);
             BuildNpc(parts.People, "DonChepe", new Vector2(1.9f, -2.65f), new Look { Skin = "#F2994A", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, false);
-            BuildStation(parts.Stations, "Station_CarDealer", StationType.CarDealer, "Hablar con Don Chepe y ver los carros", new Vector2(1.9f, -4.8f));
+            BuildThing(parts.Stations, "DonChepe", "Saludar a Don Chepe", new Vector2(1.9f, -4.8f), new Vector2(1.6f, 0.4f),
+                "\"¡Pase adelante! Vea los carros con calma. Para sacarlo en cuotas, pase a financiamiento, al fondo a la derecha.\"",
+                "\"Los vendedores le cuentan de cada carro. Las cuotas, la prima y el seguro se los arreglan en financiamiento.\"");
             WallPlate(parts.Labels, "BIENVENIDO", new Vector2(1.9f, -4.4f), 1.5f, "#1D4F8C", GamePalette.White, 0.024f);
 
             // The financing office behind glass.
@@ -131,6 +141,9 @@ namespace ColonQuest.EditorTools
             Deco(inside, "Fine print", square, 7.2f, -0.55f, 0.5f, 0.03f, "#9AA3B8", 1f, 9);
             Deco(inside, "Fine print", square, 7.2f, -0.45f, 0.5f, 0.03f, "#9AA3B8", 1f, 9);
             Solid(inside, "Chair", circle, 7.8f, -1.3f, 0.5f, 0.5f, "#3B6FB6");
+
+            // The financing officer: the car negotiation, with the payments, opens at this desk.
+            BuildStation(parts.Stations, "Station_CarDealer", StationType.CarDealer, "Hablar de cuotas con la encargada de financiamiento", new Vector2(7.8f, -2.15f));
             BuildNpc(parts.People, "Financiera", new Vector2(7.8f, 0.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.Vest, ExtraColor = "#2A7F8C" }, false);
             WallPlate(parts.Labels, "FINANCIAMIENTO", new Vector2(7.5f, 1.9f), 2.4f, "#1D4F8C", GamePalette.White, 0.026f);
             BuildThing(parts.Stations, "FinePrint", "Leer el contrato", new Vector2(7.2f, -0.5f), new Vector2(1.0f, 0.8f),

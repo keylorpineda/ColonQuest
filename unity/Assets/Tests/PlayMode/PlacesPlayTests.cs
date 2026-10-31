@@ -58,6 +58,21 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Agency_TheSalesmenTalkAndTheFinancingDeskNegotiates()
+        {
+            yield return null;
+
+            foreach (var name in new[] { "Thing_Salesman1", "Thing_Salesman2", "Thing_DonChepe" })
+            {
+                Assert.IsNotNull(GameObject.Find(name), name);
+            }
+
+            var desk = PlaceTestSetup.Stations(StationType.CarDealer)[0].transform.position;
+            Assert.Greater(desk.x, 4.4f, "the car negotiation opens in the financing office, behind the glass");
+            Assert.Less(Vector2.Distance(desk, GameObject.Find("Financiera").transform.position), 3.5f, "in front of the financing officer");
+        }
+
+        [UnityTest]
         public IEnumerator Agency_TheDeskOpensTheCarCatalogWithDonChepe()
         {
             var session = PlaceTestSetup.StartOfflineRun();

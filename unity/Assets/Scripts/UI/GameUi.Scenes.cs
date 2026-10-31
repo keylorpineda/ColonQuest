@@ -151,7 +151,7 @@ namespace ColonQuest.UI
                 case StationType.RealEstate:
                     return SignScene(station, then, "AgenteInmobiliaria", "La agente", "Le muestro las casas. Si le gusta una, firmamos y le doy las llaves.", true);
                 case StationType.CarDealer:
-                    return SignScene(station, then, "DonChepe", "Don Chepe", "Mire qué carro tan bonito. Con una prima se lo lleva hoy mismo.", true);
+                    return SignScene(station, then, "Financiera", "Financiamiento", "Siéntese. Le explico la cuota, la prima, el seguro y el costo total antes de firmar.", true);
                 case StationType.Farm:
                     return SignScene(station, then, "DonBeto", "Don Beto", "La tierra da, pero hay que saber cuándo sembrar y cuándo esperar.", false);
                 case StationType.Thing:
@@ -361,6 +361,24 @@ namespace ColonQuest.UI
                     // A passer-by: the player waves and the other person waves back.
                     string person = station.transform.parent != null ? station.transform.parent.name : string.Empty;
                     return new Interaction().Face(Here(station)).Pose(PersonPose.Wave, 1.4f).NpcPose(person, PersonPose.Wave, 1.6f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
+                case "Thing_DonChepe":
+                case "Thing_Salesman1":
+                case "Thing_Salesman2":
+                {
+                    string person = station.name == "Thing_DonChepe" ? "DonChepe" : "Vendedor" + station.name[station.name.Length - 1];
+                    Vector2 seller = PersonAt(person, Here(station, 0f, 2f));
+                    return new Interaction().WalkTo(me).Face(seller).Pose(PersonPose.Wave, 0.8f).NpcPose(person, PersonPose.Wave, 1.4f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
+                case "Thing_Mama":
+                {
+                    // The mother turns to the player and waves while she gives her advice.
+                    Vector2 mother = PersonAt(Mother, Here(station, 0f, 0.5f));
+                    return new Interaction().Face(mother).Pose(PersonPose.Wave, 0.8f).NpcPose(Mother, PersonPose.Wave, 1.4f)
                         .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
                 }
 
