@@ -223,32 +223,32 @@ namespace ColonQuest.EditorTools
             Solid(desk, "DeskChair", circle, -6.4f, -4.45f, 0.55f, 0.55f, "#3B6FB6");
             BuildStation(parts.Stations, "Station_Home", StationType.Home, "Casa", new Vector2(-6.4f, -3.9f));
 
-            // The pet (zaguatico) resting by the living room
+            // The pet (zaguatico) resting on open floor
             var pet = IL(parts.Props, "Pet");
-            Deco(pet, "Cushion", roundedSmall, 6.2f, -1.8f, 1.05f, 0.62f, "#8C4A28", 1f, 7);
-            Deco(pet, "CushionFleece", roundedSmall, 6.2f, -1.8f, 0.90f, 0.48f, "#D4B086", 1f, 8);
+            Deco(pet, "Cushion", roundedSmall, 7.2f, -4.2f, 1.05f, 0.62f, "#8C4A28", 1f, 7);
+            Deco(pet, "CushionFleece", roundedSmall, 7.2f, -4.2f, 0.90f, 0.48f, "#D4B086", 1f, 8);
 
-            Deco(pet, "Body", roundedSmall, 6.12f, -1.78f, 0.58f, 0.36f, "#C68B59", 1f, 9);
-            Deco(pet, "Spot", circle, 6.06f, -1.72f, 0.22f, 0.16f, "#A66D3B", 1f, 10);
+            Deco(pet, "Body", roundedSmall, 7.12f, -4.18f, 0.58f, 0.36f, "#C68B59", 1f, 9);
+            Deco(pet, "Spot", circle, 7.06f, -4.12f, 0.22f, 0.16f, "#A66D3B", 1f, 10);
 
-            var tail = Deco(pet, "Tail", roundedSmall, 5.78f, -1.72f, 0.24f, 0.10f, "#C68B59", 1f, 9);
+            var tail = Deco(pet, "Tail", roundedSmall, 6.78f, -4.12f, 0.24f, 0.10f, "#C68B59", 1f, 9);
             Tilt(tail, 30f);
 
-            Deco(pet, "PawBack", roundedSmall, 6.42f, -1.90f, 0.24f, 0.09f, "#A66D3B", 1f, 9);
-            Deco(pet, "PawFront", roundedSmall, 6.46f, -1.85f, 0.26f, 0.10f, "#C68B59", 1f, 10);
-            Deco(pet, "PawToe", circle, 6.56f, -1.85f, 0.08f, 0.08f, "#E2B98A", 1f, 11);
+            Deco(pet, "PawBack", roundedSmall, 7.42f, -4.30f, 0.24f, 0.09f, "#A66D3B", 1f, 9);
+            Deco(pet, "PawFront", roundedSmall, 7.46f, -4.25f, 0.26f, 0.10f, "#C68B59", 1f, 10);
+            Deco(pet, "PawToe", circle, 7.56f, -4.25f, 0.08f, 0.08f, "#E2B98A", 1f, 11);
 
-            Deco(pet, "Head", circle, 6.36f, -1.70f, 0.32f, 0.32f, "#C68B59", 1f, 10);
-            Deco(pet, "Collar", square, 6.28f, -1.74f, 0.06f, 0.18f, "#E8505B", 1f, 11);
-            Deco(pet, "Tag", circle, 6.30f, -1.82f, 0.08f, 0.08f, "#FFD23F", 1f, 12);
+            Deco(pet, "Head", circle, 7.36f, -4.10f, 0.32f, 0.32f, "#C68B59", 1f, 10);
+            Deco(pet, "Collar", square, 7.28f, -4.14f, 0.06f, 0.18f, "#E8505B", 1f, 11);
+            Deco(pet, "Tag", circle, 7.30f, -4.22f, 0.08f, 0.08f, "#FFD23F", 1f, 12);
 
-            Deco(pet, "Muzzle", roundedSmall, 6.48f, -1.72f, 0.20f, 0.14f, "#E2B98A", 1f, 11);
-            Deco(pet, "Nose", circle, 6.56f, -1.70f, 0.06f, 0.05f, "#1F1F1F", 1f, 12);
-            Deco(pet, "Eye", circle, 6.40f, -1.66f, 0.05f, 0.05f, "#1F1F1F", 1f, 12);
-            var ear = Deco(pet, "Ear", roundedSmall, 6.28f, -1.63f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
+            Deco(pet, "Muzzle", roundedSmall, 7.48f, -4.12f, 0.20f, 0.14f, "#E2B98A", 1f, 11);
+            Deco(pet, "Nose", circle, 7.56f, -4.10f, 0.06f, 0.05f, "#1F1F1F", 1f, 12);
+            Deco(pet, "Eye", circle, 7.40f, -4.06f, 0.05f, 0.05f, "#1F1F1F", 1f, 12);
+            var ear = Deco(pet, "Ear", roundedSmall, 7.28f, -4.03f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
             Tilt(ear, -18f);
 
-            var petTalk = BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
+            var petTalk = BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(7.2f, -4.2f), new Vector2(1.3f, 1.1f),
                 "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
 
             // The same rooms serve the neighbors and the houses for sale: the dog decides at run time if it lives here.
