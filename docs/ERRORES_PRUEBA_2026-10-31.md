@@ -95,3 +95,47 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
   Hecho: Rutina por puesto con 2 vueltas: ayudante en la mesa, la refri y el fogón; cajero y jefes atienden mesas y la caja.
 - [x] T2-16 Soga del muelle: el retroceso al no entrar al mar es demasiado largo y lo mete otra vez a la zona de la soga.
   Hecho: El empujón dura lo justo para salir de la zona (máximo 0,35 s), hacia la arena.
+
+## Tanda 3
+
+Lista de la tercera prueba, tal cual la pasó Jefferson. Rama `fix/SCRUM-58-playtest-oct31` (base `54fe0cd`).
+Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
+
+### Interfaz y experiencia de usuario
+- [ ] T3-01 (A) Créditos de desarrolladores: en la pantalla que dice "Diseñado por DoWhile Team" se deben ocultar o eliminar los nombres individuales de los desarrolladores.
+- [ ] T3-02 (A) Transparencia del HUD: aplicar un poco de opacidad/transparencia al HUD general, ya que su opacidad total tapa información importante del juego.
+- [ ] T3-03 (S) Sistema de misiones/tareas: implementar un menú o apartado visual en pantalla donde el jugador pueda revisar las tareas pendientes, ya que el flujo actual es poco intuitivo.
+- [ ] T3-04 (S) Gestión del tiempo muerto: como las tareas se completan rápido, implementar una mecánica para adelantar el tiempo o irse a dormir sin tener que esperar de forma pasiva a que termine el día después de trabajar.
+
+### Mecánicas y progresión
+- [ ] T3-05 (S) Animación de salida de la casa: eliminar por completo la animación al salir de la casa de la madre. Al despedirse, el personaje simplemente debe quedarse parado sin ejecutar ninguna acción automática de salida.
+- [ ] T3-06 (S) Paso del tiempo laboral: el tiempo del juego debe avanzar de manera progresiva y realista mientras el personaje está trabajando, no dar un salto repentino de horas únicamente al finalizar el turno.
+- [ ] T3-07 (A) Multas de tránsito: ajustar el valor exacto de la multa por saltarse un semáforo en rojo a 5,000 colones.
+- [ ] T3-08 (S) Día de introducción/rutina previa: lógica obligatoria en el día a día donde el jugador deba cumplir ciertos requisitos previos antes de iniciar su jornada laboral (por ejemplo: pagar el seguro, ir a visitar su nuevo cuarto de alquiler, etc.).
+- [ ] T3-09 (A) Sistema de cursos: rediseñar la lógica para llevar los cursos, haciéndola más fácil de entender. Crear o asignar un espacio/edificio físico específico para ir a recibirlos.
+- [ ] T3-10 (J→A) Puertas bloqueadas: revisar las casas del mapa, ya que algunas puertas están bloqueadas y no permiten la entrada.
+
+### Entorno, objetos y colisiones
+- [ ] T3-11 (S) Error crítico de colisión (barco): un barco pequeño está atravesando el muelle por encima. Corregir de inmediato ajustando las rutas o colisiones del barco.
+- [ ] T3-12 (A) Poste en la Cooperativa: el poste de luz sigue apareciendo justo frente a la cooperativa y su colisión bloquea completamente la entrada al jugador.
+- [ ] T3-13 (A) Muro del límite derecho: el muro que delimita el lado derecho del mapa sigue visible y mal posicionado, cortando de forma poco natural áreas como la calle.
+- [ ] T3-14 (A) Posicionamiento de las mascotas: los perros en los interiores de las casas aparecen encima de las mesas. Deben spawnear en el suelo o en camas para perros.
+
+### NPC e inteligencia artificial
+- [ ] T3-15 (A) Desaparición de NPC: al terminar sus turnos laborales, los NPC desaparecen de golpe. Programar que caminen físicamente hasta su casa asignada.
+- [ ] T3-16 (S) Interacciones y negociaciones: sistema de diálogo para negociar con NPC clave del pueblo.
+  - [ ] T3-16a (S) Invertir Ya (300%): actualmente no hay opción de negociar con ellos.
+  - [ ] T3-16b (S) Prestamista de dinero rápido: habilitar opciones de negociación o pago para el NPC que presta con intereses excesivos.
+- [ ] T3-17 (A) Vida en el mapa:
+  - [ ] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros jugando en la cancha de fútbol.
+  - [ ] T3-17b (A) Torre de salvavidas: el NPC salvavidas no está en su puesto, la torre está vacía.
+- [ ] T3-18 (A) Animación de las gaviotas: las gaviotas de la playa están estáticas y parecen piedras. Agregarles animaciones de movimiento o vuelo.
+
+### Evento de cobradores y sistema de negociación
+- [ ] T3-19 (S) Animación y sincronización con el prólogo: el evento de los cobradores debe ejecutarse literalmente como lo describe el texto: un carro negro polarizado frena físicamente frente al jugador, se bajan dos hombres y caminan hacia el personaje para realizar el cobro.
+- [ ] T3-20 (S) Opción interactiva de negociación: al ser abordado por los cobradores, el menú de interacción debe incluir obligatoriamente una opción de "Negociar".
+- [ ] T3-21 (S) Soporte de input por texto y voz: la negociación debe soportar input escrito (teclado) y reconocimiento de voz (micrófono), para que el jugador negocie con sus propias palabras.
+
+### Sistema de guardado y salida del juego
+- [ ] T3-22 (S) Mensaje de confirmación exacto: al intentar salir de la partida, mostrar obligatoriamente una alerta con el texto exacto: "¿Seguro? Se pierde la partida, ¿quieres guardar?".
+- [ ] T3-23 (S) Opciones de interacción: el cuadro debe tener únicamente dos botones, "Sí" y "No": Sí guarda y cierra, No solo cierra.
