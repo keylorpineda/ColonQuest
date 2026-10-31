@@ -97,20 +97,20 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void Run_RemembersThePlacesAlreadyUsedThisMonth()
+        public void Run_RemembersThePlacesAlreadyUsedToday()
         {
             var loop = new GameLoop();
             var gameEvent = new GameEvent { Choices = { new Choice { Id = "a" }, new Choice { Id = "b" } } };
             loop.Choose(gameEvent, "a", StationType.Garage);
-            loop.Sleep();
 
             var back = new GameLoop();
             back.Restore(loop.Snapshot());
 
             Assert.AreEqual(1, back.TasksDone);
+            Assert.AreEqual(1, back.TasksToday);
             Assert.IsTrue(back.AlreadyDid(StationType.Garage));
             Assert.IsFalse(back.CanDoTask(StationType.Garage));
-            Assert.IsTrue(back.CanDoTask(StationType.Grocery));
+            Assert.IsTrue(back.CanDoTask(StationType.Grocery), "the second task of the day");
         }
 
         [Test]
