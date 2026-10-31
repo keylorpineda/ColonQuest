@@ -53,6 +53,7 @@ namespace ColonQuest.World
                 case SceneNames.HospitalArriba:
                 case SceneNames.Inmobiliaria:
                 case SceneNames.Soda:
+                case SceneNames.Cooperativa:
                     return SurfaceKind.Tile;
                 case SceneNames.Town:
                     return Town(position);
@@ -124,6 +125,9 @@ namespace ColonQuest.World
         public HintKind Kind;
         public WaterBody Water;
         public Vector2 Away;
+
+        /// <summary>How far inside the warning zone the point is: the step back only needs to cover this.</summary>
+        public float Depth;
     }
 
     public static class WorldHints
@@ -147,35 +151,37 @@ namespace ColonQuest.World
 
             if (p.x < MapLayout.PlayWestX + EdgeMargin)
             {
-                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.right };
+                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.right, Depth = MapLayout.PlayWestX + EdgeMargin - p.x };
             }
 
             if (p.x > MapLayout.PlayEastX - EdgeMargin)
             {
-                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.left };
+                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.left, Depth = p.x - (MapLayout.PlayEastX - EdgeMargin) };
             }
 
             if (p.y > MapLayout.PlayNorthY - EdgeMargin)
             {
-                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.down };
+                return new WorldHint { Kind = HintKind.MapEdge, Away = Vector2.down, Depth = p.y - (MapLayout.PlayNorthY - EdgeMargin) };
             }
 
             bool onPier = p.x >= MapLayout.PierXMin - 0.3f && p.x <= MapLayout.PierXMax + 0.3f;
             if (p.y < MapLayout.ShoreY + WaterMargin && p.y > MapLayout.ShoreY - 2f && !onPier)
             {
-                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Sea, Away = Vector2.up };
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Sea, Away = Vector2.up, Depth = MapLayout.ShoreY + WaterMargin - p.y };
             }
 
             if (p.x > MapLayout.RiverXMin - TouchMargin && p.x < MapLayout.RiverXMax + TouchMargin && p.y > MapLayout.ShoreY && !OnDeck(p))
             {
                 float middle = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
-                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.River, Away = p.x < middle ? Vector2.left : Vector2.right };
+                bool west = p.x < middle;
+                float depth = west ? p.x - (MapLayout.RiverXMin - TouchMargin) : MapLayout.RiverXMax + TouchMargin - p.x;
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.River, Away = west ? Vector2.left : Vector2.right, Depth = depth };
             }
 
             var pond = new Rect(Pond.xMin - TouchMargin, Pond.yMin - TouchMargin, Pond.width + TouchMargin * 2f, Pond.height + TouchMargin * 2f);
             if (pond.Contains(p))
             {
-                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Pond, Away = (p - Pond.center).normalized };
+                return new WorldHint { Kind = HintKind.Water, Water = WaterBody.Pond, Away = (p - Pond.center).normalized, Depth = TouchMargin };
             }
 
             return new WorldHint();
@@ -183,7 +189,14 @@ namespace ColonQuest.World
 
         private static bool OnDeck(Vector2 p)
         {
-            return (p.y > -0.4f && p.y < 4.4f) || (p.y > -14.4f && p.y < -9.6f) || (p.y > 25.6f && p.y < 30.4f) || (p.y > -19.6f && p.y < -17.0f);
+            // From railing to railing, like the walls of the river: a player on the sidewalk of a bridge is not in the water.
+            return Between(p.y, MapLayout.BridgeFirstStreet) || Between(p.y, MapLayout.BridgeSouthStreet) || Between(p.y, MapLayout.BridgeAvenue)
+                || (p.y > -19.6f && p.y < -17.0f);
+        }
+
+        private static bool Between(float y, Rect deck)
+        {
+            return y > deck.yMin - TouchMargin && y < deck.yMax + TouchMargin;
         }
     }
 

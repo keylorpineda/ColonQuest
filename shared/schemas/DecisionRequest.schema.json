@@ -37,6 +37,14 @@
       "title": "CreditCard",
       "type": "object"
     },
+    "GameLanguage": {
+      "enum": [
+        "es",
+        "en"
+      ],
+      "title": "GameLanguage",
+      "type": "string"
+    },
     "InformalLoan": {
       "additionalProperties": false,
       "properties": {
@@ -168,6 +176,17 @@
           ],
           "default": null,
           "title": "Jobposition"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GameLanguage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "month": {
           "maximum": 12,

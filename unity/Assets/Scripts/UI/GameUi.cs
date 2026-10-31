@@ -105,6 +105,8 @@ namespace ColonQuest.UI
             session.NewGameStarted += CloseWindows;
             Loc.Changed += Refresh;
             LocalSeller.Translate = Loc.T;
+            ApiService.LocalTextsOnly = () => false;
+            ApiService.Language = () => Loc.Current == GameLanguage.English ? "en" : "es";
             session.EventReady += ShowEvent;
             session.ChoiceApplied += ShowOutcome;
             session.MonthClosed += ShowMonthReport;
@@ -172,10 +174,16 @@ namespace ColonQuest.UI
             var topLeft = new Vector2(0f, 1f);
             var card = UiKit.Card(canvas.transform, "Hud", UiKit.Paper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
 
+            // Warm header band under the month and clock.
+            UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.65f), new Vector2(434f, 48f), topLeft, new Vector2(12f, -10f));
+            UiKit.Fill(card, "HeaderDivider", new Color(0.18f, 0.20f, 0.30f, 0.16f), new Vector2(426f, 2f), topLeft, new Vector2(16f, -58f));
+
             // Top line: the month and its week on the left, the hour on the right. The tasks go on the bottom line.
-            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -14f));
+            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -12f));
+            monthText.font = UiKit.TitleFont;
             monthText.horizontalOverflow = HorizontalWrapMode.Overflow;
-            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -14f), TextAnchor.MiddleRight);
+            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -12f), TextAnchor.MiddleRight);
+            clockText.font = UiKit.TitleFont;
             tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(190f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -276f), TextAnchor.MiddleRight);
 
             cashText = Row(card, "Efectivo", 1);
@@ -184,6 +192,7 @@ namespace ColonQuest.UI
             installmentsText = Row(card, "Cuotas al mes", 4);
 
             UiKit.Label(card, "Ánimo", 26, GameUiColors.Muted, new Vector2(200f, 36f), topLeft, new Vector2(22f, -226f));
+            UiKit.Fill(card, "WellbeingOutline", UiKit.Ink, new Vector2(BarWidth + 6f, 32f), topLeft, new Vector2(247f, -228f));
             UiKit.Fill(card, "WellbeingBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
             wellbeingFill = UiKit.Fill(card, "WellbeingFill", GameUiColors.Gain, new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
             UiKit.Label(card, "[P]  Celular", 24, GameUiColors.Muted, new Vector2(300f, 36f), topLeft, new Vector2(22f, -276f));
@@ -226,6 +235,43 @@ namespace ColonQuest.UI
             RefreshPowerCut();
             TryStartOpening(scene);
             BindStations();
+            if (session != null && session.Loop.Outfit != PlayerOutfit.Everyday)
+            {
+                PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), session.Loop.Outfit);
+            }
+
+            if (scene.name == SceneNames.Casa && HouseVisit.InListing)
+            {
+                // A house for sale or rent uses the same rooms, but the mother lives in her own house.
+                foreach (var name in new[] { "Mama", "Thing_Mama" })
+                {
+                    var mother = GameObject.Find(name);
+                    if (mother != null)
+                    {
+                        mother.SetActive(false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>True inside a house for sale or rent that the player has not rented or bought.</summary>
+        private bool InHouseNotMine()
+        {
+            if (!HouseVisit.InListing || SceneManager.GetActiveScene().name != SceneNames.Casa)
+            {
+                return false;
+            }
+
+            var home = session.Holdings.Home;
+            foreach (var listing in MarketAssumptions.Homes)
+            {
+                if (listing.Id == HouseVisit.ListingId)
+                {
+                    return home == null || home.Name != listing.Name;
+                }
+            }
+
+            return true;
         }
 
         private void BindStations()
@@ -295,7 +341,17 @@ namespace ColonQuest.UI
             get
             {
                 inside.RemoveAll(s => s == null);
-                return inside.Count > 0 ? inside[inside.Count - 1] : null;
+                var hero = GameObject.FindWithTag(Station.PlayerTag);
+                for (int i = inside.Count - 1; i >= 0; i--)
+                {
+                    // A wall between rooms hides what is on the other side, even if its zone reaches through.
+                    if (hero == null || inside[i].CanBeReachedFrom(hero.transform.position))
+                    {
+                        return inside[i];
+                    }
+                }
+
+                return null;
             }
         }
 
@@ -461,7 +517,7 @@ namespace ColonQuest.UI
 
                     return "[E]  " + station.DisplayName;
                 case StationType.Atm:
-                    return "[E]  Consultar tu saldo en el cajero";
+                    return "[E]  Usar el cajero automático";
                 case StationType.RealEstate:
                 case StationType.CarDealer:
                 case StationType.Farm:
@@ -491,17 +547,12 @@ namespace ColonQuest.UI
                         return Loc.T("Ya hiciste tus tareas del mes. Ve al banco a cobrar.");
                     }
 
-                    if (loop.Clock.IsLastDay)
+                    if (loop.TasksToday >= GameRules.TasksPerDay)
                     {
-                        return Loc.T("Hoy es día de pago. Ve al banco a cobrar.");
+                        return Loc.T("Ya resolviste los pendientes de hoy. Descansa hasta mañana.");
                     }
 
-                    if (loop.TasksToday >= 1)
-                    {
-                        return Loc.T("Ya resolviste el pendiente de hoy. Descansa hasta mañana.");
-                    }
-
-                    return Loc.F("Ya pasaste por {0} este mes.", Loc.T(station.DisplayName));
+                    return Loc.F("Ya pasaste por {0} hoy.", Loc.T(station.DisplayName));
             }
         }
 
@@ -514,10 +565,18 @@ namespace ColonQuest.UI
                     AskCloseMonth();
                     break;
                 case StationType.Home:
-                case StationType.Atm:
                     ShowStatement();
                     break;
+                case StationType.Atm:
+                    ShowAtm();
+                    break;
                 case StationType.Thing:
+                    if (station.name == DepositWindowName)
+                    {
+                        ShowDeposit();
+                        break;
+                    }
+
                     ShowThing(station);
                     break;
                 case StationType.Store:
@@ -609,7 +668,8 @@ namespace ColonQuest.UI
                 + "  ·  " + Loc.F("Semana {0}", loop.Clock.Day);
             clockText.text = loop.Clock.Time;
             tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
-            cashText.text = Money.Format(state.Cash);
+            // In the opening the pocket is empty until the mother hands over the present.
+            cashText.text = Money.Format(openingPlaying && !openingCashGiven ? 0L : state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
             cardText.text = Money.Format(state.CreditCard.Balance);
             installmentsText.text = Money.Format(GameRules.MonthlyInstallments(state));
@@ -655,7 +715,7 @@ namespace ColonQuest.UI
 
             modal.Backdrop = RemoteImages.Get(gameEvent.ImageKey);
             AudioDirector.Talk(Loc.T(gameEvent.Narrative), gameEvent.Npc != null ? gameEvent.Npc.Name : string.Empty);
-            modal.Show(gameEvent.Title, who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : "Narrador");
+            modal.Show(Loc.T(gameEvent.Title), who, Loc.T(gameEvent.Narrative), options, gameEvent.Npc != null ? gameEvent.Npc.Name : Loc.T("Narrador"));
         }
 
         private void ShowOutcome(ChoiceOutcome outcome)
@@ -678,6 +738,12 @@ namespace ColonQuest.UI
                 text.AppendLine(Loc.T("Tus cuentas quedaron igual."));
             }
 
+            if (!string.IsNullOrEmpty(outcome.Note))
+            {
+                text.AppendLine();
+                text.AppendLine(outcome.Note);
+            }
+
             AppendDeal(text, session.LastDeal);
 
             text.AppendLine();
@@ -685,7 +751,7 @@ namespace ColonQuest.UI
                 ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
                 : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
 
-            modal.Show("Lo que pasó", outcome.ChoiceLabel, text.ToString(), new[] { Continue(null) });
+            modal.Show(Loc.T("Lo que pasó"), Loc.T(outcome.ChoiceLabel), text.ToString(), new[] { Continue(null) });
         }
 
         /// <summary>After a deal: the real cost of the installments next to the cash price, and the questions asked.</summary>
@@ -791,9 +857,9 @@ namespace ColonQuest.UI
             text.Append(Loc.F("Te queda {0} en efectivo y la tarjeta debe {1}.", Money.Format(report.EndingCash), Money.Format(report.EndingCardBalance)));
 
             bool last = session.Loop.IsFinished;
-            modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), "Estado de cuenta del mes", text.ToString(), new[]
+            modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), Loc.T("Estado de cuenta del mes"), text.ToString(), new[]
             {
-                new ModalOption { Label = last ? "Ver mi resumen" : "Seguir", Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
+                new ModalOption { Label = last ? Loc.T("Ver mi resumen") : Loc.T("Seguir"), Color = GameUiColors.Yellow, OnPress = last ? (System.Action)(() => session.FinishRun()) : null }
             });
         }
 
@@ -825,7 +891,7 @@ namespace ColonQuest.UI
             thingUses.TryGetValue(key, out int uses);
             thingUses[key] = uses + 1;
             string line = ThingLines.Pick(station.Lines, uses, session.State);
-            AudioDirector.Talk(line, station.DisplayName);
+            AudioDirector.Talk(Loc.T(line), station.DisplayName);
 
             // A pedestrian stops walking to chat.
             var walker = station.GetComponentInParent<Patrol>();
@@ -837,7 +903,7 @@ namespace ColonQuest.UI
 
             // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
             bool person = station.name == "Thing_Talk";
-            ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, line);
+            ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, Loc.T(line));
         }
 
         /// <summary>The name that goes before what a person says: the one of the character, or a plain word for a passer-by.</summary>
@@ -898,7 +964,7 @@ namespace ColonQuest.UI
 
             text.AppendLine();
             text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(GameRules.NetWorth(state))));
-            modal.Show("Tu estado de cuenta", Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
+            modal.Show(Loc.T("Tu estado de cuenta"), Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
         }
 
         private void ShowEnd(SessionSummary summary)
@@ -921,9 +987,9 @@ namespace ColonQuest.UI
             var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
             if (assets.Count == 0)
             {
-                modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+                modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
                 {
-                    new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                    new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
                 });
                 return;
             }
@@ -931,10 +997,10 @@ namespace ColonQuest.UI
             long withAssets = GameRules.NetWorth(session.State, session.Loop.Holdings);
             text.AppendLine();
             text.Append(Loc.F("Con lo que compraste: {0}", Money.Format(withAssets)));
-            modal.Show("Fin de la partida", Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
+            modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
             {
-                new ModalOption { Label = "Ver lo que compraste", Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
-                new ModalOption { Label = "Jugar de nuevo", Color = GameUiColors.Green, OnPress = Restart }
+                new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
+                new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
             });
         }
 
@@ -976,7 +1042,7 @@ namespace ColonQuest.UI
 
         private static ModalOption Continue(System.Action then)
         {
-            return new ModalOption { Label = "Continuar", Color = GameUiColors.Yellow, OnPress = then };
+            return new ModalOption { Label = Loc.T("Continuar"), Color = GameUiColors.Yellow, OnPress = then };
         }
     }
 }

@@ -85,6 +85,32 @@ namespace ColonQuest.World
             lines = stationLines ?? new string[0];
         }
 
+        /// <summary>The name of the colliders of the walls between rooms (see the interiors of the map builder).</summary>
+        public const string InnerWallName = "WallCollider";
+
+        private static readonly RaycastHit2D[] SightHits = new RaycastHit2D[16];
+
+        /// <summary>
+        /// False when a wall between rooms stands between this point and the middle of the station: the bathroom cannot be
+        /// used from the kitchen. Other colliders, like furniture, do not count.
+        /// </summary>
+        public bool CanBeReachedFrom(Vector2 point)
+        {
+            var filter = new ContactFilter2D();
+            filter.NoFilter();
+            int count = Physics2D.Linecast(point, transform.position, filter, SightHits);
+            for (int i = 0; i < count; i++)
+            {
+                var hit = SightHits[i].collider;
+                if (hit != null && !hit.isTrigger && hit.name == InnerWallName)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void Reset()
         {
             GetComponent<BoxCollider2D>().isTrigger = true;

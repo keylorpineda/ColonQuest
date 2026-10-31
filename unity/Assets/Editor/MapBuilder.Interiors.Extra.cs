@@ -42,15 +42,33 @@ namespace ColonQuest.EditorTools
         /// <summary>A rug with a darker border, so it reads as cloth and not as a colored zone.</summary>
         private static void Rug(Transform g, float x, float y, float w, float h, string hex, string borderHex)
         {
+            Decal(g, "Rug_Outline", rounded, x, y, w + 0.1f, h + 0.1f, "#2A3345", 0.85f);
             Decal(g, "Rug_Border", rounded, x, y, w, h, borderHex);
             Decal(g, "Rug", rounded, x, y, w - 0.24f, h - 0.24f, hex);
+            if (w > 1.4f && h > 0.8f)
+            {
+                Decal(g, "Rug_InnerTrim", rounded, x, y, w - 0.46f, h - 0.42f, borderHex, 0.55f);
+                Decal(g, "Rug_InnerCore", rounded, x, y, w - 0.56f, h - 0.52f, hex);
+            }
         }
 
         private static void Plant(Transform g, float x, float y, float scale = 1f)
         {
             Prop(g, "Pot", roundedSmall, new Vector2(x, y), new Vector2(0.6f, 0.5f) * scale, GamePalette.Hex("#C26A3A"));
-            Deco(g, "Plant", circle, x, y + 0.35f * scale, 0.9f * scale, 0.9f * scale, "#3FA66A");
-            Deco(g, "Leaf", circle, x - 0.15f * scale, y + 0.5f * scale, 0.4f * scale, 0.4f * scale, "#6BBF59");
+            Deco(g, "Pot_Rim", roundedSmall, x, y + 0.2f * scale, 0.68f * scale, 0.14f * scale, "#D67B47", 1f, OrderProp + 2);
+            Deco(g, "Pot_Soil", circle, x, y + 0.22f * scale, 0.52f * scale, 0.14f * scale, "#4A3222", 1f, OrderProp + 2);
+
+            var rig = new GameObject("PlantRig").transform;
+            rig.SetParent(g, false);
+            rig.localPosition = new Vector2(x, y + 0.22f * scale);
+            rig.gameObject.AddComponent<FoliagePhysics>().Configure(3.2f, 1.5f, x * 1.3f + y * 0.9f, 0.02f, true, 1.45f, 11f);
+
+            Deco(rig, "Plant_Outline", circle, 0f, 0.18f * scale, 1.02f * scale, 0.98f * scale, "#1C2233", 1f, 6);
+            Deco(rig, "Plant_Deep", circle, 0.06f * scale, 0.14f * scale, 0.88f * scale, 0.84f * scale, "#2E8553", 1f, 7);
+            Deco(rig, "Plant", circle, -0.02f * scale, 0.2f * scale, 0.82f * scale, 0.8f * scale, "#3FA66A", 1f, 7);
+            Deco(rig, "Leaf", circle, -0.15f * scale, 0.32f * scale, 0.44f * scale, 0.4f * scale, "#6BBF59", 1f, 8);
+            Deco(rig, "Leaf_Right", circle, 0.18f * scale, 0.26f * scale, 0.36f * scale, 0.32f * scale, "#6BBF59", 1f, 8);
+            Deco(rig, "Bloom", circle, 0.08f * scale, 0.36f * scale, 0.16f * scale, 0.16f * scale, "#FFD23F", 1f, 9);
         }
 
         private static void DustMotes(Transform g, System.Random random, Room room, int count)

@@ -1,6 +1,20 @@
 {
+  "$defs": {
+    "GameLanguage": {
+      "enum": [
+        "es",
+        "en"
+      ],
+      "title": "GameLanguage",
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
   "properties": {
+    "language": {
+      "$ref": "#/$defs/GameLanguage",
+      "default": "es"
+    },
     "offerId": {
       "pattern": "^[a-z0-9_]{1,40}$",
       "title": "Offerid",

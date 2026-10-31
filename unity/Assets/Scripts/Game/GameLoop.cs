@@ -10,6 +10,9 @@ namespace ColonQuest.Game
     public sealed class ChoiceOutcome
     {
         public string ChoiceLabel = string.Empty;
+
+        /// <summary>Why the numbers moved, when the label alone does not say it. Empty for most outcomes.</summary>
+        public string Note = string.Empty;
         public long CashDelta;
         public long SavingsDelta;
         public long EmergencyFundDelta;
@@ -50,7 +53,7 @@ namespace ColonQuest.Game
         public int TasksDone { get; private set; }
         public int Decisions { get; private set; }
 
-        /// <summary>Tasks completed today: at most 1 task event per day is allowed.</summary>
+        /// <summary>Tasks completed today: at most <see cref="GameRules.TasksPerDay"/> per day.</summary>
         public int TasksToday { get; private set; }
 
         /// <summary>Remaining days of jail sentence to serve.</summary>
@@ -105,6 +108,7 @@ namespace ColonQuest.Game
             HurtThisMonth = false;
             Arrests = 0;
             HasSwimsuit = false;
+            Outfit = 0;
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
@@ -131,6 +135,7 @@ namespace ColonQuest.Game
                 arrests = Arrests,
                 hurtThisMonth = HurtThisMonth,
                 hasSwimsuit = HasSwimsuit,
+                outfit = Outfit,
                 swamThisMonth = SwamThisMonth,
                 sleptThisMonth = SleptThisMonth,
                 cookedThisMonth = CookedThisMonth,
@@ -194,6 +199,7 @@ namespace ColonQuest.Game
             Arrests = Math.Max(0, snapshot.arrests);
             HurtThisMonth = snapshot.hurtThisMonth;
             HasSwimsuit = snapshot.hasSwimsuit;
+            Outfit = Math.Max(0, snapshot.outfit);
             SwamThisMonth = snapshot.swamThisMonth;
             SleptThisMonth = snapshot.sleptThisMonth;
             CookedThisMonth = snapshot.cookedThisMonth;
@@ -237,7 +243,7 @@ namespace ColonQuest.Game
             }
         }
 
-        /// <summary>The bank, the house and the market places are not tasks; every other place offers one event per month.</summary>
+        /// <summary>The bank, the house and the market places are not tasks; every other place offers one event per day.</summary>
         public static bool IsTaskStation(StationType type)
         {
             return type != StationType.Bank && type != StationType.Home && type != StationType.Thing && type != StationType.Atm
@@ -248,7 +254,7 @@ namespace ColonQuest.Game
 
         public bool CanDoTask(StationType type)
         {
-            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && TasksToday < 1 && !Clock.IsLastDay && !doneStations.Contains(type);
+            return IsTaskStation(type) && !IsFinished && TasksDone < GameRules.TasksPerMonth && TasksToday < GameRules.TasksPerDay && !doneStations.Contains(type);
         }
 
         public bool AlreadyDid(StationType type)
@@ -266,6 +272,21 @@ namespace ColonQuest.Game
 
         public bool HasSwimsuit { get; private set; }
 
+        /// <summary>The clothes the player wears, by number (see PlayerOutfit): 0 is the everyday clothes, 3 the swimsuit.</summary>
+        public int Outfit { get; private set; }
+
+        /// <summary>Changes the clothes. The swimsuit can only be worn once it was bought.</summary>
+        public bool Wear(int outfit, int swimsuit)
+        {
+            if (outfit < 0 || (outfit == swimsuit && !HasSwimsuit))
+            {
+                return false;
+            }
+
+            Outfit = outfit;
+            return true;
+        }
+
         public bool SwamThisMonth { get; private set; }
 
         /// <summary>True once the player slept in the bed this month. Skipping it costs a little mood when the month closes.</summary>
@@ -273,10 +294,10 @@ namespace ColonQuest.Game
 
         public bool CookedThisMonth { get; private set; }
 
-        /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): they count as tasks not done.</summary>
+        /// <summary>Days of the month that are gone (a night in jail, a day in the hospital): their tasks count as not done.</summary>
         public void LoseTasks(int days)
         {
-            TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days));
+            TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days) * GameRules.TasksPerDay);
         }
 
         // ---------------------------------------------------------------- things that happen to the player
@@ -424,10 +445,12 @@ namespace ColonQuest.Game
         private void NextMorning()
         {
             Courses.AttendedToday = false;
-            TasksToday = 0;
             int previousDay = Clock.Day;
             if (Clock.SleepToMorning())
             {
+                // A new week: two more errands, and the places of last week can be visited again.
+                TasksToday = 0;
+                doneStations.Clear();
                 EndWorkingDay();
                 if (previousDay == 2)
                 {
@@ -579,7 +602,39 @@ namespace ColonQuest.Game
             FinanceEngine.ChangeWellbeing(State, MarketAssumptions.CookWellbeing);
             CookedThisMonth = true;
             Decisions++;
-            return OutcomeFrom(before, Loc.T("Cocinaste en casa"));
+            var outcome = OutcomeFrom(before, Loc.T("Cocinaste en casa"));
+            outcome.Note = Loc.F("Comer afuera te iba a costar unos {0}. Como cocinaste, esa plata no salió de tu bolsa: por eso aparece como efectivo de más.", Money.Format(MarketAssumptions.HomeCookingSaving));
+            return outcome;
+        }
+
+        /// <summary>The cash machine: money from the savings account to cash. Null when the account is empty.</summary>
+        public ChoiceOutcome WithdrawSavings(long amount)
+        {
+            if (amount <= 0L || State.Savings <= 0L)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            long moved = FinanceEngine.WithdrawSavings(State, amount);
+            var outcome = OutcomeFrom(before, Loc.F("Sacaste {0} del cajero", Money.Format(moved)));
+            outcome.Note = Loc.T("La plata pasó de tu cuenta de ahorro a tu bolsa. Lo que tenés no cambió, solo dónde está.");
+            return outcome;
+        }
+
+        /// <summary>The deposit window: cash into the savings account. Null when there is no cash.</summary>
+        public ChoiceOutcome DepositCash(long amount)
+        {
+            if (amount <= 0L || State.Cash <= 0L)
+            {
+                return null;
+            }
+
+            var before = State.Clone();
+            long moved = FinanceEngine.DepositCash(State, amount);
+            var outcome = OutcomeFrom(before, Loc.F("Depositaste {0} en tu cuenta", Money.Format(moved)));
+            outcome.Note = Loc.T("En la cuenta la plata no se gasta por impulso y está segura si perdés la billetera.");
+            return outcome;
         }
 
         /// <summary>An officer saw the player cross on red: a fine and a little stress, no jail and no lost days.</summary>

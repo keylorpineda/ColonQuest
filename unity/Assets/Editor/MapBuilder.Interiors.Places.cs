@@ -65,6 +65,14 @@ namespace ColonQuest.EditorTools
             }
 
             WallPlate(parts.Labels, "AUTOS DON CHEPE", new Vector2(-5.0f, 6.0f), 3.2f, "#C0504D", GamePalette.White, 0.03f);
+            // Agency wall clock and dealership promo banner (Deco only)
+            Deco(show, "WallClock", circle, -0.6f, 5.9f, 0.75f, 0.75f, "#1E293B", 1f, 8);
+            Deco(show, "ClockFace", circle, -0.6f, 5.9f, 0.62f, 0.62f, "#F8FAFC", 1f, 9);
+            Deco(show, "ClockHour", square, -0.6f, 5.96f, 0.04f, 0.22f, "#0F172A", 1f, 10);
+            Deco(show, "ClockMin", square, -0.53f, 5.9f, 0.22f, 0.04f, "#0F172A", 1f, 10);
+            Deco(show, "PromoBanner", roundedSmall, -5.0f, 5.2f, 4.0f, 0.35f, "#1E293B", 1f, 8);
+            Deco(show, "PromoStripeRed", square, -6.0f, 5.2f, 0.6f, 0.25f, "#EF4444", 1f, 9);
+            Deco(show, "PromoStripeBlue", square, -4.0f, 5.2f, 0.6f, 0.25f, "#3B82F6", 1f, 9);
 
             // Two salesmen's desks in the middle of the floor.
             foreach (float x in new[] { -6.4f, -2.4f })
@@ -80,14 +88,31 @@ namespace ColonQuest.EditorTools
             BuildNpc(parts.People, "Vendedor1", new Vector2(-6.4f, 0.55f), new Look { Skin = "#4DA3FF", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, false);
             BuildNpc(parts.People, "Vendedor2", new Vector2(-2.4f, 0.55f), new Look { Skin = "#B28DFF", Extra = Accessory.Tie, ExtraColor = "#2A7F8C" }, false);
 
+            // The salesmen talk from the customer side of their desks. They sell the car; the payments are set in financing.
+            BuildThing(parts.Stations, "Salesman1", "Hablar con el vendedor", new Vector2(-6.4f, -1.75f), new Vector2(1.6f, 0.4f),
+                "\"El compacto gasta poquito. Para la ciudad es lo que más conviene.\"",
+                "\"Antes de enamorarse de un carro, sume marchamo, seguro y gasolina. Eso se paga aunque esté parqueado.\"");
+            BuildThing(parts.Stations, "Salesman2", "Hablar con el vendedor", new Vector2(-2.4f, -1.75f), new Vector2(1.6f, 0.4f),
+                "\"La SUV es linda, pero el marchamo y el seguro son más caros. Pregúnteme cuánto sale al año.\"",
+                "\"Si le gusta uno, pase a financiamiento: allá le hacen las cuotas con la prima y el seguro.\"");
+
             // Don Chepe's reception desk, by the way in: he welcomes the player here and the car negotiation opens here.
             var reception = IL(parts.Props, "Reception");
             Solid(reception, "Desk", rounded, 1.9f, -3.6f, 3.0f, 0.9f, "#8B5A3C");
             Deco(reception, "Bell", circle, 1.1f, -3.5f, 0.2f, 0.2f, "#FFD23F", 1f, 9);
             Deco(reception, "Contract", roundedSmall, 2.6f, -3.55f, 0.6f, 0.42f, "#FFFFFF", 1f, 8);
             Deco(reception, "Pen", roundedSmall, 2.2f, -3.55f, 0.06f, 0.3f, "#1D4F8C", 1f, 9);
+            Deco(reception, "Brochure1", roundedSmall, 2.95f, -3.45f, 0.3f, 0.4f, "#3B82F6", 1f, 9);
+            Deco(reception, "Brochure2", roundedSmall, 2.8f, -3.48f, 0.3f, 0.4f, "#EF4444", 1f, 9);
+            Deco(reception, "EntranceMat", roundedSmall, 0f, -6.2f, 2.2f, 0.6f, "#334155", 1f, 4);
+            Deco(reception, "EntranceMatInner", roundedSmall, 0f, -6.2f, 1.9f, 0.45f, "#475569", 1f, 5);
+            Deco(reception, "ExtinguisherBody", roundedSmall, 0.2f, -5.5f, 0.32f, 0.75f, "#EF4444", 1f, 8);
+            Deco(reception, "ExtinguisherGauge", circle, 0.2f, -5.05f, 0.14f, 0.14f, "#E2E8F0", 1f, 9);
+            Deco(reception, "ExtinguisherHose", square, 0.35f, -5.25f, 0.05f, 0.35f, "#1E293B", 1f, 9);
             BuildNpc(parts.People, "DonChepe", new Vector2(1.9f, -2.65f), new Look { Skin = "#F2994A", Extra = Accessory.Tie, ExtraColor = "#C0504D" }, false);
-            BuildStation(parts.Stations, "Station_CarDealer", StationType.CarDealer, "Hablar con Don Chepe y ver los carros", new Vector2(1.9f, -4.8f));
+            BuildThing(parts.Stations, "DonChepe", "Saludar a Don Chepe", new Vector2(1.9f, -4.8f), new Vector2(1.6f, 0.4f),
+                "\"¡Pase adelante! Vea los carros con calma. Para sacarlo en cuotas, pase a financiamiento, al fondo a la derecha.\"",
+                "\"Los vendedores le cuentan de cada carro. Las cuotas, la prima y el seguro se los arreglan en financiamiento.\"");
             WallPlate(parts.Labels, "BIENVENIDO", new Vector2(1.9f, -4.4f), 1.5f, "#1D4F8C", GamePalette.White, 0.024f);
 
             // The financing office behind glass.
@@ -131,6 +156,9 @@ namespace ColonQuest.EditorTools
             Deco(inside, "Fine print", square, 7.2f, -0.55f, 0.5f, 0.03f, "#9AA3B8", 1f, 9);
             Deco(inside, "Fine print", square, 7.2f, -0.45f, 0.5f, 0.03f, "#9AA3B8", 1f, 9);
             Solid(inside, "Chair", circle, 7.8f, -1.3f, 0.5f, 0.5f, "#3B6FB6");
+
+            // The financing officer: the car negotiation, with the payments, opens at this desk.
+            BuildStation(parts.Stations, "Station_CarDealer", StationType.CarDealer, "Hablar de cuotas con la encargada de financiamiento", new Vector2(7.8f, -2.15f));
             BuildNpc(parts.People, "Financiera", new Vector2(7.8f, 0.6f), new Look { Skin = "#FF8FB1", Extra = Accessory.Vest, ExtraColor = "#2A7F8C" }, false);
             WallPlate(parts.Labels, "FINANCIAMIENTO", new Vector2(7.5f, 1.9f), 2.4f, "#1D4F8C", GamePalette.White, 0.026f);
             BuildThing(parts.Stations, "FinePrint", "Leer el contrato", new Vector2(7.2f, -0.5f), new Vector2(1.0f, 0.8f),
@@ -147,6 +175,10 @@ namespace ColonQuest.EditorTools
             Solid(waiting, "CoffeeTable", rounded, -6.9f, -4.5f, 0.9f, 0.9f, "#E8E2D6");
             Deco(waiting, "Cup", circle, -6.9f, -4.45f, 0.22f, 0.22f, "#FFFFFF", 1f, 8);
             Deco(waiting, "Magazine", roundedSmall, -7.15f, -4.6f, 0.3f, 0.22f, "#FFD23F", 1f, 8);
+            // Water dispenser in waiting room corner (Deco only)
+            Deco(waiting, "WaterDispenserBase", roundedSmall, -5.6f, -5.5f, 0.5f, 0.9f, "#F1F5F9", 1f, 7);
+            Deco(waiting, "WaterBottle", circle, -5.6f, -4.95f, 0.44f, 0.5f, "#38BDF8", 0.85f, 8);
+            Deco(waiting, "DispenserTap", square, -5.6f, -5.35f, 0.14f, 0.06f, "#3B82F6", 1f, 9);
 
             var coffee = IL(parts.Props, "CoffeeCorner");
             Solid(coffee, "Counter", rounded, -10.0f, -2.2f, 1.0f, 1.8f, "#D6B656");
@@ -222,6 +254,22 @@ namespace ColonQuest.EditorTools
                 }
             }
 
+            // Inmates in non-player cells (sitting on the cot, standing at the bars, resting in the cell)
+            BuildNpc(parts.People, "Reo1", new Vector2(-3.5f, 4.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Neutral, Hair = HairStyle.Buzz, HairColor = "#3D2B1F"
+            }, false);
+
+            BuildNpc(parts.People, "Reo2", new Vector2(2.6f, 1.4f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Bald, Mustache = true
+            }, false);
+
+            BuildNpc(parts.People, "Reo3", new Vector2(7.0f, 3.2f), new Look
+            {
+                Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Frown, Hair = HairStyle.Spiky, HairColor = "#1F242D"
+            }, false);
+
             WallPlate(parts.Labels, "CELDAS", new Vector2(0f, 6.1f), 1.6f, "#2A3345", GamePalette.White, 0.028f);
 
             // The counter of the officer, in the middle of the room.
@@ -286,26 +334,28 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildElevator(InteriorParts parts, Vector2 center, Vector2 doorAt, Vector2 doorSize, string targetScene, string targetSpawn, Vector2 entry, Vector2 inside)
         {
-            const float halfWidth = 0.95f;
+            // Big enough for a whole person: the player walks in and the doors close in front of them.
+            const float halfWidth = 1.05f;
+            const float height = 1.6f;
             var lift = IL(parts.Props, "Elevator");
-            Deco(lift, "Elevator_Frame_Outline", rounded, center.x, center.y, 2.5f, 1.35f, "#2A3345", 1f, 7);
-            Deco(lift, "Elevator_Frame", rounded, center.x, center.y, 2.4f, 1.25f, "#B7C0D0", 1f, 8);
-            Deco(lift, "Elevator_Cabin", square, center.x, center.y, halfWidth * 2f, 1.0f, "#3A4152", 1f, 9);
+            Deco(lift, "Elevator_Frame_Outline", rounded, center.x, center.y, 2.8f, height + 0.35f, "#2A3345", 1f, 7);
+            Deco(lift, "Elevator_Frame", rounded, center.x, center.y, 2.7f, height + 0.25f, "#B7C0D0", 1f, 8);
+            Deco(lift, "Elevator_Cabin", square, center.x, center.y, halfWidth * 2f, height, "#3A4152", 1f, 9);
 
             foreach (int side in new[] { -1, 1 })
             {
                 var hinge = Group(lift, side < 0 ? "Elevator_LeafL" : "Elevator_LeafR");
                 hinge.localPosition = new Vector2(center.x + side * halfWidth, center.y);
-                Deco(hinge, "Leaf", square, -side * halfWidth * 0.5f, 0f, halfWidth, 1.0f, "#D5DBE6", 1f, 10);
-                Deco(hinge, "Leaf_Shine", square, -side * halfWidth * 0.75f, 0f, 0.06f, 0.9f, "#F2F5FA", 1f, 11);
-                Deco(hinge, "Leaf_Edge", square, -side * (halfWidth - 0.02f), 0f, 0.04f, 1.0f, "#8E96AA", 1f, 11);
+                Deco(hinge, "Leaf", square, -side * halfWidth * 0.5f, 0f, halfWidth, height, "#D5DBE6", 1f, 10);
+                Deco(hinge, "Leaf_Shine", square, -side * halfWidth * 0.75f, 0f, 0.06f, height - 0.1f, "#F2F5FA", 1f, 11);
+                Deco(hinge, "Leaf_Edge", square, -side * (halfWidth - 0.02f), 0f, 0.04f, height, "#8E96AA", 1f, 11);
             }
 
-            var buttons = new Vector2(center.x + 1.55f, center.y);
+            var buttons = new Vector2(center.x + 1.7f, center.y);
             Deco(lift, "Buttons", roundedSmall, buttons.x, buttons.y, 0.3f, 0.55f, "#4B5568", 1f, 8);
             Deco(lift, "ButtonUp", circle, buttons.x, buttons.y + 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
             Deco(lift, "ButtonDown", circle, buttons.x, buttons.y - 0.12f, 0.12f, 0.12f, "#FFD23F", 1f, 9);
-            WallPlate(parts.Labels, "ASCENSOR", new Vector2(center.x, center.y + 0.95f), 1.5f, "#2A3345", GamePalette.White, 0.022f);
+            WallPlate(parts.Labels, "ASCENSOR", new Vector2(center.x, center.y + height * 0.5f + 0.4f), 1.5f, "#2A3345", GamePalette.White, 0.022f);
 
             var door = new GameObject("Door_Elevator");
             door.transform.SetParent(parts.Stations, false);
@@ -366,6 +416,13 @@ namespace ColonQuest.EditorTools
             Deco(reception, "Cross", square, -6.8f, -3.4f, 0.14f, 0.5f, "#E8505B", 1f, 9);
             Deco(reception, "Computer", roundedSmall, -8.0f, -3.3f, 0.7f, 0.45f, "#2A3040", 1f, 8);
             Deco(reception, "Screen", roundedSmall, -8.0f, -3.28f, 0.56f, 0.3f, "#4DA3FF", 1f, 9);
+            // Hospital reception atmospheric details (Deco only)
+            Deco(reception, "HandSanitizerBase", roundedSmall, -4.8f, -3.4f, 0.22f, 0.5f, "#E2E8F0", 1f, 8);
+            Deco(reception, "HandSanitizerBottle", roundedSmall, -4.8f, -3.35f, 0.18f, 0.3f, "#38BDF8", 0.9f, 9);
+            Deco(reception, "ExtinguisherBody", roundedSmall, -4.0f, -5.5f, 0.32f, 0.75f, "#EF4444", 1f, 8);
+            Deco(reception, "ExtinguisherGauge", circle, -4.0f, -5.05f, 0.14f, 0.14f, "#E2E8F0", 1f, 9);
+            Deco(reception, "ExtinguisherHose", square, -3.85f, -5.25f, 0.05f, 0.35f, "#1E293B", 1f, 9);
+            Deco(reception, "TrashBinDeco", roundedSmall, -5.2f, -2.5f, 0.45f, 0.55f, "#64748B", 1f, 8);
             BuildNpc(parts.People, "Enfermera", new Vector2(-6.8f, -2.4f), new Look { Skin = "#55E08F", Extra = Accessory.Cap, ExtraColor = "#FFFFFF" }, false);
             BuildStation(parts.Stations, "Station_HealthDesk", StationType.HealthDesk, "Hablar de un seguro de salud", new Vector2(-6.8f, -4.6f));
             WallPlate(parts.Labels, "RECEPCIÓN Y SEGURO", new Vector2(-6.8f, -4.15f), 2.8f, "#1D4F8C", GamePalette.White, 0.024f);
@@ -378,6 +435,19 @@ namespace ColonQuest.EditorTools
                 Solid(waiting, "Chair", rounded, -10.6f + i * 1.4f, 1.1f, 1.0f, 0.6f, "#4DA3FF");
                 Solid(waiting, "Chair", rounded, -10.6f + i * 1.4f, -0.5f, 1.0f, 0.6f, "#4DA3FF");
             }
+            // Hospital waiting area details: Snellen chart, wall clock, water cooler (Deco only)
+            Deco(waiting, "EyeChartBack", roundedSmall, -10.6f, 2.5f, 0.7f, 1.0f, "#F8FAFC", 1f, 8);
+            Deco(waiting, "EyeChartE", square, -10.6f, 2.8f, 0.35f, 0.18f, "#0F172A", 1f, 9);
+            Deco(waiting, "EyeChartLines", square, -10.6f, 2.45f, 0.45f, 0.05f, "#0F172A", 1f, 9);
+            Deco(waiting, "EyeChartRed", square, -10.6f, 2.25f, 0.5f, 0.03f, "#EF4444", 1f, 9);
+            Deco(waiting, "EyeChartGreen", square, -10.6f, 2.15f, 0.5f, 0.03f, "#22C55E", 1f, 9);
+            Deco(waiting, "WallClock", circle, -8.0f, 2.6f, 0.7f, 0.7f, "#1E293B", 1f, 8);
+            Deco(waiting, "ClockFace", circle, -8.0f, 2.6f, 0.58f, 0.58f, "#F8FAFC", 1f, 9);
+            Deco(waiting, "ClockHand1", square, -8.0f, 2.65f, 0.04f, 0.2f, "#0F172A", 1f, 10);
+            Deco(waiting, "ClockHand2", square, -7.94f, 2.6f, 0.2f, 0.04f, "#0F172A", 1f, 10);
+            Deco(waiting, "WaterCoolerBase", roundedSmall, -6.5f, 0.3f, 0.5f, 0.9f, "#F1F5F9", 1f, 7);
+            Deco(waiting, "WaterJug", circle, -6.5f, 0.85f, 0.44f, 0.5f, "#38BDF8", 0.85f, 8);
+            Deco(waiting, "WaterTap", square, -6.5f, 0.45f, 0.12f, 0.06f, "#3B82F6", 1f, 9);
 
             // The emergency ward on the right: four beds with curtains and monitors.
             var ward = IL(parts.Props, "EmergencyWard");
@@ -489,6 +559,15 @@ namespace ColonQuest.EditorTools
                 if (station.Type == StationType.Home)
                 {
                     Object.DestroyImmediate(station.gameObject);
+                }
+            }
+
+            // The mother lives in her own house, not in the neighbor's.
+            foreach (var part in new[] { parts.People.Find(OpeningMother), parts.Stations.Find("Thing_" + OpeningMother) })
+            {
+                if (part != null)
+                {
+                    Object.DestroyImmediate(part.gameObject);
                 }
             }
 

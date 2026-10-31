@@ -47,6 +47,48 @@ namespace ColonQuest.Finance.Tests
         }
 
         [Test]
+        public void WithdrawSavings_MovesTheMoneyToCashAndNeverMoreThanTheAccount()
+        {
+            var state = new PlayerState { Cash = 5_000L, Savings = 30_000L };
+            Assert.AreEqual(25_000L, FinanceEngine.WithdrawSavings(state, 25_000L));
+            Assert.AreEqual(30_000L, state.Cash);
+            Assert.AreEqual(5_000L, state.Savings);
+
+            Assert.AreEqual(5_000L, FinanceEngine.WithdrawSavings(state, 50_000L), "only what the account holds");
+            Assert.AreEqual(35_000L, state.Cash);
+            Assert.AreEqual(0L, state.Savings);
+
+            Assert.AreEqual(0L, FinanceEngine.WithdrawSavings(state, 10_000L), "an empty account gives nothing");
+            Assert.AreEqual(35_000L, state.Cash);
+        }
+
+        [Test]
+        public void DepositCash_MovesTheMoneyToSavingsAndNeverMoreThanTheCash()
+        {
+            var state = new PlayerState { Cash = 30_000L, Savings = 1_000L };
+            Assert.AreEqual(10_000L, FinanceEngine.DepositCash(state, 10_000L));
+            Assert.AreEqual(20_000L, state.Cash);
+            Assert.AreEqual(11_000L, state.Savings);
+
+            Assert.AreEqual(20_000L, FinanceEngine.DepositCash(state, 50_000L), "only the cash in hand");
+            Assert.AreEqual(0L, state.Cash);
+            Assert.AreEqual(31_000L, state.Savings);
+
+            Assert.AreEqual(0L, FinanceEngine.DepositCash(state, 10_000L), "no cash, nothing moves");
+            Assert.AreEqual(31_000L, state.Savings);
+        }
+
+        [Test]
+        public void WithdrawAndDeposit_RejectNonPositiveAmounts()
+        {
+            var state = new PlayerState { Cash = 5_000L, Savings = 5_000L };
+            Assert.Throws<ArgumentOutOfRangeException>(() => FinanceEngine.WithdrawSavings(state, 0L));
+            Assert.Throws<ArgumentOutOfRangeException>(() => FinanceEngine.DepositCash(state, -1L));
+            Assert.AreEqual(5_000L, state.Cash);
+            Assert.AreEqual(5_000L, state.Savings);
+        }
+
+        [Test]
         public void Casino_TheHouseAlwaysWinsInTheLongRun()
         {
             Assert.AreEqual(63L, CasinoGame.ReturnPerHundred(10_000L), "63 colones come back for every 100 bet");

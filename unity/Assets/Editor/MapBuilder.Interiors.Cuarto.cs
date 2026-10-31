@@ -40,6 +40,8 @@ namespace ColonQuest.EditorTools
             var chair = IL(parts.Props, "PlasticChair");
             Solid(chair, "Seat", roundedSmall, -3.4f, -1.9f, 0.75f, 0.7f, "#E9E6DC");
             Deco(chair, "Back", roundedSmall, -3.4f, -1.55f, 0.75f, 0.14f, "#C9C5B8", 1f, 8);
+            Solid(chair, "TrashBin", roundedSmall, -4.2f, -2.4f, 0.42f, 0.50f, "#7F8C8D");
+            Deco(chair, "TrashRim", roundedSmall, -4.2f, -2.15f, 0.46f, 0.10f, "#616A6B", 1f, 9);
 
             // The papers of the month, in a cardboard box: the account statement.
             var box = IL(parts.Props, "PapersBox");
@@ -51,12 +53,24 @@ namespace ColonQuest.EditorTools
 
             // The pet (zaguatico) on its warm cushion
             var pet = IL(parts.Props, "Pet");
-            Deco(pet, "Cushion", rounded, 2.2f, 1.8f, 1.2f, 0.9f, "#A0522D", 1f, 7);
-            Deco(pet, "Inner", circle, 2.2f, 1.8f, 0.9f, 0.7f, "#D2B48C", 1f, 8);
-            Deco(pet, "Body", circle, 2.2f, 1.85f, 0.65f, 0.45f, "#C68B59", 1f, 9);
-            Deco(pet, "Head", circle, 2.45f, 1.95f, 0.35f, 0.32f, "#A66D3B", 1f, 10);
-            Deco(pet, "Ear", circle, 2.52f, 2.05f, 0.14f, 0.18f, "#7D4E27", 1f, 11);
-            Deco(pet, "Tail", roundedSmall, 1.85f, 1.85f, 0.25f, 0.1f, "#C68B59", 1f, 9);
+            Deco(pet, "Cushion", roundedSmall, 2.2f, 1.8f, 1.05f, 0.62f, "#8C4A28", 1f, 7);
+            Deco(pet, "CushionFleece", roundedSmall, 2.2f, 1.8f, 0.90f, 0.48f, "#D4B086", 1f, 8);
+            Deco(pet, "Body", roundedSmall, 2.12f, 1.82f, 0.58f, 0.36f, "#C68B59", 1f, 9);
+            Deco(pet, "Spot", circle, 2.06f, 1.88f, 0.22f, 0.16f, "#A66D3B", 1f, 10);
+            var tail = Deco(pet, "Tail", roundedSmall, 1.78f, 1.88f, 0.24f, 0.10f, "#C68B59", 1f, 9);
+            Tilt(tail, 30f);
+            Deco(pet, "PawBack", roundedSmall, 2.42f, 1.70f, 0.24f, 0.09f, "#A66D3B", 1f, 9);
+            Deco(pet, "PawFront", roundedSmall, 2.46f, 1.75f, 0.26f, 0.10f, "#C68B59", 1f, 10);
+            Deco(pet, "PawToe", circle, 2.56f, 1.75f, 0.08f, 0.08f, "#E2B98A", 1f, 11);
+            Deco(pet, "Head", circle, 2.36f, 1.90f, 0.32f, 0.32f, "#C68B59", 1f, 10);
+            Deco(pet, "Collar", square, 2.28f, 1.86f, 0.06f, 0.18f, "#E8505B", 1f, 11);
+            Deco(pet, "Tag", circle, 2.30f, 1.78f, 0.08f, 0.08f, "#FFD23F", 1f, 12);
+            Deco(pet, "Muzzle", roundedSmall, 2.48f, 1.88f, 0.20f, 0.14f, "#E2B98A", 1f, 11);
+            Deco(pet, "Nose", circle, 2.56f, 1.90f, 0.06f, 0.05f, "#1F1F1F", 1f, 12);
+            Deco(pet, "Eye", circle, 2.40f, 1.94f, 0.05f, 0.05f, "#1F1F1F", 1f, 12);
+            var ear = Deco(pet, "Ear", roundedSmall, 2.28f, 1.97f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
+            Tilt(ear, -18f);
+
             BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(2.2f, 1.8f), new Vector2(1.2f, 1.0f),
                 "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
 
@@ -82,14 +96,26 @@ namespace ColonQuest.EditorTools
             Deco(wear, "Crack", square, -1.1f, wall, 0.05f, 0.7f, "#5C5442", 0.8f, 8);
             Deco(wear, "Crack", square, -0.95f, wall - 0.3f, 0.4f, 0.04f, "#5C5442", 0.8f, 8);
 
+            // Wall calendar and clock
+            Deco(wear, "Calendar", roundedSmall, -1.8f, wall + 0.1f, 0.6f, 0.75f, "#FFFFFF", 1f, 8);
+            Deco(wear, "CalTop", square, -1.8f, wall + 0.38f, 0.54f, 0.14f, "#C0392B", 1f, 9);
+            Deco(wear, "Clock_Out", circle, -4.2f, wall - 0.1f, 0.58f, 0.58f, "#7F8C8D", 1f, 8);
+            Deco(wear, "Clock_Face", circle, -4.2f, wall - 0.1f, 0.46f, 0.46f, "#FFFFFF", 1f, 9);
+            Deco(wear, "Clock_Hands", square, -4.2f, wall - 0.1f, 0.04f, 0.22f, "#1D2230", 1f, 10);
+
             var floor = IL(parts.Floor, "WornFloor");
             Decal(floor, "Scuff", circle, 1.3f, 0.4f, 1.6f, 1.0f, "#8F7E5E", 0.3f);
             Decal(floor, "Scuff", circle, -1.2f, -2.2f, 1.2f, 0.7f, "#8F7E5E", 0.3f);
+            Decal(floor, "Doormat", roundedSmall, 0f, -2.6f, 1.4f, 0.65f, "#5D4037", 0.75f);
 
             // A bare bulb hanging from the ceiling, a little unsteady.
             var bulb = new Vector2(-0.4f, wall);
-            Deco(wear, "Wire", square, bulb.x, bulb.y + 0.2f, 0.03f, 0.45f, "#2A3040", 1f, 8);
-            Deco(wear, "Bulb", circle, bulb.x, bulb.y - 0.1f, 0.2f, 0.24f, "#FFF3C4", 1f, 9);
+            var bulbRig = new GameObject("BulbRig").transform;
+            bulbRig.SetParent(wear, false);
+            bulbRig.localPosition = new Vector2(bulb.x, bulb.y + 0.42f);
+            bulbRig.gameObject.AddComponent<FoliagePhysics>().Configure(2.8f, 1.35f, 4.2f, 0f, false);
+            Deco(bulbRig, "Wire", square, 0f, -0.22f, 0.03f, 0.45f, "#2A3040", 1f, 8);
+            Deco(bulbRig, "Bulb", circle, 0f, -0.52f, 0.2f, 0.24f, "#FFF3C4", 1f, 9);
             Flickering(Glow(parts.Lights, "Light_Bulb", new Vector2(-0.4f, 0.4f), 6.5f, "#FFE9A8", 0.1f, OrderLight), 0.12f, 2.2f, 4f);
         }
 

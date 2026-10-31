@@ -2,8 +2,10 @@ import json
 
 from app.game_master.prompt import (
     SYSTEM_PROMPT,
+    SYSTEM_PROMPT_EN,
     PromptContext,
     build_user_prompt,
+    get_system_prompt,
     state_signals,
 )
 from app.schemas import EffectKind, EventType, PlayerState, TeachingConcept
@@ -73,3 +75,24 @@ def test_user_prompt_payload() -> None:
     assert payload["recentHistory"] == [f"h{i}" for i in range(4, 10)]
     assert payload["player"]["salaryNet"] == 400000
     assert "evt_moto_dañada" in text  # not ASCII-escaped
+
+
+def test_system_prompt_english() -> None:
+    assert get_system_prompt("en") is SYSTEM_PROMPT_EN
+    assert get_system_prompt("es") is SYSTEM_PROMPT
+    assert get_system_prompt("English") is SYSTEM_PROMPT_EN
+    for enum in (EventType, EffectKind, TeachingConcept):
+        for member in enum:
+            assert member.value in SYSTEM_PROMPT_EN
+    assert "natural English" in SYSTEM_PROMPT_EN
+    assert "280 characters" in SYSTEM_PROMPT_EN
+
+
+def test_user_prompt_english_payload() -> None:
+    context = PromptContext(
+        state=STATE,
+        language="en",
+    )
+    text = build_user_prompt(context)
+    payload = json.loads(text.split("\n", 1)[1])
+    assert payload["language"] == "en"

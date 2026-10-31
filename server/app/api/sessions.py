@@ -27,7 +27,11 @@ async def create_session(
     """Start a game. A classCode joins the session to a Class Mode class."""
     if body.class_code is not None and await db.get(SchoolClass, body.class_code) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "class not found")
-    game_session = GameSession(class_code=body.class_code, client_hash=hashed_client)
+    game_session = GameSession(
+        class_code=body.class_code,
+        client_hash=hashed_client,
+        language=str(body.language.value if hasattr(body.language, "value") else body.language),
+    )
     db.add(game_session)
     await db.commit()
     return SessionCreated(session_id=game_session.id)

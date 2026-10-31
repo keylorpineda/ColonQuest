@@ -247,6 +247,28 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.WaitUntil, Condition = condition });
         }
 
+        /// <summary>Changes the player's clothes, as at the wardrobe (see <see cref="PlayerOutfit"/>).</summary>
+        public Interaction Wear(int outfit)
+        {
+            return Apply(() => PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), outfit));
+        }
+
+        /// <summary>The clothes come off for the shower and the pixel blur covers the body for these seconds.</summary>
+        public Interaction Undress(float seconds)
+        {
+            return Apply(() =>
+            {
+                var player = GameObject.FindWithTag(Station.PlayerTag);
+                if (player == null)
+                {
+                    return;
+                }
+
+                PlayerOutfit.Undress(player);
+                InteractionProps.Censor(player, PlayerOutfit.SkinOf(player), seconds);
+            });
+        }
+
         /// <summary>The moment the game changes. It runs even if the player skips the scene.</summary>
         public Interaction Apply(Action action)
         {
@@ -304,6 +326,22 @@ namespace ColonQuest.World
             public void SkipAll()
             {
                 skip = true;
+            }
+
+            /// <summary>
+            /// A scene change destroys the runner in the middle of its script, and the coroutine never reaches its finally:
+            /// without this the game would think a scene is still playing and hide every prompt from then on.
+            /// </summary>
+            private void OnDestroy()
+            {
+                if (Current != this)
+                {
+                    return;
+                }
+
+                Current = null;
+                SetPlaying(false);
+                PlayerController.Frozen = false;
             }
 
             public IEnumerator Run(List<Step> script, GameObject player, Action finished)
@@ -540,6 +578,7 @@ namespace ColonQuest.World
 
                 Vector2 last = body.position;
                 float still = 0f;
+                Collider2D ghost = null;
                 for (float t = 0f; t < WalkTimeout && !skip; t += Time.deltaTime)
                 {
                     Vector2 toTarget = target - body.position;
@@ -548,12 +587,21 @@ namespace ColonQuest.World
                         break;
                     }
 
-                    // Pressed against something for a moment: stop pushing instead of walking into it for seconds.
+                    // Pressed against something for a moment: the feet stop colliding and the player walks on past the
+                    // corner of the furniture, instead of jumping to the end of the walk.
                     still = t > 0.1f && (body.position - last).sqrMagnitude < 0.00002f ? still + Time.deltaTime : 0f;
                     last = body.position;
                     if (still > StuckSeconds)
                     {
-                        break;
+                        var feet = body.GetComponent<Collider2D>();
+                        if (ghost != null || feet == null || !feet.enabled)
+                        {
+                            break;
+                        }
+
+                        ghost = feet;
+                        ghost.enabled = false;
+                        still = 0f;
                     }
 
                     body.linearVelocity = toTarget.normalized * WalkSpeed;
@@ -569,9 +617,14 @@ namespace ColonQuest.World
                 body.linearVelocity = Vector2.zero;
                 if (skip || (target - body.position).magnitude >= 0.12f)
                 {
-                    // Skipped, or something blocked the way: the player ends where the scene meant.
+                    // Skipped, or still blocked after walking through: the player ends where the scene meant.
                     body.position = target;
                     body.transform.position = target;
+                }
+
+                if (ghost != null)
+                {
+                    ghost.enabled = true;
                 }
             }
 

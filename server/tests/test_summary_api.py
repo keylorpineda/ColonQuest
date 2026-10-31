@@ -78,6 +78,7 @@ async def test_summary_closes_the_session(client: httpx2.AsyncClient, db: AsyncS
         "characterName": None,
         "week": None,
         "jobPosition": None,
+        "language": None,
     }
 
     again = await client.post(f"/api/sessions/{session_id}/summary", json=FINAL_STATE)

@@ -130,6 +130,10 @@ namespace ColonQuest.EditorTools
             var pier = new Vector2(5.6f, -30.35f);
             Shape(parent, "Pier_Outline", rounded, pier, new Vector2(3.4f, 6.4f), GamePalette.Outline, 8);
             Shape(parent, "Pier", rounded, pier, new Vector2(3.2f, 6.2f), WoodColor, 9);
+            if (woodPlankTex != null)
+            {
+                TiledShape(parent, "Pier_Planks", woodPlankTex, pier, new Vector2(3.05f, 6.0f), WoodColor, 9);
+            }
             for (float y = -27.8f; y > -33.2f; y -= 0.7f)
             {
                 Shape(parent, "Plank", square, new Vector2(pier.x, y), new Vector2(3.1f, 0.06f), WoodDark, 10);
@@ -144,6 +148,10 @@ namespace ColonQuest.EditorTools
             // Boardwalk between the street and the sand.
             Shape(parent, "Boardwalk_Outline", rounded, new Vector2(20.5f, -18.3f), new Vector2(95f, 1.5f), GamePalette.Outline, 8);
             Shape(parent, "Boardwalk", rounded, new Vector2(20.5f, -18.3f), new Vector2(94.8f, 1.3f), WoodColor, 9);
+            if (woodPlankTex != null)
+            {
+                TiledShape(parent, "Boardwalk_Planks", woodPlankTex, new Vector2(20.5f, -18.3f), new Vector2(94.4f, 1.18f), WoodColor, 9);
+            }
             for (float x = -25f; x < 67f; x += 1.9f)
             {
                 Shape(parent, "Plank", square, new Vector2(x, -18.3f), new Vector2(0.05f, 1.2f), WoodDark, 10);
@@ -178,9 +186,9 @@ namespace ColonQuest.EditorTools
             }
 
             // Two bridges, on the streets: railings and posts on the street edges.
-            Bridge(parent, x, 6f, -2f);
-            Bridge(parent, x, -8f, -16f);
-            Bridge(parent, x, NorthSidewalkY, 24f);
+            Bridge(parent, x, MapLayout.BridgeFirstStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeFirstStreet.yMin - MapLayout.RailingHalf);
+            Bridge(parent, x, MapLayout.BridgeSouthStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeSouthStreet.yMin - MapLayout.RailingHalf);
+            Bridge(parent, x, MapLayout.BridgeAvenue.yMax + MapLayout.RailingHalf, MapLayout.BridgeAvenue.yMin - MapLayout.RailingHalf);
             Bridge(parent, x, -17.45f, -19.15f);
 
             // Plunge pool under the waterfall, at the foot of the cliff.
@@ -344,15 +352,15 @@ namespace ColonQuest.EditorTools
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
 
-            // The river, open only over the decks of the bridges: the two streets, the avenue and the beach path.
-            // The water between the railings and the deck is water, so it blocks like the rest of the river.
+            // The river, open over the bridges from railing to railing: the street and both sidewalks, so a player walking
+            // on the sidewalk crosses too. The railings themselves stay closed.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
             RiverWall(parent, riverX, riverWidth, shore, -19.15f);
-            RiverWall(parent, riverX, riverWidth, -17.45f, -14f);
-            RiverWall(parent, riverX, riverWidth, -10f, 0f);
-            RiverWall(parent, riverX, riverWidth, 4f, MapLayout.AvenueY - 2f);
-            RiverWall(parent, riverX, riverWidth, MapLayout.AvenueY + 2f, MapLayout.WorldNorthEdgeY);
+            RiverWall(parent, riverX, riverWidth, -17.45f, MapLayout.BridgeSouthStreet.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeSouthStreet.yMax, MapLayout.BridgeFirstStreet.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeFirstStreet.yMax, MapLayout.BridgeAvenue.yMin);
+            RiverWall(parent, riverX, riverWidth, MapLayout.BridgeAvenue.yMax, MapLayout.WorldNorthEdgeY);
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
 
@@ -374,6 +382,7 @@ namespace ColonQuest.EditorTools
             BuildNeighborhood(parent, shadows, random);
             BuildEastFarm(parent, shadows, random);
             BuildBeach(parent, shadows, random);
+            BuildEastTreeline(parent, shadows);
 
             foreach (float x in new[] { -36f, -27f, -18f, -9f, 0f, 9f, 18f, 36f, 39.5f })
             {
@@ -457,6 +466,8 @@ namespace ColonQuest.EditorTools
             {
                 Shape(rail, "Rail_Post", roundedSmall, new Vector2(x, 0.2f), new Vector2(0.2f, 0.9f), WoodDark, 2);
             }
+            // Invisible collider along the railing so nobody walks off the deck.
+            Wall(rail, "Rail_Collider", new Vector2(0f, 0.3f), new Vector2(6.8f, 0.3f));
 
             var scope = Root(parent, "Telescope", new Vector2(-1.6f, 20.6f), 20.4f);
             Shape(scope, "Leg_Outline", roundedSmall, new Vector2(0f, 0.4f), new Vector2(0.2f, 0.8f), GamePalette.Outline, 0);
@@ -473,28 +484,61 @@ namespace ColonQuest.EditorTools
         private static void Signpost(Transform parent, Vector2 position, string text)
         {
             var root = Root(parent, "Signpost", position, position.y);
-            float length = Mathf.Max(1.7f, text.Length * 0.33f + 0.7f);
-            Shape(root, "Pole_Outline", roundedSmall, new Vector2(0f, 0.7f), new Vector2(0.3f, 1.4f), GamePalette.Outline, 0);
-            Shape(root, "Pole", roundedSmall, new Vector2(0f, 0.7f), new Vector2(0.18f, 1.3f), WoodDark, 1);
-            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 1.45f), new Vector2(length + 0.14f, 0.72f), GamePalette.Outline, 2);
-            Shape(root, "Board", roundedSmall, new Vector2(0f, 1.45f), new Vector2(length, 0.58f), WoodColor, 3);
-            Label(root, text, new Vector2(0f, 1.45f), GamePalette.Outline, 0.04f, TextAnchor.MiddleCenter);
+            float length = Mathf.Max(1.85f, text.Length * 0.34f + 0.8f);
+            Shape(root, "Pole_Outline", roundedSmall, new Vector2(0f, 0.7f), new Vector2(0.32f, 1.44f), GamePalette.Outline, 0);
+            Shape(root, "Pole", roundedSmall, new Vector2(0f, 0.7f), new Vector2(0.2f, 1.34f), WoodDark, 1);
+            Shape(root, "Pole_Highlight", roundedSmall, new Vector2(-0.04f, 0.7f), new Vector2(0.06f, 1.26f), WoodColor, 1);
+
+            var boardRig = new GameObject("BoardRig").transform;
+            boardRig.SetParent(root, false);
+            boardRig.localPosition = new Vector2(0f, 1.45f);
+            boardRig.gameObject.AddComponent<FoliagePhysics>().Configure(1.8f, 1.4f, position.x * 0.7f + position.y, 0f, true, 1.3f, 6f);
+
+            var shade = GamePalette.Outline;
+            shade.a = 0.32f;
+            Shape(boardRig, "Board_Shadow", roundedSmall, new Vector2(0.05f, -0.06f), new Vector2(length + 0.22f, 0.78f), shade, 1);
+            Shape(boardRig, "Board_Outline", roundedSmall, Vector2.zero, new Vector2(length + 0.2f, 0.78f), GamePalette.Outline, 2);
+            Shape(boardRig, "Board_Frame", roundedSmall, Vector2.zero, new Vector2(length + 0.06f, 0.64f), WoodDark, 2);
+            Shape(boardRig, "Board", roundedSmall, Vector2.zero, new Vector2(length - 0.1f, 0.48f), GamePalette.Hex("#F6E7C1"), 3);
+            Shape(boardRig, "Board_Pin", circle, new Vector2(0f, 0.2f), Vector2.one * 0.09f, GamePalette.Hex("#FFD23F"), 4);
+            Label(boardRig, text, Vector2.zero, GamePalette.Hex("#3A2518"), 0.036f, TextAnchor.MiddleCenter);
             root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(0.4f, 0.4f);
         }
 
         private static void Rock(Transform parent, Transform shadows, float x, float y, float scale)
         {
             var root = Root(parent, "Rock", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.2f, y - 0.05f), new Vector2(1.9f * scale, 0.6f * scale), 0.25f);
-            Shape(root, "Outline", circle, new Vector2(0f, 0.4f * scale), new Vector2(1.7f, 1.2f) * scale, GamePalette.Outline, 0);
-            Shape(root, "Rock", circle, new Vector2(0f, 0.4f * scale), new Vector2(1.5f, 1.0f) * scale, GamePalette.Hex("#9AA3B8"), 1);
+            GroundShadow(shadows, new Vector2(x + 0.22f, y - 0.05f), new Vector2(2.0f * scale, 0.65f * scale), 0.26f);
+            var stoneBase = GamePalette.Hex("#8E98AD");
+            Shape(root, "Outline", circle, new Vector2(0f, 0.4f * scale), new Vector2(1.72f, 1.22f) * scale, GamePalette.Outline, 0);
+            Shape(root, "Rock_Shade", circle, new Vector2(0.06f, 0.36f * scale), new Vector2(1.54f, 1.04f) * scale, GamePalette.Shade(stoneBase, 0.82f), 1);
+            Shape(root, "Rock", circle, new Vector2(-0.04f, 0.43f * scale), new Vector2(1.42f, 0.94f) * scale, stoneBase, 1);
+            Shape(root, "SubRock_Outline", circle, new Vector2(0.55f, 0.22f) * scale, new Vector2(0.88f, 0.66f) * scale, GamePalette.Outline, 2);
+            Shape(root, "SubRock", circle, new Vector2(0.55f, 0.22f) * scale, new Vector2(0.72f, 0.52f) * scale, GamePalette.Shade(stoneBase, 0.9f), 3);
             var light = GamePalette.White;
-            light.a = 0.35f;
-            Shape(root, "Shine", circle, new Vector2(-0.3f, 0.65f) * scale, new Vector2(0.5f, 0.3f) * scale, light, 2);
+            light.a = 0.38f;
+            Shape(root, "Shine", circle, new Vector2(-0.32f, 0.65f) * scale, new Vector2(0.52f, 0.28f) * scale, light, 3);
+            Shape(root, "Moss", circle, new Vector2(-0.42f, 0.16f) * scale, new Vector2(0.46f, 0.22f) * scale, GamePalette.Hex("#4CB36F"), 3);
             root.gameObject.AddComponent<CircleCollider2D>().radius = 0.55f * scale;
         }
 
         // ---------------------------------------------------------------- neighborhood (west)
+
+        /// <summary>Three staggered rows of big trees along the east edge, hiding where the roads meet the rock face.</summary>
+        private static void BuildEastTreeline(Transform parent, Transform shadows)
+        {
+            // Its own random so the rest of the world keeps the layout it had.
+            var random = new System.Random(31);
+            for (int row = 0; row < 3; row++)
+            {
+                for (float y = -23f + row * 0.8f; y < MapLayout.WorldNorthEdgeY + 3f; y += 2.4f)
+                {
+                    float jx = 68.2f + row * 2.5f + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    float jy = y + ((float)random.NextDouble() - 0.5f) * 0.8f;
+                    Tree(parent, shadows, jx, jy, 1.5f + (float)random.NextDouble() * 0.25f, DistrictGreens[random.Next(DistrictGreens.Length)], false);
+                }
+            }
+        }
 
         private static void BuildNeighborhood(Transform parent, Transform shadows, System.Random random)
         {
@@ -503,7 +547,7 @@ namespace ColonQuest.EditorTools
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Cooperativa", Sign = "COOPERATIVA", Roof = "#2E8B57", Wall = "#F4EBD0",
-                XMin = -36.5f, XMax = -26.5f, YBottom = 6f, YTop = 13.4f, DoorX = -31.5f, FacadeHeight = 3.2f, Entrance = Entrance.Window,
+                XMin = -36.5f, XMax = -26.5f, YBottom = 6f, YTop = 13.4f, DoorX = -31.5f, FacadeHeight = 3.2f, Entrance = Entrance.Door,
                 AwningA = "#2E8B57", AwningB = "#F8F5E8"
             });
 
@@ -522,7 +566,8 @@ namespace ColonQuest.EditorTools
                 Bush(parent, shadows, x, x < -35f ? 5.2f : -2.7f, 1f);
             }
 
-            foreach (float x in new[] { -41f, -33f, -26f })
+            // The lamp that stood in front of the cooperative door (x = -31.5) moved to the left, out of the way.
+            foreach (float x in new[] { -41f, -34.5f, -26f })
             {
                 Lamp(parent, x, 4.5f);
             }
@@ -539,12 +584,19 @@ namespace ColonQuest.EditorTools
         private static void YardSign(Transform parent, Transform shadows, float x, float y, string text, string hex)
         {
             var root = Root(parent, "YardSign", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.0f, 0.3f), 0.2f);
-            Shape(root, "Post_Outline", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.18f, 0.9f), GamePalette.Outline, 0);
-            Shape(root, "Post", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.08f, 0.85f), GamePalette.Hex("#8B5A3C"), 1);
-            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 0.95f), new Vector2(1.5f, 0.6f), GamePalette.Outline, 2);
-            Shape(root, "Board", roundedSmall, new Vector2(0f, 0.95f), new Vector2(1.38f, 0.48f), GamePalette.Hex("#F8F5E8"), 3);
-            Label(root, text, new Vector2(0f, 0.95f), GamePalette.Hex(hex), 0.026f, TextAnchor.MiddleCenter);
+            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.05f, 0.34f), 0.24f);
+            Shape(root, "Post_Outline", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.2f, 0.92f), GamePalette.Outline, 0);
+            Shape(root, "Post", roundedSmall, new Vector2(0f, 0.45f), new Vector2(0.1f, 0.86f), GamePalette.Hex("#8B5A3C"), 1);
+
+            var board = new GameObject("BoardRig").transform;
+            board.SetParent(root, false);
+            board.localPosition = new Vector2(0f, 0.95f);
+            board.gameObject.AddComponent<FoliagePhysics>().Configure(2.0f, 1.5f, x * 0.9f + y, 0f, true, 1.2f, 7f);
+
+            Shape(board, "Board_Outline", roundedSmall, Vector2.zero, new Vector2(1.62f, 0.68f), GamePalette.Outline, 2);
+            Shape(board, "Board_Frame", roundedSmall, Vector2.zero, new Vector2(1.5f, 0.56f), GamePalette.Hex(hex), 2);
+            Shape(board, "Board", roundedSmall, Vector2.zero, new Vector2(1.36f, 0.42f), GamePalette.Hex("#FBF5E4"), 3);
+            Label(board, text, Vector2.zero, GamePalette.Hex(hex), 0.025f, TextAnchor.MiddleCenter);
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.12f;
             collider.offset = new Vector2(0f, 0.1f);
@@ -586,11 +638,22 @@ namespace ColonQuest.EditorTools
             });
             Silo(parent, shadows, 38f, 9f);
 
-            // Coffee rows.
-            for (float y = 15f; y < 22f; y += 2.3f)
+            // Coffee rows: each row of bushes sits on a furrow of dark soil, with a big shade tree every few bushes.
+            int coffeeRow = 0;
+            for (float y = 15f; y < 22f; y += 2.3f, coffeeRow++)
             {
-                for (float x = 32.8f; x < 43f; x += 1.7f)
+                OnGround(parent, "Furrow_Outline", rounded, new Vector2(37.9f, y + 0.02f), new Vector2(11.4f, 0.62f), GamePalette.Shade(GamePalette.Hex("#6B4A2E"), 0.6f), 5);
+                OnGround(parent, "Furrow", rounded, new Vector2(37.9f, y + 0.02f), new Vector2(11.2f, 0.5f), GamePalette.Hex("#6B4A2E"), 6);
+                int coffeeCol = 0;
+                for (float x = 32.8f; x < 43f; x += 1.7f, coffeeCol++)
                 {
+                    if ((coffeeRow == 1 && coffeeCol == 1) || (coffeeRow == 2 && coffeeCol == 4))
+                    {
+                        // Shade tree (poro) among the coffee.
+                        Tree(parent, shadows, x, y, 1.4f, "#3B9660", false);
+                        continue;
+                    }
+
                     CoffeeBush(parent, shadows, x, y);
                 }
             }
@@ -614,17 +677,57 @@ namespace ColonQuest.EditorTools
             Tree(parent, shadows, 41.5f, 6.4f, 1.0f, "#3B9660", false);
         }
 
+        /// <summary>A coffee bush in cartoon style: tall and cone-shaped, dark glossy leaves in pairs, red and green berries.</summary>
         private static void CoffeeBush(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Coffee", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.12f, y), new Vector2(1.0f, 0.38f), 0.2f);
-            Shape(root, "Outline", circle, new Vector2(0f, 0.38f), Vector2.one * 0.98f, GamePalette.Outline, 0);
-            Shape(root, "Bush", circle, new Vector2(0f, 0.38f), Vector2.one * 0.82f, GamePalette.Hex("#2F8A58"), 1);
-            Shape(root, "Berry", circle, new Vector2(0.18f, 0.48f), Vector2.one * 0.13f, GamePalette.Hex("#E8505B"), 2);
-            Shape(root, "Berry", circle, new Vector2(-0.16f, 0.32f), Vector2.one * 0.13f, GamePalette.Hex("#E8505B"), 2);
+            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.1f, 0.4f), 0.24f);
+
+            var rig = new GameObject("CoffeeRig").transform;
+            rig.SetParent(root, false);
+            rig.localPosition = new Vector2(0f, 0.1f);
+            rig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 2.0f, x * 1.1f + y * 0.7f, 0.025f, true, 1.5f, 12f);
+
+            var dark = GamePalette.Hex("#1F5E33");
+            var mid = GamePalette.Hex("#2E7D46");
+            var light = GamePalette.Hex("#4FA36A");
+
+            // Tall body: three stacked rounded layers, wide at the bottom and narrower at the top, each with its outline.
+            Shape(rig, "Outline_Base", circle, new Vector2(0f, 0.28f), new Vector2(1.06f, 0.64f), GamePalette.Outline, 0);
+            Shape(rig, "Outline_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.94f, 0.62f), GamePalette.Outline, 0);
+            Shape(rig, "Outline_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.68f, 0.56f), GamePalette.Outline, 0);
+            Shape(rig, "Cone_Base", circle, new Vector2(0f, 0.28f), new Vector2(0.98f, 0.56f), dark, 1);
+            Shape(rig, "Cone_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.86f, 0.54f), mid, 1);
+            Shape(rig, "Cone_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.6f, 0.48f), mid, 1);
+            Shape(rig, "Cone_Shine", circle, new Vector2(-0.12f, 1.0f), new Vector2(0.22f, 0.18f), light, 2);
+
+            // Pairs of oval leaves along three horizontal branches, drooping a little at the tips.
+            foreach (float by in new[] { 0.3f, 0.62f, 0.92f })
+            {
+                float reach = 0.36f - (by - 0.3f) * 0.22f;
+                Shape(rig, "Branch", square, new Vector2(0f, by), new Vector2(reach * 2f, 0.04f), GamePalette.Outline, 2);
+                foreach (float side in new[] { -1f, 1f })
+                {
+                    var leaf = Shape(rig, "Leaf", circle, new Vector2(side * reach, by + 0.02f), new Vector2(0.34f, 0.14f), side < 0f ? light : GamePalette.Shade(mid, 1.1f), 3);
+                    Tilt(leaf, side * -18f);
+                }
+            }
+            // Berry clusters stuck to the branches: mostly red, a few green and yellow.
+            var berries = new[]
+            {
+                new Vector3(0.30f, 0.26f, 0f), new Vector3(0.36f, 0.31f, 1f), new Vector3(-0.30f, 0.28f, 0f), new Vector3(-0.24f, 0.22f, 2f),
+                new Vector3(0.22f, 0.58f, 1f), new Vector3(0.27f, 0.62f, 0f), new Vector3(-0.22f, 0.6f, 0f), new Vector3(-0.28f, 0.56f, 3f),
+                new Vector3(0.12f, 0.9f, 0f), new Vector3(-0.1f, 0.88f, 1f)
+            };
+            var berryColors = new[] { "#C0392B", "#E74C3C", "#7FB241", "#F1C40F" };
+            foreach (var berry in berries)
+            {
+                float size = (berry.x * 37f + berry.y * 11f) % 1f > 0.5f ? 0.08f : 0.07f;
+                Shape(rig, "Berry", circle, new Vector2(berry.x, berry.y), Vector2.one * size, GamePalette.Hex(berryColors[(int)berry.z]), 4);
+            }
+
             root.gameObject.AddComponent<CircleCollider2D>().radius = 0.3f;
         }
-
         private static void Silo(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Silo", new Vector2(x, y), y);
@@ -745,25 +848,33 @@ namespace ColonQuest.EditorTools
                 XMin = 9f, XMax = 16f, YBottom = -24f, YTop = -20f, DoorX = 12.5f, FacadeHeight = 2.2f, Entrance = Entrance.Door,
                 AwningA = "#00A8A8", AwningB = "#F8F5E8"
             });
-            CoursesBoard(parent, 0f, 5.2f);
+            CoursesBoard(parent, -2.5f, 6.2f);
             Bench(parent, shadows, 17.8f, -23.2f);
         }
 
-        /// <summary>A board on two posts with the courses of the INA and the UNA, on the sidewalk between the bank and the store.</summary>
+        /// <summary>A wooden easel board with the courses of the INA and the UNA, beside the plaza entrance.</summary>
         private static void CoursesBoard(Transform parent, float x, float y)
         {
             var root = Root(parent, "CoursesBoard", new Vector2(x, y), y);
-            foreach (float post in new[] { -0.75f, 0.75f })
+            // Solid base so the easel cannot be walked through; the station stays in front of it.
+            Wall(root, "Board_Collider", new Vector2(0f, 0.2f), new Vector2(1.3f, 0.4f));
+            foreach (float post in new[] { -0.55f, 0.55f })
             {
-                Shape(root, "Post_Outline", roundedSmall, new Vector2(post, 0.6f), new Vector2(0.2f, 1.3f), GamePalette.Outline, 0);
-                Shape(root, "Post", roundedSmall, new Vector2(post, 0.6f), new Vector2(0.1f, 1.2f), GamePalette.Hex("#8B5A3C"), 1);
+                Shape(root, "Post_Outline", roundedSmall, new Vector2(post, 0.52f), new Vector2(0.18f, 1.12f), GamePalette.Outline, 0);
+                Shape(root, "Post", roundedSmall, new Vector2(post, 0.52f), new Vector2(0.10f, 1.02f), GamePalette.Hex("#8B5A3C"), 1);
             }
 
-            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 1.25f), new Vector2(2.2f, 1.06f), GamePalette.Outline, 2);
-            Shape(root, "Board", roundedSmall, new Vector2(0f, 1.25f), new Vector2(2.06f, 0.92f), GamePalette.Hex("#1D4F8C"), 3);
-            Shape(root, "Paper", square, new Vector2(-0.5f, 1.1f), new Vector2(0.6f, 0.36f), GamePalette.Hex("#F8F5E8"), 4);
-            Shape(root, "Paper", square, new Vector2(0.5f, 1.1f), new Vector2(0.6f, 0.36f), GamePalette.Hex("#FFE9A8"), 4);
-            Label(root, "CURSOS", new Vector2(0f, 1.5f), GamePalette.White, 0.03f, TextAnchor.MiddleCenter);
+            var shade = GamePalette.Outline;
+            shade.a = 0.34f;
+            Shape(root, "Board_Shadow", roundedSmall, new Vector2(0.05f, 1.02f), new Vector2(1.78f, 0.92f), shade, 1);
+            Shape(root, "Board_Outline", roundedSmall, new Vector2(0f, 1.08f), new Vector2(1.76f, 0.92f), GamePalette.Outline, 2);
+            Shape(root, "Board_Frame", roundedSmall, new Vector2(0f, 1.08f), new Vector2(1.62f, 0.78f), GamePalette.Hex("#8B5A3C"), 2);
+            Shape(root, "Board", roundedSmall, new Vector2(0f, 1.08f), new Vector2(1.48f, 0.64f), GamePalette.Hex("#1D4F8C"), 3);
+            Shape(root, "Paper", square, new Vector2(-0.36f, 0.96f), new Vector2(0.44f, 0.28f), GamePalette.Hex("#F8F5E8"), 4);
+            Shape(root, "Paper_Pin", circle, new Vector2(-0.36f, 1.06f), Vector2.one * 0.07f, GamePalette.Hex("#E8505B"), 5);
+            Shape(root, "Paper", square, new Vector2(0.36f, 0.96f), new Vector2(0.44f, 0.28f), GamePalette.Hex("#FFE9A8"), 4);
+            Shape(root, "Paper_Pin", circle, new Vector2(0.36f, 1.06f), Vector2.one * 0.07f, GamePalette.Hex("#FFD23F"), 5);
+            Label(root, "CURSOS", new Vector2(0f, 1.24f), GamePalette.White, 0.026f, TextAnchor.MiddleCenter);
         }
 
         /// <summary>The time clock of the first job, on the wall of the soda.</summary>
@@ -780,24 +891,52 @@ namespace ColonQuest.EditorTools
         private static void Palm(Transform parent, Transform shadows, float x, float y, float scale)
         {
             var root = Root(parent, "Palm", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.5f, y - 0.05f), new Vector2(2.4f * scale, 0.7f * scale), 0.22f);
-            Shape(root, "Trunk_Outline", roundedSmall, new Vector2(0.1f, 1.35f) * scale, new Vector2(0.5f, 2.8f) * scale, GamePalette.Outline, 0);
-            Shape(root, "Trunk", roundedSmall, new Vector2(0.1f, 1.35f) * scale, new Vector2(0.34f, 2.7f) * scale, GamePalette.Hex("#A9743F"), 1);
+            GroundShadow(shadows, new Vector2(x + 0.5f, y - 0.05f), new Vector2(2.6f * scale, 0.85f * scale), 0.25f);
+            var trunkColor = GamePalette.Hex("#A9743F");
+            Shape(root, "Trunk_Outline", roundedSmall, new Vector2(0.1f, 1.35f) * scale, new Vector2(0.52f, 2.84f) * scale, GamePalette.Outline, 0);
+            Shape(root, "Trunk", roundedSmall, new Vector2(0.1f, 1.35f) * scale, new Vector2(0.36f, 2.7f) * scale, trunkColor, 1);
+            Shape(root, "Trunk_Shade", roundedSmall, new Vector2(0.2f, 1.35f) * scale, new Vector2(0.12f, 2.6f) * scale, GamePalette.Shade(trunkColor, 0.82f), 1);
+            Shape(root, "Trunk_Highlight", roundedSmall, new Vector2(0.02f, 1.35f) * scale, new Vector2(0.1f, 2.5f) * scale, GamePalette.Shade(trunkColor, 1.18f), 1);
+            for (float ty = 0.42f; ty <= 2.4f; ty += 0.38f)
+            {
+                Shape(root, "Trunk_Ring", roundedSmall, new Vector2(0.1f, ty) * scale, new Vector2(0.38f, 0.08f) * scale, GamePalette.Shade(trunkColor, 0.72f), 2);
+            }
 
             var top = new Vector2(0.1f, 2.75f) * scale;
+            var crownRig = new GameObject("PalmCrownRig").transform;
+            crownRig.SetParent(root, false);
+            crownRig.localPosition = top;
+            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(5.2f, 1.55f, x * 0.6f + y * 0.9f, 0.025f, true, 2.1f, 8f);
+
+            var frondSpr = palmFrondSprite != null ? palmFrondSprite : circle;
             var leaf = GamePalette.Hex("#3FA66A");
-            foreach (float angle in new[] { 15f, 165f, 50f, 130f, 90f, -20f, 200f })
+            var leafDeep = GamePalette.Hex("#2E8550");
+            var leafBright = GamePalette.Hex("#58C97E");
+            float[] backAngles = { -28f, 208f, 55f, 125f };
+            foreach (float angle in backAngles)
             {
                 var direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-                var at = top + direction * 0.8f * scale;
-                var outline = Shape(root, "Leaf_Outline", circle, at, new Vector2(2.0f, 0.62f) * scale, GamePalette.Outline, 2);
-                Tilt(outline, angle);
-                var body = Shape(root, "Leaf", circle, at, new Vector2(1.84f, 0.5f) * scale, leaf, 3);
+                var at = direction * 0.85f * scale;
+                var backFrond = Shape(crownRig, "Leaf_Back", frondSpr, at, new Vector2(2.15f, 0.95f) * scale, leafDeep, 2);
+                Tilt(backFrond, angle);
+            }
+
+            float[] frontAngles = { 12f, 168f, 42f, 138f, 90f };
+            foreach (float angle in frontAngles)
+            {
+                var direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+                var at = direction * 0.88f * scale;
+                var body = Shape(crownRig, "Leaf", frondSpr, at, new Vector2(2.18f, 1.02f) * scale, angle == 90f ? leafBright : leaf, 3);
                 Tilt(body, angle);
             }
 
-            Shape(root, "Coconut", circle, top + new Vector2(-0.18f, -0.18f) * scale, Vector2.one * 0.3f * scale, GamePalette.Hex("#7A4F2A"), 4);
-            Shape(root, "Coconut", circle, top + new Vector2(0.18f, -0.2f) * scale, Vector2.one * 0.3f * scale, GamePalette.Hex("#7A4F2A"), 4);
+            foreach (var cocoSpot in new[] { new Vector2(-0.18f, -0.18f), new Vector2(0.18f, -0.2f), new Vector2(0f, -0.08f) })
+            {
+                Shape(crownRig, "Coconut_Outline", circle, cocoSpot * scale, Vector2.one * 0.36f * scale, GamePalette.Outline, 4);
+                Shape(crownRig, "Coconut", circle, cocoSpot * scale, Vector2.one * 0.26f * scale, GamePalette.Hex("#7A4F2A"), 5);
+                Shape(crownRig, "Coconut_Shine", circle, (cocoSpot + new Vector2(-0.04f, 0.04f)) * scale, Vector2.one * 0.09f * scale, GamePalette.Hex("#C89662"), 6);
+            }
+
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.22f;
             collider.offset = new Vector2(0.1f, 0.2f);
@@ -806,13 +945,36 @@ namespace ColonQuest.EditorTools
         private static void Umbrella(Transform parent, Transform shadows, float x, float y, string hex)
         {
             var root = Root(parent, "Umbrella", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.3f, y - 0.1f), new Vector2(2.6f, 0.8f), 0.2f);
-            OnGround(shadows, "Towel", rounded, new Vector2(x - 0.2f, y - 0.9f), new Vector2(1.7f, 0.8f), GamePalette.Hex("#F1F4FF"), WorldSand + 1);
-            OnGround(shadows, "Towel_Stripe", square, new Vector2(x - 0.2f, y - 0.9f), new Vector2(1.7f, 0.18f), GamePalette.Hex(hex), WorldSand + 2);
-            Shape(root, "Pole", roundedSmall, new Vector2(0f, 0.95f), new Vector2(0.12f, 1.9f), GamePalette.Outline, 0);
-            Shape(root, "Canopy_Outline", circle, new Vector2(0f, 1.95f), new Vector2(2.4f, 1.3f), GamePalette.Outline, 1);
-            Shape(root, "Canopy", circle, new Vector2(0f, 1.95f), new Vector2(2.2f, 1.1f), GamePalette.Hex(hex), 2);
-            Shape(root, "Canopy_Stripe", circle, new Vector2(0f, 1.95f), new Vector2(0.8f, 1.1f), GamePalette.Hex("#F8F5E8"), 3);
+            GroundShadow(shadows, new Vector2(x + 0.35f, y - 0.1f), new Vector2(2.75f, 0.95f), 0.26f);
+
+            // Cel-shaded beach towel with outline, woven stripes, and fringe ends.
+            var towelCenter = new Vector2(x - 0.2f, y - 0.9f);
+            OnGround(shadows, "Towel_Outline", roundedSmall, towelCenter, new Vector2(1.88f, 0.96f), GamePalette.Outline, WorldSand + 1);
+            OnGround(shadows, "Towel", roundedSmall, towelCenter, new Vector2(1.74f, 0.82f), GamePalette.Hex("#F8F5E8"), WorldSand + 2);
+            OnGround(shadows, "Towel_StripeMain", square, towelCenter, new Vector2(1.68f, 0.22f), GamePalette.Hex(hex), WorldSand + 3);
+            OnGround(shadows, "Towel_StripeTop", square, towelCenter + new Vector2(0f, 0.24f), new Vector2(1.68f, 0.08f), GamePalette.Hex(hex), WorldSand + 3);
+            OnGround(shadows, "Towel_StripeBot", square, towelCenter + new Vector2(0f, -0.24f), new Vector2(1.68f, 0.08f), GamePalette.Hex(hex), WorldSand + 3);
+
+            // Wood-and-metal umbrella pole with outline.
+            Shape(root, "Pole_Outline", roundedSmall, new Vector2(0f, 0.95f), new Vector2(0.22f, 1.95f), GamePalette.Outline, 0);
+            Shape(root, "Pole", roundedSmall, new Vector2(0f, 0.95f), new Vector2(0.12f, 1.88f), GamePalette.Hex("#D8D1C4"), 1);
+
+            var canopyRig = new GameObject("CanopyRig").transform;
+            canopyRig.SetParent(root, false);
+            canopyRig.localPosition = new Vector2(0f, 1.95f);
+            canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(2.4f, 1.4f, x * 0.5f + y, 0.01f, false);
+
+            var mainCol = GamePalette.Hex(hex);
+            var umbrellaSpr = beachUmbrellaSprite != null ? beachUmbrellaSprite : circle;
+            Shape(canopyRig, "Canopy", umbrellaSpr, Vector2.zero, new Vector2(2.55f, 1.55f), mainCol, 2);
+
+            // Alternating cream segments and scalloped valance along the front rim.
+            Shape(canopyRig, "Canopy_StripeL", roundedSmall, new Vector2(-0.56f, 0.02f), new Vector2(0.38f, 0.92f), GamePalette.Hex("#F8F5E8"), 3).transform.localRotation = Quaternion.Euler(0f, 0f, -18f);
+            Shape(canopyRig, "Canopy_StripeC", roundedSmall, new Vector2(0f, 0.04f), new Vector2(0.44f, 1.05f), GamePalette.Hex("#F8F5E8"), 3);
+            Shape(canopyRig, "Canopy_StripeR", roundedSmall, new Vector2(0.56f, 0.02f), new Vector2(0.38f, 0.92f), GamePalette.Hex("#F8F5E8"), 3).transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
+            Shape(canopyRig, "Canopy_CapOutline", circle, new Vector2(0f, 0.14f), Vector2.one * 0.26f, GamePalette.Outline, 4);
+            Shape(canopyRig, "Canopy_Cap", circle, new Vector2(0f, 0.14f), Vector2.one * 0.16f, GamePalette.Hex("#FFD23F"), 5);
+
             root.gameObject.AddComponent<CircleCollider2D>().radius = 0.18f;
         }
 
@@ -831,31 +993,70 @@ namespace ColonQuest.EditorTools
             Shape(root, "Window", roundedSmall, new Vector2(0f, 2.35f), new Vector2(1.1f, 0.5f), GamePalette.Hex("#BFE3F5"), 4);
             Shape(root, "Roof_Outline", rounded, new Vector2(0f, 3.25f), new Vector2(2.9f, 0.6f), GamePalette.Outline, 4);
             Shape(root, "Roof", rounded, new Vector2(0f, 3.25f), new Vector2(2.74f, 0.44f), GamePalette.Hex("#E8505B"), 5);
-            Shape(root, "Flag", roundedSmall, new Vector2(1.1f, 3.8f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 5);
+
+            var flagRig = new GameObject("FlagRig").transform;
+            flagRig.SetParent(root, false);
+            flagRig.localPosition = new Vector2(0.85f, 3.8f);
+            flagRig.gameObject.AddComponent<FoliagePhysics>().Configure(6.5f, 2.8f, x, 0.03f, false);
+            Shape(flagRig, "Flag_Outline", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.58f, 0.38f), GamePalette.Outline, 5);
+            Shape(flagRig, "Flag", roundedSmall, new Vector2(0.25f, 0f), new Vector2(0.5f, 0.3f), GamePalette.Hex("#FFD23F"), 6);
             root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.0f, 0.5f);
         }
 
         // ---------------------------------------------------------------- public building details
 
-        /// <summary>Four white columns on a facade, the mark of a bank. dx is the door offset from the building center.</summary>
+        /// <summary>Four fluted classical columns with carved capitals and bases, the mark of a bank.</summary>
         private static void Columns(Transform root, float dx, float height)
         {
-            foreach (float side in new[] { -3.7f, -1.4f, 1.4f, 3.7f })
+            foreach (float side in new[] { -3.7f, -1.65f, 1.65f, 3.7f })
             {
                 float x = dx + side;
-                Shape(root, "Column_Outline", roundedSmall, new Vector2(x, height * 0.5f), new Vector2(0.56f, height), GamePalette.Outline, 5);
-                Shape(root, "Column", roundedSmall, new Vector2(x, height * 0.5f), new Vector2(0.4f, height - 0.14f), GamePalette.White, 6);
-                Shape(root, "Column_Cap", roundedSmall, new Vector2(x, height - 0.1f), new Vector2(0.6f, 0.2f), GamePalette.Hex("#C9CFDB"), 7);
+                Shape(root, "ColBase_Outline", roundedSmall, new Vector2(x, 0.24f), new Vector2(0.86f, 0.34f), GamePalette.Outline, 6);
+                Shape(root, "ColBase", roundedSmall, new Vector2(x, 0.24f), new Vector2(0.74f, 0.22f), GamePalette.Hex("#DCE2EE"), 7);
+                Shape(root, "ColPlinth", roundedSmall, new Vector2(x, 0.12f), new Vector2(0.82f, 0.14f), GamePalette.Hex("#C5CEDE"), 7);
+
+                Shape(root, "Column_Outline", roundedSmall, new Vector2(x, height * 0.52f), new Vector2(0.66f, height - 0.1f), GamePalette.Outline, 6);
+                Shape(root, "Column", roundedSmall, new Vector2(x, height * 0.52f), new Vector2(0.54f, height - 0.22f), GamePalette.Hex("#F5F7FC"), 7);
+                Shape(root, "Column_Shade", roundedSmall, new Vector2(x + 0.16f, height * 0.52f), new Vector2(0.16f, height - 0.26f), GamePalette.Hex("#D9E0EC"), 7);
+                foreach (float fx in new[] { -0.13f, 0f, 0.13f })
+                {
+                    Shape(root, "Flute", square, new Vector2(x + fx, height * 0.52f), new Vector2(0.035f, height - 0.55f), GamePalette.Hex("#BFC8D8"), 8);
+                }
+
+                Shape(root, "Column_CapOutline", roundedSmall, new Vector2(x, height - 0.08f), new Vector2(0.88f, 0.34f), GamePalette.Outline, 8);
+                Shape(root, "Column_Cap", roundedSmall, new Vector2(x, height - 0.08f), new Vector2(0.76f, 0.22f), GamePalette.Hex("#E3E8F2"), 9);
             }
         }
 
-        /// <summary>A colored banner over the roof, such as a store offer.</summary>
+        /// <summary>A curved fabric banner with gold corner grommets and hanging ropes, swaying in the breeze.</summary>
         private static void Banner(Transform root, string text, float dx, float y, string hex)
         {
-            float length = text.Length * 0.34f + 0.8f;
-            Shape(root, "Banner_Outline", roundedSmall, new Vector2(dx, y), new Vector2(length + 0.16f, 0.8f), GamePalette.Outline, 10);
-            Shape(root, "Banner", roundedSmall, new Vector2(dx, y), new Vector2(length, 0.64f), GamePalette.Hex(hex), 11);
-            Label(root, text, new Vector2(dx, y), GamePalette.White, 0.036f, TextAnchor.MiddleCenter);
+            float length = text.Length * 0.32f + 0.95f;
+            var bannerRig = new GameObject("BannerRig").transform;
+            bannerRig.SetParent(root, false);
+            bannerRig.localPosition = new Vector2(dx, y);
+            bannerRig.gameObject.AddComponent<FoliagePhysics>().Configure(2.4f, 1.65f, dx + y * 0.6f, 0.015f, false);
+
+            var shade = GamePalette.Outline;
+            shade.a = 0.36f;
+            var bannerColor = GamePalette.Hex(hex);
+            Shape(bannerRig, "Banner_Shadow", roundedSmall, new Vector2(0.06f, -0.09f), new Vector2(length + 0.26f, 0.88f), shade, 12);
+            Shape(bannerRig, "Banner_Outline", roundedSmall, Vector2.zero, new Vector2(length + 0.22f, 0.86f), GamePalette.Outline, 13);
+            Shape(bannerRig, "Banner", roundedSmall, Vector2.zero, new Vector2(length + 0.08f, 0.72f), bannerColor, 14);
+            Shape(bannerRig, "Banner_FoldA", roundedSmall, new Vector2(0f, -0.18f), new Vector2(length - 0.2f, 0.16f), GamePalette.Shade(bannerColor, 0.84f), 15);
+            Shape(bannerRig, "Banner_Highlight", roundedSmall, new Vector2(0f, 0.22f), new Vector2(length - 0.25f, 0.10f), GamePalette.Shade(bannerColor, 1.16f), 15);
+
+            float gx = length * 0.5f - 0.12f;
+            foreach (float sx in new[] { -gx, gx })
+            {
+                foreach (float sy in new[] { -0.22f, 0.22f })
+                {
+                    Shape(bannerRig, "Grommet_Out", circle, new Vector2(sx, sy), Vector2.one * 0.15f, GamePalette.Outline, 15);
+                    Shape(bannerRig, "Grommet", circle, new Vector2(sx, sy), Vector2.one * 0.09f, GamePalette.Hex("#FFD23F"), 16);
+                }
+            }
+
+            Label(bannerRig, text, Vector2.zero, GamePalette.White, 0.035f, TextAnchor.MiddleCenter, 17);
         }
     }
 }

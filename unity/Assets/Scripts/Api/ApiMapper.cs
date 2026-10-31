@@ -29,6 +29,7 @@ namespace ColonQuest.Api
                 savings = state.Savings,
                 emergencyFund = state.EmergencyFund,
                 wellbeing = state.Wellbeing,
+                language = ApiService.Language(),
                 creditCard = new CreditCardDto
                 {
                     balance = state.CreditCard.Balance,

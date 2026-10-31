@@ -51,6 +51,11 @@ class DealStatus(StrEnum):
     WALKED_AWAY = "walked_away"
 
 
+class GameLanguage(StrEnum):
+    SPANISH = "es"
+    ENGLISH = "en"
+
+
 class SellerFact(StrEnum):
     """Facts on the hidden seller sheet that the NPC can reveal."""
 

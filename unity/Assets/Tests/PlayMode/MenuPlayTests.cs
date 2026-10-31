@@ -123,12 +123,31 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt("Button_Créditos").onClick.Invoke();
             yield return null;
             Assert.IsTrue(Active("Credits"));
-            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Label_Hecho por " + MenuEntries.Team));
-            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Label_Keylor y Jefferson"));
+            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Label_Desarrollado por"));
+            Assert.AreEqual(MenuEntries.Team, Menu.Find("Credits/Card/Body/Team").GetComponent<Text>().text);
+            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Header"), "every window has the same title band");
 
             ButtonAt("Credits/Card/Body/Button_Volver").onClick.Invoke();
             yield return null;
             Assert.IsFalse(Active("Credits"));
+        }
+
+        [UnityTest]
+        public IEnumerator Quit_AsksBeforeClosingTheGame()
+        {
+            yield return null;
+            if (Menu.Find("Button_Salir") == null)
+            {
+                Assert.Pass("this platform has no quit button");
+            }
+
+            ButtonAt("Button_Salir").onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(Active("QuitConfirm"), "quitting asks first");
+
+            ButtonAt("QuitConfirm/Card/Body/Button_Cancelar").onClick.Invoke();
+            yield return null;
+            Assert.IsFalse(Active("QuitConfirm"));
         }
 
         [UnityTest]
@@ -174,8 +193,7 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt("Settings/Card/Body/Button_Volver").onClick.Invoke();
             ButtonAt("Button_Créditos").onClick.Invoke();
             yield return null;
-            Assert.IsNotNull(Menu.Find("Credits/Card/Body/Label_Hecho por DoWhile Team"));
-            Assert.AreEqual("Made by DoWhile Team", Menu.Find("Credits/Card/Body/Label_Hecho por DoWhile Team").GetComponent<Text>().text);
+            Assert.AreEqual("Developed by", Menu.Find("Credits/Card/Body/Label_Desarrollado por").GetComponent<Text>().text);
 
             ButtonAt("Credits/Card/Body/Button_Volver").onClick.Invoke();
             ButtonAt("Button_Ajustes").onClick.Invoke();
@@ -312,7 +330,10 @@ namespace ColonQuest.World.PlayModeTests
 
             yield return SceneManager.LoadSceneAsync(SceneNames.Casa);
             yield return null;
-            Assert.IsNull(GameObject.Find("Mama"), "after the opening the mother is not in the house");
+            var mother = GameObject.Find("Mama");
+            Assert.IsNotNull(mother, "the house is the mother's: she is still there after the opening");
+            Assert.Less(mother.transform.position.y, 0.8f, "back in the living room, out of the bedroom");
+            Assert.IsNotNull(GameObject.Find("Thing_Mama"), "the player can talk to her");
         }
 
         private static string SlotButton(int slot, string text)

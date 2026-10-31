@@ -37,6 +37,23 @@ for Costa Rican high-school students.
 
 Answer with JSON only, matching the provided schema."""
 
+SYSTEM_PROMPT_EN = """You write the closing message of "Colón Quest", a financial-literacy game \
+for Costa Rican high-school students.
+
+- Natural English, warm and direct, second person, at most 500 characters. \
+Keep Costa Rican setting and colones amounts.
+- Mention one thing the player did well and one habit to watch, based only on the data.
+- Only quote amounts that appear in the data, written like ₡85 000. Never invent numbers.
+- No lecturing: describe consequences, not right or wrong.
+
+Answer with JSON only, matching the provided schema."""
+
+
+def get_system_prompt(language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        return SYSTEM_PROMPT_EN
+    return SYSTEM_PROMPT
+
 
 class SummaryText(ContractModel):
     narrative: Annotated[str, Field(min_length=1, max_length=600)]
@@ -48,26 +65,44 @@ class WrittenSummary:
     source: str  # "model" or "fallback"
 
 
-def stats_payload(stats: SessionStats) -> str:
-    return json.dumps(
-        {
-            "monthsPlayed": stats.months_played,
-            "decisions": stats.decisions,
-            "conceptsTaught": [concept.value for concept in stats.concepts_taught],
-            "negotiations": stats.negotiations,
-            "dealsAccepted": stats.deals_accepted,
-            "keyQuestionsAsked": [question.value for question in stats.key_questions_asked],
-            "totalDebt": format_colones(stats.total_debt),
-            "netWorth": format_colones(stats.net_worth)
-            if stats.net_worth >= 0
-            else "-" + format_colones(-stats.net_worth),
-            "wellbeing": stats.wellbeing,
-        },
-        ensure_ascii=False,
-    )
+def stats_payload(stats: SessionStats, language: str = "es") -> str:
+    payload = {
+        "monthsPlayed": stats.months_played,
+        "decisions": stats.decisions,
+        "conceptsTaught": [concept.value for concept in stats.concepts_taught],
+        "negotiations": stats.negotiations,
+        "dealsAccepted": stats.deals_accepted,
+        "keyQuestionsAsked": [question.value for question in stats.key_questions_asked],
+        "totalDebt": format_colones(stats.total_debt),
+        "netWorth": format_colones(stats.net_worth)
+        if stats.net_worth >= 0
+        else "-" + format_colones(-stats.net_worth),
+        "wellbeing": stats.wellbeing,
+    }
+    if language and language != "es":
+        payload["language"] = language
+    return json.dumps(payload, ensure_ascii=False)
 
 
-def fallback_narrative(stats: SessionStats) -> str:
+def fallback_narrative(stats: SessionStats, language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        if stats.net_worth >= 0:
+            opening = f"You closed the year with a net worth of {format_colones(stats.net_worth)}."
+        else:
+            opening = (
+                f"You closed the year owing {format_colones(stats.total_debt)}, "
+                "more than what you have saved."
+            )
+        if stats.key_questions_asked:
+            count = len(stats.key_questions_asked)
+            questions = (
+                f"While negotiating you asked {count} of the key questions; "
+                "asking about the total cost saves you from deceptive installments."
+            )
+        else:
+            questions = "Next time you are offered installments, ask how much you pay in total."
+        return f"{opening} {questions}"
+
     if stats.net_worth >= 0:
         opening = f"Cerraste el año con un patrimonio de {format_colones(stats.net_worth)}."
     else:
@@ -91,20 +126,24 @@ class SummaryWriter:
         self._settings = settings
 
     async def write(
-        self, ledger: Ledger, session_id: uuid.UUID, stats: SessionStats
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        stats: SessionStats,
+        language: str = "es",
     ) -> WrittenSummary:
         mode = await ledger.budget_mode()
         model = select_text_model(self._settings.summary_model, mode, self._settings)
         if model is None:
-            return WrittenSummary(fallback_narrative(stats), "fallback")
+            return WrittenSummary(fallback_narrative(stats, language=language), "fallback")
 
         started = time.perf_counter()
         try:
             async with asyncio.timeout(self._settings.summary_timeout_s):
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
-                    user=stats_payload(stats),
+                    system=get_system_prompt(language),
+                    user=stats_payload(stats, language=language),
                     output=SummaryText,
                     reasoning_effort=self._settings.live_reasoning_effort,
                     max_tokens=2000,  # reasoning tokens count against this
@@ -118,7 +157,7 @@ class SummaryWriter:
                 ok=False,
                 session_id=session_id,
             )
-            return WrittenSummary(fallback_narrative(stats), "fallback")
+            return WrittenSummary(fallback_narrative(stats, language=language), "fallback")
 
         await ledger.record(
             usage=result.usage,
@@ -131,5 +170,5 @@ class SummaryWriter:
         invented = [amount for amount in quoted_amounts(narrative) if amount not in stats.amounts]
         if invented:
             logger.warning("summary quoted invented amounts: %s", invented)
-            return WrittenSummary(fallback_narrative(stats), "fallback")
+            return WrittenSummary(fallback_narrative(stats, language=language), "fallback")
         return WrittenSummary(narrative, "model")

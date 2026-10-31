@@ -1,3 +1,4 @@
+using System;
 using ColonQuest.Finance;
 using ColonQuest.World;
 using NUnit.Framework;
@@ -27,7 +28,7 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, loop.State.Cash);
             Assert.AreEqual(-MarketAssumptions.TrespassFine, outcome.CashDelta);
             Assert.AreEqual(1, loop.JailDaysRemaining);
-            Assert.AreEqual(loop.JailDaysRemaining, loop.TasksDone);
+            Assert.AreEqual(Math.Min(GameRules.TasksPerMonth, loop.JailDaysRemaining * GameRules.TasksPerDay), loop.TasksDone);
             Assert.AreEqual(mood - MarketAssumptions.JailWellbeingLoss, loop.State.Wellbeing);
         }
 
@@ -99,7 +100,7 @@ namespace ColonQuest.Game.Tests
             loop.HospitalizePlayer();
 
             Assert.AreEqual(500_000L - MarketAssumptions.HospitalBill, loop.State.Cash);
-            Assert.AreEqual(MarketAssumptions.HospitalDaysLost, loop.TasksDone);
+            Assert.AreEqual(MarketAssumptions.HospitalDaysLost * GameRules.TasksPerDay, loop.TasksDone);
             Assert.IsTrue(loop.HurtThisMonth);
         }
 

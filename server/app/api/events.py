@@ -175,6 +175,9 @@ async def next_event(
                 state,
                 placeholder,
             )
+    language_val = (
+        (state.language.value if state.language else None) or game_session.language or "es"
+    )
     context = PromptContext(
         state=state,
         recent_event_ids=[row.event_id for row in rows[-RECENT_EVENTS:]],
@@ -184,6 +187,7 @@ async def next_event(
             for row in rows
         ],
         planned=planned,
+        language=language_val,
     )
     outcome = await game_master.next_event(ledger, session_id, context)
     await db.commit()

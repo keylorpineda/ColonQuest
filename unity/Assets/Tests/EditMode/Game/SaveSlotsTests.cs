@@ -69,6 +69,7 @@ namespace ColonQuest.Game.Tests
             loop.Holdings.SetHealthInsurance(15_000L);
             loop.Holdings.AddFarm(FarmKind.Coffee, 200_000L, 1);
             loop.BuySwimsuit();
+            loop.Wear(3, 3);
             loop.Sleep();
             loop.Clock.Advance(GameRules.SecondsPerGameHour * 3f, GameRules.SecondsPerGameHour);
             long cash = loop.State.Cash;
@@ -91,26 +92,27 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(15_000L, back.Holdings.HealthPremium);
             Assert.AreEqual(200_000L, back.Holdings.FarmInvested);
             Assert.IsTrue(back.HasSwimsuit);
+            Assert.AreEqual(3, back.Outfit, "the clothes the player wore");
             Assert.IsTrue(back.SleptThisMonth);
             Assert.AreEqual(2, back.Clock.Day);
             Assert.AreEqual("09:00", back.Clock.Time);
         }
 
         [Test]
-        public void Run_RemembersThePlacesAlreadyUsedThisMonth()
+        public void Run_RemembersThePlacesAlreadyUsedToday()
         {
             var loop = new GameLoop();
             var gameEvent = new GameEvent { Choices = { new Choice { Id = "a" }, new Choice { Id = "b" } } };
             loop.Choose(gameEvent, "a", StationType.Garage);
-            loop.Sleep();
 
             var back = new GameLoop();
             back.Restore(loop.Snapshot());
 
             Assert.AreEqual(1, back.TasksDone);
+            Assert.AreEqual(1, back.TasksToday);
             Assert.IsTrue(back.AlreadyDid(StationType.Garage));
             Assert.IsFalse(back.CanDoTask(StationType.Garage));
-            Assert.IsTrue(back.CanDoTask(StationType.Grocery));
+            Assert.IsTrue(back.CanDoTask(StationType.Grocery), "the second task of the day");
         }
 
         [Test]

@@ -138,6 +138,29 @@ namespace ColonQuest.Api.Tests
         }
 
         [Test]
+        public void LocalTextsOnly_UsesTheTranslatedEventsAndSellerWithoutAskingTheBackend()
+        {
+            StartSession();
+            int sent = transport.Requests.Count;
+            ApiService.LocalTextsOnly = () => true;
+            try
+            {
+                ApiResult<GameEvent> gameEvent = null;
+                ApiResult<NegotiationReply> reply = null;
+                Run(service.RequestEvent(State(), r => gameEvent = r));
+                Run(service.SendNegotiationText("phone", "¿Cuánto pago en total?", r => reply = r));
+
+                Assert.AreEqual(ResultSource.Fallback, gameEvent.Source);
+                Assert.IsFalse(reply.Ok, "the game answers with the local seller");
+                Assert.AreEqual(sent, transport.Requests.Count, "no text is asked to the backend");
+            }
+            finally
+            {
+                ApiService.LocalTextsOnly = () => false;
+            }
+        }
+
+        [Test]
         public void Event_FallsBackWhenTheRequestTimesOut()
         {
             StartSession();
@@ -330,6 +353,22 @@ namespace ColonQuest.Api.Tests
             StringAssert.Contains("\"salaryNet\":450000", transport.Requests[1].JsonBody);
             Assert.AreEqual(120000L, result.Value.NetWorth);
             Assert.AreEqual("fallback", result.Value.Source);
+        }
+
+        [Test]
+        public void CreateSession_InEnglishSendsLanguageEn()
+        {
+            try
+            {
+                ApiService.Language = () => "en";
+                transport.Replies.Enqueue(FakeTransport.Ok("{\"sessionId\":\"" + SessionId + "\"}"));
+                Run(service.CreateSession(null, _ => { }));
+                Assert.AreEqual("{\"language\":\"en\"}", transport.Requests[0].JsonBody);
+            }
+            finally
+            {
+                ApiService.Language = () => "es";
+            }
         }
     }
 }

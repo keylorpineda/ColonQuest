@@ -162,6 +162,7 @@ namespace ColonQuest.UI
                 {
                     modal.Hide();
                     Door.SetRememberedReturn("Town_From_" + home.Id);
+                    HouseVisit.Enter(home.Id);
                     SceneTransition.Go(SceneNames.Casa, SpawnIds.FromTown);
                 }
             });
@@ -182,7 +183,7 @@ namespace ColonQuest.UI
             {
                 text.Append(Loc.F("Ya tienes {0}. En esta partida cabe un solo carro.", Loc.T(owned.Name)));
                 options.Add(Back(Loc.T("1.  Salir")));
-                modal.Show(Loc.T("Agencia de carros"), "Don Chepe", text.ToString(), options, null, MarketFont, MarketBodyHeight);
+                modal.Show(Loc.T("Agencia de carros"), Loc.T("Financiamiento"), text.ToString(), options, null, MarketFont, MarketBodyHeight);
                 return;
             }
 
@@ -206,7 +207,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", index + 1)));
-            modal.Show(Loc.T("Agencia de carros"), "Don Chepe", text.ToString(), options, null, MarketFont, MarketBodyHeight);
+            modal.Show(Loc.T("Agencia de carros"), Loc.T("Financiamiento"), text.ToString(), options, null, MarketFont, MarketBodyHeight);
         }
 
         // ---------------------------------------------------------------- farm

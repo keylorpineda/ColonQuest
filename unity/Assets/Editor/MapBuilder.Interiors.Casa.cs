@@ -15,6 +15,7 @@ namespace ColonQuest.EditorTools
         private const float BathroomRight = 1.6f;
         private const string HouseWallFace = "#E9DDC9";
         private const string OpeningMother = "Mama";
+        private static readonly Vector2 MotherAt = new Vector2(2.4f, -0.8f);
 
         private static void BuildHouseLayout(InteriorParts parts, Room room)
         {
@@ -66,12 +67,6 @@ namespace ColonQuest.EditorTools
             var wardrobe = IL(parts.Props, "Wardrobe");
             Solid(wardrobe, "Wardrobe", rounded, -7.6f, 2.3f, 0.9f, 2.2f, "#7A4F2A");
             BuildWardrobeInside(wardrobe);
-
-            // The player's mother, only there in the opening scene.
-            BuildNpc(parts.People, OpeningMother, new Vector2(-4.0f, 1.7f), new Look
-            {
-                Skin = "#5FA38C", SkinTone = "#D9A47A", HairColor = "#555A66", Hair = HairStyle.Bun, Pants = "#6B5B50", Face = Expression.Warm
-            }, false).gameObject.AddComponent<OpeningActor>();
 
             Rug(IL(parts.Floor, "BedroomRug"), -5.1f, 1.85f, 2.2f, 0.9f, "#B98E6A", "#8E6A4C");
             Window(IL(parts.Labels, "BedroomWindow"), -5.1f, 5.6f, 1.4f);
@@ -207,6 +202,17 @@ namespace ColonQuest.EditorTools
             Deco(dining, "Vase", circle, 5.0f, -2.6f, 0.26f, 0.26f, "#55E08F", 1f, 9);
             CeilingLight(parts.Lights, new Vector2(5.0f, -2.6f), 4.0f, "#FFE9A8", 0.1f);
 
+            // The house is the mother's: she stays in the living room, out of the way between the sofa and the table. The
+            // opening moves her to the bedroom for the present (see GameUi.Opening.cs).
+            BuildNpc(parts.People, OpeningMother, MotherAt, new Look
+            {
+                Skin = "#5FA38C", SkinTone = "#D9A47A", HairColor = "#555A66", Hair = HairStyle.Bun, Pants = "#6B5B50", Face = Expression.Warm
+            }, false);
+            BuildThing(parts.Stations, OpeningMother, "Hablar con tu mamá", MotherAt + new Vector2(0f, -0.5f), new Vector2(0.8f, 0.6f),
+                "\"Antes de comprar algo, esperá un día. Si al otro día lo seguís queriendo, ahí sí.\"",
+                "\"Apartá primero para el ahorro y después gastás. Al revés nunca alcanza.\"",
+                "\"Si alguien te ofrece plata fácil, desconfiá. Nadie regala nada.\"");
+
             // The desk with the bills and the laptop: the account statement station.
             var desk = IL(parts.Props, "BillsDesk");
             Solid(desk, "Desk", rounded, -6.4f, -5.25f, 2.0f, 0.8f, "#7A4F2A");
@@ -219,14 +225,34 @@ namespace ColonQuest.EditorTools
 
             // The pet (zaguatico) resting by the living room
             var pet = IL(parts.Props, "Pet");
-            Deco(pet, "Cushion", rounded, 6.2f, -1.8f, 1.3f, 1.0f, "#A0522D", 1f, 7);
-            Deco(pet, "Inner", circle, 6.2f, -1.8f, 1.0f, 0.8f, "#D2B48C", 1f, 8);
-            Deco(pet, "Body", circle, 6.2f, -1.75f, 0.7f, 0.5f, "#C68B59", 1f, 9);
-            Deco(pet, "Head", circle, 6.48f, -1.65f, 0.38f, 0.34f, "#A66D3B", 1f, 10);
-            Deco(pet, "Ear", circle, 6.55f, -1.55f, 0.15f, 0.2f, "#7D4E27", 1f, 11);
-            Deco(pet, "Tail", roundedSmall, 5.82f, -1.75f, 0.28f, 0.1f, "#C68B59", 1f, 9);
-            BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
+            Deco(pet, "Cushion", roundedSmall, 6.2f, -1.8f, 1.05f, 0.62f, "#8C4A28", 1f, 7);
+            Deco(pet, "CushionFleece", roundedSmall, 6.2f, -1.8f, 0.90f, 0.48f, "#D4B086", 1f, 8);
+
+            Deco(pet, "Body", roundedSmall, 6.12f, -1.78f, 0.58f, 0.36f, "#C68B59", 1f, 9);
+            Deco(pet, "Spot", circle, 6.06f, -1.72f, 0.22f, 0.16f, "#A66D3B", 1f, 10);
+
+            var tail = Deco(pet, "Tail", roundedSmall, 5.78f, -1.72f, 0.24f, 0.10f, "#C68B59", 1f, 9);
+            Tilt(tail, 30f);
+
+            Deco(pet, "PawBack", roundedSmall, 6.42f, -1.90f, 0.24f, 0.09f, "#A66D3B", 1f, 9);
+            Deco(pet, "PawFront", roundedSmall, 6.46f, -1.85f, 0.26f, 0.10f, "#C68B59", 1f, 10);
+            Deco(pet, "PawToe", circle, 6.56f, -1.85f, 0.08f, 0.08f, "#E2B98A", 1f, 11);
+
+            Deco(pet, "Head", circle, 6.36f, -1.70f, 0.32f, 0.32f, "#C68B59", 1f, 10);
+            Deco(pet, "Collar", square, 6.28f, -1.74f, 0.06f, 0.18f, "#E8505B", 1f, 11);
+            Deco(pet, "Tag", circle, 6.30f, -1.82f, 0.08f, 0.08f, "#FFD23F", 1f, 12);
+
+            Deco(pet, "Muzzle", roundedSmall, 6.48f, -1.72f, 0.20f, 0.14f, "#E2B98A", 1f, 11);
+            Deco(pet, "Nose", circle, 6.56f, -1.70f, 0.06f, 0.05f, "#1F1F1F", 1f, 12);
+            Deco(pet, "Eye", circle, 6.40f, -1.66f, 0.05f, 0.05f, "#1F1F1F", 1f, 12);
+            var ear = Deco(pet, "Ear", roundedSmall, 6.28f, -1.63f, 0.14f, 0.22f, "#7D4E27", 1f, 13);
+            Tilt(ear, -18f);
+
+            var petTalk = BuildThing(parts.Stations, "Pet", "Acariciar al zaguatico", new Vector2(6.2f, -1.8f), new Vector2(1.3f, 1.1f),
                 "Acariciar al zaguatico: mueve la cola y te alegra el día. Cuidar una mascota vale la pena.");
+
+            // The same rooms serve the neighbors and the houses for sale: the dog decides at run time if it lives here.
+            pet.gameObject.AddComponent<HouseDog>().Configure(petTalk.gameObject);
 
             // By the front door: shoes, coats and a plant.
             var entry = IL(parts.Props, "Entry");

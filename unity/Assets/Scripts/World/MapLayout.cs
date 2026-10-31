@@ -19,6 +19,7 @@ namespace ColonQuest.World
         public const string Finca = "Finca";
         public const string Inmobiliaria = "Inmobiliaria";
         public const string Soda = "Soda";
+        public const string Cooperativa = "Cooperativa";
     }
 
     /// <summary>
@@ -44,6 +45,7 @@ namespace ColonQuest.World
         public const string TownFromHospital = "Town_FromHospital";
         public const string TownFromVecino = "Town_FromVecino";
         public const string TownFromSoda = "Town_FromSoda";
+        public const string TownFromCooperativa = "Town_FromCooperativa";
 
         // Inside: the cell, the hospital bed and the two ends of the hospital stairs.
         public const string JailCell = "Carcel_Cell";
@@ -88,6 +90,14 @@ namespace ColonQuest.World
         public const float PierXMin = 4f;
         public const float PierXMax = 7.2f;
 
+        // The walkable deck of each bridge over the river, between its two railings: the street and both sidewalks.
+        public static readonly Rect BridgeFirstStreet = Rect.MinMaxRect(RiverXMin, -1.8f, RiverXMax, 5.8f);
+        public static readonly Rect BridgeSouthStreet = Rect.MinMaxRect(RiverXMin, -15.8f, RiverXMax, -8.2f);
+        public static readonly Rect BridgeAvenue = Rect.MinMaxRect(RiverXMin, 24.2f, RiverXMax, 32.8f);
+
+        /// <summary>Half the thickness of a railing: it stands just outside the deck and blocks like the river.</summary>
+        public const float RailingHalf = 0.2f;
+
         // The north district: an avenue runs east to west and a dirt path joins it to the first street.
         public const float AvenueY = 28f;
         public const float NorthPathX = 26.3f;
@@ -122,5 +132,7 @@ namespace ColonQuest.World
         public static readonly Vector2 InmobiliariaMat = new Vector2(0f, -5f);
         public static readonly Vector2 SodaSize = new Vector2(18f, 12f);
         public static readonly Vector2 SodaMat = new Vector2(0f, -5f);
+        public static readonly Vector2 CooperativaSize = new Vector2(18f, 11f);
+        public static readonly Vector2 CooperativaMat = new Vector2(0f, -4.5f);
     }
 }

@@ -79,11 +79,11 @@ namespace ColonQuest.World
         /// <summary>The language of the text. Spanish unless the player chose English.</summary>
         public GameLanguage Language { get; set; } = GameLanguage.Spanish;
 
-        /// <summary>Clock progression speed: normal (15s/h) or fast (5s/h, for judging and demos).</summary>
+        /// <summary>Clock progression speed: normal (30s/h) or fast (10s/h, for judging and demos).</summary>
         public TimeSpeed Speed { get; set; } = TimeSpeed.Normal;
 
         /// <summary>Real seconds elapsed for one in-game hour.</summary>
-        public float SecondsPerGameHour => Speed == TimeSpeed.Fast ? 5f : 15f;
+        public float SecondsPerGameHour => Speed == TimeSpeed.Fast ? 10f : 30f;
 
         /// <summary>From 0 to 1. Any value outside that range is brought back into it.</summary>
         public float Volume

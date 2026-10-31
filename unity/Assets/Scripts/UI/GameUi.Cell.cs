@@ -89,29 +89,61 @@ namespace ColonQuest.UI
 
         private void ShowWardrobe()
         {
+            long price = MarketAssumptions.SwimsuitPrice;
+            int wearing = session.Loop.Outfit;
+            var text = new StringBuilder();
+            text.AppendLine(Loc.F("Tenés puesta: {0}.", Loc.T(PlayerOutfit.Names[Mathf.Clamp(wearing, 0, PlayerOutfit.Count - 1)])));
+            text.AppendLine();
             if (session.Loop.HasSwimsuit)
             {
-                Thoughts.Say("Ya tengo mi bañador guardado. Me toca ir a la playa.");
-                return;
+                text.Append(Loc.T("Elegí qué ponerte. La ropa ya es tuya: cambiarte no cuesta nada."));
+            }
+            else
+            {
+                text.AppendLine(Loc.T("En el ropero no hay nada para el agua. Un bañador es una compra chiquita, pero también sale de tu efectivo."));
+                text.AppendLine(Loc.F("Bañador  {0}", Money.Format(price)));
+                text.Append(Loc.F("Tienes {0} en efectivo.", Money.Format(session.State.Cash)));
             }
 
-            long price = MarketAssumptions.SwimsuitPrice;
-            var text = new StringBuilder();
-            text.AppendLine(Loc.T("En el ropero no hay nada para el agua. Un bañador es una compra chiquita, pero también sale de tu efectivo."));
-            text.AppendLine();
-            text.AppendLine(Loc.F("Bañador  {0}", Money.Format(price)));
-            text.AppendLine(Loc.F("Tienes {0} en efectivo.", Money.Format(session.State.Cash)));
-            text.AppendLine();
-            text.Append(Loc.T("Cifras de ejemplo del juego."));
-
             var options = new List<ModalOption>();
-            if (session.State.Cash >= price)
+            for (int outfit = PlayerOutfit.Everyday; outfit < PlayerOutfit.Swimsuit; outfit++)
             {
-                options.Add(new ModalOption { Label = Loc.F("1.  Comprar el bañador  ·  {0}", Money.Format(price)), Color = GameUiColors.Green, OnPress = () => session.BuySwimsuit() });
+                if (outfit == wearing)
+                {
+                    continue;
+                }
+
+                int chosen = outfit;
+                options.Add(new ModalOption { Label = Loc.F("{0}.  Ponerte la {1}", options.Count + 1, Loc.T(PlayerOutfit.Names[chosen]).ToLowerInvariant()), Color = GameUiColors.Cycle(options.Count), OnPress = () => WearOutfit(chosen) });
+            }
+
+            if (session.Loop.HasSwimsuit)
+            {
+                if (wearing != PlayerOutfit.Swimsuit)
+                {
+                    options.Add(new ModalOption { Label = Loc.F("{0}.  Ponerte el bañador", options.Count + 1), Color = GameUiColors.Blue, OnPress = () => WearOutfit(PlayerOutfit.Swimsuit) });
+                }
+            }
+            else if (session.State.Cash >= price)
+            {
+                options.Add(new ModalOption { Label = Loc.F("{0}.  Comprar el bañador  ·  {1}", options.Count + 1, Money.Format(price)), Color = GameUiColors.Green, OnPress = () => session.BuySwimsuit() });
             }
 
             options.Add(Back(Loc.F("{0}.  Cerrar el ropero", options.Count + 1)));
-            modal.Show(Loc.T("El ropero"), Loc.T("Ropa para ir a la playa"), text.ToString(), options);
+            modal.Show(Loc.T("El ropero"), Loc.T("Tu ropa"), text.ToString(), options);
+        }
+
+        /// <summary>Changes the clothes: the player turns, the clothes swap and a short thought says it.</summary>
+        private void WearOutfit(int outfit)
+        {
+            if (!session.Loop.Wear(outfit, PlayerOutfit.Swimsuit))
+            {
+                return;
+            }
+
+            PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), outfit);
+            AudioDirector.Effect(SoundEffectKind.Swish);
+            Thoughts.Say(outfit == PlayerOutfit.Swimsuit ? "Listo el bañador. A la playa." : "Me cambié de ropa. Ahora sí.");
         }
 
         private void ShowBeach()

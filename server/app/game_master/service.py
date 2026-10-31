@@ -18,7 +18,12 @@ from app.game_master.facts import assumes_missing_thing
 from app.game_master.fallback import pick_fallback_event
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
-from app.game_master.prompt import PROMPT_VERSION, SYSTEM_PROMPT, PromptContext, build_user_prompt
+from app.game_master.prompt import (
+    PROMPT_VERSION,
+    PromptContext,
+    build_user_prompt,
+    get_system_prompt,
+)
 from app.providers.base import (
     ModelProvider,
     ProviderError,
@@ -97,7 +102,7 @@ class GameMaster:
             return self._fallback(context, reason)
 
         user_prompt = build_user_prompt(context)
-        key = cache_key(PROMPT_VERSION, model, user_prompt)
+        key = cache_key(PROMPT_VERSION, model, context.language, user_prompt)
         cached = self._cache.get(key)
         if cached is not None:
             return EventOutcome(event=cached, source=EventSource.CACHE, model=model)
@@ -135,7 +140,7 @@ class GameMaster:
             try:
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
+                    system=get_system_prompt(context.language),
                     user=user_prompt,
                     output=GameEvent,
                     reasoning_effort=self._settings.live_reasoning_effort,

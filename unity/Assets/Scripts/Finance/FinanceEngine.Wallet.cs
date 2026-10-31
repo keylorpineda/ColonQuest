@@ -31,6 +31,40 @@ namespace ColonQuest.Finance
 
             state.Cash = ContractLimits.ClampColones(state.Cash + amountColones);
         }
+
+        /// <summary>
+        /// Takes money out of the savings account into cash, as at a cash machine. Moves at most what the account holds and
+        /// returns how much moved.
+        /// </summary>
+        public static long WithdrawSavings(PlayerState state, long requestedColones)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (requestedColones <= 0L || requestedColones > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(nameof(requestedColones), "Amount must be between 1 and MaxColones.");
+
+            long moved = Math.Min(state.Savings, requestedColones);
+            state.Savings -= moved;
+            state.Cash = ContractLimits.ClampColones(state.Cash + moved);
+            return moved;
+        }
+
+        /// <summary>
+        /// Puts cash into the savings account, as at the deposit window. Moves at most the cash in hand and returns how much
+        /// moved.
+        /// </summary>
+        public static long DepositCash(PlayerState state, long requestedColones)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (requestedColones <= 0L || requestedColones > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(nameof(requestedColones), "Amount must be between 1 and MaxColones.");
+
+            long moved = Math.Min(Math.Max(0L, state.Cash), requestedColones);
+            state.Cash -= moved;
+            state.Savings = ContractLimits.ClampColones(state.Savings + moved);
+            return moved;
+        }
     }
 
     public enum CasinoOutcome

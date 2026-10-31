@@ -49,6 +49,7 @@ namespace ColonQuest.Api
         public List<InformalLoanDto> informalLoans = new List<InformalLoanDto>();
         public List<string> history = new List<string>();
         public int wellbeing;
+        public string language = "es";
     }
 
     [Serializable]
@@ -96,6 +97,13 @@ namespace ColonQuest.Api
     }
 
     [Serializable]
+    public sealed class CreateSessionRequestDto
+    {
+        public string classCode;
+        public string language = "es";
+    }
+
+    [Serializable]
     public sealed class SessionCreatedDto
     {
         public string sessionId = string.Empty;
@@ -116,6 +124,7 @@ namespace ColonQuest.Api
     {
         public string offerId = string.Empty;
         public string text = string.Empty;
+        public string language = "es";
     }
 
     [Serializable]

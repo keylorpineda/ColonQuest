@@ -53,6 +53,20 @@ namespace ColonQuest.EditorTools
         private static Sprite softCircle;
         private static Sprite vignette;
         private static Sprite square;
+        private static Sprite triangle;
+        private static Sprite roofTileTex;
+        private static Sprite roofEaveTex;
+        private static Sprite cobblestoneTex;
+        private static Sprite sidewalkSlabTex;
+        private static Sprite grassEdgeTex;
+        private static Sprite plazaFlagstoneTex;
+        private static Sprite brickWainscotTex;
+        private static Sprite woodPlankTex;
+        private static Sprite facadeBrickTex;
+        private static Sprite grassDetailTex;
+        private static Sprite treeCanopySprite;
+        private static Sprite palmFrondSprite;
+        private static Sprite beachUmbrellaSprite;
 
         private static string ScenePathFor(string sceneName)
         {
@@ -86,7 +100,7 @@ namespace ColonQuest.EditorTools
         /// <summary>The menu is the first scene, then the town; the interiors follow. Only scenes that exist are listed.</summary>
         private static void UpdateBuildSettings()
         {
-            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Cuarto, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino, SceneNames.Finca, SceneNames.Inmobiliaria, SceneNames.Soda };
+            var names = new[] { SceneNames.Menu, SceneNames.Town, SceneNames.Casa, SceneNames.Cuarto, SceneNames.Tienda, SceneNames.Banco, SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.HospitalArriba, SceneNames.Vecino, SceneNames.Finca, SceneNames.Inmobiliaria, SceneNames.Soda, SceneNames.Cooperativa };
             var list = new System.Collections.Generic.List<EditorBuildSettingsScene>();
             foreach (var name in names)
             {
@@ -173,7 +187,53 @@ namespace ColonQuest.EditorTools
             softCircle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SoftCirclePath);
             vignette = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.VignettePath);
             square = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SquarePath);
+            triangle = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.TrianglePath);
             noise = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.NoisePath);
+            roofTileTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.RoofTileTexturePath);
+            roofEaveTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.RoofEaveTexturePath);
+            cobblestoneTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.CobblestoneTexturePath);
+            sidewalkSlabTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.SidewalkSlabTexturePath);
+            grassEdgeTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.GrassEdgeTexturePath);
+            plazaFlagstoneTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.PlazaFlagstoneTexturePath);
+            brickWainscotTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.BrickWainscotTexturePath);
+            woodPlankTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.WoodPlankTexturePath);
+            facadeBrickTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FacadeBrickTexturePath);
+            grassDetailTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.GrassDetailTexturePath);
+            treeCanopySprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.TreeCanopyPath);
+            palmFrondSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.PalmFrondPath);
+            beachUmbrellaSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.BeachUmbrellaPath);
+        }
+
+        private static int ResolveWorldOrder(Transform parent, int order)
+        {
+            if (currentLayer != LayerWorld || parent == null)
+            {
+                return order;
+            }
+
+            var group = parent.GetComponentInParent<UnityEngine.Rendering.SortingGroup>();
+            if (group != null && group.GetComponent<YSort>() == null)
+            {
+                return group.sortingOrder + order;
+            }
+
+            return order;
+        }
+
+        private static SpriteRenderer TiledShape(Transform parent, string name, Sprite sprite, Vector2 center, Vector2 size, Color color, int order)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = center;
+
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.color = color;
+            renderer.sortingLayerName = currentLayer;
+            renderer.sortingOrder = ResolveWorldOrder(parent, order);
+            renderer.drawMode = SpriteDrawMode.Tiled;
+            renderer.size = size;
+            return renderer;
         }
 
         private static Transform Group(Transform parent, string name)
@@ -193,12 +253,16 @@ namespace ColonQuest.EditorTools
             renderer.sprite = sprite;
             renderer.color = color;
             renderer.sortingLayerName = currentLayer;
-            renderer.sortingOrder = order;
+            renderer.sortingOrder = ResolveWorldOrder(parent, order);
 
             if (sprite == rounded || sprite == roundedSmall)
             {
                 renderer.drawMode = SpriteDrawMode.Sliced;
                 renderer.size = size;
+            }
+            else if (sprite != null && sprite.bounds.size.x > 0.001f && sprite.bounds.size.y > 0.001f)
+            {
+                go.transform.localScale = new Vector3(size.x / sprite.bounds.size.x, size.y / sprite.bounds.size.y, 1f);
             }
             else
             {
@@ -228,6 +292,13 @@ namespace ColonQuest.EditorTools
             if (solid)
             {
                 body.gameObject.AddComponent<BoxCollider2D>().size = size;
+                if ((sprite == rounded || sprite == roundedSmall || sprite == square) && size.x >= 0.55f && size.y >= 0.45f)
+                {
+                    var bevel = GamePalette.Shade(color, 1.14f);
+                    bevel.a = 0.5f;
+                    float bevelH = Mathf.Min(0.12f, size.y * 0.22f);
+                    Shape(parent, name + "_Highlight", roundedSmall, center + new Vector2(0f, size.y * 0.5f - bevelH * 0.65f), new Vector2(Mathf.Max(0.2f, size.x - 0.14f), bevelH), bevel, order + 1);
+                }
             }
         }
 
@@ -263,9 +334,9 @@ namespace ColonQuest.EditorTools
 
             currentLayer = LayerForeground;
 
-            // Dark corners keep the eye on the middle of the screen.
-            var tint = GamePalette.Hex("#05070F");
-            tint.a = 0.55f;
+            // Subtle warm framing at the extreme screen corners without muddying the sunny cel-shaded colors.
+            var tint = GamePalette.Hex("#1A1008");
+            tint.a = 0.18f;
             var shade = Shape(go.transform, "Vignette", vignette, Vector2.zero, Vector2.one, tint, OrderVignette);
             shade.transform.localPosition = new Vector3(0f, 0f, 5f);
             shade.gameObject.AddComponent<ViewFitter>().Fit();
@@ -452,13 +523,29 @@ namespace ColonQuest.EditorTools
             go.AddComponent<SpawnPoint>().Configure(id);
         }
 
-        private static void Label(Transform parent, string text, Vector2 position, Color color, float size = 0.07f, TextAnchor anchor = TextAnchor.MiddleLeft)
+        private static Font worldDisplayFont;
+
+        private static Font GetWorldDisplayFont()
+        {
+            if (worldDisplayFont == null)
+            {
+                worldDisplayFont = Resources.Load<Font>("Fonts/ColonQuest-Display");
+                if (worldDisplayFont == null)
+                {
+                    worldDisplayFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                }
+            }
+
+            return worldDisplayFont;
+        }
+
+        private static void Label(Transform parent, string text, Vector2 position, Color color, float size = 0.07f, TextAnchor anchor = TextAnchor.MiddleLeft, int order = OrderLabel)
         {
             var go = new GameObject("Label_" + text);
             go.transform.SetParent(parent, false);
             go.transform.localPosition = position;
 
-            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var font = GetWorldDisplayFont();
             var mesh = go.AddComponent<TextMesh>();
             mesh.text = text;
             mesh.font = font;
@@ -472,7 +559,7 @@ namespace ColonQuest.EditorTools
             var renderer = go.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = font.material;
             renderer.sortingLayerName = currentLayer;
-            renderer.sortingOrder = OrderLabel;
+            renderer.sortingOrder = ResolveWorldOrder(parent, order);
         }
     }
 }

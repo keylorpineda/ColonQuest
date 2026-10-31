@@ -247,9 +247,9 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => GameLoop.IsTaskStation(s.Type));
-            Assert.AreEqual(5, tasks.Count(), "five street stations; SINPE is a phone alert, everyday objects and the agencies are not tasks, and soda is an interior");
-            Assert.AreEqual(18, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the soda, the car agency, the police station, the hospital, the real estate agency, the farm, and all residential/market houses");
-            Assert.AreEqual(StationType.Coop, GameObject.Find("Station_Coop").GetComponent<Station>().Type);
+            Assert.AreEqual(4, tasks.Count(), "four street stations; SINPE is a phone alert, everyday objects and the agencies are not tasks, and the soda and the cooperative are interiors");
+            Assert.AreEqual(19, Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Length, "the house, the bank, the store, the soda, the cooperative, the car agency, the police station, the hospital, the real estate agency, the farm, and all residential/market houses");
+            Assert.IsNotNull(GameObject.Find("Door_" + SceneNames.Cooperativa), "the cooperative has its own door");
             Assert.IsNotNull(GameObject.Find("Door_Soda"), "the soda has its own entrance door");
             Assert.AreEqual(StationType.Courses, GameObject.Find("Station_Courses").GetComponent<Station>().Type);
         }
@@ -282,7 +282,11 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name);
             Assert.AreEqual(0f, Body.position.x, 0.6f);
-            Assert.AreEqual(MapLayout.CasaMat.y + 1.3f, Body.position.y, 0.6f);
+
+            // The player appears at the doormat and takes a few steps in, the same way it walked through the door.
+            float steps = SceneTransition.WalkOutSeconds * 4.5f;
+            Assert.GreaterOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f - 0.6f);
+            Assert.LessOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f + steps + 0.6f);
         }
 
         [UnityTest]

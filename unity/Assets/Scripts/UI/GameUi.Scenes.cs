@@ -18,6 +18,7 @@ namespace ColonQuest.UI
         private static readonly Color Dawn = new Color(0.02f, 0.03f, 0.1f, 0f);
         private static readonly Color TvLight = new Color(0.45f, 0.72f, 1f, 0.55f);
         private static readonly Color FridgeLight = new Color(1f, 0.98f, 0.82f, 0.5f);
+        private static readonly Color HeadLight = new Color(1f, 0.93f, 0.55f, 0.5f);
 
         private void OnSpoke(string speaker, string text)
         {
@@ -32,6 +33,12 @@ namespace ColonQuest.UI
         {
             if (Interaction.Playing)
             {
+                return;
+            }
+
+            if (InHouseNotMine())
+            {
+                Thoughts.Say(HouseVisit.NotMineThought);
                 return;
             }
 
@@ -144,7 +151,7 @@ namespace ColonQuest.UI
                 case StationType.RealEstate:
                     return SignScene(station, then, "AgenteInmobiliaria", "La agente", "Le muestro las casas. Si le gusta una, firmamos y le doy las llaves.", true);
                 case StationType.CarDealer:
-                    return SignScene(station, then, "DonChepe", "Don Chepe", "Mire qué carro tan bonito. Con una prima se lo lleva hoy mismo.", true);
+                    return SignScene(station, then, "Financiera", "Financiamiento", "Siéntese. Le explico la cuota, la prima, el seguro y el costo total antes de firmar.", true);
                 case StationType.Farm:
                     return SignScene(station, then, "DonBeto", "Don Beto", "La tierra da, pero hay que saber cuándo sembrar y cuándo esperar.", false);
                 case StationType.Thing:
@@ -175,7 +182,8 @@ namespace ColonQuest.UI
         {
             Vector2 me = Here(station);
             Vector2 teller = PersonAt("Cajera", Here(station, 0f, 2.3f));
-            return new Interaction().WalkTo(me).Face(teller)
+            return WaitTurn(new Interaction().WalkTo(me + new Vector2(0f, -0.9f)).Face(teller), BankCustomer.Window2, "Cajera", "Cajera")
+                .WalkTo(me).Face(teller)
                 .Say("Cajera", "Buenas. ¿Viene a cerrar el mes?")
                 .Pose(PersonPose.Handover, 0.7f)
                 .Sound(SoundEffectKind.Bills).Fly("bills", me + new Vector2(0f, 0.4f), teller, 0.8f)
@@ -187,6 +195,25 @@ namespace ColonQuest.UI
                 .Pose(PersonPose.Read, 1.2f)
                 .Apply(then);
         }
+
+        /// <summary>
+        /// When a customer is at the window, the player waits behind them: the teller asks for a moment and the scene goes
+        /// on once the window is free, or after a few seconds at most.
+        /// </summary>
+        private static Interaction WaitTurn(Interaction scene, Vector2 window, string teller, string speaker)
+        {
+            if (!BankCustomer.IsBeingServed(window))
+            {
+                return scene;
+            }
+
+            float until = Time.time + BankWaitSeconds;
+            return scene.NpcPose(teller, PersonPose.Wave, 0.8f).Say(speaker, "Un momentito, ya casi termino con el cliente.")
+                .WaitUntil(() => !BankCustomer.IsBeingServed(window) || Time.time > until).Wait(0.4f);
+        }
+
+        /// <summary>The longest the player waits in line before the teller turns to them.</summary>
+        private const float BankWaitSeconds = 8f;
 
         /// <summary>The cash machine: the card goes in, the keys are tapped, the bills come out and the receipt prints.</summary>
         private Interaction AtmScene(Station station, Action then)
@@ -224,7 +251,7 @@ namespace ColonQuest.UI
             }
 
             Vector2 me = Here(station);
-            switch (station.name)
+            switch (SceneKey(station.name))
             {
                 case "Thing_Bed":
                     return BedScene(station, then);
@@ -237,14 +264,22 @@ namespace ColonQuest.UI
 
                 case "Thing_Shower":
                 {
-                    var scene = new Interaction().WalkInto(me).Pose(PersonPose.Wash, 3.2f).Sound(SoundEffectKind.Water).Steam(Here(station, 0f, 0.4f), 3f);
+                    // The clothes come off behind the glass with a pixel blur on the body, and go back on at the end.
+                    var scene = new Interaction().WalkInto(me).Sound(SoundEffectKind.Swish).Pose(PersonPose.Reach, 0.5f)
+                        .Undress(4.4f).Wait(0.3f).Pose(PersonPose.Wash, 3.2f).Sound(SoundEffectKind.Water).Steam(Here(station, 0f, 0.4f), 3f);
                     for (int i = 0; i < 6; i++)
                     {
                         scene.Fly("drop", Here(station, -0.25f + i * 0.1f, 1.1f), Here(station, -0.25f + i * 0.1f, -0.1f), 0.5f).Wait(0.45f);
                     }
 
-                    return scene.Pose(PersonPose.None, 0.3f).Say(string.Empty, "Un baño caliente y a seguir con las cuentas.").Apply(then);
+                    return scene.Pose(PersonPose.None, 0.2f).Sound(SoundEffectKind.Swish).Wear(session.Loop.Outfit)
+                        .Say(string.Empty, "Un baño corto y a seguir con las cuentas.").Apply(then);
                 }
+
+                case "Thing_Toilet":
+                    // The screen dims while the player uses the toilet, the flush sounds and the light comes back.
+                    return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Fade(new Color(0.02f, 0.03f, 0.1f, 0.85f), 0.5f)
+                        .Wait(1.2f).Sound(SoundEffectKind.Water).Wait(0.8f).Fade(Dawn, 0.5f).Apply(then);
 
                 case "Thing_Tv":
                     // Watching from the sofa that faces the TV; without it, from the floor in front of the screen.
@@ -316,8 +351,9 @@ namespace ColonQuest.UI
                         .Sound(SoundEffectKind.Beep).Wait(0.8f).Sound(SoundEffectKind.Beep).Wait(0.8f).Apply(then);
 
                 case "Thing_Fountain":
+                    // The station is the strip in front of the rim: the player stays there and the coin lands in the water.
                     return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Pose(PersonPose.Handover, 0.7f)
-                        .Fly("coin", me + new Vector2(0f, 0.5f), Here(station, 0f, 0.3f), 0.7f)
+                        .Fly("coin", me + new Vector2(0f, 0.5f), Here(station, 0f, 1.6f), 0.7f)
                         .Wait(0.7f).Sound(SoundEffectKind.Coin).Sound(SoundEffectKind.Splash)
                         .Say(string.Empty, "Pedí un deseo: llegar a fin de mes con ahorro.").Wait(1f).Apply(then);
 
@@ -329,11 +365,84 @@ namespace ColonQuest.UI
                         .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
                 }
 
+                case "Thing_DonChepe":
+                case "Thing_Salesman1":
+                case "Thing_Salesman2":
+                {
+                    string person = station.name == "Thing_DonChepe" ? "DonChepe" : "Vendedor" + station.name[station.name.Length - 1];
+                    Vector2 seller = PersonAt(person, Here(station, 0f, 2f));
+                    return new Interaction().WalkTo(me).Face(seller).Pose(PersonPose.Wave, 0.8f).NpcPose(person, PersonPose.Wave, 1.4f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
+                case "Thing_Mama":
+                {
+                    // The mother turns to the player and waves while she gives her advice.
+                    Vector2 mother = PersonAt(Mother, Here(station, 0f, 0.5f));
+                    return new Interaction().Face(mother).Pose(PersonPose.Wave, 0.8f).NpcPose(Mother, PersonPose.Wave, 1.4f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
                 case "Thing_Guard":
                 case "Thing_Receptionist":
                 case "Thing_Cashier":
-                case "Thing_Teller3":
                     return new Interaction().Face(Here(station, 0f, 1f)).Pose(PersonPose.Wave, 1.4f).Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+
+                case "Thing_Teller3":
+                {
+                    var scene = WaitTurn(new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)), BankCustomer.Window4, "Cajero2", "Cajero");
+                    return scene.Pose(PersonPose.Wave, 1f).NpcPose("Cajero2", PersonPose.Wave, 1f).Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
+                }
+
+                case "Thing_Manager":
+                case "Thing_CreditAdvisor":
+                {
+                    // The player stands on the guest side of the desk while the other person talks.
+                    string person = station.name == "Thing_Manager" ? "Gerente" : "Asesora";
+                    Vector2 desk = PersonAt(person, Here(station, 0f, 1.3f));
+                    return new Interaction().WalkTo(me).Face(desk).Pose(PersonPose.Wave, 0.9f).NpcPose(person, PersonPose.Wave, 1.2f)
+                        .Sound(SoundEffectKind.Chime).Wait(0.4f).Fly("paper", desk + new Vector2(0f, -0.4f), me + new Vector2(0f, 0.3f), 0.7f)
+                        .Pose(PersonPose.Read, 1.2f).Apply(then);
+                }
+
+                case "Thing_Pet":
+                    // The player bends to pet the dog and the dog wiggles with joy.
+                    return new Interaction().Face(me).Pose(PersonPose.Reach, 1.6f).Wobble("Pet", 1.4f)
+                        .Sound(SoundEffectKind.Swish).Wait(0.6f).Sound(SoundEffectKind.Chime).Wait(0.8f).Apply(then);
+
+                case "Thing_Doctor":
+                {
+                    // Each doctor of the upper floor greets, writes the note and hands it over.
+                    string doctor = station.name.Substring("Thing_".Length);
+                    Vector2 desk = PersonAt(doctor, Here(station, 0f, 0.9f));
+                    return new Interaction().Face(desk).NpcPose(doctor, PersonPose.Wave, 1.2f).Sound(SoundEffectKind.Chime)
+                        .Wait(0.6f).NpcPose(doctor, PersonPose.Sign, 1.4f).Sound(SoundEffectKind.Scribble).Wait(1.0f)
+                        .Fly("paper", desk + new Vector2(0f, -0.2f), me + new Vector2(0f, 0.3f), 0.6f).Pose(PersonPose.Read, 1.0f).Apply(then);
+                }
+
+                case "Thing_Motorbike":
+                    return new Interaction().Face(me).Pose(PersonPose.Reach, 0.8f).Sound(SoundEffectKind.Keys)
+                        .Fly("key", Here(station, 0f, 0.3f), me + new Vector2(0f, 0.3f), 0.5f).Wobble("Motorbike", 0.5f)
+                        .Wait(0.5f).Pose(PersonPose.Read, 0.9f).Apply(then);
+
+                case "Thing_Accessories":
+                    return new Interaction().Face(me).Pose(PersonPose.Reach, 0.7f).Sound(SoundEffectKind.Swish)
+                        .Fly("box", Here(station, 0f, 0.4f), me + new Vector2(0f, 0.3f), 0.6f).Wait(0.3f)
+                        .Pose(PersonPose.Read, 1.2f).Wait(0.3f).Apply(then);
+
+                case "Thing_Car":
+                    // A look at the car: the key, the chirp of the alarm and the headlights blink twice.
+                    return new Interaction().Face(me).Pose(PersonPose.Reach, 0.6f).Sound(SoundEffectKind.Keys).Wait(0.4f)
+                        .Sound(SoundEffectKind.Beep).Flicker(Here(station, 0f, 0.1f), new Vector2(2.2f, 0.8f), HeadLight, 0.8f)
+                        .Wait(0.5f).Sound(SoundEffectKind.Beep).Wait(0.5f).Apply(then);
+
+                case "Thing_Workshop":
+                    return new Interaction().Face(me).Pose(PersonPose.Read, 1.6f).Sound(SoundEffectKind.Knock)
+                        .Wait(0.6f).Sound(SoundEffectKind.Knock).Wait(0.6f).Apply(then);
+
+                case "Thing_RatesBoard":
+                    return new Interaction().Face(me).Pose(PersonPose.Read, 1.8f).Sound(SoundEffectKind.Beep)
+                        .Flicker(Here(station, 0f, 0.2f), new Vector2(2f, 0.9f), TvLight, 1.6f).Wait(1.2f).Apply(then);
 
                 default:
                     return null;
@@ -341,15 +450,32 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
+        /// The scene a thing plays, by the name of its object. The people who chat on the street (Thing_Talk_DonMario...) all
+        /// wave like a passer-by, and the three doctors of the upper floor share one scene.
+        /// </summary>
+        public static string SceneKey(string thingName)
+        {
+            if (thingName.StartsWith("Thing_Talk"))
+            {
+                return "Thing_Talk";
+            }
+
+            return thingName.StartsWith("Thing_Doctor") ? "Thing_Doctor" : thingName;
+        }
+
+        /// <summary>
         /// Sleeping: the player walks to the bed and lies down, the Z letters rise, the screen goes dark, the alarm rings and the
-        /// morning comes back: the clock skips to the next week. Before the evening the bed only talks, like any object.
+        /// morning comes back: the clock skips to the next week. Before the evening it is only a short nap.
         /// </summary>
         private Interaction BedScene(Station station, Action then)
         {
             var clock = session.Loop.Clock;
             if (!clock.IsNight)
             {
-                return null;
+                // Before the evening it is only a rest: the player lies down a moment and gets up again.
+                Vector2 spot = Here(station);
+                return new Interaction().WalkInto(spot).Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 2.6f)
+                    .Zzz(spot + new Vector2(0.2f, 0.5f), 2f).Wait(0.2f).Apply(then);
             }
 
             // The month moves on only at the bank, so the last week wakes up in the same week with a reminder.
@@ -442,13 +568,18 @@ namespace ColonQuest.UI
                 return null;
             }
 
-            Vector2 me = Here(station);
-            Vector2 pan = Here(station, 0f, 0.7f);
-            return new Interaction().WalkTo(me).Face(pan)
-                .Sound(SoundEffectKind.Sizzle).Pose(PersonPose.Cook, 2.6f).Steam(pan, 2.4f)
-                .Fly("plate", pan, me + new Vector2(0.3f, 0.2f), 0.7f)
-                .Pose(PersonPose.Eat, 2f).Sound(SoundEffectKind.Munch).Wait(1f).Sound(SoundEffectKind.Munch).Wait(1f)
-                .Say(string.Empty, "Cocinar en casa sale más barato que comer afuera.")
+            // The cutting board sits left of the stove on the same worktop, the fridge to its right.
+            Vector2 pan = Here(station, -0.25f, 0.15f);
+            Vector2 board = Here(station, -1.5f, -1f);
+            Vector2 fridge = Here(station, 1.6f, -1f);
+            return new Interaction()
+                .WalkTo(fridge).Face(Here(station, 2f, 0f)).Pose(PersonPose.Reach, 0.6f).Sound(SoundEffectKind.Knock)
+                .Flicker(Here(station, 2f, -0.3f), new Vector2(0.9f, 1.2f), FridgeLight, 0.8f).Wait(0.6f)
+                .WalkTo(board).Face(Here(station, -1.5f, 0f)).Pose(PersonPose.Cook, 1.6f).Sound(SoundEffectKind.Knock).Wait(0.4f).Sound(SoundEffectKind.Knock)
+                .WalkTo(Here(station, 0f, -1f)).Face(pan).Sound(SoundEffectKind.Sizzle).Pose(PersonPose.Cook, 2.6f).Steam(pan, 2.4f)
+                .Pose(PersonPose.Handover, 0.6f).Fly("plate", pan, Here(station, 0f, -0.7f), 0.6f).Wait(0.4f)
+                .Pose(PersonPose.Eat, 2f).Sound(SoundEffectKind.Munch).Wait(1f).Sound(SoundEffectKind.Munch).Wait(0.6f)
+                .Say(string.Empty, Loc.F("Comer afuera me salía unos {0}. Esa plata hoy se queda en mi bolsa.", Money.Format(MarketAssumptions.HomeCookingSaving)))
                 .Apply(() => session.Cook());
         }
 

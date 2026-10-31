@@ -19,6 +19,9 @@ QUESTION_PATTERNS: dict[KeyQuestion, tuple[str, ...]] = {
         r"al final",
         r"cuanto (?:pago|sale|cuesta|termino pagando|seria) (?:todo|en todo)",
         r"\bcosto (?:real|completo)",
+        r"in the end",
+        r"how much (?:in total|altogether|all in all|do i pay)",
+        r"total cost",
     ),
     KeyQuestion.HIDDEN_FEES: (
         r"comision",
@@ -28,14 +31,23 @@ QUESTION_PATTERNS: dict[KeyQuestion, tuple[str, ...]] = {
         r"letra (?:pequena|chiquita)",
         r"algo mas que (?:pagar|cobren)",
         r"escondid",
+        r"\bfees?\b",
+        r"commission",
+        r"hidden",
+        r"extra charge",
+        r"fine print",
     ),
-    KeyQuestion.INTEREST_RATE: (r"interes", r"\btasa\b"),
+    KeyQuestion.INTEREST_RATE: (r"interes", r"\btasa\b", r"interest", r"\brate\b"),
     KeyQuestion.TERM: (
         r"\bplazo\b",
         r"cuantos meses",
         r"cuantas cuotas",
         r"cuanto tiempo",
         r"por cuantos",
+        r"\bterm\b",
+        r"how many months",
+        r"how many installments",
+        r"how long",
     ),
     KeyQuestion.CASH_PRICE: (
         r"contado",
@@ -43,8 +55,13 @@ QUESTION_PATTERNS: dict[KeyQuestion, tuple[str, ...]] = {
         r"sin cuotas",
         r"en efectivo",
         r"de una vez",
+        r"\bcash\b",
+        r"upfront",
+        r"full price",
+        r"real price",
+        r"without installments",
     ),
-    KeyQuestion.INSURANCE: (r"seguro", r"poliza"),
+    KeyQuestion.INSURANCE: (r"seguro", r"poliza", r"insurance", r"policy"),
 }
 
 FACTS_FOR_QUESTION: dict[KeyQuestion, tuple[SellerFact, ...]] = {
@@ -108,9 +125,38 @@ def facts_answering(questions: set[KeyQuestion]) -> list[SellerFact]:
     return facts
 
 
-def fallback_reply(offer: Offer, questions: set[KeyQuestion]) -> tuple[str, list[SellerFact]]:
+def fallback_reply(
+    offer: Offer, questions: set[KeyQuestion], language: str = "es"
+) -> tuple[str, list[SellerFact]]:
     """Scripted seller answer that only reveals what the player asked about."""
     facts = facts_answering(questions)
+    if language and language.lower().startswith("en"):
+        if not facts:
+            pitch = (
+                f"Dude, this {offer.item} is only {offer.facts[SellerFact.MONTHLY_PAYMENT]} "
+                "a month. You can take it home today!"
+            )
+            return pitch, [SellerFact.MONTHLY_PAYMENT]
+        labels_en = {
+            SellerFact.CASH_PRICE: "in cash it comes out to",
+            SellerFact.MONTHLY_PAYMENT: "the monthly payment is",
+            SellerFact.TERM_MONTHS: "the term is",
+            SellerFact.INTEREST_RATE: "the interest rate is",
+            SellerFact.INSURANCE_FEE: "the insurance is",
+            SellerFact.COMMISSION: "the opening fee is",
+            SellerFact.TOTAL_COST: "in total you end up paying",
+        }
+        parts = []
+        for fact in facts:
+            val = (
+                offer.facts[fact]
+                .replace(" meses", " months")
+                .replace(" mensual", " monthly")
+                .replace(" al mes", " a month")
+            )
+            parts.append(f"{labels_en[fact]} {val}")
+        return "Well, look... " + "; ".join(parts) + ".", facts
+
     if not facts:
         pitch = (
             f"Mae, este {offer.item} sale a solo {offer.facts[SellerFact.MONTHLY_PAYMENT]} "

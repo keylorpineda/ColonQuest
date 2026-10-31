@@ -35,6 +35,24 @@ namespace ColonQuest.EditorTools
                 Deco(sacks, "SackKnot", circle, at.x, at.y + 0.45f, 0.26f, 0.2f, "#8B5A3C", 1f, 9);
             }
 
+            // Atmospheric farm props: wooden water barrel, hanging tools on wall, rustic lantern
+            var rustic = IL(parts.Props, "RusticDetails");
+            Solid(rustic, "WoodenBarrel", circle, -7.2f, 2.5f, 0.85f, 0.85f, "#6A4526");
+            Deco(rustic, "BarrelBand1", circle, -7.2f, 2.5f, 0.87f, 0.15f, "#3D2B1F", 1f, 9);
+            Deco(rustic, "BarrelBand2", circle, -7.2f, 2.5f, 0.7f, 0.7f, "#54361E", 1f, 9);
+            Deco(rustic, "WaterBucket", circle, 8.2f, 2.7f, 0.65f, 0.65f, "#7A8288", 1f, 8);
+            Deco(rustic, "BucketWater", circle, 8.2f, 2.7f, 0.5f, 0.5f, "#4DA3FF", 0.85f, 9);
+            // Hanging wall tools (machete & rake)
+            Deco(rustic, "WallToolRack", roundedSmall, -9.6f, 6.0f, 1.6f, 0.2f, "#5A381E", 1f, 7);
+            Deco(rustic, "MacheteBlade", square, -9.9f, 5.5f, 0.08f, 0.9f, "#CBD5E1", 1f, 8);
+            Deco(rustic, "MacheteHandle", square, -9.9f, 6.05f, 0.12f, 0.25f, "#2A1810", 1f, 9);
+            Deco(rustic, "RakeHandle", square, -9.3f, 5.3f, 0.08f, 1.4f, "#A16207", 1f, 8);
+            Deco(rustic, "RakeHead", square, -9.3f, 4.65f, 0.4f, 0.12f, "#475569", 1f, 9);
+            // Rustic wall lantern
+            Deco(rustic, "LanternMount", square, 0f, 5.5f, 0.1f, 0.3f, "#2A2A2A", 1f, 8);
+            Deco(rustic, "LanternGlass", roundedSmall, 0f, 5.25f, 0.35f, 0.45f, "#FDE68A", 1f, 9);
+            Deco(rustic, "LanternCap", roundedSmall, 0f, 5.52f, 0.45f, 0.12f, "#1E293B", 1f, 10);
+
             // Two stalls at the back with a cow in each: wooden rails in front of them.
             var stalls = IL(parts.Props, "Stalls");
             foreach (float x in new[] { -2.8f, 2.8f })
@@ -106,14 +124,31 @@ namespace ColonQuest.EditorTools
             Deco(desk, "Screen", roundedSmall, -0.8f, -0.58f, 0.46f, 0.3f, "#4DA3FF", 1f, 9);
             Deco(desk, "Keys", roundedSmall, 0.9f, -0.7f, 0.4f, 0.3f, "#FFD23F", 1f, 9);
             Deco(desk, "Folder", roundedSmall, 0.3f, -0.7f, 0.6f, 0.4f, "#F8F5E8", 1f, 8);
+            // Desk accessory: business card holder & trash bin
+            Deco(desk, "CardHolder", roundedSmall, -1.4f, -0.7f, 0.3f, 0.2f, "#334155", 1f, 9);
+            Solid(desk, "TrashBin", roundedSmall, 2.2f, -0.7f, 0.5f, 0.6f, "#475569");
+            Deco(desk, "TrashOpening", circle, 2.2f, -0.45f, 0.35f, 0.15f, "#1E293B", 1f, 9);
             BuildNpc(parts.People, "AgenteInmobiliaria", new Vector2(0f, 0.3f), new Look { Skin = "#4DA3FF", Extra = Accessory.Tie, ExtraColor = "#2A7F8C" }, false);
             BuildStation(parts.Stations, "Station_RealEstate", StationType.RealEstate, "Hablar con la agente y ver las casas", new Vector2(0f, -2.2f));
 
-            // A small waiting corner with two armchairs and a plant.
+            // A small waiting corner with two armchairs, water dispenser, and a plant.
             var corner = IL(parts.Props, "WaitingCorner");
             Rug(corner, -7.0f, -2.2f, 4.0f, 2.4f, "#8FB8C2", "#2A7F8C");
             Solid(corner, "Armchair", rounded, -8.0f, -2.2f, 1.1f, 1.0f, "#2A7F8C");
             Solid(corner, "Armchair", rounded, -6.0f, -2.2f, 1.1f, 1.0f, "#2A7F8C");
+            // Water dispenser
+            Solid(corner, "WaterDispenserBase", roundedSmall, -4.5f, -2.0f, 0.6f, 1.0f, "#E2E8F0");
+            Deco(corner, "WaterBottle", circle, -4.5f, -1.35f, 0.5f, 0.55f, "#38BDF8", 0.85f, 9);
+            Deco(corner, "DispenserTapRed", square, -4.6f, -1.85f, 0.08f, 0.08f, "#EF4444", 1f, 10);
+            Deco(corner, "DispenserTapBlue", square, -4.4f, -1.85f, 0.08f, 0.08f, "#3B82F6", 1f, 10);
+            // Office wall clock & fire extinguisher
+            Deco(corner, "WallClock", circle, 0f, 4.7f, 0.8f, 0.8f, "#1E293B", 1f, 8);
+            Deco(corner, "ClockFace", circle, 0f, 4.7f, 0.68f, 0.68f, "#F8FAFC", 1f, 9);
+            Deco(corner, "ClockHour", square, 0f, 4.75f, 0.05f, 0.22f, "#0F172A", 1f, 10);
+            Deco(corner, "ClockMin", square, 0.08f, 4.7f, 0.26f, 0.05f, "#0F172A", 1f, 10);
+            Deco(corner, "ExtinguisherBody", roundedSmall, 9.6f, 2.0f, 0.35f, 0.8f, "#EF4444", 1f, 8);
+            Deco(corner, "ExtinguisherGauge", circle, 9.6f, 2.48f, 0.15f, 0.15f, "#E2E8F0", 1f, 9);
+            Deco(corner, "ExtinguisherNozzle", square, 9.8f, 2.3f, 0.06f, 0.35f, "#1E293B", 1f, 9);
 
             foreach (var at in new[] { new Vector2(-6f, 2f), new Vector2(6f, 2f), new Vector2(0f, -3f) })
             {

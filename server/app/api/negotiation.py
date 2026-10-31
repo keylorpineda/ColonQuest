@@ -70,6 +70,7 @@ async def run_turn(
     session_id: uuid.UUID,
     offer_id: str,
     player_text: str,
+    language: str | None = None,
 ) -> NegotiationReply:
     game_session = await get_active_session(db, session_id)
     offer = get_offer(offer_id)
@@ -87,7 +88,10 @@ async def run_turn(
     habits = await player_habits(db, session_id, offer_id)
 
     ledger = DbLedger(db, settings, game_session.client_hash)
-    outcome = await negotiator.reply(ledger, session_id, offer, player_text, history, habits)
+    lang = language or game_session.language or "es"
+    outcome = await negotiator.reply(
+        ledger, session_id, offer, player_text, history, habits, language=lang
+    )
     reply = outcome.reply
     db.add(
         Negotiation(
@@ -116,7 +120,10 @@ async def negotiate_text(
     negotiator: NegotiatorDep,
 ) -> NegotiationReply:
     """One negotiation turn with typed text (always available as the fallback to voice)."""
-    return await run_turn(db, settings, negotiator, response, session_id, body.offer_id, body.text)
+    lang = body.language.value if body.language else None
+    return await run_turn(
+        db, settings, negotiator, response, session_id, body.offer_id, body.text, language=lang
+    )
 
 
 @router.post("/{session_id}/negotiation/voice", response_model=NegotiationReply)
@@ -148,8 +155,9 @@ async def negotiate_voice(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, VOICE_UNAVAILABLE)
 
     started = time.perf_counter()
+    bias = ["English"] if game_session.language == "en" else ["Spanish"]
     try:
-        transcription = await transcriber.transcribe(wav)
+        transcription = await transcriber.transcribe(wav, language_bias=bias)
     except ProviderError as error:
         await ledger.record(
             usage=Usage(model=settings.transcribe_model),

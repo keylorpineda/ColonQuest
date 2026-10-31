@@ -58,6 +58,21 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Agency_TheSalesmenTalkAndTheFinancingDeskNegotiates()
+        {
+            yield return null;
+
+            foreach (var name in new[] { "Thing_Salesman1", "Thing_Salesman2", "Thing_DonChepe" })
+            {
+                Assert.IsNotNull(GameObject.Find(name), name);
+            }
+
+            var desk = PlaceTestSetup.Stations(StationType.CarDealer)[0].transform.position;
+            Assert.Greater(desk.x, 4.4f, "the car negotiation opens in the financing office, behind the glass");
+            Assert.Less(Vector2.Distance(desk, GameObject.Find("Financiera").transform.position), 3.5f, "in front of the financing officer");
+        }
+
+        [UnityTest]
         public IEnumerator Agency_TheDeskOpensTheCarCatalogWithDonChepe()
         {
             var session = PlaceTestSetup.StartOfflineRun();
@@ -179,13 +194,33 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
             Body.GetComponent<PlayerController>().enabled = false;
 
+            // Upstairs the elevator is in the front wall: the player starts in the cabin and walks up, into the corridor.
+            float firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Less(firstY, Body.position.y - 1f, "out of the cabin and up into the corridor");
+            Assert.Greater(Body.position.y, MapLayout.HospitalArribaMat.y + 0.8f, "in the room, not in the wall");
+
             Teleport(MapLayout.HospitalArribaMat + new Vector2(0f, 0.3f));
             Body.linearVelocity = Vector2.down * 3f;
             yield return WaitForScene(SceneNames.Hospital, 10f);
             FindPlayer();
 
+            // Downstairs it is in the back wall: the player starts in the cabin and walks down, the way they went in.
+            firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Greater(firstY, Body.position.y + 1f, "out of the cabin and down into the hall");
             Assert.AreEqual(-8.4f, Body.position.x, 0.8f);
             Assert.AreEqual(4.0f, Body.position.y, 0.8f);
+        }
+
+        /// <summary>The screen clears and the doors of the elevator open and close behind the player.</summary>
+        private static IEnumerator WaitForArrival()
+        {
+            yield return new WaitForSeconds(0.5f);
+            for (float waited = 0f; waited < 6f && (SceneTransition.IsBusy || Interaction.Playing); waited += Time.deltaTime)
+            {
+                yield return null;
+            }
         }
     }
 
@@ -210,6 +245,32 @@ namespace ColonQuest.World.PlayModeTests
     public sealed class VecinoPlayTests : PlayTestBase
     {
         protected override string SceneToLoad => SceneNames.Vecino;
+
+        [UnityTest]
+        public IEnumerator Neighbor_HasNoMotherAndOnlySomeHousesHaveADog()
+        {
+            yield return null;
+            Assert.IsNull(GameObject.Find("Mama"), "the mother lives in her own house");
+            Assert.IsNull(GameObject.Find("Thing_Mama"));
+
+            string remembered = Door.RememberedReturn;
+            try
+            {
+                Door.SetRememberedReturn("Town_From_Casa_Almendros_3");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNull(GameObject.Find("Thing_Pet"), "no dog in this house");
+
+                Door.SetRememberedReturn("Town_From_Casa_Vecina_A");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNotNull(GameObject.Find("Thing_Pet"), "this neighbor keeps a dog");
+            }
+            finally
+            {
+                Door.SetRememberedReturn(remembered);
+            }
+        }
 
         [UnityTest]
         public IEnumerator Neighbor_TheOwnerCountsDownAndThePlayersOwnDeskIsNotThere()
@@ -277,7 +338,7 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(SceneNames.Carcel, SceneManager.GetActiveScene().name);
             Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, session.State.Cash);
-            Assert.AreEqual(1, session.Loop.TasksDone);
+            Assert.AreEqual(GameRules.TasksPerDay, session.Loop.TasksDone, "a day in the cell is a day of tasks lost");
             Assert.AreEqual(1, session.Loop.JailDaysRemaining);
         }
     }
@@ -374,7 +435,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(SceneNames.Hospital, SceneManager.GetActiveScene().name);
             Assert.IsTrue(session.Loop.HurtThisMonth);
             Assert.AreEqual(600_000L - MarketAssumptions.HospitalBill, session.State.Cash);
-            Assert.AreEqual(MarketAssumptions.HospitalDaysLost, session.Loop.TasksDone);
+            Assert.AreEqual(MarketAssumptions.HospitalDaysLost * GameRules.TasksPerDay, session.Loop.TasksDone);
         }
 
         [UnityTest]

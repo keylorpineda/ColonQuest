@@ -95,7 +95,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             var tasks = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => GameLoop.IsTaskStation(s.Type));
-            Assert.AreEqual(5, tasks.Count(), "five street stations; soda is an interior");
+            Assert.AreEqual(4, tasks.Count(), "four street stations; the soda and the cooperative are interiors");
         }
 
         [UnityTest]
@@ -124,6 +124,15 @@ namespace ColonQuest.World.PlayModeTests
             yield return Walk(new Vector2(25f, MapLayout.AvenueY), Vector2.right, 3.2f);
 
             Assert.Greater(Body.position.x, MapLayout.RiverXMax + 1f);
+        }
+
+        [UnityTest]
+        public IEnumerator Player_CrossesTheRiverOnTheSidewalkOfTheBridge()
+        {
+            yield return Walk(new Vector2(25f, -1.0f), Vector2.right, 3.2f);
+
+            // Past the water: what stands on the sidewalk after the bridge may stop the walk, the river does not.
+            Assert.Greater(Body.position.x, MapLayout.RiverXMax + 0.3f);
         }
 
         [UnityTest]

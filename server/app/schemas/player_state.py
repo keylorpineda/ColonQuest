@@ -5,6 +5,7 @@ from typing import Annotated
 from pydantic import Field, field_validator
 
 from app.schemas.base import Colones, ContractModel, Percent
+from app.schemas.enums import GameLanguage
 
 ShortText = Annotated[str, Field(min_length=1, max_length=60)]
 
@@ -42,6 +43,7 @@ class PlayerState(ContractModel):
     character_name: Annotated[ShortText | None, Field(default=None)] = None
     week: Annotated[int | None, Field(default=None, ge=1, le=4)] = None
     job_position: Annotated[ShortText | None, Field(default=None)] = None
+    language: Annotated[GameLanguage | None, Field(default=None)] = None
 
     @field_validator("character_name", "job_position", mode="before")
     @classmethod

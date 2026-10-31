@@ -48,5 +48,14 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(OfficerAction.Pursue, OfficerLogic.Decide(UnityEngine.Vector2.zero, new UnityEngine.Vector2(4f, 0f), OffenseKind.RedLight, false));
             Assert.AreEqual(OfficerAction.Idle, OfficerLogic.Decide(UnityEngine.Vector2.zero, new UnityEngine.Vector2(1f, 0f), OffenseKind.None, false));
         }
+
+        [Test]
+        public void Officer_ContinuesPursuitToStopRangeOnceRedLightOffenseIsLatched()
+        {
+            // When the officer latches onto a red-light offense, effectiveOffense remains RedLight
+            // even after the pedestrian steps onto the sidewalk, until within StopRange.
+            Assert.AreEqual(OfficerAction.Pursue, OfficerLogic.Decide(new UnityEngine.Vector2(0.4f, 4.4f), new UnityEngine.Vector2(0f, 2f), OffenseKind.RedLight, false));
+            Assert.AreEqual(OfficerAction.Stop, OfficerLogic.Decide(new UnityEngine.Vector2(0f, 2.8f), new UnityEngine.Vector2(0f, 2f), OffenseKind.RedLight, false));
+        }
     }
 }

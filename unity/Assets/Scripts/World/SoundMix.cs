@@ -33,7 +33,10 @@ namespace ColonQuest.World
         Splash,
         Munch,
         Swish,
-        Cuffs
+        Cuffs,
+
+        /// <summary>A door that opens: the latch clicks and the hinge creaks a little.</summary>
+        DoorOpen
     }
 
     /// <summary>How loud each layer of the soundscape should be at one spot. All values are 0 to 1.</summary>
@@ -80,6 +83,7 @@ namespace ColonQuest.World
                 case SceneNames.Agencia:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.3f, Crowd = 0.15f };
                 case SceneNames.Inmobiliaria:
+                case SceneNames.Cooperativa:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.22f, Crowd = 0.1f };
                 case SceneNames.Soda:
                     return new SoundLevels { Track = MusicTrack.Store, Music = 0.25f, Crowd = 0.3f };

@@ -110,6 +110,11 @@ namespace ColonQuest.EditorTools
 
         private static bool OnWalkway(float x, float y)
         {
+            if (y > 3.8f && y < 6.4f && x > -25f && x < 15f)
+            {
+                return false; // Keep the hero sidewalks in front of Tu Casa, Banco, Plaza, and Tienda free of random clutter
+            }
+
             return (y > 4.2f && y < 5.8f) || (y > -1.8f && y < -0.2f) || (y > -9.8f && y < -8.2f) || (y > -15.8f && y < -14.2f);
         }
 
@@ -165,22 +170,22 @@ namespace ColonQuest.EditorTools
         private static void BuildStreetMarkings(Transform parent, System.Random random)
         {
             var seams = CityGroup(parent, "SidewalkSeams");
-            foreach (float y in new[] { 5f, -1f, -9f, -15f })
+            foreach (float y in new[] { -1f, -9f, -15f })
             {
                 for (float x = -49f; x < 49f; x += 3f)
                 {
-                    Flat(seams, "Seam", square, new Vector2(x, y), new Vector2(0.05f, 1.9f), Hex("#8E93A8", 0.55f), 15);
+                    Flat(seams, "Seam", square, new Vector2(x, y), new Vector2(0.04f, 1.4f), Hex("#8E8574", 0.35f), TownWalkPlate + 1);
                 }
             }
 
             var stains = CityGroup(parent, "SidewalkStains");
             Scatter(stains, random, 90, WholeMap, (x, y) => OnWalkway(x, y), 0.2f, (g, x, y) =>
-                Flat(g, "Stain", softCircle, new Vector2(x, y), new Vector2(0.3f + (float)random.NextDouble() * 0.3f, 0.2f), Hex("#5B6075", 0.35f), 15));
+                Flat(g, "Stain", softCircle, new Vector2(x, y), new Vector2(0.3f + (float)random.NextDouble() * 0.3f, 0.2f), Hex("#5B6075", 0.35f), TownWalkPlate + 3));
 
             var litter = CityGroup(parent, "Litter");
             string[] papers = { "#F8F5E8", "#FFD23F", "#E8505B", "#4DA3FF" };
             Scatter(litter, random, 60, WholeMap, (x, y) => OnWalkway(x, y) || OnRoadLane(x, y), 0.3f, (g, x, y) =>
-                Tilt(Flat(g, "Paper", square, new Vector2(x, y), new Vector2(0.2f, 0.14f), Hex(papers[random.Next(papers.Length)]), 16), (float)random.NextDouble() * 180f));
+                Tilt(Flat(g, "Paper", square, new Vector2(x, y), new Vector2(0.2f, 0.14f), Hex(papers[random.Next(papers.Length)]), TownRoadMark + 1), (float)random.NextDouble() * 180f));
 
             var cracks = CityGroup(parent, "SidewalkWeeds");
             foreach (float y in new[] { 6.02f, 3.98f, -0.02f, -1.98f, -8.02f, -9.98f, -13.98f, -16.02f })
@@ -188,36 +193,36 @@ namespace ColonQuest.EditorTools
                 for (int i = 0; i < 9; i++)
                 {
                     float x = (float)random.NextDouble() * 92f - 46f;
-                    Flat(cracks, "Weed", circle, new Vector2(x, y), new Vector2(0.28f, 0.16f), Hex("#4CB36F"), 16);
-                    Flat(cracks, "Weed", circle, new Vector2(x + 0.14f, y + 0.04f), new Vector2(0.2f, 0.12f), Hex("#3E9457"), 16);
+                    Flat(cracks, "Weed", circle, new Vector2(x, y), new Vector2(0.28f, 0.16f), Hex("#4CB36F"), TownRoadMark + 1);
+                    Flat(cracks, "Weed", circle, new Vector2(x + 0.14f, y + 0.04f), new Vector2(0.2f, 0.12f), Hex("#3E9457"), TownRoadMark + 1);
                 }
             }
 
             var manholes = CityGroup(parent, "Manholes");
             Scatter(manholes, random, 12, WholeMap, OnRoadLane, 2.5f, (g, x, y) =>
             {
-                Flat(g, "Cover", circle, new Vector2(x, y), new Vector2(0.74f, 0.74f), GamePalette.Outline, 15);
-                Flat(g, "Cover", circle, new Vector2(x, y), new Vector2(0.62f, 0.62f), Hex("#6B7186"), 16);
-                Flat(g, "Grid", square, new Vector2(x, y), new Vector2(0.5f, 0.05f), Hex("#3A3F52"), 17);
+                Flat(g, "Cover", circle, new Vector2(x, y), new Vector2(0.74f, 0.74f), GamePalette.Outline, TownRoadMark);
+                Flat(g, "Cover", circle, new Vector2(x, y), new Vector2(0.62f, 0.62f), Hex("#6B7186"), TownRoadMark + 1);
+                Flat(g, "Grid", square, new Vector2(x, y), new Vector2(0.5f, 0.05f), Hex("#3A3F52"), TownRoadMark + 2);
             });
 
             var patches = CityGroup(parent, "RoadPatches");
             Scatter(patches, random, 14, WholeMap, OnRoadLane, 1.5f, (g, x, y) =>
-                Flat(g, "Patch", rounded, new Vector2(x, y), new Vector2(1.1f + (float)random.NextDouble(), 0.6f), Hex("#4A5166"), 15));
+                Flat(g, "Patch", rounded, new Vector2(x, y), new Vector2(1.1f + (float)random.NextDouble(), 0.6f), Hex("#4A5166"), TownRoadMark));
 
             var roadCracks = CityGroup(parent, "RoadCracks");
             Scatter(roadCracks, random, 34, WholeMap, OnRoadLane, 0.5f, (g, x, y) =>
-                Tilt(Flat(g, "Crack", square, new Vector2(x, y), new Vector2(0.9f + (float)random.NextDouble() * 0.8f, 0.04f), Hex("#2E3345", 0.7f), 15), (float)random.NextDouble() * 60f - 30f));
+                Tilt(Flat(g, "Crack", square, new Vector2(x, y), new Vector2(0.9f + (float)random.NextDouble() * 0.8f, 0.04f), Hex("#2E3345", 0.7f), TownRoadMark), (float)random.NextDouble() * 60f - 30f));
 
             var oil = CityGroup(parent, "OilStains");
             Scatter(oil, random, 12, WholeMap, OnRoadLane, 1f, (g, x, y) =>
-                Flat(g, "Oil", softCircle, new Vector2(x, y), new Vector2(1.3f, 0.7f), Hex("#14172A", 0.35f), 15));
+                Flat(g, "Oil", softCircle, new Vector2(x, y), new Vector2(1.3f, 0.7f), Hex("#14172A", 0.35f), TownRoadMark));
 
             var puddles = CityGroup(parent, "RoadPuddles");
             Scatter(puddles, random, 10, WholeMap, (x, y) => OnRoadLane(x, y) || OnWalkway(x, y), 1f, (g, x, y) =>
             {
-                Flat(g, "Puddle", softCircle, new Vector2(x, y), new Vector2(1.5f, 0.7f), Hex("#7FB6E8", 0.45f), 16);
-                Flat(g, "Shine", softCircle, new Vector2(x - 0.2f, y + 0.08f), new Vector2(0.6f, 0.2f), Hex("#FFFFFF", 0.5f), 17);
+                Flat(g, "Puddle", softCircle, new Vector2(x, y), new Vector2(1.5f, 0.7f), Hex("#7FB6E8", 0.45f), TownRoadMark + 1);
+                Flat(g, "Shine", softCircle, new Vector2(x - 0.2f, y + 0.08f), new Vector2(0.6f, 0.2f), Hex("#FFFFFF", 0.5f), TownRoadMark + 2);
             });
 
             var arrows = CityGroup(parent, "RoadArrows");
@@ -225,25 +230,25 @@ namespace ColonQuest.EditorTools
             {
                 foreach (float y in new[] { 1f, -13f })
                 {
-                    Flat(arrows, "Shaft", square, new Vector2(x, y), new Vector2(1.4f, 0.14f), Hex("#F8F5E8", 0.85f), 15);
-                    Tilt(Flat(arrows, "Head", square, new Vector2(x + 0.75f, y), new Vector2(0.4f, 0.4f), Hex("#F8F5E8", 0.85f), 15), 45f);
+                    Flat(arrows, "Shaft", square, new Vector2(x, y), new Vector2(1.4f, 0.14f), Hex("#F8F5E8", 0.85f), TownRoadMark);
+                    Tilt(Flat(arrows, "Head", square, new Vector2(x + 0.75f, y), new Vector2(0.4f, 0.4f), Hex("#F8F5E8", 0.85f), TownRoadMark), 45f);
                 }
             }
 
             var curbPaint = CityGroup(parent, "CurbPaint");
-            foreach (float y in new[] { 3.86f, 0.14f, -10.14f, -13.86f })
+            foreach (float y in new[] { -10.14f, -13.86f })
             {
                 for (int i = 0; i < 10; i++)
                 {
                     float x = (float)random.NextDouble() * 88f - 44f;
-                    Flat(curbPaint, "Paint", square, new Vector2(x, y), new Vector2(2.2f, 0.16f), Hex(i % 2 == 0 ? "#FFD23F" : "#E8505B", 0.9f), 15);
+                    Flat(curbPaint, "Paint", square, new Vector2(x, y), new Vector2(2.2f, 0.16f), Hex(i % 2 == 0 ? "#FFD23F" : "#E8505B", 0.9f), TownRoadMark);
                 }
             }
 
             var edgeLines = CityGroup(parent, "RoadEdgeLines");
             foreach (float y in new[] { 3.55f, 0.45f, -10.45f, -13.55f })
             {
-                Flat(edgeLines, "Edge", square, new Vector2(0f, y), new Vector2(98f, 0.07f), Hex("#F8F5E8", 0.6f), 15);
+                Flat(edgeLines, "Edge", square, new Vector2(0f, y), new Vector2(98f, 0.07f), Hex("#F8F5E8", 0.6f), TownRoadMark);
             }
 
             var parking = CityGroup(parent, "ParkingLines");
@@ -253,7 +258,7 @@ namespace ColonQuest.EditorTools
                 {
                     foreach (float y in new[] { 1f, 3f, -11f, -13f })
                     {
-                        Flat(parking, "Bay", square, new Vector2(x, y), new Vector2(0.07f, 1.1f), Hex("#F8F5E8", 0.7f), 15);
+                        Flat(parking, "Bay", square, new Vector2(x, y), new Vector2(0.07f, 1.1f), Hex("#F8F5E8", 0.7f), TownRoadMark);
                     }
                 }
             }
@@ -264,8 +269,8 @@ namespace ColonQuest.EditorTools
                 for (int i = 0; i < 4; i++)
                 {
                     float x = (float)random.NextDouble() * 80f - 40f;
-                    Flat(drains, "Drain", rounded, new Vector2(x, y), new Vector2(0.9f, 0.24f), GamePalette.Outline, 15);
-                    Flat(drains, "Bars", square, new Vector2(x, y), new Vector2(0.7f, 0.05f), Hex("#4A5166"), 16);
+                    Flat(drains, "Drain", rounded, new Vector2(x, y), new Vector2(0.9f, 0.24f), GamePalette.Outline, TownRoadMark);
+                    Flat(drains, "Bars", square, new Vector2(x, y), new Vector2(0.7f, 0.05f), Hex("#4A5166"), TownRoadMark + 1);
                 }
             }
         }
@@ -499,7 +504,7 @@ namespace ColonQuest.EditorTools
             int posterIndex = 0;
             foreach (var b in buildingSpecs)
             {
-                if (!PutsOutABoard(b))
+                if (!PutsOutABoard(b) || b.Name == "Tienda" || b.Name == "SodaElMuelle")
                 {
                     continue;
                 }
@@ -511,12 +516,12 @@ namespace ColonQuest.EditorTools
                 Shape(root, "Line", square, new Vector2(0f, -0.06f), new Vector2(0.28f, 0.05f), Hex("#F8F5E8"), 3);
             }
 
-            // Air conditioners hang beside a window of the offices and shops, never on homes.
+            // Air conditioners hang beside a window of the offices and shops, never on homes or Banco's classical columns.
             var conditioners = CityGroup(parent, "WindowAirConditioners");
             foreach (var b in buildingSpecs)
             {
                 float side = FacadeWindowOffset(b);
-                if (!IsBusiness(b) || side <= 0f || b.AwningA != null)
+                if (!IsBusiness(b) || b.Name == "Banco" || side <= 0f || b.AwningA != null)
                 {
                     continue;
                 }
@@ -527,13 +532,13 @@ namespace ColonQuest.EditorTools
                 Shape(root, "Grille", square, new Vector2(0f, 0.09f), new Vector2(0.5f, 0.06f), Hex("#8E93A8"), 3);
             }
 
-            // Flower boxes under the windows of the homes.
+            // Flower boxes under the windows of the homes (Casa already builds its own rich window planters).
             string[] blooms = { "#FF7A8A", "#FFD23F", "#B28DFF", "#F8F5E8" };
             var boxes = CityGroup(parent, "FlowerBoxes");
             foreach (var b in buildingSpecs)
             {
                 float side = FacadeWindowOffset(b);
-                if (!IsHouse(b) || side <= 0f)
+                if (!IsHouse(b) || b.Name == "Casa" || side <= 0f)
                 {
                     continue;
                 }
@@ -554,7 +559,7 @@ namespace ColonQuest.EditorTools
             var lamps = CityGroup(parent, "WallLamps");
             foreach (var b in buildingSpecs)
             {
-                if (b.Entrance != Entrance.Door)
+                if (b.Entrance != Entrance.Door || b.Name == "Casa" || b.Name == "Banco" || b.Name == "Tienda")
                 {
                     continue;
                 }
@@ -564,7 +569,7 @@ namespace ColonQuest.EditorTools
                 Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.1f), Vector2.one * 1.3f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, b.DoorX, true);
             }
 
-            // A number plate on the door of every home.
+            // A number plate beside the door of every home (placed to the left of the door, never covering the wood panels).
             var numbers = CityGroup(parent, "HouseNumbers");
             foreach (var b in buildingSpecs)
             {
@@ -573,10 +578,10 @@ namespace ColonQuest.EditorTools
                     continue;
                 }
 
-                var root = Root(numbers, "Number", new Vector2(b.DoorX, b.YBottom + 1.72f), b.YBottom - 0.05f);
-                Part(root, rounded, Vector2.zero, new Vector2(0.36f, 0.26f), "#F8F5E8", 0);
-                Shape(root, "Digit", square, new Vector2(-0.06f, 0f), new Vector2(0.06f, 0.14f), Hex("#2A3345"), 3);
-                Shape(root, "Digit", square, new Vector2(0.06f, 0f), new Vector2(0.06f, 0.14f), Hex("#2A3345"), 3);
+                var root = Root(numbers, "Number", new Vector2(b.DoorX - 0.95f, b.YBottom + 1.45f), b.YBottom - 0.05f);
+                Part(root, rounded, Vector2.zero, new Vector2(0.34f, 0.24f), "#F8F5E8", 0);
+                Shape(root, "Digit", square, new Vector2(-0.06f, 0f), new Vector2(0.05f, 0.12f), Hex("#2A3345"), 3);
+                Shape(root, "Digit", square, new Vector2(0.06f, 0f), new Vector2(0.05f, 0.12f), Hex("#2A3345"), 3);
             }
 
             var cameras = CityGroup(parent, "SecurityCameras");
@@ -595,13 +600,13 @@ namespace ColonQuest.EditorTools
             var mats = CityGroup(parent, "DoorMats");
             foreach (var b in buildingSpecs)
             {
-                if (b.Entrance != Entrance.Door)
+                if (b.Entrance != Entrance.Door || b.Name == "Casa" || b.Name == "Banco" || b.Name == "Tienda" || b.Name == "SodaElMuelle")
                 {
                     continue;
                 }
 
-                Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.5f), new Vector2(1.1f, 0.5f), GamePalette.Outline, 16);
-                Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.5f), new Vector2(0.98f, 0.38f), Hex("#B2475A"), 17);
+                Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.22f), new Vector2(1.1f, 0.36f), GamePalette.Outline, 16);
+                Flat(mats, "Mat", rounded, new Vector2(b.DoorX, b.YBottom - 0.22f), new Vector2(0.98f, 0.26f), Hex("#B2475A"), 17);
             }
 
             var boards = CityGroup(parent, "SandwichBoards");
@@ -609,7 +614,7 @@ namespace ColonQuest.EditorTools
             {
                 float x = Mathf.Clamp(b.DoorX + 2.1f, b.XMin, b.XMax);
                 float y = b.YBottom - 0.9f;
-                if (!PutsOutABoard(b) || !Clear(x, y, 0.8f))
+                if (!PutsOutABoard(b) || b.Name == "Tienda" || !Clear(x, y, 0.8f))
                 {
                     continue;
                 }
@@ -622,11 +627,11 @@ namespace ColonQuest.EditorTools
                 occupied.Add(new Vector2(x, y));
             }
 
-            // Potted plants by the doors of the homes and the bank.
+            // Potted plants by the doors of neighborhood homes.
             var pots = CityGroup(parent, "DoorPlants");
             foreach (var b in buildingSpecs)
             {
-                if (!IsHouse(b) && b.Name != "Banco")
+                if ((!IsHouse(b) && b.Name != "Banco") || b.Name == "Casa" || b.Name == "Banco")
                 {
                     continue;
                 }
@@ -667,7 +672,7 @@ namespace ColonQuest.EditorTools
             {
                 float roofY = b.YTop - 1.1f;
                 float cx = (b.XMin + b.XMax) * 0.5f;
-                if (IsHouse(b))
+                if (IsHouse(b) && b.Name != "Casa")
                 {
                     var tank = Root(tanks, "Tank", new Vector2(b.XMax - 1.0f, roofY), b.YBottom - 0.05f);
                     Part(tank, roundedSmall, new Vector2(0f, 0.3f), new Vector2(0.7f, 0.6f), "#3C7FD9", 0);

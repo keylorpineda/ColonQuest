@@ -18,6 +18,16 @@ namespace ColonQuest.Api
         private readonly ApiConfig config;
         private readonly HashSet<string> seenEvents = new HashSet<string>();
 
+        /// <summary>
+        /// True while the texts written by the models cannot be shown: the backend writes them only in Spanish, so in English
+        /// the local events, seller and summary answer instead, all of them translated. The game sets this (to "the game is in
+        /// English"); the telemetry and the voice transcription still go to the backend.
+        /// </summary>
+        public static Func<bool> LocalTextsOnly = () => false;
+
+        /// <summary>The language the backend writes in, "es" or "en". The game sets this from its own language setting.</summary>
+        public static Func<string> Language = () => "es";
+
         public ApiService(IHttpTransport transport, ApiConfig config)
         {
             this.transport = transport;
@@ -36,7 +46,18 @@ namespace ColonQuest.Api
 
         public IEnumerator CreateSession(string classCode, Action<ApiResult<string>> done)
         {
-            string body = string.IsNullOrEmpty(classCode) ? "{}" : "{\"classCode\":\"" + Escape(classCode) + "\"}";
+            string lang = Language();
+            string body;
+            if (string.IsNullOrEmpty(classCode))
+            {
+                body = lang == "en" ? "{\"language\":\"en\"}" : "{}";
+            }
+            else
+            {
+                body = lang == "en"
+                    ? "{\"classCode\":\"" + Escape(classCode) + "\",\"language\":\"en\"}"
+                    : "{\"classCode\":\"" + Escape(classCode) + "\"}";
+            }
             HttpResponseData response = null;
             yield return transport.Send(Post("sessions", body, config.Timeout), r => response = r);
 
@@ -63,7 +84,7 @@ namespace ColonQuest.Api
         {
             ApiResult<GameEvent> result = null;
 
-            if (HasSession)
+            if (HasSession && !LocalTextsOnly())
             {
                 string body = JsonUtility.ToJson(ApiMapper.ToDto(state));
                 HttpResponseData response = null;
@@ -105,13 +126,14 @@ namespace ColonQuest.Api
         /// <summary>One negotiation turn with typed text, the fallback that always exists next to voice.</summary>
         public IEnumerator SendNegotiationText(string offerId, string text, Action<ApiResult<NegotiationReply>> done)
         {
-            if (!HasSession)
+            if (!HasSession || LocalTextsOnly())
             {
-                done(ApiResult<NegotiationReply>.Failure("no session"));
+                done(ApiResult<NegotiationReply>.Failure(HasSession ? "local texts only" : "no session"));
                 yield break;
             }
 
-            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text });
+            string lang = Language();
+            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
             HttpResponseData response = null;
             yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.Timeout), r => response = r);
             done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));
@@ -162,9 +184,9 @@ namespace ColonQuest.Api
         /// <summary>Closes the session: the backend needs the final state to compute net worth and debt.</summary>
         public IEnumerator RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
         {
-            if (!HasSession)
+            if (!HasSession || LocalTextsOnly())
             {
-                done(ApiResult<SessionSummary>.Failure("no session"));
+                done(ApiResult<SessionSummary>.Failure(HasSession ? "local texts only" : "no session"));
                 yield break;
             }
 

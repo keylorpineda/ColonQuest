@@ -44,6 +44,7 @@ namespace ColonQuest.Game
         public int arrests;
         public bool hurtThisMonth;
         public bool hasSwimsuit;
+        public int outfit;
         public bool swamThisMonth;
         public bool sleptThisMonth;
         public bool cookedThisMonth;

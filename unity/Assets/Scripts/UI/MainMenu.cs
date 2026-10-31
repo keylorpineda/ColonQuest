@@ -46,6 +46,7 @@ namespace ColonQuest.UI
         private float openedAt;
         private GameObject notice;
         private GameObject credits;
+        private GameObject quitConfirm;
         private SettingsPanel settings;
 
         private void Awake()
@@ -58,10 +59,12 @@ namespace ColonQuest.UI
             BuildFooter();
             BuildNotice();
             BuildCredits();
+            BuildQuitConfirm();
             BuildSlots();
             BuildNewGame();
             settings = new SettingsPanel(root, null);
             openedAt = Time.unscaledTime;
+            BuildSplash();
         }
 
         private void OnEnable()
@@ -88,6 +91,11 @@ namespace ColonQuest.UI
             float now = Time.unscaledTime;
 
             MoveLayers(dt);
+            if (UpdateSplash(now))
+            {
+                return;
+            }
+
             SlideIn(now - openedAt);
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -155,7 +163,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>True while a window (notice, credits or settings) covers the buttons.</summary>
-        public bool WindowOpen => notice.activeSelf || credits.activeSelf || settings.IsOpen || slots.activeSelf || newGame.activeSelf;
+        public bool WindowOpen => notice.activeSelf || credits.activeSelf || quitConfirm.activeSelf || settings.IsOpen || slots.activeSelf || newGame.activeSelf;
 
         /// <summary>Starts a new life saved in a slot and goes to the opening in the house, behind the loading screen.</summary>
         public void StartStory(int slot, string runName, string characterName, bool female)
@@ -178,6 +186,7 @@ namespace ColonQuest.UI
         {
             notice.SetActive(false);
             credits.SetActive(false);
+            quitConfirm.SetActive(false);
             slots.SetActive(false);
             newGame.SetActive(false);
             if (finishedReport != null)
@@ -312,7 +321,7 @@ namespace ColonQuest.UI
                     credits.SetActive(true);
                     break;
                 default:
-                    Quit();
+                    quitConfirm.SetActive(true);
                     break;
             }
         }
@@ -328,17 +337,11 @@ namespace ColonQuest.UI
             notice = UiKit.Overlay(root, "Notice");
             var center = new Vector2(0.5f, 0.5f);
             var top = new Vector2(0.5f, 1f);
-            var card = UiKit.Card(notice.transform, "Card", UiKit.Paper, new Vector2(960f, 640f), center, Vector2.zero);
+            var card = UiKit.Card(notice.transform, "Card", UiKit.Paper, new Vector2(960f, 600f), center, Vector2.zero);
+            UiKit.Header(card, "Jugar online", GamePalette.Hex("#2E7D9A"));
 
-            // A little globe: the online mode lives on the other side of the connection.
-            UiKit.Round(card, "Globe", GamePalette.Hex("#5BC0DE"), 96f, top, new Vector2(0f, -30f));
-            UiKit.Round(card, "Land", GamePalette.Hex("#3E9A57"), 40f, top, new Vector2(-14f, -52f));
-            UiKit.Round(card, "Land", GamePalette.Hex("#3E9A57"), 26f, top, new Vector2(18f, -78f));
-
-            var title = UiKit.Label(card, "Jugar online", 56, UiKit.Ink, new Vector2(880f, 70f), top, new Vector2(0f, -140f), TextAnchor.MiddleCenter);
-            title.font = UiKit.TitleFont;
-            UiKit.Label(card, MenuEntries.OnlineNotice, 38, GameUiColors.Muted, new Vector2(880f, 56f), top, new Vector2(0f, -214f), TextAnchor.MiddleCenter);
-            Divider(card, -284f, 760f);
+            UiKit.Label(card, MenuEntries.OnlineNotice, 38, UiKit.Ink, new Vector2(880f, 56f), top, new Vector2(0f, -134f), TextAnchor.MiddleCenter);
+            Divider(card, -206f, 760f);
 
             string[] points =
             {
@@ -348,11 +351,11 @@ namespace ColonQuest.UI
             };
             for (int i = 0; i < points.Length; i++)
             {
-                UiKit.Round(card, "Dot", GameUiColors.Gain, 18f, top, new Vector2(-410f, -332f - i * 74f));
-                UiKit.Label(card, points[i], 30, UiKit.Ink, new Vector2(780f, 70f), top, new Vector2(30f, -312f - i * 74f), TextAnchor.MiddleLeft);
+                UiKit.Round(card, "Dot", GameUiColors.Gain, 18f, top, new Vector2(-410f, -256f - i * 76f));
+                UiKit.Label(card, points[i], 30, UiKit.Ink, new Vector2(780f, 70f), top, new Vector2(30f, -236f - i * 76f), TextAnchor.MiddleLeft);
             }
 
-            UiKit.MakeButton(card, "Entendido", GameUiColors.Green, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 36f), CloseWindows);
+            UiKit.MakeButton(card, "Entendido", GameUiColors.Green, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 32f), CloseWindows);
             notice.SetActive(false);
         }
 
@@ -361,31 +364,141 @@ namespace ColonQuest.UI
             credits = UiKit.Overlay(root, "Credits");
             var center = new Vector2(0.5f, 0.5f);
             var top = new Vector2(0.5f, 1f);
-            var card = UiKit.Card(credits.transform, "Card", UiKit.Paper, new Vector2(1100f, 940f), center, Vector2.zero);
+            var card = UiKit.Card(credits.transform, "Card", UiKit.Paper, new Vector2(1100f, 960f), center, Vector2.zero);
+            UiKit.Header(card, "Créditos", GamePalette.Hex("#C0612B"));
 
-            var title = UiKit.Label(card, "Créditos", 60, UiKit.Ink, new Vector2(1000f, 76f), top, new Vector2(0f, -26f), TextAnchor.MiddleCenter);
-            title.font = UiKit.TitleFont;
-            UiKit.Label(card, "Hecho por " + MenuEntries.Team, 42, UiKit.Ink, new Vector2(1000f, 56f), top, new Vector2(0f, -112f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, string.Join(" y ", MenuEntries.Makers), 34, GameUiColors.Muted, new Vector2(1000f, 46f), top, new Vector2(0f, -166f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, "Keylor Pineda: backend, IA y motor financiero", 28, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -214f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, "Jefferson Abarca: Unity, arte y flujo del juego", 28, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -252f), TextAnchor.MiddleCenter);
-            Divider(card, -308f, 860f);
+            UiKit.Label(card, "Desarrollado por", 30, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -124f), TextAnchor.MiddleCenter);
+            var team = UiKit.PlainLabel(card, "Team", MenuEntries.Team, 64, UiKit.Ink, new Vector2(1000f, 76f), top, new Vector2(0f, -160f), TextAnchor.MiddleCenter);
+            team.font = UiKit.TitleFont;
+            UiKit.Label(card, "Keylor Pineda: backend, IA y motor financiero", 28, UiKit.Ink, new Vector2(1000f, 40f), top, new Vector2(0f, -244f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "Jefferson Abarca: Unity, arte y flujo del juego", 28, UiKit.Ink, new Vector2(1000f, 40f), top, new Vector2(0f, -284f), TextAnchor.MiddleCenter);
+            Divider(card, -340f, 860f);
 
-            UiKit.Label(card, "Herramientas de Meta", 40, UiKit.Ink, new Vector2(1000f, 56f), top, new Vector2(0f, -330f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "Herramientas de Meta", 38, UiKit.Ink, new Vector2(1000f, 52f), top, new Vector2(0f, -358f), TextAnchor.MiddleCenter);
             for (int i = 0; i < MenuEntries.Tools.Length; i++)
             {
                 var tool = MenuEntries.Tools[i];
-                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -410f - i * 104f));
-                UiKit.Label(card, tool[0], 34, GameUiColors.Gain, new Vector2(920f, 44f), top, new Vector2(0f, -396f - i * 104f), TextAnchor.MiddleCenter);
-                UiKit.Label(card, tool[1], 28, GameUiColors.Muted, new Vector2(860f, 60f), top, new Vector2(0f, -440f - i * 104f), TextAnchor.UpperCenter);
+                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -434f - i * 96f));
+                UiKit.Label(card, tool[0], 32, GameUiColors.Gain, new Vector2(920f, 42f), top, new Vector2(0f, -420f - i * 96f), TextAnchor.MiddleCenter);
+                UiKit.Label(card, tool[1], 26, GameUiColors.Muted, new Vector2(860f, 54f), top, new Vector2(0f, -462f - i * 96f), TextAnchor.UpperCenter);
             }
 
-            Divider(card, -726f, 860f);
-            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 28, UiKit.Ink, new Vector2(1000f, 40f), top, new Vector2(0f, -748f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, BuildInfo.Label, 26, GameUiColors.Muted, new Vector2(1000f, 36f), top, new Vector2(0f, -792f), TextAnchor.MiddleCenter);
+            Divider(card, -804f, 860f);
+            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -818f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -852f), TextAnchor.MiddleCenter);
 
-            UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 30f), CloseWindows);
+            UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(320f, 72f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), CloseWindows);
             credits.SetActive(false);
+        }
+
+        /// <summary>Quitting asks first: a click by mistake on "Salir" should not close the game.</summary>
+        private void BuildQuitConfirm()
+        {
+            quitConfirm = UiKit.Overlay(root, "QuitConfirm");
+            var card = UiKit.Card(quitConfirm.transform, "Card", UiKit.Paper, new Vector2(820f, 400f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            UiKit.Header(card, "Salir del juego", GameUiColors.Loss);
+            UiKit.Label(card, "¿Seguro que querés salir de Colón Quest?", 36, UiKit.Ink, new Vector2(740f, 110f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), TextAnchor.MiddleCenter);
+
+            var bottom = new Vector2(0.5f, 0f);
+            UiKit.MakeButton(card, "Cancelar", GameUiColors.Blue, new Vector2(300f, 84f), bottom, new Vector2(-170f, 36f), CloseWindows);
+            UiKit.MakeButton(card, "Salir", GameUiColors.Pink, new Vector2(300f, 84f), bottom, new Vector2(170f, 36f), Quit);
+            quitConfirm.SetActive(false);
+        }
+
+        // ---------------------------------------------------------------- splash
+
+        /// <summary>The presentation shows once per launch, not every time the player comes back to the menu.</summary>
+        private static bool splashShown;
+
+        private const float SplashFadeIn = 0.7f;
+        private const float SplashHold = 4.0f;
+        private const float SplashFadeOut = 0.7f;
+
+        private CanvasGroup splash;
+        private CanvasGroup splashContent;
+        private float splashStartedAt;
+        private bool splashLeaving;
+        private float splashLeftAt;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetSplash()
+        {
+            splashShown = false;
+        }
+
+        /// <summary>
+        /// After the Unity logo, a screen of the team: who made the game and who designed it, then the menu. Any key or click skips it.
+        /// </summary>
+        private void BuildSplash()
+        {
+            if (splashShown)
+            {
+                return;
+            }
+
+            splashShown = true;
+            var layer = UiKit.Overlay(root, "Splash");
+            layer.GetComponent<Image>().color = GamePalette.Hex("#0E1413");
+            layer.transform.SetAsLastSibling();
+            splash = layer.AddComponent<CanvasGroup>();
+            splash.alpha = 1f;
+
+            var center = new Vector2(0.5f, 0.5f);
+            var content = UiKit.Rect(layer.transform, "Content", new Vector2(1400f, 560f), center, Vector2.zero);
+            splashContent = content.gameObject.AddComponent<CanvasGroup>();
+            splashContent.alpha = 0f;
+
+            var muted = GamePalette.Hex("#C9C3AE");
+            UiKit.Label(content, "Desarrollado por", 36, muted, new Vector2(1200f, 50f), center, new Vector2(0f, 170f), TextAnchor.MiddleCenter);
+            var team = UiKit.PlainLabel(content, "Team", MenuEntries.Team, 132, Cream, new Vector2(1400f, 170f), center, new Vector2(0f, 60f), TextAnchor.MiddleCenter);
+            team.font = UiKit.TitleFont;
+            team.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var teamShadow = team.gameObject.AddComponent<Shadow>();
+            teamShadow.effectColor = Beak;
+            teamShadow.effectDistance = new Vector2(6f, -6f);
+
+            UiKit.Fill(content, "Rule", Beak, new Vector2(420f, 6f), center, new Vector2(0f, -40f));
+            UiKit.Label(content, "Diseño y desarrollo: Jefferson Abarca y Keylor Pineda", 34, Cream, new Vector2(1300f, 50f), center, new Vector2(0f, -96f), TextAnchor.MiddleCenter);
+            UiKit.Label(content, "Hecho para el Meta Global AI Developer Hackathon", 28, muted, new Vector2(1300f, 44f), center, new Vector2(0f, -150f), TextAnchor.MiddleCenter);
+
+            UiKit.Label(layer.transform, "Clic o cualquier tecla para saltar", 22, GamePalette.Hex("#7C8580"), new Vector2(800f, 36f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), TextAnchor.MiddleCenter);
+            splashStartedAt = Time.unscaledTime;
+        }
+
+        /// <summary>Plays the presentation. True while it covers the menu, so the menu waits under it.</summary>
+        private bool UpdateSplash(float now)
+        {
+            if (splash == null)
+            {
+                return false;
+            }
+
+            float shown = now - splashStartedAt;
+            if (!splashLeaving)
+            {
+                splashContent.alpha = Mathf.SmoothStep(0f, 1f, shown / SplashFadeIn);
+                bool skip = shown > 0.3f && (Input.anyKeyDown || Input.GetMouseButtonDown(0));
+                if (skip || shown >= SplashFadeIn + SplashHold)
+                {
+                    splashLeaving = true;
+                    splashLeftAt = now;
+                }
+
+                return true;
+            }
+
+            float leaving = (now - splashLeftAt) / SplashFadeOut;
+            splash.alpha = 1f - Mathf.SmoothStep(0f, 1f, leaving);
+            if (leaving >= 1f)
+            {
+                Destroy(splash.gameObject);
+                splash = null;
+                // The title and the buttons slide in once the menu is in sight.
+                openedAt = now;
+                return false;
+            }
+
+            return true;
         }
     }
 }
