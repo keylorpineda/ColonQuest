@@ -61,12 +61,6 @@ namespace ColonQuest.UI
         private void OnStoppedByOfficer(OffenseKind offense)
         {
             ReactionBubble.Show(ReactionKind.Alert);
-            if (offense == OffenseKind.RedLight && !SceneTransition.IsBusy && !modal.IsOpen)
-            {
-                ShowRedLightFine();
-                return;
-            }
-
             if (offense != OffenseKind.Trespass || SceneTransition.IsBusy || modal.IsOpen)
             {
                 return;
@@ -97,33 +91,6 @@ namespace ColonQuest.UI
             };
 
             modal.Show(Loc.T("El oficial te detiene"), Loc.T("Entrar a una casa ajena"), text.ToString(), options);
-        }
-
-        /// <summary>The officer saw the player cross on red. The fine is charged when the window is closed.</summary>
-        private void ShowRedLightFine()
-        {
-            var text = new StringBuilder();
-            text.AppendLine(Loc.T("Un oficial te vio cruzar con el semáforo en rojo y te para."));
-            text.AppendLine();
-            text.AppendLine(Loc.F("Te pone una multa de {0}. Esperar unos segundos en la acera no cuesta nada.", Money.Format(MarketAssumptions.RedLightFine)));
-            text.AppendLine();
-            text.Append(Loc.T("Cifras de ejemplo del juego."));
-
-            var options = new List<ModalOption>
-            {
-                new ModalOption
-                {
-                    Label = Loc.T("Continuar"),
-                    Color = GameUiColors.Yellow,
-                    OnPress = () =>
-                    {
-                        CrossingSignal.ForgiveAll();
-                        session.FineRedLight();
-                    }
-                }
-            };
-
-            modal.Show(Loc.T("El oficial te detiene"), Loc.T("Cruzar en rojo"), text.ToString(), options);
         }
 
         // ---------------------------------------------------------------- the street

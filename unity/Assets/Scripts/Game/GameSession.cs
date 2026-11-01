@@ -744,19 +744,6 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>An officer fines the player for crossing on red. Nothing else changes.</summary>
-        public bool FineRedLight()
-        {
-            if (Loop.IsFinished || Busy)
-            {
-                return false;
-            }
-
-            ChoiceApplied?.Invoke(Loop.FineRedLight());
-            Changed?.Invoke();
-            return true;
-        }
-
         /// <summary>A car ran the player over. It happens once a month at most; false when it did not count.</summary>
         public bool Hospitalize()
         {

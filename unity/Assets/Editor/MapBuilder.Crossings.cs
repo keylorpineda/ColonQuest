@@ -6,12 +6,12 @@ namespace ColonQuest.EditorTools
     public static partial class MapBuilder
     {
         /// <summary>
-        /// The pedestrian lights of the main crosswalks and an officer next to each group. The lights only mark the
-        /// offense; the fine exists only when the officer reaches the player (see <see cref="PoliceOfficer"/>).
+        /// The pedestrian lights of the main crosswalks and an officer next to each group. The lights hold the cars back
+        /// while pedestrians cross; the officers leave a player who crosses on red alone (see <see cref="PoliceOfficer"/>).
         /// </summary>
         private static void BuildCrossings(Transform parent)
         {
-            // Every crosswalk on the main streets has its pedestrian signal and an officer watching within sight range.
+            // Every crosswalk on the main streets has its pedestrian signal and an officer nearby.
             BuildSignal(parent, "Signal_PlazaEast", 3.6f, 0f, 4f, 0f);
             BuildSignal(parent, "Signal_PlazaWest", -3.6f, 0f, 4f, 0f);
             BuildSignal(parent, "Signal_South", 3.6f, -14f, -10f, 7f);

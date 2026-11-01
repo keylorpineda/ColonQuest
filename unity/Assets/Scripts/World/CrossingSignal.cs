@@ -24,19 +24,9 @@ namespace ColonQuest.World
         }
     }
 
-    /// <summary>When walking on a crosswalk is an offense. Pure, so the rule can be tested.</summary>
-    public static class CrossingRules
-    {
-        /// <summary>Being on the crosswalk while the light says wait, unless the officer already fined this crossing.</summary>
-        public static bool IsRedLightOffense(bool onCrosswalk, bool walkLight, bool alreadyFined)
-        {
-            return onCrosswalk && !walkLight && !alreadyFined;
-        }
-    }
-
     /// <summary>
-    /// The light and the zone of one crosswalk. Crossing on red only raises the offense: it costs nothing by itself,
-    /// a fine arrives only if an officer who sees the player stops them (<see cref="PoliceOfficer"/>).
+    /// The light and the zone of one crosswalk. The cars stop at it while pedestrians have green. Crossing on red is not
+    /// an offense: the only risk of walking across is the traffic.
     /// </summary>
     public sealed class CrossingSignal : MonoBehaviour
     {
@@ -52,10 +42,6 @@ namespace ColonQuest.World
         private static readonly Color WalkOff = new Color(0.12f, 0.28f, 0.16f, 1f);
         private static readonly Color WaitOn = new Color(0.95f, 0.25f, 0.25f, 1f);
         private static readonly Color WaitOff = new Color(0.32f, 0.10f, 0.10f, 1f);
-
-        private Transform player;
-        private bool raised;
-        private bool fined;
 
         /// <summary>True while the pedestrian light of this crosswalk is green.</summary>
         public bool WalkLight => CrossingClock.IsWalk(Time.time, phase);
@@ -82,17 +68,6 @@ namespace ColonQuest.World
             waitLamp = wait;
         }
 
-        /// <summary>The officer fined the player: the crossings stop counting until the player leaves or the light turns green.</summary>
-        public static void ForgiveAll()
-        {
-            Offenses.Clear(OffenseKind.RedLight);
-            foreach (var signal in all)
-            {
-                signal.fined = true;
-                signal.raised = false;
-            }
-        }
-
         private void OnEnable()
         {
             all.Add(this);
@@ -101,11 +76,6 @@ namespace ColonQuest.World
         private void OnDisable()
         {
             all.Remove(this);
-            if (raised)
-            {
-                Offenses.Clear(OffenseKind.RedLight);
-                raised = false;
-            }
         }
 
         private void Update()
@@ -119,34 +89,6 @@ namespace ColonQuest.World
             if (waitLamp != null)
             {
                 waitLamp.color = walk ? WaitOff : WaitOn;
-            }
-
-            if (player == null)
-            {
-                var found = GameObject.FindWithTag(Station.PlayerTag);
-                player = found != null ? found.transform : null;
-            }
-
-            bool inside = player != null && new Rect(zoneCenter - zoneSize * 0.5f, zoneSize).Contains(player.position);
-            if (!inside || walk)
-            {
-                fined = false;
-            }
-
-            bool offending = !SceneTransition.IsBusy && CrossingRules.IsRedLightOffense(inside, walk, fined);
-            if (offending)
-            {
-                Offenses.Raise(OffenseKind.RedLight);
-                raised = true;
-            }
-            else if (raised)
-            {
-                // Keep the red-light offense active while any nearby officer is still pursuing the player to issue the fine.
-                if (!PoliceOfficer.IsAnyPursuingRedLight())
-                {
-                    Offenses.Clear(OffenseKind.RedLight);
-                    raised = false;
-                }
             }
         }
     }
