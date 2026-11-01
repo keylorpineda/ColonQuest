@@ -17,12 +17,8 @@ namespace ColonQuest.Game
     {
         public const string Team = "DoWhile Team";
 
-        /// <summary>Who made the game and what each one was in charge of.</summary>
-        public static readonly string[][] Makers =
-        {
-            new[] { "Keylor Pineda", "Backend, inteligencia artificial y motor financiero" },
-            new[] { "Jefferson Abarca", "Unity, arte y flujo del juego" }
-        };
+        /// <summary>Who made the game.</summary>
+        public static readonly string[] Makers = { "Keylor Pineda", "Jefferson Abarca" };
 
         /// <summary>The Meta tools the game uses, what each one does for the player and the time measured for it (docs/adr/0004-model-roles.md).</summary>
         public static readonly string[][] Tools =

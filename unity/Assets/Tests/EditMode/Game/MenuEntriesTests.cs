@@ -38,12 +38,7 @@ namespace ColonQuest.Game.Tests
         [Test]
         public void Credits_NameBothMakersAndEveryToolWithAReasonAndATime()
         {
-            Assert.AreEqual(2, MenuEntries.Makers.Length);
-            foreach (var maker in MenuEntries.Makers)
-            {
-                Assert.AreEqual(2, maker.Length);
-                Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(maker[1]), maker[1]);
-            }
+            CollectionAssert.AreEqual(new[] { "Keylor Pineda", "Jefferson Abarca" }, MenuEntries.Makers);
 
             Assert.AreEqual(5, MenuEntries.Tools.Length, "the five models the game uses");
             foreach (var tool in MenuEntries.Tools)
