@@ -34,6 +34,7 @@ namespace ColonQuest.UI
         private static readonly Color Ink = GamePalette.Hex("#17201E");
 
         private RectTransform art;
+        private MenuToucan toucan;
         private GameObject firstButton;
 
         // What slides in when the menu opens: the title, and each button a moment after the other.
@@ -65,6 +66,11 @@ namespace ColonQuest.UI
             settings = new SettingsPanel(root, null);
             openedAt = Time.unscaledTime;
             BuildSplash();
+            if (splash == null && toucan != null)
+            {
+                // No splash (coming back from a game): the toucan flies in right away.
+                toucan.Arrive();
+            }
         }
 
         private void OnEnable()
@@ -238,8 +244,34 @@ namespace ColonQuest.UI
         {
             art = UiKit.Rect(root, "KeyArt", new Vector2(ArtWidth, ArtHeight), new Vector2(0.5f, 0.5f), Vector2.zero);
             var image = art.gameObject.AddComponent<Image>();
-            image.sprite = Resources.Load<Sprite>("Menu/KeyArt");
             image.raycastTarget = false;
+
+            // The picture without the toucan and the smoke, with both of them as their own animated pieces of it. If any
+            // of the pieces is missing, the whole original picture is used as it always was.
+            var plate = Resources.Load<Sprite>("Menu/KeyArt_Plate");
+            if (plate != null)
+            {
+                image.sprite = plate;
+                var smoke = MenuVolcanoSmoke.Create(art, ArtWidth);
+                toucan = MenuToucan.Create(art, ArtWidth, ArtHeight);
+                if (smoke != null && toucan != null)
+                {
+                    return;
+                }
+
+                if (smoke != null)
+                {
+                    Destroy(smoke.gameObject);
+                }
+
+                if (toucan != null)
+                {
+                    Destroy(toucan.gameObject);
+                    toucan = null;
+                }
+            }
+
+            image.sprite = Resources.Load<Sprite>("Menu/KeyArt");
         }
 
         private void BuildTitle()
@@ -484,6 +516,10 @@ namespace ColonQuest.UI
                     splashLeaving = true;
                     splashLeftAt = now;
                     openedAt = now;
+                    if (toucan != null)
+                    {
+                        toucan.Arrive();
+                    }
                 }
 
                 return true;
