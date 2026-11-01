@@ -1,5 +1,6 @@
 using System.Linq;
 using ColonQuest.Finance;
+using ColonQuest.World;
 using NUnit.Framework;
 
 namespace ColonQuest.Game.Tests
@@ -7,6 +8,22 @@ namespace ColonQuest.Game.Tests
     [TestFixture]
     public sealed class AssetsReportTests
     {
+        private GameLanguage savedLanguage;
+
+        // The report is checked in Spanish, whatever language is saved on this machine.
+        [SetUp]
+        public void SetUp()
+        {
+            savedLanguage = GameSettings.Current.Language;
+            GameSettings.Current.Language = GameLanguage.Spanish;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            GameSettings.Current.Language = savedLanguage;
+        }
+
         [Test]
         public void Build_SaysNothingWhenThePlayerBoughtNothing()
         {

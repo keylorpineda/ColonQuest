@@ -8,11 +8,21 @@ namespace ColonQuest.Game.Tests
     public sealed class AssetPurchaseTests
     {
         private GameLoop loop;
+        private GameLanguage savedLanguage;
 
         [SetUp]
         public void SetUp()
         {
+            // The labels are checked in Spanish, whatever language is saved on this machine.
+            savedLanguage = GameSettings.Current.Language;
+            GameSettings.Current.Language = GameLanguage.Spanish;
             loop = new GameLoop();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            GameSettings.Current.Language = savedLanguage;
         }
 
         private static CarModel Compact => MarketAssumptions.FindCar("compacto");
