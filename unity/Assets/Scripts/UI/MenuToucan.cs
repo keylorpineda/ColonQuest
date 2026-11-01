@@ -7,9 +7,10 @@ namespace ColonQuest.UI
     /// <summary>
     /// The toucan of the main menu, cut from the key art into three pieces (body, head with the bill and the banknote,
     /// and the wing) that sit on the picture without the bird (<c>KeyArt_Plate</c>). When the menu opens it flies in from
-    /// the top right beating its wings, brakes and lands on its branch; then, now and then, it tilts its head, ruffles its
-    /// wing, hops or blinks. At rest every piece is exactly where the drawing had it, so the perched toucan looks like the
-    /// original picture. There is nothing drawn over the picture: the bird is part of it.
+    /// the top right beating its wings, brakes and lands on its branch; then it keeps looking around with quick turns of
+    /// the head and pauses, as birds do, and now and then ruffles its wing, hops or blinks. The head always moves on a
+    /// spring, so it lags, nods when the bird lands and never jumps. Every piece starts where the drawing had it, so the
+    /// perched toucan looks like the original picture. There is nothing drawn over the picture: the bird is part of it.
     /// </summary>
     public sealed class MenuToucan : MonoBehaviour
     {
@@ -28,6 +29,10 @@ namespace ColonQuest.UI
 
         private const float FlightSeconds = 1.9f;
 
+        // Positive turns the bill down and negative lifts it, in degrees. Past these the cut of the neck would show.
+        private const float HeadLookUp = -7f;
+        private const float HeadLookDown = 6f;
+
         private RectTransform root;
         private RectTransform headPivot;
         private RectTransform wingPivot;
@@ -43,9 +48,14 @@ namespace ColonQuest.UI
         private float nextAction;
         private int action;
         private float actionStarted = -10f;
-        private float actionSign = 1f;
         private float nextBlink;
         private float blinkStarted = -10f;
+        private Vector2 neckRest;
+        private float headAngle;
+        private float headVelocity;
+        private float lookTarget;
+        private float nextLook;
+        private float lastUpdate;
 
         /// <summary>True once the bird is on its branch.</summary>
         public bool Perched => perched;
@@ -78,6 +88,7 @@ namespace ColonQuest.UI
 
             arriving = true;
             arrivalStarted = Time.unscaledTime;
+            lastUpdate = arrivalStarted;
             root.gameObject.SetActive(true);
         }
 
@@ -87,6 +98,7 @@ namespace ColonQuest.UI
             arriving = false;
             perched = true;
             landedAt = Time.unscaledTime - 1f;
+            lastUpdate = Time.unscaledTime;
             root.gameObject.SetActive(true);
             ResetPose();
             ScheduleNext(Time.unscaledTime);
@@ -114,6 +126,7 @@ namespace ColonQuest.UI
             wingImage = Piece("Wing", wing, WingPx, wingPivot, ShoulderPx);
 
             headPivot = Pivot("HeadPivot", root, NeckPx, PerchPx);
+            neckRest = headPivot.anchoredPosition;
             Piece("Head", head, HeadPx, headPivot, NeckPx);
 
             // The eyelid: a disc of the skin around the eye that closes from the top for a blink.
@@ -175,7 +188,15 @@ namespace ColonQuest.UI
                 arriving = false;
                 perched = true;
                 landedAt = now;
+
+                // The body stops on the branch and the head carries on: it nods and comes back on its spring.
+                float carried = headAngle;
+                float carriedVelocity = headVelocity;
                 ResetPose();
+                headAngle = carried;
+                headVelocity = carriedVelocity + 70f;
+                headPivot.localRotation = Quaternion.Euler(0f, 0f, headAngle);
+                nextLook = now + 1.1f;
                 ScheduleNext(now);
                 return;
             }
@@ -189,7 +210,15 @@ namespace ColonQuest.UI
             // Smaller far away, the body nose down while it glides and level as it brakes.
             float size = Mathf.Lerp(0.72f, 1f, eased);
             root.localScale = new Vector3(size, size, 1f);
-            root.localRotation = Quaternion.Euler(0f, 0f, Mathf.Lerp(16f, 0f, eased));
+            float pitch = Mathf.Lerp(16f, 0f, eased);
+            root.localRotation = Quaternion.Euler(0f, 0f, pitch);
+
+            // Birds keep the head steady while the body pitches and beats. Halfway it looks up at where it goes, then
+            // down at the branch, and each beat of the wings bobs it a little.
+            float seconds = now - arrivalStarted;
+            float look = -10f * MenuMotion.Pulse(Mathf.InverseLerp(0.22f, 0.58f, t)) + 8f * MenuMotion.Pulse(Mathf.InverseLerp(0.58f, 1f, t));
+            float bob = Mathf.Sin(seconds * 5.5f * Mathf.PI * 2f + 2f) * 2.5f * (1f - Mathf.InverseLerp(0.8f, 1f, t));
+            MoveHead(-pitch * 0.8f + look + bob, 110f, 12f, now);
 
             // Fast beats in the air; in the last fifth the wing opens wide to brake and then folds.
             float flap = MenuMotion.FlapAngle(now - arrivalStarted, 5.5f, 38f, 42f);
@@ -198,25 +227,48 @@ namespace ColonQuest.UI
             wingPivot.localRotation = Quaternion.Euler(0f, 0f, angle);
             float beat = Mathf.Cos((now - arrivalStarted) * 5.5f * Mathf.PI * 2f);
             wingImage.localScale = new Vector3(1f, Mathf.Lerp(0.75f + 0.25f * beat, 1f, brake), 1f);
-            headPivot.localRotation = Quaternion.Euler(0f, 0f, Mathf.Lerp(-8f, 0f, eased));
         }
 
-        /// <summary>On the branch: it breathes and, every few seconds, does one small thing.</summary>
+        /// <summary>Takes the head toward an angle on its spring; the neck stretches a little as the head turns.</summary>
+        private void MoveHead(float target, float stiffness, float damping, float now)
+        {
+            // Long frames are cut so that a hiccup never throws the spring.
+            float delta = Mathf.Min(now - lastUpdate, 0.05f);
+            lastUpdate = now;
+            MenuMotion.SpringStep(ref headAngle, ref headVelocity, target, stiffness, damping, delta);
+            headPivot.localRotation = Quaternion.Euler(0f, 0f, headAngle);
+            headPivot.anchoredPosition = neckRest + new Vector2(-headAngle * 0.35f, Mathf.Sin(now * 1.8f + 0.8f) * 1.6f) * scale;
+        }
+
+        /// <summary>A quick turn to somewhere new and then a pause; sometimes it blinks as it turns, as birds do.</summary>
+        private void LookAround(float now)
+        {
+            if (now < nextLook)
+            {
+                return;
+            }
+
+            // A clear turn up or down, or back to the pose of the drawing: small turns would not read at this size.
+            float pick = Random.value;
+            lookTarget = pick < 0.25f ? 0f : pick < 0.65f ? Random.Range(HeadLookUp, -3f) : Random.Range(2.5f, HeadLookDown);
+            nextLook = now + Random.Range(0.7f, 2.6f);
+            if (Random.value < 0.35f)
+            {
+                nextBlink = now;
+            }
+        }
+
+        /// <summary>On the branch: it breathes, looks around and, every few seconds, does one small thing.</summary>
         private void Idle(float now)
         {
             float squash = MenuMotion.LandingSquash(now - landedAt);
             float breath = 1f + Mathf.Sin(now * 1.8f) * 0.006f;
             float hop = 0f;
-            float headAngle = 0f;
             float wingAngle = 0f;
 
             float since = now - actionStarted;
             switch (action)
             {
-                case 1:
-                    // Tilts the head to look around, holds it and comes back.
-                    headAngle = actionSign * 8f * MenuMotion.Pulse(since / 1.6f);
-                    break;
                 case 2:
                     // Ruffles the wing: two small beats.
                     wingAngle = since < 0.7f ? Mathf.Abs(Mathf.Sin(since * Mathf.PI * 2f / 0.35f)) * 24f : 0f;
@@ -235,15 +287,22 @@ namespace ColonQuest.UI
             if (now >= nextAction)
             {
                 actionStarted = now;
-                action = 1 + Random.Range(0, 3);
-                actionSign = Random.value < 0.5f ? -1f : 1f;
+                action = 2 + Random.Range(0, 2);
+                if (action == 3)
+                {
+                    // The hop throws the head up, and it comes back on its spring.
+                    headVelocity -= 45f;
+                }
+
                 ScheduleNext(now);
             }
+
+            LookAround(now);
 
             root.anchoredPosition = perch + new Vector2(0f, hop);
             root.localScale = new Vector3(1f / squash, squash * breath, 1f);
             root.localRotation = Quaternion.identity;
-            headPivot.localRotation = Quaternion.Euler(0f, 0f, headAngle);
+            MoveHead(lookTarget + MenuMotion.HeadDrift(now), 140f, 15f, now);
             wingPivot.localRotation = Quaternion.Euler(0f, 0f, wingAngle);
             wingImage.localScale = Vector3.one;
             Blink(now);
@@ -276,6 +335,10 @@ namespace ColonQuest.UI
             root.localScale = Vector3.one;
             root.localRotation = Quaternion.identity;
             headPivot.localRotation = Quaternion.identity;
+            headPivot.anchoredPosition = neckRest;
+            headAngle = 0f;
+            headVelocity = 0f;
+            lookTarget = 0f;
             wingPivot.localRotation = Quaternion.identity;
             wingImage.localScale = Vector3.one;
             lid.localScale = new Vector3(1f, 0f, 1f);
