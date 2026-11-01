@@ -156,6 +156,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 | `GET /api/images/{key}` | Devuelve un retrato o escena cacheada; la genera solo si no existe |
 | `POST /api/sessions/{id}/summary` | Genera el resumen final con Muse Spark |
 | `GET /api/classes/{code}/dashboard` | Métricas agregadas del grupo para el panel del profesor |
+| `GET /api/sessions/{id}/trace` | Lo que hicieron los modelos y agentes en la sesión; lo muestra la demo de funciones del menú |
 | `GET /api/health` | Estado y presupuesto restante |
 
 ### `PlayerState` (lo envía Unity, lo calcula el motor C#)
@@ -244,8 +245,8 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 
 **Decidido el 29 de octubre: va.** El mes jugable funciona de punta a punta. En Render están
 encendidos `AGENTIC_GAME_MASTER` (1,4 a 4,2 s, usa sus herramientas) y `SEASON_PLANNER` (3,6 s).
-`SELLER_AGENT` queda apagado hasta que el vendedor agente corra en Baseten (pendiente), porque hoy
-gastaría créditos de Meta. Detalle en `docs/adr/0003-agentic-game-master.md`.
+`SELLER_AGENT` también está encendido: el vendedor agente corre en Baseten (visto en vivo el 1 de
+noviembre). Detalle en `docs/adr/0003-agentic-game-master.md`.
 
 La versión base del game master hace una llamada por mes. La versión agéntica:
 

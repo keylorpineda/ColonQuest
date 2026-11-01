@@ -32,13 +32,30 @@ borrow. Muse Spark writes one event built for your situation and the C# engine a
 whole colones. When a seller shows up, you negotiate out loud: the real price, rate, insurance and
 commission only come out if you ask.
 
+### Try every feature in two minutes
+
+Choose **Demo de funciones** in the main menu. You do not need to play a year to reach each feature,
+and the panel on the right shows what really happened, read back from the server: model, provider,
+latency, tokens, cost and tool calls.
+
+| Station | Try this | Models |
+| --- | --- | --- |
+| Game master | Pick a player's situation, then a choice, and see the engine apply it | Muse Spark with tools |
+| Negotiation | Talk or type to a seller and open the hidden sheet line by line | Muse Spark Open, Muse Voice Transcribe |
+| Year plan and ending | Compare the plans for two profiles and read how a year ended | Muse Wonder |
+| Game art | Browse the twenty pictures, all without text | Muse Image |
+| Engine and guards | Try to sneak in an amount out of range, see the live budgets | None, by design |
+| Class Mode | Run a real test class of three simulated students, labelled as such | Muse Spark |
+
+It needs internet, because the models run on the backend. A whole tour costs about $0.10.
+
 ### Judging criteria
 
 | Criterion | Weight | What we built |
 | --- | --- | --- |
 | Impact | 30% | Telemetry per decision, Class Mode for teachers, a student pilot |
-| Meta tools | 25% | Four Meta models, one clear job each, plus tool-using agents |
-| Demo | 25% | One link; every model call has a timeout and a fallback |
+| Meta tools | 25% | Five Meta models, one clear job each, plus tool-using agents |
+| Demo | 25% | A feature demo in the game's menu; every model call has a timeout and a fallback |
 | Technical depth | 20% | Validated contracts, an exact engine, 260+ tests in CI |
 
 ### Meta models
