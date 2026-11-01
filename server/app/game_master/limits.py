@@ -7,6 +7,7 @@ again on its side.
 
 from dataclasses import dataclass
 
+from app.images.keys import SCENE_BY_CONCEPT, SCENE_KEYS
 from app.schemas import Effect, EffectKind, EventType, GameEvent
 
 
@@ -73,8 +74,13 @@ def clamp_effect(event_type: EventType, effect: Effect) -> tuple[Effect, list[st
 
 
 def clamp_event(event: GameEvent) -> tuple[GameEvent, list[str]]:
-    """Clamp every effect of every choice. Returns the safe event and what was adjusted."""
+    """Clamp every effect of every choice and the scene. Returns the safe event and the changes."""
     notes: list[str] = []
+    image_key = event.image_key
+    if image_key is not None and image_key not in SCENE_KEYS:
+        image_key = SCENE_BY_CONCEPT[event.teaching_concept]
+        notes.append(f"imageKey: {event.image_key} -> {image_key}")
+
     choices = []
     for choice in event.choices:
         effects = []
@@ -83,4 +89,4 @@ def clamp_event(event: GameEvent) -> tuple[GameEvent, list[str]]:
             effects.append(clamped)
             notes.extend(f"{choice.id}.{note}" for note in effect_notes)
         choices.append(choice.model_copy(update={"effects": effects}))
-    return event.model_copy(update={"choices": choices}), notes
+    return event.model_copy(update={"choices": choices, "image_key": image_key}), notes

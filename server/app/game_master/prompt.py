@@ -13,9 +13,10 @@ from app.agents.tools import HistoryItem
 from app.game_master.facts import owns_fridge, owns_vehicle
 from app.game_master.limits import CASH_FLOW_RANGES, KIND_RANGES, MONTH_RANGES
 from app.game_master.season import PlannedMonth
+from app.images.keys import SCENE_KEYS
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-10-30b"
+PROMPT_VERSION = "gm-2026-11-01"
 
 
 def _ranges_table() -> str:
@@ -74,7 +75,8 @@ RULES THE GAME ENGINE ENFORCES (out-of-range values are clamped, so stay inside 
 - new_installment amount is the MONTHLY payment and needs months; new_informal_loan amount is \
 the principal and needs months.
 - Only savings_change and wellbeing_change may be negative. price_inflation amount is a percent.
-- Ids (eventId, choice ids, npc.id, imageKey) use lowercase letters, digits and underscores only.
+- Ids (eventId, choice ids, npc.id) use lowercase letters, digits and underscores only.
+- imageKey is exactly one of: {", ".join(SCENE_KEYS)}
 - You never compute balances or interest; the game engine does. Only propose effects.
 
 Answer with JSON only, matching the provided schema."""
@@ -117,7 +119,8 @@ RULES THE GAME ENGINE ENFORCES (out-of-range values are clamped, so stay inside 
 - new_installment amount is the MONTHLY payment and needs months; new_informal_loan amount is \
 the principal and needs months.
 - Only savings_change and wellbeing_change may be negative. price_inflation amount is a percent.
-- Ids (eventId, choice ids, npc.id, imageKey) use lowercase letters, digits and underscores only.
+- Ids (eventId, choice ids, npc.id) use lowercase letters, digits and underscores only.
+- imageKey is exactly one of: {", ".join(SCENE_KEYS)}
 - You never compute balances or interest; the game engine does. Only propose effects.
 
 Answer with JSON only, matching the provided schema."""
