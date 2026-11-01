@@ -54,16 +54,76 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void Smoke_RisesBendsRightGrowsAndThinsAway()
+        public void SmokeSway_StaysOnTheCraterAndBendsHigherUp()
         {
-            Assert.AreEqual(Vector2.zero, MenuMotion.SmokeOffset(0f, 1.3f));
-            var top = MenuMotion.SmokeOffset(1f, 1.3f);
-            Assert.Greater(top.y, 200f, "it rises out of the picture");
-            Assert.Greater(top.x, 100f, "the wind bends it to the right, as in the drawing");
-            Assert.Less(MenuMotion.SmokeScale(0f), MenuMotion.SmokeScale(1f));
-            Assert.AreEqual(0f, MenuMotion.SmokeAlpha(0f), 0.0001f);
-            Assert.AreEqual(1f, MenuMotion.SmokeAlpha(0.4f), 0.0001f);
-            Assert.AreEqual(0f, MenuMotion.SmokeAlpha(1f), 0.0001f);
+            float low = 0f;
+            float high = 0f;
+            for (float seconds = 0f; seconds < 20f; seconds += 0.05f)
+            {
+                Assert.AreEqual(0f, MenuMotion.SmokeSway(0f, seconds), 0.0001f, "the base never leaves the crater");
+                low = Mathf.Max(low, Mathf.Abs(MenuMotion.SmokeSway(20f, seconds)));
+                high = Mathf.Max(high, Mathf.Abs(MenuMotion.SmokeSway(165f, seconds)));
+            }
+
+            Assert.Greater(high, low * 3f, "the top moves much more than the base");
+            Assert.Less(high, 16f, "a sway, not a column that leaves its place in the picture");
+        }
+
+        [Test]
+        public void SmokeSway_ClimbsTheColumn()
+        {
+            // A wave that rises shows the same bend higher up a moment later.
+            float now = MenuMotion.SmokeSway(100f, 3f) / Mathf.Clamp01(100f / 170f);
+            float later = MenuMotion.SmokeSway(100f, 3f + 3.4f) / Mathf.Clamp01(100f / 170f);
+            Assert.AreNotEqual(now, later, "the fast waves and the lean keep it from repeating exactly");
+            Assert.AreNotEqual(MenuMotion.SmokeSway(100f, 3f), MenuMotion.SmokeSway(120f, 3f));
+        }
+
+        [Test]
+        public void SmokeAxis_FollowsTheDrawnColumnToTheRight()
+        {
+            Assert.AreEqual(0f, MenuMotion.SmokeAxis(0f), 0.0001f);
+            Assert.AreEqual(104f, MenuMotion.SmokeAxis(165f), 0.0001f);
+            Assert.AreEqual(104f, MenuMotion.SmokeAxis(500f), 0.0001f, "past the top it stays on the last point");
+            for (float height = 0f; height < 165f; height += 5f)
+            {
+                Assert.LessOrEqual(MenuMotion.SmokeAxis(height), MenuMotion.SmokeAxis(height + 5f));
+            }
+        }
+
+        [Test]
+        public void Wisps_AreFaintAndGrow()
+        {
+            Assert.Less(MenuMotion.WispScale(0f), MenuMotion.WispScale(1f));
+            Assert.AreEqual(0f, MenuMotion.WispAlpha(0f), 0.0001f);
+            Assert.AreEqual(0.5f, MenuMotion.WispAlpha(0.5f), 0.0001f);
+            Assert.AreEqual(0f, MenuMotion.WispAlpha(1f), 0.0001f);
+        }
+
+        [Test]
+        public void SpringStep_PassesTheTargetAndSettlesOnIt()
+        {
+            float value = 0f;
+            float velocity = 0f;
+            float highest = 0f;
+            for (int i = 0; i < 300; i++)
+            {
+                MenuMotion.SpringStep(ref value, ref velocity, 10f, 140f, 15f, 1f / 60f);
+                highest = Mathf.Max(highest, value);
+            }
+
+            Assert.Greater(highest, 10f, "a little overshoot gives it weight");
+            Assert.Less(highest, 13f, "but it never swings wildly");
+            Assert.AreEqual(10f, value, 0.01f);
+        }
+
+        [Test]
+        public void HeadDrift_IsSmall()
+        {
+            for (float seconds = 0f; seconds < 30f; seconds += 0.1f)
+            {
+                Assert.LessOrEqual(Mathf.Abs(MenuMotion.HeadDrift(seconds)), 1.6f + 0.001f);
+            }
         }
     }
 }
