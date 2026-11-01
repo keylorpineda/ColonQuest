@@ -366,32 +366,7 @@ namespace ColonQuest.UI
 
         private void BuildCredits()
         {
-            credits = UiKit.Overlay(root, "Credits");
-            var center = new Vector2(0.5f, 0.5f);
-            var top = new Vector2(0.5f, 1f);
-            var card = UiKit.Card(credits.transform, "Card", UiKit.Paper, new Vector2(1100f, 960f), center, Vector2.zero);
-            UiKit.Header(card, "Créditos", GamePalette.Hex("#C0612B"));
-
-            UiKit.Label(card, "Desarrollado por", 30, GameUiColors.Muted, new Vector2(1000f, 40f), top, new Vector2(0f, -130f), TextAnchor.MiddleCenter);
-            var team = UiKit.PlainLabel(card, "Team", MenuEntries.Team, 64, UiKit.Ink, new Vector2(1000f, 76f), top, new Vector2(0f, -175f), TextAnchor.MiddleCenter);
-            team.font = UiKit.TitleFont;
-            Divider(card, -260f, 860f);
-
-            UiKit.Label(card, "Herramientas de Meta", 38, UiKit.Ink, new Vector2(1000f, 52f), top, new Vector2(0f, -285f), TextAnchor.MiddleCenter);
-            for (int i = 0; i < MenuEntries.Tools.Length; i++)
-            {
-                var tool = MenuEntries.Tools[i];
-                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -358f - i * 74f));
-                UiKit.PlainLabel(card, "Tool", tool[0], 30, GameUiColors.Gain, new Vector2(920f, 38f), top, new Vector2(0f, -346f - i * 74f), TextAnchor.MiddleCenter);
-                UiKit.Label(card, tool[1], 24, GameUiColors.Muted, new Vector2(860f, 32f), top, new Vector2(0f, -382f - i * 74f), TextAnchor.UpperCenter);
-            }
-
-            Divider(card, -722f, 860f);
-            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -745f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -785f), TextAnchor.MiddleCenter);
-
-            UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(320f, 72f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), CloseWindows);
-            credits.SetActive(false);
+            credits = CreditsRoll.Build(root, CloseWindows);
         }
 
         /// <summary>Quitting asks first: a click by mistake on "Salir" should not close the game.</summary>
