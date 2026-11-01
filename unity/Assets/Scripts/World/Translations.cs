@@ -13,8 +13,6 @@ namespace ColonQuest.World
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
             // The credits (1 Nov)
-            { "Backend, inteligencia artificial y motor financiero", "Backend, artificial intelligence and finance engine" },
-            { "Unity, arte y flujo del juego", "Unity, art and game flow" },
             { "3 a 4,4 s: el único que siempre llega a tiempo", "3 to 4.4 s: the only one that is always on time" },
             { "1,9 a 2,8 s, con pesos abiertos", "1.9 to 2.8 s, on open weights" },
             { "0,7 a 1,5 s, y escribir siempre sirve", "0.7 to 1.5 s, and typing always works" },

@@ -76,14 +76,12 @@ namespace ColonQuest.UI
 
             for (int i = 0; i < MenuEntries.Makers.Length; i++)
             {
-                var maker = MenuEntries.Makers[i];
-                var person = UiKit.Card(card, "Maker", Color.white, new Vector2(600f, 122f), Top, new Vector2(0f, y));
+                string maker = MenuEntries.Makers[i];
+                var person = UiKit.Card(card, "Maker", Color.white, new Vector2(600f, 116f), Top, new Vector2(0f, y));
                 var badge = UiKit.Round(person, "Badge", i == 0 ? Beak : GameUiColors.Blue, 84f, MiddleLeft, new Vector2(16f, 0f));
-                UiKit.PlainLabel(badge.transform, "Initials", Initials(maker[0]), 34, UiKit.Ink, new Vector2(84f, 84f), Middle, Vector2.zero, TextAnchor.MiddleCenter);
-                UiKit.PlainLabel(person, "Name", maker[0], 32, UiKit.Ink, new Vector2(470f, 42f), MiddleLeft, new Vector2(116f, 24f));
-                var role = UiKit.Label(person, maker[1], 22, GameUiColors.Muted, new Vector2(470f, 56f), MiddleLeft, new Vector2(116f, -24f));
-                role.fontStyle = FontStyle.Normal;
-                y -= 134f;
+                UiKit.PlainLabel(badge.transform, "Initials", Initials(maker), 34, UiKit.Ink, new Vector2(84f, 84f), Middle, Vector2.zero, TextAnchor.MiddleCenter);
+                UiKit.PlainLabel(person, "Name", maker, 38, UiKit.Ink, new Vector2(470f, 60f), MiddleLeft, new Vector2(116f, 0f));
+                y -= 128f;
             }
 
             y -= 18f;
