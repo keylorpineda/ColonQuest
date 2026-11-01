@@ -72,6 +72,41 @@ class TranscriptResponse(ContractModel):
     transcript: Annotated[str, Field(min_length=1)]
 
 
+class ModelCallInfo(ContractModel):
+    endpoint: str
+    provider: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+    latency_ms: int
+    ok: bool
+
+
+class ToolStepInfo(ContractModel):
+    endpoint: str
+    step: int
+    tool: str
+    arguments: str
+    result: str
+
+
+class PlanMonthInfo(ContractModel):
+    month: int
+    teaching_concept: str
+    event_type: str
+    theme: str
+
+
+class SessionTrace(ContractModel):
+    """What the models and agents did in a session, for the judges' demo. Newest calls last."""
+
+    calls: list[ModelCallInfo]
+    tool_steps: list[ToolStepInfo]
+    season_plan: list[PlanMonthInfo]
+    total_cost_usd: float
+
+
 class SessionSummary(ContractModel):
     months_played: int
     decisions: int

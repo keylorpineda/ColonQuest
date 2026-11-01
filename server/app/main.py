@@ -6,7 +6,17 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import classes, dashboard, events, health, images, negotiation, sessions, summary
+from app.api import (
+    classes,
+    dashboard,
+    events,
+    health,
+    images,
+    negotiation,
+    sessions,
+    summary,
+    trace,
+)
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
 from app.cost_guard import OpenWeightsBudget
@@ -86,6 +96,7 @@ def create_app() -> FastAPI:
     app.include_router(negotiation.router, prefix="/api")
     app.include_router(summary.router, prefix="/api")
     app.include_router(images.router, prefix="/api")
+    app.include_router(trace.router, prefix="/api")
     return app
 
 
