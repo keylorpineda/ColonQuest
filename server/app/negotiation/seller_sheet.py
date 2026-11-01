@@ -28,6 +28,7 @@ class Offer:
     monthly_rate_pct: Decimal
     insurance_monthly: int
     commission: int
+    item_en: str = ""
 
     @cached_property
     def monthly_payment(self) -> int:
@@ -58,6 +59,21 @@ class Offer:
         }
 
     @cached_property
+    def facts_en(self) -> dict[SellerFact, str]:
+        """The same facts in English, so a seller speaking English never quotes them in Spanish."""
+        return self.facts | {
+            SellerFact.TERM_MONTHS: f"{self.term_months} months",
+            SellerFact.INTEREST_RATE: f"{self.monthly_rate_pct}% a month",
+            SellerFact.INSURANCE_FEE: f"{format_colones(self.insurance_monthly)} a month",
+        }
+
+    def facts_in(self, language: str) -> dict[SellerFact, str]:
+        return self.facts_en if language.lower().startswith("en") else self.facts
+
+    def item_in(self, language: str) -> str:
+        return self.item_en if language.lower().startswith("en") and self.item_en else self.item
+
+    @cached_property
     def allowed_amounts(self) -> frozenset[int]:
         """Every colón amount the seller may quote."""
         return frozenset(
@@ -86,6 +102,7 @@ OFFERS: dict[str, Offer] = {
             monthly_rate_pct=Decimal("2.5"),
             insurance_monthly=3_500,
             commission=15_000,
+            item_en="high-end phone",
         ),
         Offer(
             offer_id="pantalla_65",
@@ -96,6 +113,7 @@ OFFERS: dict[str, Offer] = {
             monthly_rate_pct=Decimal("2.9"),
             insurance_monthly=4_500,
             commission=25_000,
+            item_en="65-inch TV",
         ),
         Offer(
             offer_id="moto_125",
@@ -106,6 +124,7 @@ OFFERS: dict[str, Offer] = {
             monthly_rate_pct=Decimal("2.2"),
             insurance_monthly=9_000,
             commission=40_000,
+            item_en="125 cc motorbike",
         ),
         Offer(
             offer_id="refri_doble_puerta",
@@ -116,6 +135,7 @@ OFFERS: dict[str, Offer] = {
             monthly_rate_pct=Decimal("2.7"),
             insurance_monthly=0,
             commission=20_000,
+            item_en="double-door fridge",
         ),
     )
 }

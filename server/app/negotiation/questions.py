@@ -133,7 +133,8 @@ def fallback_reply(
     if language and language.lower().startswith("en"):
         if not facts:
             pitch = (
-                f"Dude, this {offer.item} is only {offer.facts[SellerFact.MONTHLY_PAYMENT]} "
+                f"Dude, this {offer.item_in(language)} is only "
+                f"{offer.facts[SellerFact.MONTHLY_PAYMENT]} "
                 "a month. You can take it home today!"
             )
             return pitch, [SellerFact.MONTHLY_PAYMENT]
@@ -146,15 +147,7 @@ def fallback_reply(
             SellerFact.COMMISSION: "the opening fee is",
             SellerFact.TOTAL_COST: "in total you end up paying",
         }
-        parts = []
-        for fact in facts:
-            val = (
-                offer.facts[fact]
-                .replace(" meses", " months")
-                .replace(" mensual", " monthly")
-                .replace(" al mes", " a month")
-            )
-            parts.append(f"{labels_en[fact]} {val}")
+        parts = [f"{labels_en[fact]} {offer.facts_en[fact]}" for fact in facts]
         return "Well, look... " + "; ".join(parts) + ".", facts
 
     if not facts:
