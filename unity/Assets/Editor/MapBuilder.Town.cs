@@ -19,10 +19,24 @@ namespace ColonQuest.EditorTools
         public static void BuildTown()
         {
             var scene = BeginScene();
+            BeginLitScene();
+            try
+            {
+                BuildTownContents(scene);
+            }
+            finally
+            {
+                EndLitScene();
+            }
+        }
+
+        private static void BuildTownContents(UnityEngine.SceneManagement.Scene scene)
+        {
             var map = new GameObject("Map").transform;
             var random = new System.Random(11);
             footprints.Clear();
             buildingSpecs.Clear();
+            BuildSunLight(map);
 
             currentLayer = LayerFloor;
             BuildGround(Group(map, "Ground"), random);

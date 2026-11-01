@@ -85,6 +85,7 @@ namespace ColonQuest.EditorTools
         {
             SpriteFactory.EnsureGenerated();
             LoadSprites();
+            LoadLighting();
             EnsureSortingLayers();
             currentLayer = LayerWorld;
             return EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -233,6 +234,7 @@ namespace ColonQuest.EditorTools
             renderer.sortingOrder = ResolveWorldOrder(parent, order);
             renderer.drawMode = SpriteDrawMode.Tiled;
             renderer.size = size;
+            ApplyLighting(renderer);
             return renderer;
         }
 
@@ -269,6 +271,7 @@ namespace ColonQuest.EditorTools
                 go.transform.localScale = new Vector3(size.x, size.y, 1f);
             }
 
+            ApplyLighting(renderer);
             return renderer;
         }
 
@@ -355,12 +358,17 @@ namespace ColonQuest.EditorTools
         {
             var color = GamePalette.Hex(hex);
             color.a = alpha;
-            return Shape(parent, name, softCircle, center, Vector2.one * size, color, order);
+            return KeepUnlit(Shape(parent, name, softCircle, center, Vector2.one * size, color, order));
         }
 
         private static void Flickering(SpriteRenderer target, float amplitude, float speed, float seed, bool nightOnly = false)
         {
             target.gameObject.AddComponent<Flicker>().Configure(amplitude, speed, seed, nightOnly);
+            if (nightOnly)
+            {
+                // Something that only shows at night is a light: it shines by itself instead of being darkened.
+                KeepUnlit(target);
+            }
         }
 
         private static Transform ParallaxGroup(Transform parent, string name, float factor)

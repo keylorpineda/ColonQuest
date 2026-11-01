@@ -1005,6 +1005,7 @@ namespace ColonQuest.EditorTools
                 var shine = GamePalette.White;
                 shine.a = 0.55f;
                 Shape(root, "Window_Shine", roundedSmall, new Vector2(wx - 0.25f, 1.78f), new Vector2(0.22f, 0.28f), shine, 8);
+                WindowNightGlow(root, wx, 1.58f, b.YBottom);
 
                 // Terracotta window planter box overflowing with colorful blooms and foliage
                 Shape(root, "FlowerBox_Outline", roundedSmall, new Vector2(wx, 0.92f), new Vector2(1.48f, 0.34f), GamePalette.Outline, 8);
@@ -1025,6 +1026,26 @@ namespace ColonQuest.EditorTools
                 }
 
                 boxFlowers.gameObject.AddComponent<FoliagePhysics>().Configure(3.2f, 1.8f, wx * 1.3f, 0.025f, false);
+            }
+        }
+
+        /// <summary>
+        /// The warm light of a room behind a window, only at night: four panes between the frame bars, so the bars still
+        /// show. Not every home has the light on: about one window in four stays dark.
+        /// </summary>
+        private static void WindowNightGlow(Transform root, float wx, float wy, float seed)
+        {
+            if (Mathf.Abs(Mathf.RoundToInt(wx * 7f + seed * 3f)) % 4 == 0)
+            {
+                return;
+            }
+
+            var warm = GamePalette.Hex("#FFD27A");
+            warm.a = 0.85f;
+            foreach (var pane in new[] { new Vector2(-0.2525f, 0.2325f), new Vector2(0.2525f, 0.2325f), new Vector2(-0.2525f, -0.2325f), new Vector2(0.2525f, -0.2325f) })
+            {
+                var glow = Shape(root, "Window_NightGlow", roundedSmall, new Vector2(wx, wy) + pane, new Vector2(0.42f, 0.38f), warm, 8);
+                Flickering(glow, 0.06f, 0.25f, wx + pane.x * 10f + seed, true);
             }
         }
 
@@ -1087,7 +1108,8 @@ namespace ColonQuest.EditorTools
             var canopyRig = new GameObject("CanopyRig").transform;
             canopyRig.SetParent(root, false);
             canopyRig.localPosition = new Vector2(0f, 1.58f * scale);
-            canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(4.2f, 1.45f, x * 0.53f + y * 0.71f, 0.028f, true, 2.2f, 11f);
+            // The crown bends from the foot of the trunk with the breeze that crosses the town, instead of spinning in place.
+            canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(3.2f, 1.45f, x * 0.53f + y * 0.71f, 0.006f, true, 2.2f, 9f, true, 1.58f * scale);
 
             // Tropical banana/plantain fronds peeking out behind the tree crown
             if (palmFrondSprite != null)
@@ -1138,6 +1160,8 @@ namespace ColonQuest.EditorTools
             Shape(root, "Head_Cap", circle, new Vector2(0f, 2.34f), new Vector2(0.46f, 0.30f), GamePalette.Hex("#5E687E"), 2);
             Shape(root, "Head_Bulb", circle, new Vector2(0f, 2.24f), new Vector2(0.36f, 0.24f), GamePalette.Hex("#FFE688"), 3);
             Flickering(Glow(root, "Glow", new Vector2(0f, 2.1f), 4.0f, "#FFE082", 0.24f, 20), 0.12f, 1.3f, x * 3.1f, false);
+            // Seen from above at an angle, the head shines on the ground around the foot of the post: the light sits between them.
+            AddNightLight(root, new Vector2(0f, 0.8f), 3.6f, "#FFD98A", 0.95f, x * 3.1f);
 
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.15f;
@@ -1170,6 +1194,7 @@ namespace ColonQuest.EditorTools
             }
 
             Flickering(Glow(root, "LanternGlow", new Vector2(0f, 3.2f), 4.6f, "#FFE074", 0.32f, 20), 0.12f, 1.4f, x * 2.7f, false);
+            AddNightLight(root, new Vector2(0f, 1.2f), 4.2f, "#FFE08A", 1f, x * 2.7f);
 
             var collider = root.gameObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.16f;
