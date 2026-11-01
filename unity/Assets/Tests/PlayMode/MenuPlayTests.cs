@@ -254,7 +254,7 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.IsTrue(AudioDirector.Muted);
             Assert.AreEqual("Sonido: desactivado", LabelOf("Settings/Card/Body/Button_Sonido"));
-            Assert.AreEqual("0;1.00", PlayerPrefs.GetString(GameSettings.StoreKey));
+            Assert.AreEqual("0;1.00;es", PlayerPrefs.GetString(GameSettings.StoreKey));
 
             ButtonAt("Settings/Card/Body/Button_Sonido").onClick.Invoke();
             yield return null;
@@ -278,7 +278,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual("Story mode", LabelOf("Button_Modo historia"));
             Assert.AreEqual("Feature demo", LabelOf("Button_Demo de funciones"));
             Assert.AreEqual("Sound: on", LabelOf("Settings/Card/Body/Button_Sonido"));
-            StringAssert.EndsWith(";en", PlayerPrefs.GetString(GameSettings.StoreKey));
+            Assert.AreEqual("1;1.00", PlayerPrefs.GetString(GameSettings.StoreKey), "English is the default, so it adds nothing");
 
             ButtonAt("Settings/Card/Body/Button_Volver").onClick.Invoke();
             ButtonAt("Button_Créditos").onClick.Invoke();
@@ -291,6 +291,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
             Assert.AreEqual(GameLanguage.Spanish, Loc.Current);
             Assert.AreEqual("Modo historia", LabelOf("Button_Modo historia"));
+            StringAssert.EndsWith(";es", PlayerPrefs.GetString(GameSettings.StoreKey));
         }
 
         [UnityTest]
@@ -308,7 +309,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
             Assert.AreEqual(0.7f, AudioDirector.Volume, 0.0001f);
             Assert.AreEqual("70 %", Menu.Find("Settings/Card/Body/Label_").GetComponent<Text>().text);
-            Assert.AreEqual("1;0.70", PlayerPrefs.GetString(GameSettings.StoreKey));
+            Assert.AreEqual("1;0.70;es", PlayerPrefs.GetString(GameSettings.StoreKey));
 
             for (int i = 0; i < 5; i++)
             {
