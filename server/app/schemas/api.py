@@ -68,6 +68,10 @@ class NegotiationRequest(ContractModel):
     language: GameLanguage = GameLanguage.SPANISH
 
 
+class TranscriptResponse(ContractModel):
+    transcript: Annotated[str, Field(min_length=1)]
+
+
 class SessionSummary(ContractModel):
     months_played: int
     decisions: int

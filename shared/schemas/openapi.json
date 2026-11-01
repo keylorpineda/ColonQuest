@@ -22,6 +22,21 @@
         "title": "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post",
         "type": "object"
       },
+      "Body_transcribe_api_sessions__session_id__transcribe_post": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "description": "WAV clip, 16-bit PCM, up to 15 s",
+            "title": "Audio",
+            "type": "string"
+          }
+        },
+        "required": [
+          "audio"
+        ],
+        "title": "Body_transcribe_api_sessions__session_id__transcribe_post",
+        "type": "object"
+      },
       "BudgetInfo": {
         "additionalProperties": false,
         "properties": {
@@ -1026,6 +1041,21 @@
         "title": "TeachingConcept",
         "type": "string"
       },
+      "TranscriptResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "transcript": {
+            "minLength": 1,
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript"
+        ],
+        "title": "TranscriptResponse",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1452,7 +1482,7 @@
     },
     "/api/sessions/{session_id}/negotiation/voice": {
       "post": {
-        "description": "One negotiation turn spoken by the player.\n\nValidation happens before paying for transcription. If voice fails the response is 503 and\nthe client switches to the text endpoint, so the negotiation never blocks.",
+        "description": "One negotiation turn spoken by the player, for builds older than /transcribe.\n\nIf voice fails the response is 503 and the client switches to the text endpoint, so the\nnegotiation never blocks.",
         "operationId": "negotiate_voice_api_sessions__session_id__negotiation_voice_post",
         "parameters": [
           {
@@ -1555,6 +1585,60 @@
         "summary": "Finish Session",
         "tags": [
           "summary"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/transcribe": {
+      "post": {
+        "description": "Only the player's words, so the game can show them at once and then ask the seller.",
+        "operationId": "transcribe_api_sessions__session_id__transcribe_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_api_sessions__session_id__transcribe_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transcribe",
+        "tags": [
+          "negotiation"
         ]
       }
     }

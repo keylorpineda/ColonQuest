@@ -1,5 +1,6 @@
 """Negotiation endpoints: typed text and voice share the same turn logic."""
 
+import asyncio
 import time
 import uuid
 from typing import Annotated
@@ -21,14 +22,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import AppSettings, DbSession
 from app.api.sessions import get_active_session
 from app.cost_guard import BudgetMode
-from app.db import Negotiation
+from app.db import GameSession, Negotiation
 from app.game_master.ledger import DbLedger
 from app.negotiation.audio import MAX_BYTES, AudioError, normalize_wav
 from app.negotiation.seller_sheet import get_offer
 from app.negotiation.service import NegotiationResponder, PreviousTurn
 from app.providers.base import ProviderError, Transcriber, Usage
 from app.schemas import KeyQuestion, NegotiationReply
-from app.schemas.api import NegotiationRequest
+from app.schemas.api import NegotiationRequest, TranscriptResponse
 
 router = APIRouter(prefix="/sessions", tags=["negotiation"])
 
@@ -126,27 +127,21 @@ async def negotiate_text(
     )
 
 
-@router.post("/{session_id}/negotiation/voice", response_model=NegotiationReply)
-async def negotiate_voice(
-    session_id: uuid.UUID,
-    response: Response,
-    db: DbSession,
+async def transcribe_clip(
+    db: AsyncSession,
     settings: AppSettings,
-    negotiator: NegotiatorDep,
-    transcriber: TranscriberDep,
-    offer_id: Annotated[str, Form(alias="offerId", pattern=r"^[a-z0-9_]{1,40}$")],
-    audio: Annotated[UploadFile, File(description="WAV clip, 16-bit PCM, up to 15 s")],
-) -> NegotiationReply:
-    """One negotiation turn spoken by the player.
+    transcriber: Transcriber,
+    game_session: GameSession,
+    audio: UploadFile,
+) -> str:
+    """The player's words from a clip, or an HTTP error the client answers by asking for text.
 
-    Validation happens before paying for transcription. If voice fails the response is 503 and
-    the client switches to the text endpoint, so the negotiation never blocks.
+    Validation happens before paying for transcription.
     """
-    game_session = await get_active_session(db, session_id)
-    if get_offer(offer_id) is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "offer not found")
+    session_id = game_session.id
     try:
-        wav, _ = normalize_wav(await audio.read(MAX_BYTES + 1))
+        # Resampling a browser clip is pure Python: it must not hold up the other requests.
+        wav, _ = await asyncio.to_thread(normalize_wav, await audio.read(MAX_BYTES + 1))
     except AudioError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
 
@@ -178,7 +173,42 @@ async def negotiate_voice(
     if not transcription.text:
         await db.commit()
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "no speech detected")
+    return transcription.text
 
-    return await run_turn(
-        db, settings, negotiator, response, session_id, offer_id, transcription.text
-    )
+
+@router.post("/{session_id}/transcribe", response_model=TranscriptResponse)
+async def transcribe(
+    session_id: uuid.UUID,
+    db: DbSession,
+    settings: AppSettings,
+    transcriber: TranscriberDep,
+    audio: Annotated[UploadFile, File(description="WAV clip, 16-bit PCM, up to 15 s")],
+) -> TranscriptResponse:
+    """Only the player's words, so the game can show them at once and then ask the seller."""
+    game_session = await get_active_session(db, session_id)
+    text = await transcribe_clip(db, settings, transcriber, game_session, audio)
+    await db.commit()
+    return TranscriptResponse(transcript=text)
+
+
+@router.post("/{session_id}/negotiation/voice", response_model=NegotiationReply)
+async def negotiate_voice(
+    session_id: uuid.UUID,
+    response: Response,
+    db: DbSession,
+    settings: AppSettings,
+    negotiator: NegotiatorDep,
+    transcriber: TranscriberDep,
+    offer_id: Annotated[str, Form(alias="offerId", pattern=r"^[a-z0-9_]{1,40}$")],
+    audio: Annotated[UploadFile, File(description="WAV clip, 16-bit PCM, up to 15 s")],
+) -> NegotiationReply:
+    """One negotiation turn spoken by the player, for builds older than /transcribe.
+
+    If voice fails the response is 503 and the client switches to the text endpoint, so the
+    negotiation never blocks.
+    """
+    game_session = await get_active_session(db, session_id)
+    if get_offer(offer_id) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "offer not found")
+    text = await transcribe_clip(db, settings, transcriber, game_session, audio)
+    return await run_turn(db, settings, negotiator, response, session_id, offer_id, text)
