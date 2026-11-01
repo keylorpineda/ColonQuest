@@ -200,7 +200,7 @@ K=280; Wc=330; Hc=580; cols=5; rows=4
 img=Image.new("RGB",(Wc*cols,Hc*rows+70),(236,238,244)); d=ImageDraw.Draw(img)
 fnt=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",22)
 big=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",30)
-d.text((20,18),"Colon Quest - elenco v2 (propuesta)" + (" - siluetas" if mode=='sil' else ""),fill=OUT,font=big)
+d.text((20,18),"ColonQuest - elenco v2 (propuesta)" + (" - siluetas" if mode=='sil' else ""),fill=OUT,font=big)
 for i,(n,spec) in enumerate(cast):
     cx=Wc*(i%cols)+Wc//2; cy=70+Hc*(i//cols)+330
     fig=person(spec)

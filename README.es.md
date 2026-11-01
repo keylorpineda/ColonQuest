@@ -1,13 +1,13 @@
 <p align="center"><a href="README.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg" width="100%" alt="Colón Quest, un juego 2D de educación financiera para estudiantes de Costa Rica, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg" width="100%" alt="ColonQuest, un juego 2D de educación financiera para estudiantes de Costa Rica, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
 <summary><b>Leer esta página como texto</b></summary>
 
-## Colón Quest
+## ColonQuest
 
 De Costa Rica para el mundo. Un juego 2D de educación financiera para estudiantes de Costa Rica,
 hecho por DoWhile Team para el Meta Global AI Developer Hackathon 2026 (track Indie). Cada
@@ -18,7 +18,7 @@ los colones exactos y negociás con la voz. La IA cuenta la historia; el motor l
 
 Muchos jóvenes costarricenses toman sus primeras decisiones grandes de plata solos, y la primera
 lección real suele ser la deuda misma. Nadie te enseña a hacer la pregunta correcta mientras un
-vendedor te sonríe. Esa es la habilidad que entrena Colón Quest. El juego enseña a detectar
+vendedor te sonríe. Esa es la habilidad que entrena ColonQuest. El juego enseña a detectar
 cuatro trampas:
 
 - **Cuotas:** solo una cuota al mes, y un seguro escondido.

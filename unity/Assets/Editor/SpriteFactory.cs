@@ -57,7 +57,7 @@ namespace ColonQuest.EditorTools
         public const string FloorCementTexturePath = Folder + "/FloorCementTexture.png";
         public const string WallPaintTexturePath = Folder + "/WallPaintTexture.png";
 
-        [MenuItem("Colon Quest/Art/Generate Sprites")]
+        [MenuItem("ColonQuest/Art/Generate Sprites")]
         public static void Generate()
         {
             Directory.CreateDirectory(Folder);

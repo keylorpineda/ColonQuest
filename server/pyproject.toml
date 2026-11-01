@@ -1,7 +1,7 @@
 [project]
 name = "colon-quest-server"
 version = "0.1.0"
-description = "FastAPI backend for Colón Quest: AI game master, negotiation, cost guard and telemetry."
+description = "FastAPI backend for ColonQuest: AI game master, negotiation, cost guard and telemetry."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = "MIT"

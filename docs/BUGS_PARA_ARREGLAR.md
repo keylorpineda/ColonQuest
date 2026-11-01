@@ -1,4 +1,4 @@
-# Colón Quest: bugs de la alpha y diseño del modo historia (2026-10-29)
+# ColonQuest: bugs de la alpha y diseño del modo historia (2026-10-29)
 
 Parte 1: 15 bugs encontrados al jugar. Parte 2 (al final): el modo historia definido con Jefferson.
 

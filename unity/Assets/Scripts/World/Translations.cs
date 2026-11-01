@@ -278,7 +278,7 @@ namespace ColonQuest.World
             { "Clic o cualquier tecla para saltar", "Click or press any key to skip" },
             { "Salir del juego", "Quit the game" },
             { "Cancelar", "Cancel" },
-            { "¿Seguro que querés salir de Colón Quest?", "Are you sure you want to quit Colón Quest?" },
+            { "¿Seguro que querés salir de ColonQuest?", "Are you sure you want to quit ColonQuest?" },
             { "Aprendé a manejar tu plata", "Learn to handle your money" },
             { "alfa", "alpha" },
             { "Versión alfa. Si algo se rompe, avisanos y lo arreglamos.", "Alpha version. If something breaks, let us know." },

@@ -1,5 +1,5 @@
 # MATRIZ MAESTRA: CUMPLIMIENTO AL 100% Y GESTIÓN DE RIESGOS LATENTES
-## Meta Global AI Developer Hackathon 2026 (Track Indie — DoWhile Team / Colón Quest)
+## Meta Global AI Developer Hackathon 2026 (Track Indie — DoWhile Team / ColonQuest)
 
 > **Fecha límite oficial:** 4 de noviembre de 2026, 8:00 PM CST (Costa Rica) / 9:00 PM EST.  
 > **Meta interna (Code Freeze):** 2 de noviembre de 2026, 11:59 PM CST.  
@@ -121,7 +121,7 @@ Cerebral Valley contempla hasta $50,000 acumulados en categorías discrecionales
 2. **Premio "Community Vote" (Voto de la Comunidad)**:
    - **Mecánica:** Publicar un hilo en X (Twitter) y LinkedIn el día de la entrega con el video y el enlace WebGL, etiquetando a los organizadores y activando a la comunidad de desarrolladores y educadores de Costa Rica y LATAM.
 3. **Mención de Honor en Modelos Abiertos (Open Weights)**:
-   - Documentar con orgullo el uso de **Muse Spark Open en Baseten**, posicionando a Colón Quest como el mejor caso de uso de open-weights del hackathon.
+   - Documentar con orgullo el uso de **Muse Spark Open en Baseten**, posicionando a ColonQuest como el mejor caso de uso de open-weights del hackathon.
 
 ---
 

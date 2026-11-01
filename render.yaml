@@ -1,4 +1,4 @@
-# Render Blueprint for the Colón Quest FastAPI backend (SCRUM-52).
+# Render Blueprint for the ColonQuest FastAPI backend (SCRUM-52).
 # Deploys from `develop` while the game is in development; switch to `main` for judging.
 # Only after GitHub Actions CI passes.
 services:

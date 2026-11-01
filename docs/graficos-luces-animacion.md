@@ -7,9 +7,9 @@ Rama `feat/SCRUM-94-lighting-water-characters`. Todo el cambio vive en el códig
 
 1. Abrir el proyecto. Unity instala solo el paquete `com.unity.render-pipelines.universal` 17.3.0 (ya está en
    `Packages/manifest.json`) y actualiza `packages-lock.json`.
-2. Menú **Colon Quest > Build All Scenes**. La primera vez crea `Assets/Settings/ColonQuest_URP2D.asset` y su
+2. Menú **ColonQuest > Build All Scenes**. La primera vez crea `Assets/Settings/ColonQuest_URP2D.asset` y su
    renderer 2D, y los pone como pipeline del proyecto (Project Settings > Graphics). También se puede hacer aparte con
-   **Colon Quest > Setup URP 2D Lighting**.
+   **ColonQuest > Setup URP 2D Lighting**.
 3. Revisar la consola: no debe haber errores. Si aparece "Building the town without 2D lights", el pueblo se armó con
    el aspecto viejo (sin luces) y hay que revisar el paso 2.
 4. Correr los tests de EditMode y PlayMode (Window > General > Test Runner).

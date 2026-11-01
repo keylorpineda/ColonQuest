@@ -9,7 +9,7 @@ namespace ColonQuest.EditorTools
     /// <summary>The main menu scene: a camera and the object that builds the whole screen when it starts.</summary>
     public static partial class MapBuilder
     {
-        [MenuItem("Colon Quest/Build Menu Scene")]
+        [MenuItem("ColonQuest/Build Menu Scene")]
         public static void BuildMenu()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

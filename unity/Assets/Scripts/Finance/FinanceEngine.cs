@@ -62,7 +62,7 @@ namespace ColonQuest.Finance
     }
 
     /// <summary>
-    /// Pure deterministic C# financial engine for Colón Quest.
+    /// Pure deterministic C# financial engine for ColonQuest.
     /// <para>
     /// Rule 1: The AI tells the story; <see cref="FinanceEngine"/> keeps the books.
     /// Every money amount is an integer number of colones (<see cref="long"/>); <c>float</c> and

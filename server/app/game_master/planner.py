@@ -33,7 +33,7 @@ def _values(enum: type[EventType | TeachingConcept]) -> str:
     return ", ".join(member.value for member in enum)
 
 
-SYSTEM_PROMPT = f"""You plan the 12-month season of "Colón Quest", a financial-literacy game \
+SYSTEM_PROMPT = f"""You plan the 12-month season of "ColonQuest", a financial-literacy game \
 for Costa Rican high-school students. Each month later gets one event built around your plan.
 
 - Return exactly 12 months, numbered 1 to 12 in order.

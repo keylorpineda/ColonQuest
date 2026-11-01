@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 ENDPOINT = "summary"
 
-SYSTEM_PROMPT = """You write the closing message of "Colón Quest", a financial-literacy game \
+SYSTEM_PROMPT = """You write the closing message of "ColonQuest", a financial-literacy game \
 for Costa Rican high-school students.
 
 - Costa Rican Spanish, warm and direct, second person, at most 500 characters.
@@ -37,7 +37,7 @@ for Costa Rican high-school students.
 
 Answer with JSON only, matching the provided schema."""
 
-SYSTEM_PROMPT_EN = """You write the closing message of "Colón Quest", a financial-literacy game \
+SYSTEM_PROMPT_EN = """You write the closing message of "ColonQuest", a financial-literacy game \
 for Costa Rican high-school students.
 
 - Natural English, warm and direct, second person, at most 500 characters. \

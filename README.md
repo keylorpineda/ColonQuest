@@ -1,13 +1,13 @@
 <p align="center"><b>English</b> | <a href="README.es.md">Español</a></p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg" width="100%" alt="Colón Quest, a 2D financial-literacy game for Costa Rican students, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg" width="100%" alt="ColonQuest, a 2D financial-literacy game for Costa Rican students, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
 <summary><b>Read this page as text</b></summary>
 
-## Colón Quest
+## ColonQuest
 
 From Costa Rica to the world. A 2D financial-literacy game for Costa Rican students, built by the
 DoWhile Team for the Meta Global AI Developer Hackathon 2026 (Indie track). Every money decision
@@ -18,7 +18,7 @@ you negotiate by voice. The AI tells the story; the engine keeps the books.
 
 Many young Costa Ricans make their first big money decisions alone, and the first real lesson is
 usually the debt itself. Nobody teaches you to ask the right question while a salesperson is
-smiling at you. That is the skill Colón Quest trains. The game teaches players to spot four traps:
+smiling at you. That is the skill ColonQuest trains. The game teaches players to spot four traps:
 
 - **Installments:** just one payment a month, plus hidden insurance.
 - **Minimum payment:** you pay a little and the debt keeps growing.

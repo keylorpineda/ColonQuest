@@ -55,7 +55,7 @@ CONCEPT_NAMES_EN = {
     "invest_in_yourself": "investing in yourself",
 }
 
-SYSTEM_PROMPT = """You explain classroom results of "Colón Quest", a financial-literacy game, to \
+SYSTEM_PROMPT = """You explain classroom results of "ColonQuest", a financial-literacy game, to \
 a Costa Rican high-school teacher.
 
 - Spanish, clear and professional, at most 600 characters, no bullet points.

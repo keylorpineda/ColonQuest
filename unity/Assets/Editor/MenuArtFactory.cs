@@ -7,7 +7,7 @@ namespace ColonQuest.EditorTools
     {
         public const string KeyArtPath = "Assets/Resources/Menu/KeyArt.png";
 
-        [MenuItem("Colon Quest/Art/Import Menu Art")]
+        [MenuItem("ColonQuest/Art/Import Menu Art")]
         public static void Import()
         {
             AssetDatabase.ImportAsset(KeyArtPath);

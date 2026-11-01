@@ -1,4 +1,4 @@
-# Colón Quest — Server
+# ColonQuest — Server
 
 FastAPI backend: AI game master, negotiation, image cache, cost guard and Class Mode telemetry.
 

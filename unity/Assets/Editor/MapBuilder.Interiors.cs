@@ -23,7 +23,7 @@ namespace ColonQuest.EditorTools
             public Color Color;
         }
 
-        [MenuItem("Colon Quest/Build Interior Scenes")]
+        [MenuItem("ColonQuest/Build Interior Scenes")]
         public static void BuildInteriors()
         {
             BuildInterior(SceneNames.Casa);

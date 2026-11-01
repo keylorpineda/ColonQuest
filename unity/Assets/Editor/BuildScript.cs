@@ -26,7 +26,7 @@ namespace ColonQuest.EditorTools
             return scenes.ToArray();
         }
 
-        [MenuItem("Colon Quest/Build/WebGL")]
+        [MenuItem("ColonQuest/Build/WebGL")]
         public static void WebGL()
         {
             // Gzip with the fallback loader works on any static host, even one that cannot set headers.
@@ -36,7 +36,7 @@ namespace ColonQuest.EditorTools
             Run(BuildTarget.WebGL, "webgl", string.Empty);
         }
 
-        [MenuItem("Colon Quest/Build/Windows")]
+        [MenuItem("ColonQuest/Build/Windows")]
         public static void Windows()
         {
             Run(BuildTarget.StandaloneWindows64, "windows", "ColonQuest.exe");

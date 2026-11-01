@@ -61,7 +61,7 @@ namespace ColonQuest.UI
             UiKit.Header(card, "Créditos", GamePalette.Hex("#C0612B"));
 
             float y = -UiKit.HeaderHeight - 34f;
-            var game = UiKit.PlainLabel(card, "Game", "Colón Quest", 76, UiKit.Ink, new Vector2(620f, 92f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
+            var game = UiKit.PlainLabel(card, "Game", "ColonQuest", 76, UiKit.Ink, new Vector2(620f, 92f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
             game.font = UiKit.TitleFont;
             y -= 92f;
             var motto = UiKit.Label(card, "Aprendé a manejar tu plata", 28, GameUiColors.Muted, new Vector2(620f, 40f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
