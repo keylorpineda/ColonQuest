@@ -20,6 +20,7 @@ from app.schemas.api import (
     DecisionRequest,
     HealthResponse,
     NegotiationRequest,
+    SessionTrace,
     TranscriptResponse,
 )
 
@@ -32,6 +33,7 @@ CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
     DecisionRequest,
     HealthResponse,
     NegotiationRequest,
+    SessionTrace,
     TranscriptResponse,
 )
 

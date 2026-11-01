@@ -662,6 +662,55 @@
         "title": "KeyQuestion",
         "type": "string"
       },
+      "ModelCallInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "costUsd": {
+            "title": "Costusd",
+            "type": "number"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "inputTokens": {
+            "title": "Inputtokens",
+            "type": "integer"
+          },
+          "latencyMs": {
+            "title": "Latencyms",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "outputTokens": {
+            "title": "Outputtokens",
+            "type": "integer"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint",
+          "provider",
+          "model",
+          "inputTokens",
+          "outputTokens",
+          "costUsd",
+          "latencyMs",
+          "ok"
+        ],
+        "title": "ModelCallInfo",
+        "type": "object"
+      },
       "MoneySource": {
         "enum": [
           "cash",
@@ -784,6 +833,35 @@
           "status"
         ],
         "title": "PingResponse",
+        "type": "object"
+      },
+      "PlanMonthInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "title": "Eventtype",
+            "type": "string"
+          },
+          "month": {
+            "title": "Month",
+            "type": "integer"
+          },
+          "teachingConcept": {
+            "title": "Teachingconcept",
+            "type": "string"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "teachingConcept",
+          "eventType",
+          "theme"
+        ],
+        "title": "PlanMonthInfo",
         "type": "object"
       },
       "PlayerState": {
@@ -1024,6 +1102,45 @@
         "title": "SessionSummary",
         "type": "object"
       },
+      "SessionTrace": {
+        "additionalProperties": false,
+        "description": "What the models and agents did in a session, for the judges' demo. Newest calls last.",
+        "properties": {
+          "calls": {
+            "items": {
+              "$ref": "#/components/schemas/ModelCallInfo"
+            },
+            "title": "Calls",
+            "type": "array"
+          },
+          "seasonPlan": {
+            "items": {
+              "$ref": "#/components/schemas/PlanMonthInfo"
+            },
+            "title": "Seasonplan",
+            "type": "array"
+          },
+          "toolSteps": {
+            "items": {
+              "$ref": "#/components/schemas/ToolStepInfo"
+            },
+            "title": "Toolsteps",
+            "type": "array"
+          },
+          "totalCostUsd": {
+            "title": "Totalcostusd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "calls",
+          "toolSteps",
+          "seasonPlan",
+          "totalCostUsd"
+        ],
+        "title": "SessionTrace",
+        "type": "object"
+      },
       "TeachingConcept": {
         "enum": [
           "budget",
@@ -1040,6 +1157,40 @@
         ],
         "title": "TeachingConcept",
         "type": "string"
+      },
+      "ToolStepInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "arguments": {
+            "title": "Arguments",
+            "type": "string"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "result": {
+            "title": "Result",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint",
+          "step",
+          "tool",
+          "arguments",
+          "result"
+        ],
+        "title": "ToolStepInfo",
+        "type": "object"
       },
       "TranscriptResponse": {
         "additionalProperties": false,
@@ -1585,6 +1736,50 @@
         "summary": "Finish Session",
         "tags": [
           "summary"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/trace": {
+      "get": {
+        "description": "The session's model calls, its agents' tool steps and its season plan. It works after the end.",
+        "operationId": "session_trace_api_sessions__session_id__trace_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTrace"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session Trace",
+        "tags": [
+          "trace"
         ]
       }
     },
