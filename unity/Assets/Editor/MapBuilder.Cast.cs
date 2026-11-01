@@ -5,6 +5,7 @@ namespace ColonQuest.EditorTools
     /// <summary>
     /// The v2 cast: one sheet per named person (see docs/characters-v2.md, section 4). A person with a sheet
     /// ignores the look the town gives it; everyone else keeps the color hash with the new head, hair and arms.
+    /// A skin tone never goes with a role: the people who collect and lend, and the ones who cure and judge, come in every tone.
     /// </summary>
     public static partial class MapBuilder
     {
@@ -42,8 +43,8 @@ namespace ColonQuest.EditorTools
             },
             ["Prestamista"] = new Look
             {
-                Skin = "#2D2D2D", SkinTone = "#B5835A", HairColor = "#1A1A1A", Hair = HairStyle.Buzz, Pants = "#1F2433",
-                Hat = Hat.FlatCap, HatColor = "#3A3A3A", Face = Expression.Smirk, MouthX = 0.02f, Width = 1.12f,
+                Skin = "#C9803A", SkinTone = "#EBC29A", HairColor = "#5A3A28", Hair = HairStyle.Side, Pants = "#4A4F5E",
+                Hat = Hat.FlatCap, HatColor = "#8A5A3C", Face = Expression.Smirk, MouthX = 0.02f, Width = 1.12f,
                 Goatee = true, HeavyLids = true, Wear = Extras.Chain | Extras.Pouch
             },
             ["Promotor"] = new Look
@@ -65,13 +66,13 @@ namespace ColonQuest.EditorTools
             },
             ["Oficial"] = new Look
             {
-                Skin = "#22324F", SkinTone = "#9C6B47", HairColor = "#1A1A1A", Hair = HairStyle.Buzz, Pants = "#1A2438",
+                Skin = "#22324F", SkinTone = "#E7B994", HairColor = "#4A2F20", Hair = HairStyle.Buzz, Pants = "#1A2438",
                 Hat = Hat.Police, HatColor = "#22324F", Face = Expression.Neutral, Width = 1.08f, LongSleeve = true,
                 Wear = Extras.PoliceBadge
             },
             ["Juez"] = new Look
             {
-                Skin = "#1E1E26", SkinTone = "#D7A27E", HairColor = "#5A3A28", Hair = HairStyle.Bob, Pants = "#1E1E26",
+                Skin = "#1E1E26", SkinTone = "#6F4529", HairColor = "#8A8A8A", Hair = HairStyle.Bob, Pants = "#1E1E26",
                 Face = Expression.Neutral, Glasses = true, LongSleeve = true, Wear = Extras.Robe
             },
             ["Enfermera"] = new Look
@@ -81,7 +82,7 @@ namespace ColonQuest.EditorTools
             },
             ["Doctora"] = new Look
             {
-                Skin = "#6FA8DC", SkinTone = "#F0CDB0", HairColor = "#B0452D", Hair = HairStyle.Ponytail, Pants = "#3A3F52",
+                Skin = "#6FA8DC", SkinTone = "#80553A", HairColor = "#1A1A1A", Hair = HairStyle.Afro, Pants = "#3A3F52",
                 Face = Expression.Warm, Wear = Extras.Coat | Extras.Stethoscope
             },
             ["AsesoraCoop"] = new Look
@@ -121,13 +122,13 @@ namespace ColonQuest.EditorTools
             },
             ["Estudiante"] = new Look
             {
-                Skin = "#C0392B", SkinTone = "#D9A47A", HairColor = "#1A1A1A", Hair = HairStyle.Long, Pants = "#2F3E66",
+                Skin = "#C0392B", SkinTone = "#80553A", HairColor = "#1A1A1A", Hair = HairStyle.Curly, Pants = "#2F3E66",
                 Face = Expression.Smile, Width = 0.92f, Height = 0.97f, Wear = Extras.Backpack | Extras.Stripe,
                 WearColor = "#F4F1E8"
             },
             ["Repartidor"] = new Look
             {
-                Skin = "#F39C12", SkinTone = "#80553A", HairColor = "#1A1A1A", Hair = HairStyle.Buzz, Pants = "#2D2D2D",
+                Skin = "#F39C12", SkinTone = "#EBC29A", HairColor = "#6B3E26", Hair = HairStyle.Buzz, Pants = "#2D2D2D",
                 Hat = Hat.Helmet, HatColor = "#2D2D2D", Face = Expression.Neutral, LongSleeve = true,
                 Wear = Extras.Stripe, WearColor = "#2D2D2D"
             }
@@ -155,7 +156,14 @@ namespace ColonQuest.EditorTools
             }
 
             Look sheet;
-            return Cast.TryGetValue(key, out sheet) ? sheet : look;
+            if (Cast.TryGetValue(key, out sheet))
+            {
+                return sheet;
+            }
+
+            // Two people in the same shirt color are still two people.
+            look.Seed = name;
+            return look;
         }
     }
 }
