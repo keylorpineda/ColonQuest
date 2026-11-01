@@ -171,7 +171,9 @@ namespace ColonQuest.EditorTools
             if (ySorted)
             {
                 // Out in the town the steps kick up a little sand or dust (indoors the floors stay clean).
-                player.AddComponent<FootDust>().Configure(softCircle, LayerFloor, 200, -0.45f);
+                var footDust = player.AddComponent<FootDust>();
+                footDust.Configure(softCircle, LayerFloor, 200, -0.45f);
+                footDust.ConfigurePrints(circle, LayerFloor, 199);
 
                 // At night a soft light goes with the player, so the way ahead never gets lost in the dark.
                 AddNightLight(player.transform, new Vector2(0f, -0.1f), 3f, "#FFE8C0", 0.45f, 0f);

@@ -115,14 +115,20 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Sea", rounded, new Vector2(15.5f, -31f), new Vector2(129f, 7.2f), SeaColor, WorldSea);
 
             var foam = GamePalette.White;
-            foam.a = 0.7f;
+            foam.a = 0.85f;
             // The foam laps the sand: a bright line that rushes up and slides back, and a fainter one a beat behind it.
-            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(13f, -27.45f), new Vector2(118f, 0.4f), foam, WorldFoam)
-                .gameObject.AddComponent<ShoreLap>().Configure(0.16f, 6f, 0f, 0.45f);
+            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(13f, -27.45f), new Vector2(118f, 0.55f), foam, WorldFoam)
+                .gameObject.AddComponent<ShoreLap>().Configure(0.38f, 5.5f, 0f, 0.35f);
             var backFoam = GamePalette.White;
-            backFoam.a = 0.35f;
-            Shape(parent, "Shore_Foam_Back", roundedSmall, new Vector2(13f, -27.75f), new Vector2(116f, 0.22f), backFoam, WorldFoam)
-                .gameObject.AddComponent<ShoreLap>().Configure(0.12f, 6f, 0.35f, 0.7f);
+            backFoam.a = 0.55f;
+            Shape(parent, "Shore_Foam_Back", roundedSmall, new Vector2(13f, -27.75f), new Vector2(116f, 0.32f), backFoam, WorldFoam)
+                .gameObject.AddComponent<ShoreLap>().Configure(0.3f, 5.5f, 0.3f, 0.6f);
+            // The sand the wave leaves dark behind it: a third line that laps up and down over the dry sand.
+            var lapColor = GamePalette.Shade(SandColor, 0.82f);
+            lapColor.a = 0.5f;
+            Shape(parent, "WetSand_Lap", roundedSmall, new Vector2(13f, -27.0f), new Vector2(116f, 0.6f), lapColor, WorldSand + 1)
+                .gameObject.AddComponent<ShoreLap>().Configure(0.3f, 5.5f, 0.1f, 0.8f);
+            BuildSeaShimmer(parent);
             BuildSeaSwells(parent);
             for (int i = 0; i < 16; i++)
             {
@@ -136,13 +142,15 @@ namespace ColonQuest.EditorTools
             // Rings now and then on the open sea, and at the feet of a player who walks along any water. Never over the pier.
             var ripples = new GameObject("Ripples").transform;
             ripples.SetParent(parent, false);
-            ripples.gameObject.AddComponent<RippleField>().Configure(
+            var seaRipples = ripples.gameObject.AddComponent<RippleField>();
+            seaRipples.Configure(
                 ring,
                 Rect.MinMaxRect(-44f, -34f, 76f, -28.6f),
                 Rect.MinMaxRect(MapLayout.PierXMin - 0.8f, -34.5f, MapLayout.PierXMax + 0.8f, -27f),
                 currentLayer,
                 WorldRiverFoam + 1,
                 true);
+            seaRipples.ConfigureDrops(circle);
 
             // Pier.
             var pier = new Vector2(5.6f, -30.35f);
@@ -203,17 +211,19 @@ namespace ColonQuest.EditorTools
                 Flickering(Shape(parent, "River_Ripple", ring, new Vector2(x + (y % 2f - 1f) * 0.5f, y), new Vector2(1.2f, 0.45f), ripple, WorldRiverFoam), 0.5f, 1.1f, y);
             }
 
+            BuildRiverShimmer(parent, center, width, top - bottom);
+
             // The current: faint streaks that the river carries south, under the bridges, fading before both ends.
             var current = new GameObject("River_Current").transform;
             current.SetParent(parent, false);
             var streak = GamePalette.White;
-            streak.a = 0.28f;
-            for (int i = 0; i < 18; i++)
+            streak.a = 0.42f;
+            for (int i = 0; i < 36; i++)
             {
                 float lane = x + ((i * 7) % 5 - 2) * 0.42f;
-                float y = bottom + 0.5f + (top - bottom - 1f) * (i / 18f) + (i % 3) * 0.6f;
-                Shape(current, "River_Streak", roundedSmall, new Vector2(lane, y), new Vector2(0.07f, 0.9f + (i % 4) * 0.25f), streak, WorldRiverFoam)
-                    .gameObject.AddComponent<WaterFlow>().Configure(0.55f + (i % 5) * 0.08f, bottom + 0.4f, top - 0.4f, 2.5f);
+                float y = bottom + 0.5f + (top - bottom - 1f) * (i / 36f) + (i % 3) * 0.6f;
+                Shape(current, "River_Streak", roundedSmall, new Vector2(lane, y), new Vector2(0.09f, 0.9f + (i % 4) * 0.25f), streak, WorldRiverFoam)
+                    .gameObject.AddComponent<WaterFlow>().Configure(0.9f + (i % 6) * 0.1f, bottom + 0.4f, top - 0.4f, 2.5f);
             }
 
             // Two bridges, on the streets: railings and posts on the street edges.
@@ -227,6 +237,50 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Pool", rounded, new Vector2(20.3f, PoolY), new Vector2(5.5f, 2.3f), SeaColor, 6);
             Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(19.4f, PoolY), new Vector2(1.5f, 0.7f), ripple, 7), 0.5f, 1.3f, 3f);
             Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(21.6f, PoolY - 0.2f), new Vector2(1.1f, 0.55f), ripple, 7), 0.5f, 1.7f, 8f);
+
+            // The fall keeps stirring the pool: rings all the time, nobody walks in it.
+            var poolRipples = new GameObject("Pool_Ripples").transform;
+            poolRipples.SetParent(parent, false);
+            var poolField = poolRipples.gameObject.AddComponent<RippleField>();
+            poolField.Configure(ring, Rect.MinMaxRect(20.3f - 2.4f, PoolY - 0.95f, 20.3f + 2.4f, PoolY + 0.95f), Rect.zero, currentLayer, 8, false);
+            poolField.ConfigureRate(0.35f);
+        }
+
+        /// <summary>
+        /// Two layers of caustic light that slide over the sea in opposite directions, so it glitters and moves all the
+        /// time without anyone going near the shore. Wider than the sea, so the sliding never shows an edge.
+        /// </summary>
+        private static void BuildSeaShimmer(Transform parent)
+        {
+            if (waterCausticTex == null)
+            {
+                return;
+            }
+
+            var center = new Vector2(15.5f, -31f);
+            var size = new Vector2(133f, 6.6f);
+            var front = GamePalette.White;
+            front.a = 0.6f;
+            TiledShape(parent, "Sea_Shimmer", waterCausticTex, center, size, front, WorldFoam)
+                .gameObject.AddComponent<WaterShimmer>().Configure(0.25f, 0f, 0.15f, 2f);
+            var back = GamePalette.White;
+            back.a = 0.4f;
+            TiledShape(parent, "Sea_Shimmer_Back", waterCausticTex, center, size, back, WorldFoam)
+                .gameObject.AddComponent<WaterShimmer>().Configure(-0.18f, 0f, 0.15f, 2f);
+        }
+
+        /// <summary>Caustic light that runs down the river. The layer is two units shorter than the river, so it stays inside it.</summary>
+        private static void BuildRiverShimmer(Transform parent, Vector2 center, float width, float height)
+        {
+            if (waterCausticTex == null)
+            {
+                return;
+            }
+
+            var color = GamePalette.White;
+            color.a = 0.5f;
+            TiledShape(parent, "River_Shimmer", waterCausticTex, center, new Vector2(width - 0.3f, height - 2.2f), color, WorldRiverFoam)
+                .gameObject.AddComponent<WaterShimmer>().Configure(0f, -0.8f, 0f, 2f);
         }
 
         /// <summary>
@@ -240,14 +294,14 @@ namespace ColonQuest.EditorTools
             var group = new GameObject("Sea_Swells").transform;
             group.SetParent(parent, false);
             var line = GamePalette.White;
-            line.a = 0.32f;
-            for (int i = 0; i < 26; i++)
+            line.a = 0.5f;
+            for (int i = 0; i < 40; i++)
             {
-                float x = -42f + i * 4.6f + (float)random.NextDouble() * 2.5f;
+                float x = -42f + i * 3f + (float)random.NextDouble() * 2.5f;
                 float y = -34f + (float)random.NextDouble() * 0.8f;
-                float width = 4.5f + (float)random.NextDouble() * 4f;
-                Shape(group, "Swell", roundedSmall, new Vector2(x, y), new Vector2(width, 0.1f), line, WorldFoam)
-                    .gameObject.AddComponent<Swell>().Configure(5.2f, 8f + (float)random.NextDouble() * 4f, (float)random.NextDouble());
+                float width = 5f + (float)random.NextDouble() * 5f;
+                Shape(group, "Swell", roundedSmall, new Vector2(x, y), new Vector2(width, 0.16f), line, WorldFoam)
+                    .gameObject.AddComponent<Swell>().Configure(5.6f, 6f + (float)random.NextDouble() * 3f, (float)random.NextDouble());
             }
         }
 
@@ -301,6 +355,16 @@ namespace ColonQuest.EditorTools
             for (int i = 0; i < 3; i++)
             {
                 Flickering(Shape(north, "Waterfall", roundedSmall, new Vector2(19.3f + i * 1.0f, 25.4f), new Vector2(0.62f, 5.2f), water, WorldCliff + 6), 0.25f, 1.6f + i * 0.4f, i * 3f);
+            }
+
+            // Bright streaks that run down the fall, wrapping at the top once they reach the pool.
+            var fallStreak = GamePalette.White;
+            fallStreak.a = 0.6f;
+            for (int i = 0; i < 3; i++)
+            {
+                float streakX = 19.3f + i * 1.0f + (i == 1 ? 0.08f : -0.08f);
+                Shape(north, "Waterfall_Streak", roundedSmall, new Vector2(streakX, 24.2f + i * 1.3f), new Vector2(0.14f, 1.1f), fallStreak, WorldCliff + 7)
+                    .gameObject.AddComponent<WaterFlow>().Configure(2.5f, 23.4f, 27.6f, 1f);
             }
 
             var mist = GamePalette.White;

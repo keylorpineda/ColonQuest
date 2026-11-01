@@ -86,5 +86,57 @@ namespace ColonQuest.World.Tests
 
             Assert.AreEqual(0f, WaterMath.Rock(4f, 3f, 0f, 0f));
         }
+
+        [Test]
+        public void Wrap_StaysWithinHalfATileAndRepeatsEveryTile()
+        {
+            for (float v = -9f; v < 9f; v += 0.13f)
+            {
+                float w = WaterMath.Wrap(v, 2f);
+                Assert.That(w, Is.InRange(-1f, 1f));
+                Assert.AreEqual(w, WaterMath.Wrap(v + 2f, 2f), 0.001f, "one tile later it is in the same place");
+            }
+
+            Assert.AreEqual(0f, WaterMath.Wrap(5f, 0f));
+        }
+
+        [Test]
+        public void ShimmerDrift_MovesWithTheSignOfItsSpeedAndNeverLeavesATile()
+        {
+            Assert.AreEqual(0.5f, WaterMath.ShimmerDrift(2f, 0.25f, 2f), 0.001f);
+            Assert.AreEqual(-0.36f, WaterMath.ShimmerDrift(2f, -0.18f, 2f), 0.001f);
+            for (float t = 0f; t < 60f; t += 0.37f)
+            {
+                Assert.That(WaterMath.ShimmerDrift(t, -0.8f, 2f), Is.InRange(-1f, 1f));
+            }
+        }
+
+        [Test]
+        public void ShimmerBob_IsBoundedByItsAmplitude()
+        {
+            Assert.AreEqual(0f, WaterMath.ShimmerBob(0f, 0.4f, 0.15f), 0.0001f);
+            for (float t = 0f; t < 40f; t += 0.21f)
+            {
+                Assert.LessOrEqual(Mathf.Abs(WaterMath.ShimmerBob(t, 0.4f, 0.15f)), 0.15f + 0.0001f);
+            }
+        }
+
+        [Test]
+        public void SplashOffset_RisesInAnArcAndLandsWhereItsSideTakesIt()
+        {
+            Assert.AreEqual(0f, WaterMath.SplashOffset(0f, 1f, 0.3f, 0.2f).y, 0.0001f);
+            Assert.AreEqual(0.3f, WaterMath.SplashOffset(0.5f, 1f, 0.3f, 0.2f).y, 0.0001f, "the arc peaks halfway");
+            var end = WaterMath.SplashOffset(1f, -1f, 0.3f, 0.2f);
+            Assert.AreEqual(0f, end.y, 0.0001f);
+            Assert.AreEqual(-0.2f, end.x, 0.0001f);
+        }
+
+        [Test]
+        public void SplashAlpha_IsSolidThenFadesToNothing()
+        {
+            Assert.AreEqual(1f, WaterMath.SplashAlpha(0.3f), 0.0001f);
+            Assert.AreEqual(0f, WaterMath.SplashAlpha(1f), 0.0001f);
+            Assert.That(WaterMath.SplashAlpha(0.85f), Is.InRange(0.1f, 0.9f));
+        }
     }
 }

@@ -69,6 +69,48 @@ namespace ColonQuest.World
             alpha = 1f - t;
         }
 
+        /// <summary>
+        /// Wraps <paramref name="value"/> into [-size/2, size/2), so a tiled texture that slides by this much looks
+        /// endless: after one tile it is exactly where it started.
+        /// </summary>
+        public static float Wrap(float value, float size)
+        {
+            return size <= 0f ? 0f : Mathf.Repeat(value + size * 0.5f, size) - size * 0.5f;
+        }
+
+        /// <summary>
+        /// Where a sliding caustic layer sits relative to its rest position: it drifts at <paramref name="speed"/>
+        /// (units per second, either sign) and wraps every <paramref name="tile"/> units.
+        /// </summary>
+        public static float ShimmerDrift(float time, float speed, float tile)
+        {
+            return Wrap(time * speed, tile);
+        }
+
+        /// <summary>The slow bob of a caustic layer across its drift: <c>sin(time * rate) * amplitude</c>.</summary>
+        public static float ShimmerBob(float time, float rate, float amplitude)
+        {
+            return Mathf.Sin(time * rate) * amplitude;
+        }
+
+        /// <summary>
+        /// A water drop thrown up by a step, relative to where it started: it moves a little to its
+        /// <paramref name="side"/> (-1 or 1) and rises in an arc of <paramref name="height"/> that peaks halfway
+        /// and is back at zero at the end.
+        /// </summary>
+        public static Vector2 SplashOffset(float t01, float side, float height, float spread)
+        {
+            float t = Mathf.Clamp01(t01);
+            return new Vector2(side * spread * t, 4f * height * t * (1f - t));
+        }
+
+        /// <summary>Opacity of a drop: solid for most of its flight, then gone at the end.</summary>
+        public static float SplashAlpha(float t01)
+        {
+            float t = Mathf.Clamp01(t01);
+            return t < 0.7f ? 1f : Mathf.Clamp01((1f - t) / 0.3f);
+        }
+
         /// <summary>The gentle rocking of a boat or a buoy, in degrees.</summary>
         public static float Rock(float time, float degrees, float period, float phase)
         {
