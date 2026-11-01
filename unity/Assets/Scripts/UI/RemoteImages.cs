@@ -67,7 +67,7 @@ namespace ColonQuest.UI
             return null;
         }
 
-        /// <summary>Asks for the portraits and the postcard once there is a session, so they are ready when a window needs them.</summary>
+        /// <summary>Asks for the portraits, the postcards and the scenes once there is a session, so they are ready when a window needs them.</summary>
         public static void Prefetch()
         {
             if (prefetched || !ApiClient.Instance.Service.HasSession)
@@ -82,6 +82,12 @@ namespace ColonQuest.UI
             }
 
             foreach (var key in PostcardKeys.All)
+            {
+                Request(key);
+            }
+
+            // An event shows its scene as soon as it opens: asked for only then, it would miss its first time.
+            foreach (var key in DemoReadout.Scenes)
             {
                 Request(key);
             }
