@@ -110,17 +110,27 @@ namespace ColonQuest.World.Tests
         }
 
         [Test]
-        public void Settings_SpanishAddsNothingToTheText()
+        public void Settings_EnglishIsTheDefaultAndAddsNothingToTheText()
         {
+            Assert.AreEqual(GameLanguage.English, new GameSettings().Language);
             Assert.AreEqual("1;1.00", new GameSettings().Serialize());
+        }
+
+        [Test]
+        public void Settings_SpanishIsRemembered()
+        {
+            var again = GameSettings.Parse(new GameSettings { Language = GameLanguage.Spanish }.Serialize());
+
+            Assert.AreEqual(GameLanguage.Spanish, again.Language);
         }
 
         [TestCase("1;1.00;fr")]
         [TestCase("1;1.00;")]
-        [TestCase("1;1.00;EN")]
-        public void Settings_AnythingButEnIsSpanish(string text)
+        [TestCase("1;1.00;ES")]
+        [TestCase("1;1.00;en")]
+        public void Settings_AnythingButEsIsEnglish(string text)
         {
-            Assert.AreEqual(GameLanguage.Spanish, GameSettings.Parse(text).Language);
+            Assert.AreEqual(GameLanguage.English, GameSettings.Parse(text).Language);
         }
 
         [Test]
@@ -130,7 +140,7 @@ namespace ColonQuest.World.Tests
 
             Assert.IsFalse(old.SoundOn);
             Assert.AreEqual(0.5f, old.Volume, 0.0001f);
-            Assert.AreEqual(GameLanguage.Spanish, old.Language);
+            Assert.AreEqual(GameLanguage.English, old.Language);
             Assert.AreEqual(TimeSpeed.Normal, old.Speed);
             Assert.AreEqual(30f, old.SecondsPerGameHour);
         }

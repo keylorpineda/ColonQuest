@@ -76,8 +76,8 @@ namespace ColonQuest.World
 
         public bool SoundOn { get; set; } = true;
 
-        /// <summary>The language of the text. Spanish unless the player chose English.</summary>
-        public GameLanguage Language { get; set; } = GameLanguage.Spanish;
+        /// <summary>The language of the text. English unless the player chose Spanish: the judges of the hackathon read English.</summary>
+        public GameLanguage Language { get; set; } = GameLanguage.English;
 
         /// <summary>Clock progression speed: normal (30s/h) or fast (10s/h, for judging and demos).</summary>
         public TimeSpeed Speed { get; set; } = TimeSpeed.Normal;
@@ -115,9 +115,9 @@ namespace ColonQuest.World
         public string Serialize()
         {
             string text = (SoundOn ? "1" : "0") + ";" + volume.ToString("0.00", CultureInfo.InvariantCulture);
-            if (Language == GameLanguage.English)
+            if (Language == GameLanguage.Spanish)
             {
-                text += ";en";
+                text += ";es";
             }
 
             if (Speed == TimeSpeed.Fast)
@@ -150,9 +150,9 @@ namespace ColonQuest.World
 
             for (int i = 2; i < parts.Length; i++)
             {
-                if (parts[i] == "en")
+                if (parts[i] == "es")
                 {
-                    settings.Language = GameLanguage.English;
+                    settings.Language = GameLanguage.Spanish;
                 }
                 else if (parts[i] == "fast")
                 {
