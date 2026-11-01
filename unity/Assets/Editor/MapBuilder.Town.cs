@@ -75,13 +75,6 @@ namespace ColonQuest.EditorTools
             new GameObject("GameBootstrap").AddComponent<ColonQuest.UI.GameBootstrap>();
 
             ClearNewBuildingFootprints(map);
-            foreach (var sg in map.GetComponentsInChildren<UnityEngine.Rendering.SortingGroup>(true))
-            {
-                if (sg != null && sg.GetComponent<YSort>() == null)
-                {
-                    Object.DestroyImmediate(sg);
-                }
-            }
             SaveScene(scene, SceneNames.Town);
         }
 
@@ -421,8 +414,8 @@ namespace ColonQuest.EditorTools
 
             // Traffic keeps to the right: east along the south lane of each road, west along the north lane.
             // Cars in the same lane share a speed, so none catches up with the one ahead.
-            Car(parent, shadows, -20.2f, 1.35f, "#E8505B", 2.4f);
-            Car(parent, shadows, 12.5f, 1.35f, "#4DA3FF", 2.4f);
+            Car(parent, shadows, -20.2f, 0.95f, "#E8505B", 2.4f);
+            Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
             // The north lane of the main street belongs to the collectors' car, so no other car shares it.
             Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
             Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
@@ -458,7 +451,7 @@ namespace ColonQuest.EditorTools
 
 
             // Iconic cast members in the residential and central plaza zones
-            var donMario = BuildNpc(parent, "DonMario", new Vector2(-17.1f, 5.05f), new Look { Skin = "#E9E2D0" }, true);
+            var donMario = BuildNpc(parent, "DonMario", new Vector2(-15.2f, 4.85f), new Look { Skin = "#E9E2D0" }, true);
             BuildThing(donMario, "Talk_DonMario", "Saludar a Don Mario", Vector2.zero, new Vector2(0.8f, 0.8f),
                 "¡Buenos días, vecino! Qué bonito día hace hoy en el barrio.",
                 "Cuidar la casa y llevar las cuentas al día da una paz que no tiene precio.");

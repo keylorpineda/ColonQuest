@@ -53,6 +53,16 @@ namespace ColonQuest.World.PlayModeTests
         protected override string SceneToLoad => SceneNames.Banco;
 
         [UnityTest]
+        public IEnumerator Interior_HasExactlyOneGlobalLight()
+        {
+            yield return null;
+            var lightGo = GameObject.Find("InteriorGlobalLight");
+            Assert.IsNotNull(lightGo, "Interior scene must have InteriorGlobalLight");
+            var lightComp = lightGo.GetComponent("Light2D");
+            Assert.IsNotNull(lightComp, "InteriorGlobalLight must have Light2D component");
+        }
+
+        [UnityTest]
         public IEnumerator Player_AppearsInFrontOfTheDoormat()
         {
             yield return null;

@@ -132,6 +132,20 @@ namespace ColonQuest.EditorTools
             var plants = IL(parts.Props, "Plants");
             Plant(plants, -8.0f, -5.2f);
             Plant(plants, 8.0f, -5.2f);
+
+            // Ceiling fan with smooth rotation
+            var fanGo = new GameObject("CeilingFan");
+            fanGo.transform.SetParent(parts.Props, false);
+            fanGo.transform.localPosition = new Vector2(0f, 2.5f);
+            fanGo.AddComponent<ColonQuest.World.Spin>().Configure(180f);
+            Shape(fanGo.transform, "FanHub", circle, Vector2.zero, Vector2.one * 0.45f, GamePalette.Hex("#2C3440"), 12);
+            for (int fi = 0; fi < 4; fi++)
+            {
+                float fa = fi * 90f * Mathf.Deg2Rad;
+                var bladePos = new Vector2(Mathf.Cos(fa), Mathf.Sin(fa)) * 0.95f;
+                var blade = Shape(fanGo.transform, "FanBlade", roundedSmall, bladePos, new Vector2(1.2f, 0.32f), GamePalette.Hex("#5C3D28"), 11);
+                Tilt(blade, fi * 90f);
+            }
         }
     }
 }

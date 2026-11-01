@@ -582,6 +582,70 @@ namespace ColonQuest.EditorTools
             var trespass = watch.AddComponent<TrespassWatch>();
             trespass.Configure("Don Mario", MarketAssumptions.TrespassGraceSeconds);
             trespass.SetOfficer(officer);
+
+            BuildNeighborVariants(parts);
+        }
+
+        private static void BuildNeighborVariants(InteriorParts parts)
+        {
+            var root = new GameObject("NeighborVariants").transform;
+            root.SetParent(parts.Props, false);
+            var comp = root.gameObject.AddComponent<ColonQuest.World.NeighborVariant>();
+
+            var v0 = new GameObject("Variant_0"); v0.transform.SetParent(root, false);
+            var v1 = new GameObject("Variant_1"); v1.transform.SetParent(root, false);
+            var v2 = new GameObject("Variant_2"); v2.transform.SetParent(root, false);
+            var v3 = new GameObject("Variant_3"); v3.transform.SetParent(root, false);
+
+            comp.Configure(new[] { v0, v1, v2, v3 });
+
+            // 0: Familia con niños (juguetes, dibujos en la pared, sillón con cojín de color)
+            Deco(v0.transform, "ChildRug", roundedSmall, -3.2f, -1.5f, 1.8f, 1.4f, "#FFD166", 0.9f, 6);
+            Deco(v0.transform, "ToyBlock1", roundedSmall, -3.5f, -1.2f, 0.22f, 0.22f, "#EF476F", 1f, 10);
+            Deco(v0.transform, "ToyBlock2", roundedSmall, -3.2f, -1.35f, 0.22f, 0.22f, "#118AB2", 1f, 10);
+            Deco(v0.transform, "ToyBlock3", roundedSmall, -2.9f, -1.15f, 0.22f, 0.22f, "#06D6A0", 1f, 10);
+            Deco(v0.transform, "ToyCar", roundedSmall, -2.6f, -1.6f, 0.35f, 0.18f, "#E63946", 1f, 10);
+            Deco(v0.transform, "ChildDrawing1", square, -3.8f, 2.2f, 0.45f, 0.35f, "#FFFFFF", 1f, 10);
+            Deco(v0.transform, "ChildScribble1", circle, -3.8f, 2.2f, 0.25f, 0.20f, "#EF476F", 0.7f, 11);
+            Deco(v0.transform, "ChildDrawing2", square, -2.8f, 2.25f, 0.40f, 0.32f, "#FFFBEB", 1f, 10);
+            Deco(v0.transform, "ChildScribble2", square, -2.8f, 2.25f, 0.20f, 0.15f, "#118AB2", 0.7f, 11);
+            Deco(v0.transform, "KidsCushion", roundedSmall, -5.8f, -2.2f, 0.48f, 0.36f, "#FF6B6B", 1f, 10);
+
+            // 1: Abuelita (mecedora/cojín, carpetas tejidas, santos, plantas)
+            Deco(v1.transform, "Doily1", circle, 4.5f, 1.2f, 0.65f, 0.65f, "#FFFDF0", 1f, 9);
+            Deco(v1.transform, "Doily2", circle, -5.1f, 3.85f, 0.55f, 0.55f, "#FFFDF0", 1f, 9);
+            Deco(v1.transform, "SaintFrame", roundedSmall, -4.2f, 2.25f, 0.42f, 0.60f, "#D4AF37", 1f, 10);
+            Deco(v1.transform, "SaintPic", square, -4.2f, 2.25f, 0.34f, 0.50f, "#2A5298", 1f, 11);
+            Deco(v1.transform, "SaintHalo", circle, -4.2f, 2.42f, 0.18f, 0.18f, "#F1C40F", 0.9f, 12);
+            Deco(v1.transform, "FloralCushion", roundedSmall, -5.8f, -2.2f, 0.45f, 0.40f, "#8E44AD", 1f, 10);
+            Deco(v1.transform, "GrandmaPot", circle, -6.8f, -0.6f, 0.35f, 0.35f, "#C0392B", 1f, 10);
+            Deco(v1.transform, "GrandmaPlant", circle, -6.8f, -0.6f, 0.50f, 0.50f, "#27AE60", 1f, 11);
+            Deco(v1.transform, "GrandmaFlowers", circle, -6.8f, -0.58f, 0.22f, 0.22f, "#E91E63", 1f, 12);
+
+            // 2: Estudiante (escritorio con laptop, afiches, libros en el piso)
+            Deco(v2.transform, "LaptopBase", square, 4.5f, 1.15f, 0.65f, 0.38f, "#37474F", 1f, 9);
+            Deco(v2.transform, "LaptopScreen", square, 4.5f, 1.40f, 0.62f, 0.32f, "#64B5F6", 1f, 10);
+            Deco(v2.transform, "CoffeeMug", roundedSmall, 4.0f, 1.15f, 0.16f, 0.20f, "#E0E0E0", 1f, 9);
+            Deco(v2.transform, "EnergyCan", roundedSmall, 5.0f, 1.18f, 0.14f, 0.26f, "#00E676", 1f, 9);
+            Deco(v2.transform, "Book1", roundedSmall, -3.2f, -1.8f, 0.42f, 0.55f, "#1565C0", 1f, 8);
+            Deco(v2.transform, "Book2", roundedSmall, -3.22f, -1.85f, 0.40f, 0.52f, "#C62828", 1f, 9);
+            Deco(v2.transform, "Book3", roundedSmall, -3.18f, -1.90f, 0.38f, 0.48f, "#2E7D32", 1f, 10);
+            Deco(v2.transform, "RockPoster", square, -3.5f, 2.2f, 0.60f, 0.85f, "#212121", 1f, 10);
+            Deco(v2.transform, "PosterGraphic", square, -3.5f, 2.2f, 0.45f, 0.40f, "#FF5722", 1f, 11);
+            Deco(v2.transform, "ChargerCable", square, -4.5f, 1.2f, 0.02f, 0.8f, "#FFFFFF", 0.8f, 8);
+
+            // 3: Casa humilde (pocos muebles, manchas en paredes, radio pequeño)
+            Deco(v3.transform, "RusticStool", circle, -3.5f, -1.5f, 0.50f, 0.50f, "#8D6E63", 1f, 8);
+            Deco(v3.transform, "RadioShelf", square, -2.5f, 2.1f, 0.65f, 0.10f, "#6D4C41", 1f, 9);
+            Deco(v3.transform, "SmallRadio", roundedSmall, -2.5f, 2.25f, 0.38f, 0.24f, "#546E7A", 1f, 10);
+            Deco(v3.transform, "RadioAntenna", square, -2.6f, 2.45f, 0.02f, 0.22f, "#B0BEC5", 1f, 11);
+            Deco(v3.transform, "WallStain1", circle, -5.2f, 2.1f, 0.9f, 0.5f, "#5D4037", 0.18f, 7);
+            Deco(v3.transform, "WallStain2", circle, 3.8f, 2.0f, 0.8f, 0.45f, "#5D4037", 0.16f, 7);
+            Deco(v3.transform, "WovenBasket", roundedSmall, -6.8f, -0.6f, 0.55f, 0.45f, "#A1887F", 1f, 8);
+
+            v1.SetActive(false);
+            v2.SetActive(false);
+            v3.SetActive(false);
         }
     }
 }

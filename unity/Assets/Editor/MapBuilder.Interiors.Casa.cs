@@ -63,6 +63,10 @@ namespace ColonQuest.EditorTools
                 Deco(nightstands, "Lamp", circle, x, 4.75f, 0.3f, 0.3f, "#FFD23F", 1f, 8);
                 Flickering(Glow(parts.Lights, "Light_Nightstand", new Vector2(x, 4.7f), 2.2f, "#FFD23F", 0.18f, OrderLight), 0.06f, 0.8f, x);
             }
+            Deco(nightstands, "BookStack1", roundedSmall, -6.75f, 4.88f, 0.32f, 0.12f, "#C0392B", 1f, 9);
+            Deco(nightstands, "BookStack2", roundedSmall, -6.75f, 4.96f, 0.28f, 0.10f, "#2980B9", 1f, 10);
+            Deco(nightstands, "PhoneCharger", square, -3.45f, 4.95f, 0.02f, 0.45f, "#FFFFFF", 0.85f, 9);
+            Deco(nightstands, "PhoneBody", roundedSmall, -3.45f, 4.75f, 0.16f, 0.28f, "#1E272C", 1f, 10);
 
             var wardrobe = IL(parts.Props, "Wardrobe");
             Solid(wardrobe, "Wardrobe", rounded, -7.6f, 2.3f, 0.9f, 2.2f, "#7A4F2A");
