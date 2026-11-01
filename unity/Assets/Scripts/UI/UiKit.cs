@@ -36,6 +36,24 @@ namespace ColonQuest.UI
         }
 
         private static Font titleFont;
+        private static Font regularFont;
+
+        /// <summary>
+        /// The regular weight of the interface font, for long texts and hints. Labels ask for it with
+        /// <c>fontStyle = FontStyle.Normal</c> and <see cref="TextFit"/> swaps the file.
+        /// </summary>
+        public static Font RegularFont
+        {
+            get
+            {
+                if (regularFont == null)
+                {
+                    regularFont = Resources.Load<Font>("Fonts/ColonQuest-BodyRegular");
+                }
+
+                return regularFont;
+            }
+        }
 
         /// <summary>
         /// The font of the whole interface: a rounder one of the computer when it has it, and the built-in one in the browser,
@@ -203,6 +221,7 @@ namespace ColonQuest.UI
             label.verticalOverflow = VerticalWrapMode.Overflow;
             label.raycastTarget = false;
             label.text = Loc.T(text);
+            TextFit.Attach(label);
             if (!string.IsNullOrEmpty(text))
             {
                 // Texts that code fills in later start empty and are left alone.
@@ -226,6 +245,7 @@ namespace ColonQuest.UI
             label.verticalOverflow = VerticalWrapMode.Overflow;
             label.raycastTarget = false;
             label.text = text;
+            TextFit.Attach(label);
             return label;
         }
 
@@ -401,9 +421,42 @@ namespace ColonQuest.UI
             return label;
         }
 
+        /// <summary>
+        /// Gives a card made by <see cref="Card"/> a new size: the outline, its shadow, the body and the bevel together.
+        /// The card keeps its anchor, so a card anchored at the top grows downward.
+        /// </summary>
+        public static void ResizeCard(RectTransform body, Vector2 size)
+        {
+            if (body == null || !(body.parent is RectTransform outline))
+            {
+                return;
+            }
+
+            outline.sizeDelta = size;
+            var bodySize = size - new Vector2(Outline * 2f, Outline * 2f);
+            body.sizeDelta = bodySize;
+            var shadow = outline.Find("DropShadow") as RectTransform;
+            if (shadow != null)
+            {
+                shadow.sizeDelta = size;
+            }
+
+            var bevel = body.Find("TopBevel") as RectTransform;
+            if (bevel != null)
+            {
+                bevel.sizeDelta = new Vector2(Mathf.Max(24f, bodySize.x - 16f), bevel.sizeDelta.y);
+            }
+        }
+
         /// <summary>The height a text needs when wrapped to <paramref name="width"/>.</summary>
         public static float MeasureHeight(Text label, float width)
         {
+            var fit = label.GetComponent<TextFit>();
+            if (fit != null)
+            {
+                fit.PrepareForMeasure();
+            }
+
             var settings = label.GetGenerationSettings(new Vector2(width, 0f));
             return label.cachedTextGeneratorForLayout.GetPreferredHeight(label.text, settings) / label.pixelsPerUnit;
         }
