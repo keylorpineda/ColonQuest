@@ -353,7 +353,8 @@ namespace ColonQuest.EditorTools
                 XMin = 4f, XMax = 13.5f, YBottom = 6f, YTop = 13.4f, DoorX = 8.5f, FacadeHeight = 3.2f, Entrance = Entrance.Door,
                 AwningA = "#E8505B", AwningB = "#F8F5E8"
             });
-            Banner(tienda, "CRÉDITO FÁCIL", 8.5f - (4f + 13.5f) * 0.5f, 3.2f + 1.7f, "#E8505B");
+            // Low and centered on the gable, the only height where its triangle is wider than the banner.
+            Banner(tienda, "CRÉDITO FÁCIL", 0f, 3.2f + 0.54f, "#E8505B");
             Building(parent, shadows, new BuildingSpec
             {
                 Name = "Taller", Sign = "TALLER DON RAFA", Roof = "#4B5568", Wall = "#D7DDE8",
