@@ -22,6 +22,19 @@ namespace ColonQuest.World
         private static readonly string[] DogHouses = { "Casa_Vecina_A", "Casa_Almendros_4" };
 
         /// <summary>
+        /// Deterministic interior decoration variant (0..3) chosen based on which house door the player entered from.
+        /// </summary>
+        public static int VariantFor(string doorReturn)
+        {
+            if (string.IsNullOrEmpty(doorReturn))
+            {
+                return 0;
+            }
+
+            return BuildingMath.StableHash(doorReturn) % 4;
+        }
+
+        /// <summary>
         /// True when the neighbor's house the player came in by has a dog. The key is the spot in front of its door, the
         /// remembered return of the door (for example "Town_From_Casa_Vecina_A").
         /// </summary>

@@ -25,5 +25,43 @@ namespace ColonQuest.World.Tests
             HouseVisit.Enter(null);
             Assert.IsFalse(HouseVisit.InListing);
         }
+
+        [Test]
+        public void VariantFor_ReturnsDeterministicValuesBetweenZeroAndThree()
+        {
+            Assert.AreEqual(0, HouseVisit.VariantFor(null));
+            Assert.AreEqual(0, HouseVisit.VariantFor(string.Empty));
+
+            int v1 = HouseVisit.VariantFor("Town_From_Casa_Vecina_A");
+            int v2 = HouseVisit.VariantFor("Town_From_Casa_Vecina_A");
+            Assert.AreEqual(v1, v2);
+            Assert.GreaterOrEqual(v1, 0);
+            Assert.LessOrEqual(v1, 3);
+
+            // Test coverage across typical neighbor doors
+            var variantsFound = new System.Collections.Generic.HashSet<int>();
+            string[] doors =
+            {
+                "Town_From_Casa_Vecina_A",
+                "Town_From_Casa_Vecina_B",
+                "Town_From_Casa_Vecina_C",
+                "Town_From_Casa_Vecina_D",
+                "Town_From_Casa_Almendros_1",
+                "Town_From_Casa_Almendros_2",
+                "Town_From_Casa_Almendros_3",
+                "Town_From_Casa_Almendros_4",
+                "Town_From_Casa_Almendros_5"
+            };
+
+            foreach (var door in doors)
+            {
+                int variant = HouseVisit.VariantFor(door);
+                Assert.GreaterOrEqual(variant, 0);
+                Assert.LessOrEqual(variant, 3);
+                variantsFound.Add(variant);
+            }
+
+            Assert.GreaterOrEqual(variantsFound.Count, 3);
+        }
     }
 }

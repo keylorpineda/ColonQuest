@@ -144,108 +144,122 @@ namespace ColonQuest.EditorTools
         private static void BuildInterior(string sceneName)
         {
             var scene = BeginScene();
-            var map = new GameObject("Map").transform;
-            BuildBackground(Group(map, "Background"));
-
-            var room = RoomFor(sceneName);
-            currentLayer = LayerFloor;
-            BuildFloors(Group(map, "Floors"), new[] { room });
-            bool upperFloor = sceneName == SceneNames.HospitalArriba;
-            if (!upperFloor)
+            BeginLitScene();
+            try
             {
-                BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName), SceneNames.Town);
+                var map = new GameObject("Map").transform;
+                BuildBackground(Group(map, "Background"));
+
+                var room = RoomFor(sceneName);
+                currentLayer = LayerFloor;
+                BuildFloors(Group(map, "Floors"), new[] { room });
+                bool upperFloor = sceneName == SceneNames.HospitalArriba;
+                if (!upperFloor)
+                {
+                    BuildDoorMat(Group(map, "Door"), MatFor(sceneName), TownSpawnFor(sceneName), SceneNames.Town);
+                }
+                currentLayer = LayerWorld;
+
+                var layout = new InteriorParts
+                {
+                    Floor = Group(map, "FloorZones"),
+                    Walls = Group(map, "Walls"),
+                    Props = Group(map, "Props"),
+                    Stations = Group(map, "Stations"),
+                    Lights = Group(map, "Lights"),
+                    People = Group(map, "People"),
+                    Labels = Group(map, "Labels")
+                };
+
+                interiorLayers = 0;
+                switch (sceneName)
+                {
+                    case SceneNames.Casa:
+                        BuildHouseLayout(layout, room);
+                        BuildHouseThings(layout);
+                        break;
+                    case SceneNames.Cuarto:
+                        BuildRoomLayout(layout, room);
+                        break;
+                    case SceneNames.Tienda:
+                        BuildStoreLayout(layout, room);
+                        BuildStoreThings(layout);
+                        break;
+                    case SceneNames.Agencia:
+                        BuildAgencyLayout(layout, room);
+                        break;
+                    case SceneNames.Carcel:
+                        BuildJailLayout(layout, room);
+                        break;
+                    case SceneNames.Hospital:
+                        BuildHospitalLayout(layout, room);
+                        break;
+                    case SceneNames.HospitalArriba:
+                        BuildHospitalUpperLayout(layout, room);
+                        break;
+                    case SceneNames.Vecino:
+                        BuildNeighborLayout(layout, room);
+                        break;
+                    case SceneNames.Finca:
+                        BuildFarmLayout(layout, room);
+                        break;
+                    case SceneNames.Inmobiliaria:
+                        BuildRealEstateLayout(layout, room);
+                        break;
+                    case SceneNames.Cooperativa:
+                        BuildCoopLayout(layout, room);
+                        break;
+                    case SceneNames.Soda:
+                        BuildSodaLayout(layout, room);
+                        break;
+                    default:
+                        BuildBankLayout(layout, room);
+                        BuildBankThings(layout);
+                        break;
+                }
+
+                // Wall decorative details (zócalo, rodapié, outlets, pictures, clock/calendar)
+                DecorateWalls(layout.Walls, room, ColonQuest.World.BuildingMath.StableHash(sceneName));
+
+                // 2D Interior lighting (global ambient + soft point lights)
+                BuildInteriorLights(layout.Lights, room);
+
+                if (upperFloor)
+                {
+                    // The upper floor of the hospital has no way out but the elevator down, where the mat used to be.
+                    var mat = MatFor(sceneName);
+                    BuildElevator(layout, mat + new Vector2(0f, -0.45f), mat, new Vector2(1.6f, 0.8f),
+                        SceneNames.Hospital, TownSpawnFor(sceneName), Vector2.down, mat + new Vector2(0f, -0.4f));
+                }
+                else
+                {
+                    var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
+                    Deco(layout.Labels, "ExitSign_Outline", roundedSmall, exit.x, exit.y, 1.14f, 0.42f, "#1C2233", 1f, OrderLabel - 2);
+                    Deco(layout.Labels, "ExitSign_Frame", roundedSmall, exit.x, exit.y, 1.06f, 0.34f, "#2E9E62", 1f, OrderLabel - 1);
+                    Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 0.96f, 0.26f, "#55E08F", 1f, OrderLabel - 1);
+                    Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
+                }
+                DustMotes(IL(layout.Props, "DustMotes"), new System.Random(5), room, 18);
+
+                BuildRoomColliders(Group(map, "Colliders"), room);
+
+                Vector2 spawnAt = MatFor(sceneName) + new Vector2(0f, 1.3f);
+                BuildSpawnPoint(map, SpawnIds.FromTown, spawnAt);
+                BuildExtraSpawns(map, sceneName);
+
+                var player = BuildPlayer(spawnAt, false);
+                var half = room.Size * 0.5f + Vector2.one * 0.3f;
+                var bounds = new Rect(room.Center - half, half * 2f);
+                BuildCamera(MapLayout.InteriorCameraSize, GamePalette.Space, room.Center)
+                    .AddComponent<CameraFollow>().Configure(player, bounds);
+
+                Debug.Log(sceneName + " detail layers: " + interiorLayers);
+                SaveScene(scene, sceneName);
             }
-            currentLayer = LayerWorld;
-
-            var layout = new InteriorParts
+            finally
             {
-                Floor = Group(map, "FloorZones"),
-                Walls = Group(map, "Walls"),
-                Props = Group(map, "Props"),
-                Stations = Group(map, "Stations"),
-                Lights = Group(map, "Lights"),
-                People = Group(map, "People"),
-                Labels = Group(map, "Labels")
-            };
-
-            interiorLayers = 0;
-            switch (sceneName)
-            {
-                case SceneNames.Casa:
-                    BuildHouseLayout(layout, room);
-                    BuildHouseThings(layout);
-                    break;
-                case SceneNames.Cuarto:
-                    BuildRoomLayout(layout, room);
-                    break;
-                case SceneNames.Tienda:
-                    BuildStoreLayout(layout, room);
-                    BuildStoreThings(layout);
-                    break;
-                case SceneNames.Agencia:
-                    BuildAgencyLayout(layout, room);
-                    break;
-                case SceneNames.Carcel:
-                    BuildJailLayout(layout, room);
-                    break;
-                case SceneNames.Hospital:
-                    BuildHospitalLayout(layout, room);
-                    break;
-                case SceneNames.HospitalArriba:
-                    BuildHospitalUpperLayout(layout, room);
-                    break;
-                case SceneNames.Vecino:
-                    BuildNeighborLayout(layout, room);
-                    break;
-                case SceneNames.Finca:
-                    BuildFarmLayout(layout, room);
-                    break;
-                case SceneNames.Inmobiliaria:
-                    BuildRealEstateLayout(layout, room);
-                    break;
-                case SceneNames.Cooperativa:
-                    BuildCoopLayout(layout, room);
-                    break;
-                case SceneNames.Soda:
-                    BuildSodaLayout(layout, room);
-                    break;
-                default:
-                    BuildBankLayout(layout, room);
-                    BuildBankThings(layout);
-                    break;
+                EndLitScene();
             }
-
-            if (upperFloor)
-            {
-                // The upper floor of the hospital has no way out but the elevator down, where the mat used to be.
-                var mat = MatFor(sceneName);
-                BuildElevator(layout, mat + new Vector2(0f, -0.45f), mat, new Vector2(1.6f, 0.8f),
-                    SceneNames.Hospital, TownSpawnFor(sceneName), Vector2.down, mat + new Vector2(0f, -0.4f));
-            }
-            else
-            {
-                var exit = MatFor(sceneName) + new Vector2(0f, -0.75f);
-                Deco(layout.Labels, "ExitSign_Outline", roundedSmall, exit.x, exit.y, 1.14f, 0.42f, "#1C2233", 1f, OrderLabel - 2);
-                Deco(layout.Labels, "ExitSign_Frame", roundedSmall, exit.x, exit.y, 1.06f, 0.34f, "#2E9E62", 1f, OrderLabel - 1);
-                Deco(layout.Labels, "ExitSign", roundedSmall, exit.x, exit.y, 0.96f, 0.26f, "#55E08F", 1f, OrderLabel - 1);
-                Label(layout.Labels, "SALIDA", exit, GamePalette.Outline, 0.03f, TextAnchor.MiddleCenter);
-            }
-            DustMotes(IL(layout.Props, "DustMotes"), new System.Random(5), room, 18);
-
-            BuildRoomColliders(Group(map, "Colliders"), room);
-
-            Vector2 spawnAt = MatFor(sceneName) + new Vector2(0f, 1.3f);
-            BuildSpawnPoint(map, SpawnIds.FromTown, spawnAt);
-            BuildExtraSpawns(map, sceneName);
-
-            var player = BuildPlayer(spawnAt, false);
-            var half = room.Size * 0.5f + Vector2.one * 0.3f;
-            var bounds = new Rect(room.Center - half, half * 2f);
-            BuildCamera(MapLayout.InteriorCameraSize, GamePalette.Space, room.Center)
-                .AddComponent<CameraFollow>().Configure(player, bounds);
-
-            Debug.Log(sceneName + " detail layers: " + interiorLayers);
-            SaveScene(scene, sceneName);
         }
 
         /// <summary>The groups every interior fills.</summary>
@@ -311,11 +325,44 @@ namespace ColonQuest.EditorTools
                 var room = rooms[i];
                 int order = OrderFloor + i * FloorOrdersPerRoom;
                 Shape(parent, room.Name + "_Floor", rounded, room.Center, room.Size, room.Color, order);
+
+                var floorTex = FloorTexFor(room.Name);
+                if (floorTex != null)
+                {
+                    TiledShape(parent, room.Name + "_FloorTexture", floorTex, room.Center, room.Size - new Vector2(0.1f, 0.1f), room.Color, order);
+                }
+
                 Shape(parent, room.Name + "_Plate", rounded, room.Center,
                     room.Size - Vector2.one, GamePalette.Shade(room.Color, 0.94f), order + 1);
                 TileJoints(parent, room, order + 2);
 
                 WallFace(parent, room, order + 3);
+            }
+        }
+
+        private static Sprite FloorTexFor(string roomName)
+        {
+            switch (roomName)
+            {
+                case SceneNames.Casa:
+                case SceneNames.Vecino:
+                case SceneNames.Soda:
+                    return floorCeramicTex;
+                case SceneNames.Banco:
+                case SceneNames.Cooperativa:
+                    return floorTerrazzoTex;
+                case SceneNames.Hospital:
+                case SceneNames.HospitalArriba:
+                    return floorMosaicTex;
+                case SceneNames.Finca:
+                case SceneNames.Inmobiliaria:
+                case SceneNames.Cuarto:
+                    return floorWoodTex;
+                case SceneNames.Carcel:
+                case SceneNames.Agencia:
+                    return floorCementTex;
+                default:
+                    return null;
             }
         }
 
@@ -343,12 +390,89 @@ namespace ColonQuest.EditorTools
             float top = room.Center.y + room.Size.y * 0.5f;
             Shape(parent, room.Name + "_WallFace", roundedSmall, new Vector2(room.Center.x, top - 0.4f),
                 new Vector2(room.Size.x, 0.8f), GamePalette.Shade(room.Color, 0.68f), order);
+
+            if (wallPaintTex != null)
+            {
+                TiledShape(parent, room.Name + "_WallPaint", wallPaintTex, new Vector2(room.Center.x, top - 0.4f),
+                    new Vector2(room.Size.x - 0.1f, 0.78f), GamePalette.Shade(room.Color, 0.68f), order);
+            }
+
             Shape(parent, room.Name + "_CrownMolding", square, new Vector2(room.Center.x, top - 0.06f),
                 new Vector2(room.Size.x - 0.2f, 0.08f), GamePalette.Shade(room.Color, 0.52f), order);
             Shape(parent, room.Name + "_Wainscot", square, new Vector2(room.Center.x, top - 0.62f),
                 new Vector2(room.Size.x - 0.24f, 0.28f), GamePalette.Shade(room.Color, 0.58f), order);
             Shape(parent, room.Name + "_Baseboard", square, new Vector2(room.Center.x, top - 0.78f),
                 new Vector2(room.Size.x - 0.24f, 0.09f), GamePalette.Shade(room.Color, 0.42f), order);
+        }
+
+        private static void DecorateWalls(Transform walls, Room room, int seed)
+        {
+            float top = room.Center.y + room.Size.y * 0.5f;
+            float wallBottom = top - 0.8f;
+            var rng = new System.Random(seed);
+
+            // Zócalo (15% darker than wall face)
+            Shape(walls, "Wall_Zocalo", square, new Vector2(room.Center.x, wallBottom + 0.15f), new Vector2(room.Size.x - 0.2f, 0.30f), GamePalette.Shade(room.Color, 0.56f), OrderWall - 3);
+
+            // Rodapié (wood baseboard line)
+            Deco(walls, "Wall_Rodapie", square, room.Center.x, wallBottom + 0.03f, room.Size.x - 0.2f, 0.06f, "#5C3D28", 1f, OrderWall - 2);
+
+            // Enchufes (2 or 3 white electrical outlets)
+            int outletCount = 2 + (seed % 2);
+            float step = (room.Size.x - 2.5f) / (outletCount + 1);
+            for (int i = 1; i <= outletCount; i++)
+            {
+                float ox = (room.Center.x - (room.Size.x - 2.5f) * 0.5f) + i * step;
+                Deco(walls, "Wall_Outlet", roundedSmall, ox, wallBottom + 0.16f, 0.14f, 0.18f, "#F8F5E8", 1f, OrderWall - 1);
+                Deco(walls, "Wall_OutletPin1", square, ox - 0.025f, wallBottom + 0.16f, 0.02f, 0.06f, "#2A3345", 1f, OrderWall);
+                Deco(walls, "Wall_OutletPin2", square, ox + 0.025f, wallBottom + 0.16f, 0.02f, 0.06f, "#2A3345", 1f, OrderWall);
+            }
+
+            // Cuadros (1 to 3 landscape paintings)
+            int pictureCount = 1 + (rng.Next(3));
+            if (room.Name == SceneNames.Carcel) pictureCount = 0;
+            float picStep = (room.Size.x - 3.0f) / (pictureCount + 1);
+            for (int p = 1; p <= pictureCount; p++)
+            {
+                float px = (room.Center.x - (room.Size.x - 3.0f) * 0.5f) + p * picStep;
+                float py = wallBottom + 0.48f;
+                Deco(walls, "Picture_Frame", roundedSmall, px, py, 0.76f, 0.52f, "#4A2E18", 1f, OrderWall - 1);
+                Deco(walls, "Picture_Canvas", square, px, py, 0.66f, 0.42f, "#F4EBD9", 1f, OrderWall);
+                Deco(walls, "Picture_Sky", square, px, py + 0.10f, 0.62f, 0.14f, "#7CB5D8", 1f, OrderWall + 1);
+                Deco(walls, "Picture_Mount", square, px, py - 0.01f, 0.62f, 0.12f, "#4A7C59", 1f, OrderWall + 1);
+                Deco(walls, "Picture_Meadow", square, px, py - 0.11f, 0.62f, 0.10f, "#78B159", 1f, OrderWall + 1);
+            }
+
+            // Reloj en Banco, Soda, Hospital, Cooperativa
+            if (room.Name == SceneNames.Banco || room.Name == SceneNames.Soda || room.Name == SceneNames.Hospital || room.Name == SceneNames.Cooperativa)
+            {
+                float clockX = room.Center.x + room.Size.x * 0.28f;
+                float clockY = wallBottom + 0.52f;
+                Deco(walls, "Clock_Rim", circle, clockX, clockY, 0.44f, 0.44f, "#2C3E50", 1f, OrderWall - 1);
+                Deco(walls, "Clock_Face", circle, clockX, clockY, 0.38f, 0.38f, "#FFFFFF", 1f, OrderWall);
+                Deco(walls, "Clock_HandH", square, clockX + 0.04f, clockY, 0.09f, 0.03f, "#1A252F", 1f, OrderWall + 1);
+                Deco(walls, "Clock_HandM", square, clockX, clockY + 0.06f, 0.025f, 0.12f, "#E74C3C", 1f, OrderWall + 1);
+            }
+
+            // Calendario en Casa y Vecino
+            if (room.Name == SceneNames.Casa || room.Name == SceneNames.Vecino)
+            {
+                float calX = room.Center.x - room.Size.x * 0.28f;
+                float calY = wallBottom + 0.46f;
+                Deco(walls, "Calendar_Back", roundedSmall, calX, calY, 0.38f, 0.46f, "#FFFFFF", 1f, OrderWall - 1);
+                Deco(walls, "Calendar_Header", square, calX, calY + 0.15f, 0.34f, 0.10f, "#E74C3C", 1f, OrderWall);
+                Deco(walls, "Calendar_Grid", square, calX, calY - 0.05f, 0.30f, 0.20f, "#BDC3C7", 0.6f, OrderWall);
+            }
+
+            // Grietas y manchas solo en Cárcel
+            if (room.Name == SceneNames.Carcel)
+            {
+                float cx = room.Center.x - 1.5f;
+                float cy = wallBottom + 0.40f;
+                Deco(walls, "JailCrack_1", square, cx, cy, 0.03f, 0.55f, "#2A2F35", 0.45f, OrderWall - 1);
+                Deco(walls, "JailCrack_2", square, cx + 0.1f, cy - 0.1f, 0.22f, 0.03f, "#2A2F35", 0.45f, OrderWall - 1);
+                Deco(walls, "JailStain", circle, cx + 3.0f, cy - 0.15f, 0.8f, 0.45f, "#3E3B32", 0.25f, OrderWall - 2);
+            }
         }
 
         // ---------------------------------------------------------------- room structure

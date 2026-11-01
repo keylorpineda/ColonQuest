@@ -1520,6 +1520,15 @@ namespace ColonQuest.EditorTools
 
             if (!tinted)
             {
+                Shape(root, "Seat", roundedSmall, new Vector2(0.10f, 0.28f), new Vector2(0.34f, 0.32f), GamePalette.Hex("#2A3345"), 4);
+                if (driving)
+                {
+                    string[] skins = { "#F2B84B", "#FF8FB1", "#4DA3FF", "#55E08F", "#B28DFF" };
+                    var skin = GamePalette.Hex(skins[Mathf.Abs(Mathf.RoundToInt(x * 7f + y * 3f)) % skins.Length]);
+                    Shape(root, "DriverBody", roundedSmall, new Vector2(0.08f, 0.22f), new Vector2(0.26f, 0.24f), GamePalette.Hex("#35405A"), 5);
+                    Shape(root, "DriverHead", circle, new Vector2(0.12f, 0.36f), Vector2.one * 0.20f, skin, 5);
+                }
+
                 var shine = new Color(1f, 1f, 1f, 0.55f);
                 Tilt(Shape(root, "WinShineA", roundedSmall, new Vector2(0.08f, 0.32f), new Vector2(0.10f, 0.24f), shine, 6), -20f);
                 Tilt(Shape(root, "WinShineB", roundedSmall, new Vector2(0.58f, 0.32f), new Vector2(0.09f, 0.26f), shine, 6), -20f);

@@ -167,5 +167,52 @@ namespace ColonQuest.EditorTools
             light.falloffIntensity = 0.65f;
             go.AddComponent<NightLight>().Configure(intensity, 0.05f, seed);
         }
+
+        /// <summary>
+        /// Interior 2D ambient and point lighting: exactly one global ambient light (0.85 intensity, #FFF4E0)
+        /// plus soft point lights for ceiling fixtures and windows (max 4 lights).
+        /// </summary>
+        private static void BuildInteriorLights(Transform parent, Room room)
+        {
+            if (!litScene)
+            {
+                return;
+            }
+
+            // 1. One global interior ambient light (constant 0.85, #FFF4E0, no DayLight script)
+            var globalGo = new GameObject("InteriorGlobalLight");
+            globalGo.transform.SetParent(parent, false);
+            var globalLight = globalGo.AddComponent<Light2D>();
+            globalLight.lightType = Light2D.LightType.Global;
+            globalLight.shadowsEnabled = false;
+            globalLight.color = GamePalette.Hex("#FFF4E0");
+            globalLight.intensity = 0.85f;
+
+            // 2. Ceiling lamp warm point light
+            var lampGo = new GameObject("CeilingLampLight");
+            lampGo.transform.SetParent(parent, false);
+            lampGo.transform.localPosition = new Vector2(room.Center.x, room.Center.y + room.Size.y * 0.15f);
+            var lampLight = lampGo.AddComponent<Light2D>();
+            lampLight.lightType = Light2D.LightType.Point;
+            lampLight.shadowsEnabled = false;
+            lampLight.color = GamePalette.Hex("#FFE2B0");
+            lampLight.intensity = 0.50f;
+            lampLight.pointLightOuterRadius = 4.5f;
+            lampLight.pointLightInnerRadius = 0.8f;
+            lampLight.falloffIntensity = 0.65f;
+
+            // 3. Window ambient cool point light
+            var winGo = new GameObject("WindowLight");
+            winGo.transform.SetParent(parent, false);
+            winGo.transform.localPosition = new Vector2(room.Center.x - room.Size.x * 0.35f, room.Center.y + room.Size.y * 0.30f);
+            var winLight = winGo.AddComponent<Light2D>();
+            winLight.lightType = Light2D.LightType.Point;
+            winLight.shadowsEnabled = false;
+            winLight.color = GamePalette.Hex("#DDEBFF");
+            winLight.intensity = 0.35f;
+            winLight.pointLightOuterRadius = 3.5f;
+            winLight.pointLightInnerRadius = 0.5f;
+            winLight.falloffIntensity = 0.65f;
+        }
     }
 }
