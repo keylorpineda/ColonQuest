@@ -318,6 +318,46 @@ namespace ColonQuest.Api.Tests
         }
 
         [Test]
+        public void Event_InEnglishTheServersSpanishFallbackBecomesATranslatedLocalOne()
+        {
+            ApiService.Language = () => "en";
+            try
+            {
+                service.RestoreSession(SessionId);
+                var reply = FakeTransport.Ok(EventJson);
+                reply.Headers["x-event-source"] = "fallback";
+                transport.Replies.Enqueue(reply);
+                ApiResult<GameEvent> result = null;
+
+                Run(service.RequestEvent(new PlayerState { Month = 1, SalaryNet = 1L }, r => result = r));
+
+                Assert.AreEqual(ResultSource.Fallback, result.Source);
+                Assert.AreEqual("fallback", result.Origin);
+                Assert.AreNotEqual("evt_remote", result.Value.EventId);
+            }
+            finally
+            {
+                ApiService.Language = () => "es";
+            }
+        }
+
+        [Test]
+        public void ClassMode_ThePanelIsAskedForInTheLanguageOfTheGame()
+        {
+            ApiService.Language = () => "en";
+            try
+            {
+                transport.Replies.Enqueue(FakeTransport.Ok("{\"code\":\"AB12\"}"));
+                Run(service.RequestClassDashboard("AB12", _ => { }));
+                Assert.AreEqual("http://test/api/classes/AB12/dashboard?language=en", transport.Requests[0].Url);
+            }
+            finally
+            {
+                ApiService.Language = () => "es";
+            }
+        }
+
+        [Test]
         public void Trace_ReadsWhatTheModelsDidAndNeedsASession()
         {
             ApiResult<SessionTraceDto> result = null;
