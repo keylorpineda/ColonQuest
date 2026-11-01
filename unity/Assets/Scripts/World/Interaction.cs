@@ -34,7 +34,9 @@ namespace ColonQuest.World
             HoldProp,
             ReleaseProp,
             WaitUntil,
-            Apply
+            Apply,
+            Zoom,
+            Burst
         }
 
         private struct Step
@@ -194,6 +196,18 @@ namespace ColonQuest.World
         public Interaction Wait(float seconds)
         {
             return Add(new Step { Kind = Kind.Wait, Seconds = seconds });
+        }
+
+        /// <summary>The camera eases to this share of its normal view: below 1 is closer. The view comes back when the scene ends. It does not wait.</summary>
+        public Interaction Zoom(float share, float seconds)
+        {
+            return Add(new Step { Kind = Kind.Zoom, Point = new Vector2(share, 0f), Seconds = seconds });
+        }
+
+        /// <summary>Small things that burst out of a point and fade: "confetti", or any prop such as "coin". It does not wait.</summary>
+        public Interaction Burst(string kind, Vector2 at, int pieces)
+        {
+            return Add(new Step { Kind = Kind.Burst, Name = kind, Point = at, Seconds = pieces });
         }
 
         /// <summary>Makes another person (found by the name of its object) take a pose for some seconds. It does not wait.</summary>
@@ -362,6 +376,8 @@ namespace ColonQuest.World
                 bool through = false;
                 Vector2 entry = Vector2.zero;
                 GameObject held = null;
+                Coroutine zoom = null;
+                float viewSize = Camera.main != null ? Camera.main.orthographicSize : 0f;
 
                 try
                 {
@@ -494,6 +510,23 @@ namespace ColonQuest.World
                             case Kind.Apply:
                                 step.Action?.Invoke();
                                 break;
+
+                            case Kind.Zoom:
+                                if (zoom != null)
+                                {
+                                    StopCoroutine(zoom);
+                                }
+
+                                zoom = StartCoroutine(Zoom(viewSize * step.Point.x, skip ? 0f : step.Seconds));
+                                break;
+
+                            case Kind.Burst:
+                                if (!skip)
+                                {
+                                    InteractionProps.Burst(step.Name, step.Point, Mathf.RoundToInt(step.Seconds));
+                                }
+
+                                break;
                         }
                     }
 
@@ -535,6 +568,16 @@ namespace ColonQuest.World
                     if (held != null)
                     {
                         Destroy(held);
+                    }
+
+                    if (zoom != null)
+                    {
+                        StopCoroutine(zoom);
+                    }
+
+                    if (Camera.main != null && viewSize > 0f)
+                    {
+                        Camera.main.orthographicSize = viewSize;
                     }
 
                     InteractionProps.ClearOverlay();
@@ -654,6 +697,24 @@ namespace ColonQuest.World
                 }
 
                 InteractionProps.SetOverlay(color);
+            }
+
+            private IEnumerator Zoom(float size, float seconds)
+            {
+                var camera = Camera.main;
+                if (camera == null)
+                {
+                    yield break;
+                }
+
+                float start = camera.orthographicSize;
+                for (float t = 0f; t < seconds && !skip; t += Time.deltaTime)
+                {
+                    camera.orthographicSize = Mathf.Lerp(start, size, Mathf.SmoothStep(0f, 1f, t / seconds));
+                    yield return null;
+                }
+
+                camera.orthographicSize = size;
             }
 
             private static void SetActorPose(string person, PersonPose pose, float seconds)
