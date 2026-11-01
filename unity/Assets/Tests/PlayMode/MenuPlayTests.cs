@@ -178,6 +178,34 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Credits_RollByThemselvesAndStartOverWhenOpenedAgain()
+        {
+            yield return null;
+            ButtonAt("Button_Créditos").onClick.Invoke();
+            yield return null;
+            var content = (RectTransform)Menu.Find("Credits/Roll/Content");
+            Assert.Greater(content.childCount, 20, "the roll has its sections");
+            Assert.Greater(content.sizeDelta.y, 1080f, "there is more than one screen to roll");
+            Assert.AreEqual(0f, content.anchoredPosition.y);
+
+            float waited = 0f;
+            while (content.anchoredPosition.y <= 0f && waited < 6f)
+            {
+                waited += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            Assert.Greater(content.anchoredPosition.y, 0f, "it moves without touching anything");
+
+            ButtonAt("Credits/Card/Body/Button_Volver").onClick.Invoke();
+            yield return null;
+            ButtonAt("Button_Créditos").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(0f, content.anchoredPosition.y, 0.01f);
+            ButtonAt("Credits/Card/Body/Button_Volver").onClick.Invoke();
+        }
+
+        [UnityTest]
         public IEnumerator Credits_OpenAndCloseAndNameTheTeam()
         {
             yield return null;
