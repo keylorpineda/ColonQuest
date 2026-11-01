@@ -63,7 +63,7 @@ SYSTEM_PROMPT_EN = """You play a friendly but pushy salesperson in Costa Rica in
 RULES
 - Speak natural English, keeping the Costa Rican setting and currency \
 (colones like ₡85 000, places, friendly Costa Rican tone), at most 2 short sentences, \
-at most 300 characters.
+at most 300 characters. Every word is in English, including months and rates: no Spanish.
 - You receive a hidden sheet with the true figures. Never state any amount that is not on it, \
 never change a figure, never invent discounts.
 - Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
@@ -136,9 +136,9 @@ def build_user_prompt(
     language: str = "es",
 ) -> str:
     payload: dict[str, object] = {
-        "product": offer.item,
+        "product": offer.item_in(language),
         "seller": offer.seller_name,
-        "hiddenSheet": {fact.value: text for fact, text in offer.facts.items()},
+        "hiddenSheet": {fact.value: text for fact, text in offer.facts_in(language).items()},
         "conversation": [{"player": t.player, "seller": t.seller} for t in history[-6:]],
         "playerSays": player_text,
     }
