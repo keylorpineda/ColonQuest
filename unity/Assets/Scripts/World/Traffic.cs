@@ -28,6 +28,12 @@ namespace ColonQuest.World
         /// <summary>How fast the speed changes, in units per second per second.</summary>
         public const float Acceleration = 3.5f;
 
+        /// <summary>How much a wheel turns when the car rolls a distance forward: clockwise on a car drawn nose to the right.</summary>
+        public static float WheelTurnDegrees(float forward, float radius)
+        {
+            return radius > 0f ? -forward / radius * Mathf.Rad2Deg : 0f;
+        }
+
         /// <summary>The stop line for a car going this way through a crosswalk that covers these x.</summary>
         public static float StopLine(float zoneMinX, float zoneMaxX, int direction)
         {

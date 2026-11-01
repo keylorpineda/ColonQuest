@@ -407,6 +407,7 @@ namespace ColonQuest.World.PlayModeTests
             foreach (var car in driving)
             {
                 Assert.IsNotNull(car.Find("DriverHead"), "somebody is driving");
+                Assert.AreEqual(2, car.GetComponentsInChildren<WheelSpin>().Length, "both wheels roll");
             }
 
             foreach (var car in parked)

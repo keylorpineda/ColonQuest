@@ -10,6 +10,18 @@ namespace ColonQuest.World.Tests
         private const float ZoneMax = 4.8f;
 
         [Test]
+        public void Wheel_RollsOneTurnPerCircumference()
+        {
+            float radius = 0.31f;
+            float circumference = 2f * UnityEngine.Mathf.PI * radius;
+
+            Assert.AreEqual(-360f, CarRules.WheelTurnDegrees(circumference, radius), 0.01f, "forward is clockwise");
+            Assert.AreEqual(360f, CarRules.WheelTurnDegrees(-circumference, radius), 0.01f);
+            Assert.AreEqual(0f, CarRules.WheelTurnDegrees(0f, radius));
+            Assert.AreEqual(0f, CarRules.WheelTurnDegrees(1f, 0f), "no radius, no turning");
+        }
+
+        [Test]
         public void StopLine_IsBeforeTheStripesOnEachSide()
         {
             Assert.Less(CarRules.StopLine(ZoneMin, ZoneMax, 1), ZoneMin);
