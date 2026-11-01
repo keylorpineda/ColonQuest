@@ -100,13 +100,13 @@ namespace ColonQuest.World.Tests
         [Test]
         public void Settings_TheLanguageIsKeptInTheTextForm()
         {
-            var settings = new GameSettings { SoundOn = false, Volume = 0.4f, Language = GameLanguage.English };
+            var settings = new GameSettings { SoundOn = false, Volume = 0.4f, Language = GameLanguage.Spanish };
 
             var again = GameSettings.Parse(settings.Serialize());
 
-            Assert.AreEqual(GameLanguage.English, again.Language);
+            Assert.AreEqual(GameLanguage.Spanish, again.Language);
             Assert.IsFalse(again.SoundOn);
-            Assert.AreEqual("0;0.40;en", settings.Serialize());
+            Assert.AreEqual("0;0.40;es", settings.Serialize());
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace ColonQuest.World.Tests
         public void Settings_SpeedFastWithEnglish()
         {
             var settings = new GameSettings { Language = GameLanguage.English, Speed = TimeSpeed.Fast };
-            Assert.AreEqual("1;1.00;en;fast", settings.Serialize());
+            Assert.AreEqual("1;1.00;fast", settings.Serialize());
 
             var parsed = GameSettings.Parse(settings.Serialize());
             Assert.AreEqual(GameLanguage.English, parsed.Language);
