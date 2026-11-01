@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ColonQuest.Api;
 using ColonQuest.Game;
 using ColonQuest.World;
@@ -9,9 +9,9 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The window to haggle with the store seller: the last lines of the conversation, the key
-    /// questions the player has already asked, a text box and the buttons to buy or leave. It is
-    /// rebuilt whenever the conversation changes, so it holds no state of its own.
+    /// The window to haggle with the store seller: the conversation as bubbles, the key questions the player has already
+    /// asked, a text box with the microphone and the buttons to buy or leave. It is rebuilt whenever the conversation
+    /// changes, so it holds no state of its own. What the player says shows at once, before the seller answers.
     /// </summary>
     public sealed class NegotiationPanel
     {
@@ -22,12 +22,17 @@ namespace ColonQuest.UI
 
         private const string MicNotice = "No pude usar el micrófono, escribilo.";
         private const string TypeHint = "Escribe lo que le dices al vendedor...";
+        private const string ListeningHint = "Te escucho. Al callarte se envía solo.";
+        private const string Understanding = "Entendiendo lo que dijiste...";
 
         private readonly GameSession session;
         private readonly GameObject root;
         private readonly IVoiceRecorder recorder;
         private InputField input;
-        private Text talkLabel;
+        private Text hint;
+        private VoiceButton voiceButton;
+        private Text waitLabel;
+        private string waitText;
         private string micNotice;
         private string lastKey = string.Empty;
         private int lastKnownFeesCount;
@@ -84,7 +89,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
+            string key = negotiation.Offer.OfferId + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + session.Transcribing + "|" + session.PendingLine + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
             if (IsOpen && key == lastKey)
             {
                 return;
@@ -114,6 +119,7 @@ namespace ColonQuest.UI
                 Submit();
             }
 
+            ChatView.AnimateWait(waitLabel, waitText);
             TickVoice();
         }
 
@@ -148,10 +154,10 @@ namespace ColonQuest.UI
                 ShowMicProblem();
             }
 
-            UpdateTalkLabel();
+            UpdateVoice();
         }
 
-        /// <summary>Tap to start talking, tap again to send; the recorder also stops by itself at the limit.</summary>
+        /// <summary>Tap to start talking, tap again to send; the recorder also stops by itself when the player goes quiet.</summary>
         private void ToggleTalk()
         {
             if (session.Busy)
@@ -173,27 +179,15 @@ namespace ColonQuest.UI
                     break;
             }
 
-            UpdateTalkLabel();
+            UpdateVoice();
         }
 
-        private void UpdateTalkLabel()
+        private void UpdateVoice()
         {
-            if (talkLabel == null)
+            voiceButton?.Refresh();
+            if (hint != null && Notice == null)
             {
-                return;
-            }
-
-            switch (recorder.State)
-            {
-                case VoiceRecorderState.Starting:
-                    talkLabel.text = Loc.T("Abriendo micro...");
-                    break;
-                case VoiceRecorderState.Recording:
-                    talkLabel.text = Loc.F("Enviar voz  {0}/{1} s", Mathf.FloorToInt(recorder.Seconds), WavEncoder.MaxSeconds);
-                    break;
-                default:
-                    talkLabel.text = Loc.T("Hablar");
-                    break;
+                hint.text = Loc.T(recorder.State == VoiceRecorderState.Recording && recorder.StopsOnSilence ? ListeningHint : TypeHint);
             }
         }
 
@@ -239,16 +233,13 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             float y = -Pad + UiKit.Outline;
 
-            UiKit.Portrait(card, negotiation.Offer.SellerName, 92f, top, new Vector2(textWidth * 0.5f - 46f, y - 4f));
-            UiKit.Label(card, Loc.F("{0}  ·  {1}", Loc.T(negotiation.Venue), negotiation.Offer.SellerName), 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
+            UiKit.Portrait(card, negotiation.Offer.SellerName, 92f, top, new Vector2(-textWidth * 0.5f + 46f, y - 4f));
+            UiKit.Label(card, Loc.F("{0}  ·  {1}", Loc.T(negotiation.Venue), negotiation.Offer.SellerName), 46, UiKit.Ink, new Vector2(textWidth - 110f, 60f), top, new Vector2(55f, y), TextAnchor.MiddleLeft);
             y -= 60f;
-            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth - 110f, 38f), top, new Vector2(-55f, y), TextAnchor.MiddleLeft);
+            UiKit.Label(card, SubtitleFor(negotiation), 24, GameUiColors.Muted, new Vector2(textWidth - 110f, 38f), top, new Vector2(55f, y), TextAnchor.MiddleLeft);
             y -= 50f;
 
-            var log = UiKit.Label(card, ConversationText(negotiation), 30, UiKit.Ink, new Vector2(textWidth, LogHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
-            log.supportRichText = true;
-            log.verticalOverflow = VerticalWrapMode.Truncate;
-            log.fontStyle = FontStyle.Normal;
+            BuildConversation(card, negotiation, textWidth, y);
             y -= LogHeight + 14f;
 
             UiKit.Label(card, "Preguntas clave que ya hiciste", 22, GameUiColors.Muted, new Vector2(textWidth, 30f), top, new Vector2(0f, y), TextAnchor.MiddleLeft);
@@ -264,14 +255,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            if (session.Busy)
-            {
-                UiKit.Label(card, Loc.F("{0} está pensando...", negotiation.Offer.SellerName), 32, GameUiColors.Muted, new Vector2(textWidth, 84f), top, new Vector2(0f, y - 10f), TextAnchor.MiddleCenter);
-            }
-            else
-            {
-                BuildInput(card, textWidth, y);
-            }
+            BuildInput(card, textWidth, y);
 
             y -= 100f;
             float half = (textWidth - 20f) / 2f;
@@ -285,10 +269,44 @@ namespace ColonQuest.UI
             }
 
             root.SetActive(true);
-            if (input != null)
+            if (input != null && !session.Busy)
             {
                 input.ActivateInputField();
             }
+        }
+
+        /// <summary>The bubbles, ending in the line on its way and whoever is working on it.</summary>
+        private void BuildConversation(RectTransform card, Negotiation negotiation, float textWidth, float y)
+        {
+            string seller = negotiation.Offer.SellerName;
+            string player = Loc.T("Tú:").TrimEnd(':');
+            var lines = new List<ChatLine> { new ChatLine(seller, negotiation.Opening, false) };
+            foreach (var turn in negotiation.Turns)
+            {
+                lines.Add(new ChatLine(player, turn.Player, true));
+                lines.Add(new ChatLine(seller, turn.Seller, false));
+            }
+
+            ChatLine? wait = null;
+            if (session.Busy && !negotiation.IsClosed)
+            {
+                if (session.Transcribing)
+                {
+                    wait = new ChatLine(player, Loc.T(Understanding), true);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(session.PendingLine))
+                    {
+                        lines.Add(new ChatLine(player, session.PendingLine, true));
+                    }
+
+                    wait = new ChatLine(seller, Loc.F("{0} está pensando...", seller), false);
+                }
+            }
+
+            waitText = wait.HasValue ? wait.Value.Text : null;
+            waitLabel = ChatView.Build(card, new Vector2(textWidth, LogHeight), new Vector2(0.5f, 1f), new Vector2(0f, y), lines, wait);
         }
 
         /// <summary>The line under the title: what is offered and, at the car agency, the costs that come with the car.</summary>
@@ -321,6 +339,7 @@ namespace ColonQuest.UI
         {
             var top = new Vector2(0.5f, 1f);
             bool voice = recorder.IsSupported;
+            bool free = !session.Busy;
             float sendWidth = 220f;
             float talkWidth = voice ? 300f : 0f;
             float gap = 16f;
@@ -337,7 +356,7 @@ namespace ColonQuest.UI
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.fontStyle = FontStyle.Normal;
             string notice = Notice;
-            var hint = UiKit.Label(body.transform, notice ?? TypeHint, 30, notice != null ? GameUiColors.Loss : new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
+            hint = UiKit.PlainLabel(body.transform, "Hint", Loc.T(notice ?? TypeHint), 30, notice != null ? GameUiColors.Loss : new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero);
             hint.fontStyle = FontStyle.Italic;
 
             input = outline.gameObject.AddComponent<InputField>();
@@ -346,71 +365,24 @@ namespace ColonQuest.UI
             input.placeholder = hint;
             input.characterLimit = 300;
             input.lineType = InputField.LineType.SingleLine;
+            input.interactable = free;
 
             if (voice)
             {
                 var talk = UiKit.MakeButton(card, "Hablar", GameUiColors.Yellow, new Vector2(talkWidth, 84f), top, new Vector2(talkX, y - 10f), ToggleTalk);
-                talkLabel = talk.GetComponentInChildren<Text>();
-                UpdateTalkLabel();
+                talk.interactable = free;
+                voiceButton = new VoiceButton(talk, recorder, talkWidth);
             }
 
-            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y - 10f), Submit);
-        }
-
-        /// <summary>The last lines that fit the window, newest at the bottom of the text.</summary>
-        private string ConversationText(Negotiation negotiation)
-        {
-            string seller = negotiation.Offer.SellerName;
-            var lines = new System.Collections.Generic.List<string> { $"<b>{seller}:</b> {negotiation.Opening}" };
-            foreach (var turn in negotiation.Turns)
-            {
-                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>{Loc.T("Tú:")}</b> {Escape(turn.Player)}</color>");
-                lines.Add($"<b>{seller}:</b> {turn.Seller}");
-            }
-
-            // Keep the newest lines: drop the oldest ones until the text fits the log area.
-            int skip = 0;
-            while (lines.Count - skip > 2 && Estimate(lines, skip) > LogHeight)
-            {
-                skip++;
-            }
-
-            var text = new StringBuilder();
-            for (int i = skip; i < lines.Count; i++)
-            {
-                if (text.Length > 0)
-                {
-                    text.Append("\n\n");
-                }
-
-                text.Append(lines[i]);
-            }
-
-            return text.ToString();
-        }
-
-        /// <summary>A cheap height guess (about 62 characters per line at this size) so no layout pass is needed.</summary>
-        private static float Estimate(System.Collections.Generic.List<string> lines, int skip)
-        {
-            float height = 0f;
-            for (int i = skip; i < lines.Count; i++)
-            {
-                int rows = Mathf.CeilToInt(Mathf.Max(1, lines[i].Length) / 62f);
-                height += rows * 38f + 38f;
-            }
-
-            return height;
-        }
-
-        private static string Escape(string text)
-        {
-            return text.Replace("<", "‹").Replace(">", "›");
+            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y - 10f), Submit).interactable = free;
         }
 
         private void Clear()
         {
             input = null;
-            talkLabel = null;
+            hint = null;
+            voiceButton = null;
+            waitLabel = null;
             for (int i = root.transform.childCount - 1; i >= 0; i--)
             {
                 Object.Destroy(root.transform.GetChild(i).gameObject);

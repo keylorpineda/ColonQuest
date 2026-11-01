@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
@@ -21,13 +20,16 @@ namespace ColonQuest.UI
 
         private const string MicNotice = "No pude usar el micrófono, escribilo.";
         private const string TypeHint = "Escribí lo que le querés decir...";
+        private const string Understanding = "Entendiendo lo que dijiste...";
 
         private readonly GameSession session;
         private readonly GameObject root;
         private readonly IVoiceRecorder recorder;
         private readonly Func<DebtTalk, IList<ModalOption>> actionsFor;
         private InputField input;
-        private Text talkLabel;
+        private VoiceButton voiceButton;
+        private Text waitLabel;
+        private string waitText;
         private string micNotice;
 
         public TalkPanel(Transform canvas, GameSession gameSession, Func<DebtTalk, IList<ModalOption>> actions, IVoiceRecorder voiceRecorder = null)
@@ -82,6 +84,7 @@ namespace ColonQuest.UI
                 Submit();
             }
 
+            ChatView.AnimateWait(waitLabel, waitText);
             TickVoice();
         }
 
@@ -111,7 +114,7 @@ namespace ColonQuest.UI
                 ShowMicProblem();
             }
 
-            UpdateTalkLabel();
+            voiceButton?.Refresh();
         }
 
         private void ToggleTalk()
@@ -135,28 +138,7 @@ namespace ColonQuest.UI
                     break;
             }
 
-            UpdateTalkLabel();
-        }
-
-        private void UpdateTalkLabel()
-        {
-            if (talkLabel == null)
-            {
-                return;
-            }
-
-            switch (recorder.State)
-            {
-                case VoiceRecorderState.Starting:
-                    talkLabel.text = Loc.T("Abriendo micro...");
-                    break;
-                case VoiceRecorderState.Recording:
-                    talkLabel.text = Loc.F("Enviar voz  {0}/{1} s", Mathf.FloorToInt(recorder.Seconds), WavEncoder.MaxSeconds);
-                    break;
-                default:
-                    talkLabel.text = Loc.T("Hablar");
-                    break;
-            }
+            voiceButton?.Refresh();
         }
 
         private void ShowMicProblem()
@@ -186,11 +168,7 @@ namespace ColonQuest.UI
             var title = UiKit.Label(card, talk.Name, 54, UiKit.Ink, new Vector2(TextWidth, 70f), top, new Vector2(0f, -28f), TextAnchor.MiddleCenter);
             title.font = UiKit.TitleFont;
 
-            var log = UiKit.PlainLabel(card, "Log", Conversation(talk), 30, UiKit.Ink, new Vector2(TextWidth, LogHeight), top, new Vector2(0f, -110f), TextAnchor.LowerLeft);
-            log.supportRichText = true;
-            log.horizontalOverflow = HorizontalWrapMode.Wrap;
-            log.verticalOverflow = VerticalWrapMode.Truncate;
-
+            BuildConversation(card, talk);
             BuildInput(card, -500f);
 
             var actions = actionsFor != null ? actionsFor(talk) : new List<ModalOption>();
@@ -203,16 +181,39 @@ namespace ColonQuest.UI
                 UiKit.MakeButton(card, action.Label, action.Color, new Vector2(width, 84f), top, new Vector2(x, -640f), () => action.OnPress?.Invoke());
             }
 
-            if (input != null)
+            if (input != null && !session.Busy)
             {
                 input.ActivateInputField();
             }
+        }
+
+        /// <summary>The bubbles and, while a spoken line is being understood, one more that says so.</summary>
+        private void BuildConversation(RectTransform card, DebtTalk talk)
+        {
+            string name = Loc.T(talk.Name);
+            string player = Loc.T("Tú:").TrimEnd(':');
+            var lines = new List<ChatLine> { new ChatLine(name, Loc.T(talk.Opening), false) };
+            foreach (var turn in talk.Turns)
+            {
+                lines.Add(new ChatLine(player, turn.Player, true));
+                lines.Add(new ChatLine(name, Loc.T(turn.Reply), false));
+            }
+
+            ChatLine? wait = null;
+            if (session.Transcribing)
+            {
+                wait = new ChatLine(player, Loc.T(Understanding), true);
+            }
+
+            waitText = wait.HasValue ? wait.Value.Text : null;
+            waitLabel = ChatView.Build(card, new Vector2(TextWidth, LogHeight), new Vector2(0.5f, 1f), new Vector2(0f, -110f), lines, wait);
         }
 
         private void BuildInput(RectTransform card, float y)
         {
             var top = new Vector2(0.5f, 1f);
             bool voice = recorder.IsSupported;
+            bool free = !session.Busy;
             float sendWidth = 220f;
             float talkWidth = voice ? 300f : 0f;
             float gap = 16f;
@@ -237,52 +238,23 @@ namespace ColonQuest.UI
             input.placeholder = hint;
             input.characterLimit = 300;
             input.lineType = InputField.LineType.SingleLine;
+            input.interactable = free;
 
             if (voice)
             {
                 var talk = UiKit.MakeButton(card, "Hablar", GameUiColors.Yellow, new Vector2(talkWidth, 84f), top, new Vector2(talkX, y), ToggleTalk);
-                talkLabel = talk.GetComponentInChildren<Text>();
-                UpdateTalkLabel();
+                talk.interactable = free;
+                voiceButton = new VoiceButton(talk, recorder, talkWidth);
             }
 
-            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y), Submit);
-        }
-
-        /// <summary>The last turns that fit, newest at the bottom.</summary>
-        private static string Conversation(DebtTalk talk)
-        {
-            string name = Loc.T(talk.Name);
-            var lines = new List<string> { $"<b>{name}:</b> {Loc.T(talk.Opening)}" };
-            foreach (var turn in talk.Turns)
-            {
-                lines.Add($"<color={GameUiColors.Hex(GameUiColors.Muted)}><b>{Loc.T("Tú:")}</b> {Escape(turn.Player)}</color>");
-                lines.Add($"<b>{name}:</b> {Loc.T(turn.Reply)}");
-            }
-
-            int skip = Math.Max(0, lines.Count - 6);
-            var text = new StringBuilder();
-            for (int i = skip; i < lines.Count; i++)
-            {
-                if (text.Length > 0)
-                {
-                    text.Append("\n\n");
-                }
-
-                text.Append(lines[i]);
-            }
-
-            return text.ToString();
-        }
-
-        private static string Escape(string text)
-        {
-            return text.Replace("<", "‹").Replace(">", "›");
+            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y), Submit).interactable = free;
         }
 
         private void Clear()
         {
             input = null;
-            talkLabel = null;
+            voiceButton = null;
+            waitLabel = null;
             for (int i = root.transform.childCount - 1; i >= 0; i--)
             {
                 UnityEngine.Object.Destroy(root.transform.GetChild(i).gameObject);
