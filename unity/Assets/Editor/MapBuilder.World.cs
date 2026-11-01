@@ -116,7 +116,14 @@ namespace ColonQuest.EditorTools
 
             var foam = GamePalette.White;
             foam.a = 0.7f;
-            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(13f, -27.45f), new Vector2(118f, 0.4f), foam, WorldFoam);
+            // The foam laps the sand: a bright line that rushes up and slides back, and a fainter one a beat behind it.
+            Shape(parent, "Shore_Foam", roundedSmall, new Vector2(13f, -27.45f), new Vector2(118f, 0.4f), foam, WorldFoam)
+                .gameObject.AddComponent<ShoreLap>().Configure(0.16f, 6f, 0f, 0.45f);
+            var backFoam = GamePalette.White;
+            backFoam.a = 0.35f;
+            Shape(parent, "Shore_Foam_Back", roundedSmall, new Vector2(13f, -27.75f), new Vector2(116f, 0.22f), backFoam, WorldFoam)
+                .gameObject.AddComponent<ShoreLap>().Configure(0.12f, 6f, 0.35f, 0.7f);
+            BuildSeaSwells(parent);
             for (int i = 0; i < 16; i++)
             {
                 float x = -42f + i * 5.6f + (float)random.NextDouble() * 2f;
@@ -125,6 +132,17 @@ namespace ColonQuest.EditorTools
                 ripple.a = 0.5f;
                 Flickering(Shape(parent, "Wave", ring, new Vector2(x, y), new Vector2(1.8f, 0.55f), ripple, WorldFoam), 0.5f, 0.9f + (float)random.NextDouble(), x);
             }
+
+            // Rings now and then on the open sea, and at the feet of a player who walks along any water. Never over the pier.
+            var ripples = new GameObject("Ripples").transform;
+            ripples.SetParent(parent, false);
+            ripples.gameObject.AddComponent<RippleField>().Configure(
+                ring,
+                Rect.MinMaxRect(-44f, -34f, 76f, -28.6f),
+                Rect.MinMaxRect(MapLayout.PierXMin - 0.8f, -34.5f, MapLayout.PierXMax + 0.8f, -27f),
+                currentLayer,
+                WorldRiverFoam + 1,
+                true);
 
             // Pier.
             var pier = new Vector2(5.6f, -30.35f);
@@ -185,6 +203,19 @@ namespace ColonQuest.EditorTools
                 Flickering(Shape(parent, "River_Ripple", ring, new Vector2(x + (y % 2f - 1f) * 0.5f, y), new Vector2(1.2f, 0.45f), ripple, WorldRiverFoam), 0.5f, 1.1f, y);
             }
 
+            // The current: faint streaks that the river carries south, under the bridges, fading before both ends.
+            var current = new GameObject("River_Current").transform;
+            current.SetParent(parent, false);
+            var streak = GamePalette.White;
+            streak.a = 0.28f;
+            for (int i = 0; i < 18; i++)
+            {
+                float lane = x + ((i * 7) % 5 - 2) * 0.42f;
+                float y = bottom + 0.5f + (top - bottom - 1f) * (i / 18f) + (i % 3) * 0.6f;
+                Shape(current, "River_Streak", roundedSmall, new Vector2(lane, y), new Vector2(0.07f, 0.9f + (i % 4) * 0.25f), streak, WorldRiverFoam)
+                    .gameObject.AddComponent<WaterFlow>().Configure(0.55f + (i % 5) * 0.08f, bottom + 0.4f, top - 0.4f, 2.5f);
+            }
+
             // Two bridges, on the streets: railings and posts on the street edges.
             Bridge(parent, x, MapLayout.BridgeFirstStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeFirstStreet.yMin - MapLayout.RailingHalf);
             Bridge(parent, x, MapLayout.BridgeSouthStreet.yMax + MapLayout.RailingHalf, MapLayout.BridgeSouthStreet.yMin - MapLayout.RailingHalf);
@@ -196,6 +227,28 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Pool", rounded, new Vector2(20.3f, PoolY), new Vector2(5.5f, 2.3f), SeaColor, 6);
             Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(19.4f, PoolY), new Vector2(1.5f, 0.7f), ripple, 7), 0.5f, 1.3f, 3f);
             Flickering(Shape(parent, "Pool_Ripple", ring, new Vector2(21.6f, PoolY - 0.2f), new Vector2(1.1f, 0.55f), ripple, 7), 0.5f, 1.7f, 8f);
+        }
+
+        /// <summary>
+        /// Lines of swell that roll in from the open sea toward the beach and fade before the foam. They pass under the
+        /// pier, which is drawn above them.
+        /// </summary>
+        private static void BuildSeaSwells(Transform parent)
+        {
+            // Its own seed: drawing from the town's random would move every prop placed after the sea.
+            var random = new System.Random(2027);
+            var group = new GameObject("Sea_Swells").transform;
+            group.SetParent(parent, false);
+            var line = GamePalette.White;
+            line.a = 0.32f;
+            for (int i = 0; i < 26; i++)
+            {
+                float x = -42f + i * 4.6f + (float)random.NextDouble() * 2.5f;
+                float y = -34f + (float)random.NextDouble() * 0.8f;
+                float width = 4.5f + (float)random.NextDouble() * 4f;
+                Shape(group, "Swell", roundedSmall, new Vector2(x, y), new Vector2(width, 0.1f), line, WorldFoam)
+                    .gameObject.AddComponent<Swell>().Configure(5.2f, 8f + (float)random.NextDouble() * 4f, (float)random.NextDouble());
+            }
         }
 
         private static void Bridge(Transform parent, float x, float yNorth, float ySouth)
@@ -712,7 +765,7 @@ namespace ColonQuest.EditorTools
             var rig = new GameObject("CoffeeRig").transform;
             rig.SetParent(root, false);
             rig.localPosition = new Vector2(0f, 0.1f);
-            rig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 2.0f, x * 1.1f + y * 0.7f, 0.025f, true, 1.5f, 12f);
+            rig.gameObject.AddComponent<FoliagePhysics>().Configure(3.0f, 2.0f, x * 1.1f + y * 0.7f, 0.01f, true, 1.5f, 10f, true, 0.1f);
 
             var dark = GamePalette.Hex("#1F5E33");
             var mid = GamePalette.Hex("#2E7D46");
@@ -949,7 +1002,8 @@ namespace ColonQuest.EditorTools
             var crownRig = new GameObject("PalmCrownRig").transform;
             crownRig.SetParent(root, false);
             crownRig.localPosition = top;
-            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(5.2f, 1.55f, x * 0.6f + y * 0.9f, 0.025f, true, 2.1f, 8f);
+            // A palm bends along the upper part of its trunk; a lower pivot would open a gap between the crown and the trunk.
+            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(3.4f, 1.55f, x * 0.6f + y * 0.9f, 0.006f, true, 2.1f, 7f, true, 1.0f * scale);
 
             var frondSpr = palmFrondSprite != null ? palmFrondSprite : circle;
             var leaf = GamePalette.Hex("#3FA66A");

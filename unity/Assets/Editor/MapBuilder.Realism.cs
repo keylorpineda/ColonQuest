@@ -63,7 +63,14 @@ namespace ColonQuest.EditorTools
             currentLayer = LayerForeground;
 
             var tint = Shape(parent, "DayTint", square, MapLayout.TownBounds.center, MapLayout.TownBounds.size + Vector2.one * 60f, DayCycle.TintFor(0f), 6);
-            tint.gameObject.AddComponent<DayTint>();
+            var wash = tint.gameObject.AddComponent<DayTint>();
+            if (litScene)
+            {
+                // The sun light colors the day now (see BuildSunLight); the wash stays as a faint haze over it, unlit.
+                KeepUnlit(tint);
+                wash.SetStrength(0.3f);
+                tint.color = DayTint.TintAt(0f, 0.3f);
+            }
 
             currentLayer = previous;
         }

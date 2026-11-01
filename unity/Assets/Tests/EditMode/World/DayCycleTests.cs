@@ -53,5 +53,57 @@ namespace ColonQuest.World.Tests
                 previous = tint;
             }
         }
+    
+
+        [Test]
+        public void LightFor_IsBrightAtNoonDimmerAtNightAndNeverTooDark()
+        {
+            DayCycle.LightFor(0.4f, out Color noon, out float noonIntensity);
+            DayCycle.LightFor(1f, out Color night, out float nightIntensity);
+
+            Assert.Greater(noonIntensity, nightIntensity);
+            Assert.GreaterOrEqual(nightIntensity, DayCycle.MinLightIntensity, "the town always stays readable");
+            Assert.Greater(night.b, night.r, "the night light is blue");
+            Assert.AreEqual(1f, noon.r, 0.0001f);
+        }
+
+        [Test]
+        public void LightFor_SunsetIsWarmAndValuesStayInRange()
+        {
+            DayCycle.LightFor(0.75f, out Color sunset, out _);
+            Assert.Greater(sunset.r, sunset.b + 0.3f, "six o'clock is golden");
+
+            for (float p = -0.5f; p <= 1.5f; p += 0.05f)
+            {
+                DayCycle.LightFor(p, out Color color, out float intensity);
+                Assert.That(intensity, Is.InRange(DayCycle.MinLightIntensity, 1f));
+                Assert.That(color.r, Is.InRange(0f, 1f));
+                Assert.That(color.g, Is.InRange(0f, 1f));
+                Assert.That(color.b, Is.InRange(0f, 1f));
+            }
+        }
+
+        [Test]
+        public void LampIntensity_FadesInAndFlickersAFewPercent()
+        {
+            Assert.AreEqual(0f, DayCycle.LampIntensity(0f, 0.9f, 0.05f, 0.7f), 0.0001f, "off by day");
+            Assert.AreEqual(0.9f, DayCycle.LampIntensity(1f, 0.9f, 0.05f, 0.5f), 0.0001f, "the middle of the noise is the full intensity");
+            Assert.AreEqual(0.45f, DayCycle.LampIntensity(0.5f, 0.9f, 0f, 1f), 0.0001f, "half way on is half as bright");
+            Assert.That(DayCycle.LampIntensity(1f, 1f, 0.05f, 1f), Is.InRange(0.949f, 1.051f));
+            Assert.That(DayCycle.LampIntensity(1f, 1f, 0.05f, 0f), Is.InRange(0.949f, 1.051f));
+        }
+
+        [Test]
+        public void TintAt_ScalesOnlyTheOpacity()
+        {
+            var full = DayCycle.TintFor(1f);
+            var haze = DayTint.TintAt(1f, 0.3f);
+
+            Assert.AreEqual(full.r, haze.r, 0.0001f);
+            Assert.AreEqual(full.g, haze.g, 0.0001f);
+            Assert.AreEqual(full.b, haze.b, 0.0001f);
+            Assert.AreEqual(full.a * 0.3f, haze.a, 0.0001f);
+            Assert.AreEqual(full, DayTint.TintAt(1f, 1f));
+        }
     }
 }

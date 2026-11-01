@@ -567,6 +567,7 @@ namespace ColonQuest.EditorTools
                 var root = Root(lamps, "PorchLight", new Vector2(b.DoorX, b.YBottom + 2.2f), b.YBottom - 0.05f);
                 Part(root, roundedSmall, Vector2.zero, new Vector2(0.3f, 0.2f), "#4A5166", 0);
                 Flickering(Shape(root, "Glow", softCircle, new Vector2(0f, -0.1f), Vector2.one * 1.3f, Hex("#FFD98A", 0.35f), 6), 0.15f, 0.3f, b.DoorX, true);
+                AddNightLight(root, new Vector2(0f, -1.4f), 2.6f, "#FFD98A", 0.8f, b.DoorX);
             }
 
             // A number plate beside the door of every home (placed to the left of the door, never covering the wood panels).
@@ -917,6 +918,7 @@ namespace ColonQuest.EditorTools
                 Shape(boat, "Sail", square, new Vector2(0.25f, 0.65f), new Vector2(0.5f, 0.8f), Hex("#F8F5E8"), 10);
                 currentLayer = previous;
                 bool west = i < 2;
+                boat.gameObject.AddComponent<BoatRock>().Configure(3.5f, 3.4f + i * 0.5f, i * 1.9f);
                 boat.gameObject.AddComponent<Drift>().ConfigureSpan(0.35f + i * 0.1f,
                     west ? MapLayout.TownBounds.xMin + 2f : MapLayout.PierXMax + 3f,
                     west ? MapLayout.PierXMin - 2.5f : MapLayout.PlayEastX);
