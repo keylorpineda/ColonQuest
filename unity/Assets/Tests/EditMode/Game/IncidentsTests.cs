@@ -45,32 +45,6 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void RedLightFine_ChargesTheFineAndALittleMoodButNoJailAndNoLostDays()
-        {
-            var loop = Loop(500_000L);
-            int mood = loop.State.Wellbeing;
-
-            var outcome = loop.FineRedLight();
-
-            Assert.AreEqual(500_000L - MarketAssumptions.RedLightFine, loop.State.Cash);
-            Assert.AreEqual(-MarketAssumptions.RedLightFine, outcome.CashDelta);
-            Assert.AreEqual(0, loop.TasksDone);
-            Assert.AreEqual(mood - MarketAssumptions.RedLightWellbeingLoss, loop.State.Wellbeing);
-        }
-
-        [Test]
-        public void RedLightFine_WithoutCashGoesOnTheCard()
-        {
-            var loop = Loop(2_000L);
-            long card = loop.State.CreditCard.Balance;
-
-            loop.FineRedLight();
-
-            Assert.AreEqual(0L, loop.State.Cash);
-            Assert.AreEqual(card + MarketAssumptions.RedLightFine - 2_000L, loop.State.CreditCard.Balance);
-        }
-
-        [Test]
         public void LostDays_NeverPassTheTasksOfTheMonth()
         {
             var loop = Loop();

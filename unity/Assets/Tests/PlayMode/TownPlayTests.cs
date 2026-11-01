@@ -78,6 +78,29 @@ namespace ColonQuest.World.PlayModeTests
             Assert.Greater(car.position.x + CarRules.HalfLength, line + 1f, "red for pedestrians: the car goes on");
         }
 
+        [UnityTest]
+        public IEnumerator Officers_IgnoreAPlayerWhoCrossesOnRed()
+        {
+            var signal = CrossingSignal.All.First(s => s.name == "Signal_PlazaEast");
+            yield return WaitForLight(signal, true, CrossingClock.Cycle + 1f);
+            yield return WaitForLight(signal, false, CrossingClock.Cycle + 1f);
+
+            var officers = Object.FindObjectsByType<PoliceOfficer>(FindObjectsSortMode.None);
+            Assert.GreaterOrEqual(officers.Length, 1, "there are officers on the street");
+            var before = officers.Select(o => (Vector2)o.transform.position).ToList();
+
+            Teleport(new Vector2((signal.ZoneMinX + signal.ZoneMaxX) * 0.5f, 2f));
+            yield return new WaitForSeconds(2f);
+
+            Assert.IsFalse(signal.WalkLight, "the player is still crossing on red");
+            Assert.AreEqual(OffenseKind.None, Offenses.Current);
+            for (int i = 0; i < officers.Length; i++)
+            {
+                Assert.AreEqual(before[i], (Vector2)officers[i].transform.position, officers[i].name + " stays at his post");
+                Assert.IsFalse(officers[i].HasStopped);
+            }
+        }
+
         private static IEnumerator WaitForLight(CrossingSignal signal, bool walk, float timeout)
         {
             for (float waited = 0f; waited < timeout && signal.WalkLight != walk; waited += Time.deltaTime)

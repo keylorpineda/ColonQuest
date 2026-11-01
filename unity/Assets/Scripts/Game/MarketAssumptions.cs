@@ -257,11 +257,6 @@ namespace ColonQuest.Game
         /// <summary>The fine for entering a house that is not yours, in colones.</summary>
         public const long TrespassFine = 120_000L;
 
-        /// <summary>The fine for crossing the street on a red pedestrian light, in colones. Only an officer who sees it charges it.</summary>
-        public const long RedLightFine = 5_000L;
-
-        public const int RedLightWellbeingLoss = 3;
-
         /// <summary>The swimsuit of the wardrobe, in colones.</summary>
         public const long SwimsuitPrice = 18_000L;
 
