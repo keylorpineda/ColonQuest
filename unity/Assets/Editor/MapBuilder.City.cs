@@ -417,7 +417,8 @@ namespace ColonQuest.EditorTools
             }
 
             var cars = CityGroup(parent, "ParkedCars");
-            string[] carColors = { "#E8505B", "#4DA3FF", "#FFD23F", "#55E08F", "#B28DFF", "#F8F5E8" };
+            // The colors of real cars, a little sun-worn, so they sit with the houses instead of shouting over them.
+            string[] carColors = { "#B8423F", "#3F7FC4", "#C9A23C", "#5C8F6B", "#7F8796", "#E9ECF2" };
             for (int i = 0; i < 40 && cars.childCount < 7; i++)
             {
                 float x = (float)random.NextDouble() * 90f - 45f;

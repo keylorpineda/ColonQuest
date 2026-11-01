@@ -437,12 +437,12 @@ namespace ColonQuest.EditorTools
 
             // Traffic keeps to the right: east along the south lane of each road, west along the north lane.
             // Cars in the same lane share a speed, so none catches up with the one ahead.
-            Car(parent, shadows, -20.2f, 0.95f, "#E8505B", 2.4f);
-            Car(parent, shadows, 12.5f, 0.95f, "#4DA3FF", 2.4f);
+            Taxi(parent, shadows, -20.2f, 0.95f, 2.4f);
+            Car(parent, shadows, 12.5f, 0.95f, "#3F7FC4", 2.4f, false, CarShape.Hatchback);
             // The north lane of the main street belongs to the collectors' car, so no other car shares it.
-            Car(parent, shadows, -6f, -10.95f, "#55E08F", -2.2f);
-            Car(parent, shadows, 8f, -13.05f, "#F1F4FF", 2.6f);
-            Car(parent, shadows, -18f, -13.05f, "#FF8A3D", 2.6f);
+            Car(parent, shadows, -6f, -10.95f, "#5C8F6B", -2.2f, false, CarShape.Pickup);
+            Car(parent, shadows, 8f, -13.05f, "#E9ECF2", 2.6f, false, CarShape.Suv);
+            Car(parent, shadows, -18f, -13.05f, "#D98A3D", 2.6f, false, CarShape.Sedan);
         }
 
         private static void BuildPlazaAndPark(Transform parent, Transform shadows)
