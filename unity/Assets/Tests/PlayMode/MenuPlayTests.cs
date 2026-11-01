@@ -302,6 +302,8 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsTrue(Interaction.Playing, "the opening plays in the house");
             Assert.IsNotNull(GameObject.Find("Mama"), "the mother is there for the opening");
             Vector3 before = GameObject.FindWithTag(Station.PlayerTag).transform.position;
+            yield return new WaitForSeconds(1.2f);
+            float closeUp = Camera.main.orthographicSize;
             Interaction.SkipCurrent();
             for (float waited = 0f; waited < 10f && Interaction.Playing; waited += Time.unscaledDeltaTime)
             {
@@ -309,6 +311,7 @@ namespace ColonQuest.World.PlayModeTests
             }
 
             yield return null;
+            Assert.Greater(Camera.main.orthographicSize, closeUp, "the camera comes back from the close-up even when the scene is skipped");
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "the goodbye does not walk the player out");
             Assert.Less(Vector2.Distance(before, GameObject.FindWithTag(Station.PlayerTag).transform.position), 0.5f,
                 "the player stays standing where the goodbye ended");

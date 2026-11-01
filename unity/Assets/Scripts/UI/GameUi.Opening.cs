@@ -2,6 +2,7 @@ using System.Collections;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ColonQuest.UI
 {
@@ -23,6 +24,13 @@ namespace ColonQuest.UI
 
         private const string Mother = "Mama";
 
+        /// <summary>How close the camera comes during the opening, as a share of its normal view.</summary>
+        private const float OpeningCloseUp = 0.68f;
+
+        /// <summary>How far along the way to the player the mother walks to hand over the present.</summary>
+        private const float OpeningMotherApproach = 0.45f;
+
+        private CinematicBars openingBars;
         private bool openingPending;
         private bool openingPlaying;
 
@@ -81,6 +89,13 @@ namespace ColonQuest.UI
                 }
             }
 
+            // A skipped scene ends here too: nothing of the film stays on the screen.
+            HideOpeningBars();
+            if (mother != null)
+            {
+                mother.transform.position = OpeningMotherAt;
+            }
+
             openingPlaying = false;
             openingCashGiven = true;
             promptCard.SetActive(false);
@@ -92,15 +107,30 @@ namespace ColonQuest.UI
         {
             Vector2 mom = PersonAt(Mother, OpeningMotherAt);
             Vector2 me = OpeningStart;
+            Vector2 close = Vector2.Lerp(mom, me, OpeningMotherApproach);
+            Vector2 aboveMom = mom + new Vector2(0f, 0.75f);
+            Vector2 aboveMe = me + new Vector2(0f, 0.75f);
             string name = PlayerProfile.HasName ? PlayerProfile.Name : PlayerProfile.DefaultName;
             return new Interaction()
-                .Face(mom).Wait(0.6f)
-                .NpcPose(Mother, PersonPose.Wave, 2f).Sound(SoundEffectKind.Chime)
+
+                // Like a film: out of black, the bars close in and the camera comes up to the two of them.
+                .Fade(Color.black, 0f)
+                .Face(mom)
+                .Apply(ShowOpeningBars)
+                .Zoom(OpeningCloseUp, 2.2f)
+                .Fade(Color.clear, 1f)
+                .NpcPose(Mother, PersonPose.Wave, 2f).Sound(SoundEffectKind.Chime).Burst("confetti", aboveMom, 18)
                 .Say("Mamá", Loc.F("¡Feliz cumpleaños, {0}! Ya 18 años, ¿quién lo diría?", name)).Wait(3.2f)
+
+                // She crosses the room to put the present in the player's hands.
+                .NpcWalk(Mother, close, 0.8f).Wait(0.85f)
                 .NpcPose(Mother, PersonPose.Handover, 1.2f).Sound(SoundEffectKind.Swish)
-                .Fly("box", mom, me + new Vector2(0f, 0.2f), 0.9f).Wait(1f)
+                .Fly("box", close, me + new Vector2(0f, 0.2f), 0.7f).Wait(0.75f)
+                .HoldProp("box").Pose(PersonPose.Handover, 0.9f)
 
                 // The money is in the box: it reaches the HUD now, even if the scene is skipped.
+                .ReleaseProp()
+                .Burst("coin", aboveMe, 8)
                 .Apply(() =>
                 {
                     openingCashGiven = true;
@@ -111,15 +141,98 @@ namespace ColonQuest.UI
                 .Pose(PersonPose.Wave, 1.4f)
                 .Say(string.Empty, "Gracias, mami. Qué chiva.").Wait(1.2f)
                 .Say("Mamá", "Ahora te toca manejar tu propia plata. Con cuidado, ¿oyó?").Wait(3.4f)
+
+                // The phone interrupts: both look, and the camera leans in on the player.
                 .Sound(SoundEffectKind.Beep).Wait(0.25f).Sound(SoundEffectKind.Beep)
                 .Pose(PersonPose.Pocket, 0.3f).HoldProp("phone").Pose(PersonPose.Type, 0.9f)
+                .Zoom(OpeningCloseUp * 0.92f, 1f)
                 .Say("Mensaje", "¡Te contrataron! Empezás el lunes a las 7:00 en la soda El Muelle.").Wait(3.4f)
                 .Say("Mensaje", "Antes del primer turno: pasá por tu cuarto y sacá el seguro de salud en el hospital.").Wait(3.4f)
-                .Pose(PersonPose.Pocket, 0.25f).ReleaseProp().Pose(PersonPose.HandsUp, 1.2f).Sound(SoundEffectKind.Chime)
+                .Pose(PersonPose.Pocket, 0.25f).ReleaseProp().Pose(PersonPose.HandsUp, 1.2f).Sound(SoundEffectKind.Chime).Burst("confetti", aboveMe, 22)
                 .Say(string.Empty, "¡Me contrataron, mami!").Wait(1.2f)
                 .NpcPose(Mother, PersonPose.Wave, 3f)
                 .Say("Mamá", "¡Qué orgullo! Ya tenés tu cuartito alquilado en el barrio. Cuidá esa platica.").Wait(3.2f)
+                .NpcWalk(Mother, mom, 0.9f)
+
+                // She steps back, the camera opens and the bars leave: now the player is in charge.
+                .Zoom(1f, 1.4f)
+                .Apply(HideOpeningBars)
                 .Say(string.Empty, "Bueno. A empezar mi vida.").Wait(1.6f);
+        }
+
+        private void ShowOpeningBars()
+        {
+            if (openingBars == null)
+            {
+                openingBars = CinematicBars.Create(canvas.transform);
+            }
+
+            openingBars.Show();
+        }
+
+        private void HideOpeningBars()
+        {
+            if (openingBars != null)
+            {
+                openingBars.Hide();
+            }
+        }
+    }
+
+    /// <summary>The two black bars of a film, behind the rest of the interface, so a line of dialogue is never covered.</summary>
+    public sealed class CinematicBars : MonoBehaviour
+    {
+        private const float Height = 84f;
+        private const float Seconds = 0.7f;
+
+        private RectTransform top;
+        private RectTransform bottom;
+        private float shown;
+        private float goal;
+
+        public static CinematicBars Create(Transform canvas)
+        {
+            var go = new GameObject("CinematicBars", typeof(RectTransform));
+            go.transform.SetParent(canvas, false);
+            go.transform.SetAsFirstSibling();
+            var bars = go.AddComponent<CinematicBars>();
+            bars.top = Bar(go.transform, new Vector2(0.5f, 1f));
+            bars.bottom = Bar(go.transform, new Vector2(0.5f, 0f));
+            bars.Place();
+            return bars;
+        }
+
+        private static RectTransform Bar(Transform parent, Vector2 anchor)
+        {
+            var rect = UiKit.Rect(parent, "Bar", new Vector2(6000f, Height), anchor, Vector2.zero);
+            var image = rect.gameObject.AddComponent<Image>();
+            image.color = Color.black;
+            image.raycastTarget = false;
+            return rect;
+        }
+
+        public void Show()
+        {
+            goal = 1f;
+        }
+
+        public void Hide()
+        {
+            goal = 0f;
+        }
+
+        private void Update()
+        {
+            shown = Mathf.MoveTowards(shown, goal, Time.unscaledDeltaTime / Seconds);
+            Place();
+        }
+
+        /// <summary>From fully off the screen to fully on it, slowing down as they arrive.</summary>
+        private void Place()
+        {
+            float hidden = (1f - Mathf.SmoothStep(0f, 1f, shown)) * Height;
+            top.anchoredPosition = new Vector2(0f, hidden);
+            bottom.anchoredPosition = new Vector2(0f, -hidden);
         }
     }
 }
