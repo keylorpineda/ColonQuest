@@ -1446,120 +1446,9 @@ namespace ColonQuest.EditorTools
             Shape(bushRig, "Bloom", circle, new Vector2(0.24f, 0.16f) * scale, Vector2.one * 0.17f * scale, GamePalette.Hex("#FF5E7E"), 4);
         }
 
-        /// <summary>
-        /// 3/4 Side-Top Perspective Cel-Shaded Car (matching the red hatchback in the concept art):
-        /// sculpted chassis, raised cabin roof, side windows, angled windshield, bumpers, headlights,
-        /// and round rubber tires with silver hubcaps along the bottom edge.
-        /// </summary>
-        private static Transform Car(Transform parent, Transform shadows, float x, float y, string hex, float speed = 0f, bool tinted = false)
-        {
-            var root = Root(parent, "Car", new Vector2(x, y), y - 0.55f);
-            bool driving = speed != 0f;
-            if (driving)
-            {
-                var shadowColor = GamePalette.Outline;
-                shadowColor.a = 0.28f;
-                OnGround(root, "Shadow", softCircle, new Vector2(0.06f, -0.42f), new Vector2(2.85f, 0.95f), shadowColor, TownShadow);
-                root.gameObject.AddComponent<TrafficCar>();
-                var body2d = root.gameObject.AddComponent<Rigidbody2D>();
-                body2d.bodyType = RigidbodyType2D.Kinematic;
-                body2d.useFullKinematicContacts = true;
-                root.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(2.5f, 1.1f);
-                root.gameObject.AddComponent<Drift>().ConfigureLane(speed, MapLayout.PlayWestX - 12f, MapLayout.PlayEastX + 12f);
-                if (speed < 0f)
-                {
-                    root.localScale = new Vector3(-1f, 1f, 1f);
-                }
-            }
-            else
-            {
-                BuildThing(root, "Car", "Ver el carro", Vector2.zero, new Vector2(2.4f, 1.1f),
-                    "Un carro no es solo la cuota: marchamo, RTV, seguro, gasolina y mantenimiento, todos los años.");
-                GroundShadowRect(shadows, new Vector2(x + 0.08f, y - 0.38f), new Vector2(2.85f, 0.95f), 0.34f);
-            }
-
-            var body = GamePalette.Hex(hex);
-            var darkBody = GamePalette.Shade(body, 0.78f);
-            var roofCol = GamePalette.Shade(body, 1.12f);
-
-            // Far-side tires peeking slightly under the chassis
-            foreach (float wx in new[] { -0.78f, 0.78f })
-            {
-                Shape(root, "FarWheel", circle, new Vector2(wx + 0.08f, -0.32f), new Vector2(0.56f, 0.48f), GamePalette.Outline, 0);
-            }
-
-            // Sculpted lower car body (hood, doors, fenders)
-            Shape(root, "LowerBody_Out", rounded, new Vector2(0f, -0.06f), new Vector2(2.78f, 0.86f), GamePalette.Outline, 1);
-            Shape(root, "LowerBody", rounded, new Vector2(0f, -0.06f), new Vector2(2.62f, 0.70f), body, 2);
-            Shape(root, "LowerBody_SkirtShade", roundedSmall, new Vector2(0f, -0.28f), new Vector2(2.50f, 0.22f), darkBody, 2);
-
-            // Raised 3/4 passenger cabin & roof
-            Shape(root, "Cabin_Out", rounded, new Vector2(-0.14f, 0.34f), new Vector2(1.82f, 0.78f), GamePalette.Outline, 2);
-            Shape(root, "Cabin", rounded, new Vector2(-0.14f, 0.34f), new Vector2(1.66f, 0.64f), body, 3);
-            Shape(root, "Roof_Top", rounded, new Vector2(-0.16f, 0.48f), new Vector2(1.44f, 0.34f), roofCol, 3);
-
-            // Side windows + angled front windshield
-            var glass = tinted ? GamePalette.Hex("#161922") : GamePalette.Hex("#78B8DC");
-            Shape(root, "RearSideWindow_Out", roundedSmall, new Vector2(-0.56f, 0.30f), new Vector2(0.58f, 0.40f), GamePalette.Outline, 4);
-            Shape(root, "RearSideWindow", roundedSmall, new Vector2(-0.56f, 0.30f), new Vector2(0.48f, 0.30f), glass, 5);
-
-            Shape(root, "FrontSideWindow_Out", roundedSmall, new Vector2(0.10f, 0.30f), new Vector2(0.62f, 0.40f), GamePalette.Outline, 4);
-            Shape(root, "FrontSideWindow", roundedSmall, new Vector2(0.10f, 0.30f), new Vector2(0.52f, 0.30f), glass, 5);
-
-            Shape(root, "Windshield_Out", roundedSmall, new Vector2(0.58f, 0.30f), new Vector2(0.36f, 0.44f), GamePalette.Outline, 4);
-            Shape(root, "Windshield", roundedSmall, new Vector2(0.58f, 0.30f), new Vector2(0.26f, 0.34f), glass, 5);
-
-            if (!tinted)
-            {
-                Shape(root, "Seat", roundedSmall, new Vector2(0.10f, 0.28f), new Vector2(0.34f, 0.32f), GamePalette.Hex("#2A3345"), 4);
-                if (driving)
-                {
-                    string[] skins = { "#F2B84B", "#FF8FB1", "#4DA3FF", "#55E08F", "#B28DFF" };
-                    var skin = GamePalette.Hex(skins[Mathf.Abs(Mathf.RoundToInt(x * 7f + y * 3f)) % skins.Length]);
-                    Shape(root, "DriverBody", roundedSmall, new Vector2(0.08f, 0.22f), new Vector2(0.26f, 0.24f), GamePalette.Hex("#35405A"), 5);
-                    Shape(root, "DriverHead", circle, new Vector2(0.12f, 0.36f), Vector2.one * 0.20f, skin, 5);
-                }
-
-                var shine = new Color(1f, 1f, 1f, 0.55f);
-                Tilt(Shape(root, "WinShineA", roundedSmall, new Vector2(0.08f, 0.32f), new Vector2(0.10f, 0.24f), shine, 6), -20f);
-                Tilt(Shape(root, "WinShineB", roundedSmall, new Vector2(0.58f, 0.32f), new Vector2(0.09f, 0.26f), shine, 6), -20f);
-            }
-
-            // Side door seams, handle, bumpers, headlights & taillights
-            Shape(root, "DoorSeam", square, new Vector2(-0.22f, -0.06f), new Vector2(0.04f, 0.54f), GamePalette.Outline, 4);
-            Shape(root, "DoorHandle", roundedSmall, new Vector2(-0.08f, 0.06f), new Vector2(0.14f, 0.06f), GamePalette.Outline, 4);
-            Shape(root, "FrontBumper_Out", roundedSmall, new Vector2(1.30f, -0.22f), new Vector2(0.26f, 0.22f), GamePalette.Outline, 4);
-            Shape(root, "FrontBumper", roundedSmall, new Vector2(1.30f, -0.22f), new Vector2(0.18f, 0.14f), GamePalette.Hex("#5A6275"), 5);
-            Shape(root, "RearBumper_Out", roundedSmall, new Vector2(-1.30f, -0.22f), new Vector2(0.24f, 0.22f), GamePalette.Outline, 4);
-            Shape(root, "RearBumper", roundedSmall, new Vector2(-1.30f, -0.22f), new Vector2(0.16f, 0.14f), GamePalette.Hex("#5A6275"), 5);
-
-            Shape(root, "Headlight_Out", circle, new Vector2(1.28f, 0.02f), new Vector2(0.22f, 0.26f), GamePalette.Outline, 4);
-            Shape(root, "Headlight", circle, new Vector2(1.28f, 0.02f), new Vector2(0.14f, 0.18f), GamePalette.Hex("#FFE875"), 5);
-            Shape(root, "Taillight_Out", roundedSmall, new Vector2(-1.28f, 0.04f), new Vector2(0.16f, 0.24f), GamePalette.Outline, 4);
-            Shape(root, "Taillight", roundedSmall, new Vector2(-1.28f, 0.04f), new Vector2(0.10f, 0.18f), GamePalette.Hex("#FF4242"), 5);
-
-            // Round 3/4 front and rear wheels with dark rubber tires and silver hubcaps
-            foreach (float wx in new[] { -0.76f, 0.76f })
-            {
-                Shape(root, "WheelWell", circle, new Vector2(wx, -0.34f), new Vector2(0.68f, 0.60f), GamePalette.Outline, 5);
-                Shape(root, "Tire", circle, new Vector2(wx, -0.36f), new Vector2(0.58f, 0.54f), GamePalette.Hex("#22252E"), 6);
-                Shape(root, "Rim_Out", circle, new Vector2(wx, -0.36f), new Vector2(0.36f, 0.33f), GamePalette.Outline, 7);
-                Shape(root, "Rim", circle, new Vector2(wx, -0.36f), new Vector2(0.28f, 0.25f), GamePalette.Hex("#B8C2D4"), 8);
-                Shape(root, "Hub", circle, new Vector2(wx, -0.36f), Vector2.one * 0.10f, GamePalette.Hex("#5A6275"), 9);
-            }
-
-            if (!driving)
-            {
-                var collider = root.gameObject.AddComponent<BoxCollider2D>();
-                collider.size = new Vector2(2.5f, 1.1f);
-            }
-
-            return root;
-        }
-
         private static void CollectorCarBuild(Transform parent, Transform shadows)
         {
-            var root = Car(parent, shadows, MapLayout.PlayWestX - 12f, 3.2f, "#15161C", 3.4f, true);
+            var root = Car(parent, shadows, MapLayout.PlayWestX - 12f, 3.2f, "#2A2C36", 3.4f, true, CarShape.Suv);
             root.name = "CollectorCar";
             var drift = root.GetComponent<Drift>();
             if (drift != null)
@@ -1567,8 +1456,9 @@ namespace ColonQuest.EditorTools
                 Object.DestroyImmediate(drift);
             }
 
-            Shape(root, "GoldStripe", roundedSmall, new Vector2(0f, -0.04f), new Vector2(2.4f, 0.09f), GamePalette.Hex("#FFD23F"), 5);
-            Shape(root, "Speaker", circle, new Vector2(-0.15f, 0.68f), Vector2.one * 0.26f, GamePalette.Hex("#FFD23F"), 5);
+            Shape(root, "GoldStripe", roundedSmall, new Vector2(0f, -0.04f), new Vector2(2.3f, 0.07f), GamePalette.Hex("#FFD23F"), 5);
+            Shape(root, "Speaker_Out", roundedSmall, new Vector2(-0.3f, 0.88f), new Vector2(0.44f, 0.2f), GamePalette.Outline, 2);
+            Shape(root, "Speaker", roundedSmall, new Vector2(-0.3f, 0.88f), new Vector2(0.36f, 0.13f), GamePalette.Hex("#FFD23F"), 3);
             root.gameObject.AddComponent<CollectorCar>().Configure(3.4f, MapLayout.PlayWestX - 12f, MapLayout.PlayEastX + 12f);
             BuildCollectorMen(parent);
         }
