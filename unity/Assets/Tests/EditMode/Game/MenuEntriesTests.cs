@@ -11,7 +11,7 @@ namespace ColonQuest.Game.Tests
             var entries = MenuEntries.For(RuntimePlatform.WindowsPlayer);
 
             CollectionAssert.AreEqual(
-                new[] { MenuEntry.Story, MenuEntry.Online, MenuEntry.Settings, MenuEntry.Credits, MenuEntry.Quit },
+                new[] { MenuEntry.Story, MenuEntry.Demo, MenuEntry.Settings, MenuEntry.Credits, MenuEntry.Quit },
                 entries);
         }
 
@@ -26,7 +26,7 @@ namespace ColonQuest.Game.Tests
         }
 
         [TestCase(MenuEntry.Story, "Modo historia")]
-        [TestCase(MenuEntry.Online, "Jugar online")]
+        [TestCase(MenuEntry.Demo, "Demo de funciones")]
         [TestCase(MenuEntry.Settings, "Ajustes")]
         [TestCase(MenuEntry.Credits, "Créditos")]
         [TestCase(MenuEntry.Quit, "Salir")]
@@ -36,16 +36,10 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void OnlineNotice_SaysItComesWithTheFullVersion()
-        {
-            StringAssert.Contains("versión completa", MenuEntries.OnlineNotice);
-        }
-
-        [Test]
         public void Credits_NameBothMakersAndEveryToolWithAReason()
         {
             CollectionAssert.AreEqual(new[] { "Keylor", "Jefferson" }, MenuEntries.Makers);
-            Assert.IsNotEmpty(MenuEntries.Tools);
+            Assert.AreEqual(5, MenuEntries.Tools.Length, "the five models the game uses");
             foreach (var tool in MenuEntries.Tools)
             {
                 Assert.AreEqual(2, tool.Length);
