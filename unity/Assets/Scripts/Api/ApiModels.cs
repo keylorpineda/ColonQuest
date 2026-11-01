@@ -67,6 +67,12 @@ namespace ColonQuest.Api
 
         /// <summary>"normal", "downgraded" or "fallback_only"; empty when the backend does not report a budget.</summary>
         public string BudgetMode = string.Empty;
+
+        /// <summary>Today's spend and limit in dollars: the Meta API, and Baseten for the open-weight sellers.</summary>
+        public float MetaSpentUsd;
+        public float MetaBudgetUsd;
+        public float OpenWeightsSpentUsd;
+        public float OpenWeightsBudgetUsd;
     }
 
     /// <summary>Where a value came from: the backend, or the local catalog used when the backend failed.</summary>
@@ -84,6 +90,9 @@ namespace ColonQuest.Api
         public string Error = string.Empty;
         public long StatusCode;
         public ResultSource Source;
+
+        /// <summary>Who wrote it according to the backend ("agent", "model", "cache", "fallback"...); empty when it does not say.</summary>
+        public string Origin = string.Empty;
 
         public static ApiResult<T> Success(T value, ResultSource source = ResultSource.Remote, long statusCode = 200)
         {

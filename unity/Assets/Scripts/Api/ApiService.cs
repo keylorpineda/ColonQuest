@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using ColonQuest.Finance;
 using UnityEngine;
 
@@ -90,6 +91,7 @@ namespace ColonQuest.Api
                 HttpResponseData response = null;
                 yield return transport.Send(Post($"sessions/{SessionId}/event", body, config.EventTimeout), r => response = r);
                 result = Parse<GameEventDto, GameEvent>(response, ApiMapper.FromDto);
+                result.Origin = HeaderOf(response, "X-Event-Source");
             }
             else
             {
@@ -136,7 +138,9 @@ namespace ColonQuest.Api
             string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
             HttpResponseData response = null;
             yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.NegotiationTimeout), r => response = r);
-            done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));
+            var result = Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto);
+            result.Origin = HeaderOf(response, "X-Reply-Source");
+            done(result);
         }
 
         /// <summary>
@@ -231,7 +235,64 @@ namespace ColonQuest.Api
             done(Parse<HealthDto, HealthStatus>(response, ApiMapper.FromDto));
         }
 
+        /// <summary>What the models and agents did in this session. It also answers after the session is closed.</summary>
+        public IEnumerator RequestTrace(Action<ApiResult<SessionTraceDto>> done)
+        {
+            if (!HasSession)
+            {
+                done(ApiResult<SessionTraceDto>.Failure("no session"));
+                yield break;
+            }
+
+            HttpResponseData response = null;
+            var request = new HttpRequestData { Method = "GET", Url = config.Url($"sessions/{SessionId}/trace"), TimeoutSeconds = config.Timeout };
+            yield return transport.Send(request, r => response = r);
+            done(Parse<SessionTraceDto, SessionTraceDto>(response, dto => dto));
+        }
+
+        /// <summary>Opens a class of the Class Mode and answers with its code.</summary>
+        public IEnumerator CreateClass(string name, Action<ApiResult<string>> done)
+        {
+            string body = JsonUtility.ToJson(new CreateClassRequestDto { name = name });
+            HttpResponseData response = null;
+            yield return transport.Send(Post("classes", body, config.Timeout), r => response = r);
+            done(Parse<ClassCreatedDto, string>(response, dto =>
+            {
+                if (string.IsNullOrEmpty(dto.code))
+                {
+                    throw new ApiFormatException("The class has no code.");
+                }
+
+                return dto.code;
+            }));
+        }
+
+        /// <summary>The teacher's panel of a class: figures computed by the backend, explained by a model.</summary>
+        public IEnumerator RequestClassDashboard(string code, Action<ApiResult<ClassDashboardDto>> done)
+        {
+            HttpResponseData response = null;
+            var request = new HttpRequestData { Method = "GET", Url = config.Url($"classes/{code}/dashboard"), TimeoutSeconds = config.Timeout };
+            yield return transport.Send(request, r => response = r);
+
+            // JsonUtility reads a null number as 0, and "nobody yet" is not the same as "nobody".
+            response.Text = Regex.Replace(response.Text ?? string.Empty, "\"(riskyChoicePct|trapDetectionPct|averageFinalDebt)\"\\s*:\\s*null", "\"$1\":" + ClassDashboardDto.NoData);
+            done(Parse<ClassDashboardDto, ClassDashboardDto>(response, dto => dto));
+        }
+
         // ---------------------------------------------------------------- helpers
+
+        private static string HeaderOf(HttpResponseData response, string name)
+        {
+            foreach (var header in response.Headers)
+            {
+                if (string.Equals(header.Key, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return header.Value;
+                }
+            }
+
+            return string.Empty;
+        }
 
         private HttpRequestData Post(string path, string jsonBody, float timeout)
         {

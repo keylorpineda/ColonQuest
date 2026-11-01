@@ -44,6 +44,24 @@ namespace ColonQuest.Api
 
         public static ApiConfig Current { get; private set; } = new ApiConfig();
 
+        /// <summary>
+        /// The same backend for the demo lab, which waits longer: a judge is there to watch the real model answer, and a
+        /// server that was asleep needs most of a minute for its first reply. Nothing here falls back in silence.
+        /// </summary>
+        public ApiConfig ForDemo()
+        {
+            return new ApiConfig
+            {
+                BaseUrl = BaseUrl,
+                Timeout = 70f,
+                EventTimeout = 25f,
+                NegotiationTimeout = 25f,
+                VoiceTimeout = 20f,
+                SummaryTimeout = 50f,
+                ImageTimeout = 45f
+            };
+        }
+
         public static void Use(string baseUrl)
         {
             Current = new ApiConfig { BaseUrl = baseUrl.TrimEnd('/') };
