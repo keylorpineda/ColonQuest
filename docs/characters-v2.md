@@ -37,7 +37,7 @@ Para regenerar las imágenes: `python docs/art/characters-v2/mockup_v2.py out.pn
 | `MapBuilder.Town.cs`, `Interiors.*.cs`, `Crossings.cs`, `Districts.Props.cs` | Donde se crea cada NPC con `new Look { ... }`. Hay unas 40 llamadas a `BuildNpc`/`BuildPedestrian` |
 
 Las escenas **se generan por código**: después de cualquier cambio hay que correr
-`Colon Quest > Build All Scenes` y commitear las escenas regeneradas.
+`ColonQuest > Build All Scenes` y commitear las escenas regeneradas.
 
 ### El modelo actual
 
@@ -371,7 +371,7 @@ Reescribir `BuildHead` y `Eye` con la tabla de la sección 3:
 
 ### Paso 7. Regenerar y revisar
 
-1. Abrir Unity y correr `Colon Quest > Build All Scenes`.
+1. Abrir Unity y correr `ColonQuest > Build All Scenes`.
 2. Correr los tests de EditMode y PlayMode. Hoy pasan 146 y 51; tienen que seguir pasando.
 3. **Mirarlo en pantalla** (esto no lo cubre ningún test):
    - Caminar con el jugador: que los brazos se balanceen sin despegarse y el codo no se vea raro.

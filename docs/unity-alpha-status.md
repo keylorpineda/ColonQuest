@@ -102,7 +102,7 @@ them with a warning. Money for these purchases moves only in `FinanceEngine` (`H
 - EditMode 146 of 146 and PlayMode 51 of 51 pass (28 October, branch `feat/SCRUM-48-voice-on-tip`).
 - Windows build succeeds with 0 errors, 91 MB, and starts without exceptions; with the backend off it
   plays offline on the local events and seller.
-- Scenes rebuild from code with `Colon Quest > Build All Scenes`.
+- Scenes rebuild from code with `ColonQuest > Build All Scenes`.
 
 ## Not verified
 

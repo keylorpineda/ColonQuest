@@ -1,4 +1,4 @@
-# Contributing to Colón Quest
+# Contributing to ColonQuest
 
 Thanks for helping! This guide keeps the repository tidy and every change traceable to a Jira ticket.
 

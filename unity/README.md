@@ -1,4 +1,4 @@
-# Colón Quest — Unity client
+# ColonQuest — Unity client
 
 Unity 2D project (WebGL + desktop). Owner: Jefferson.
 
@@ -178,7 +178,7 @@ pedestrians walk between two points (`Patrol`).
 ## Rebuilding the scenes
 
 The scenes are generated, not hand-edited. After changing any `Assets/Editor/MapBuilder*.cs`
-file run **Colon Quest > Build All Scenes** and commit the changed `.unity` files.
+file run **ColonQuest > Build All Scenes** and commit the changed `.unity` files.
 
 | File | What it builds |
 | --- | --- |

@@ -6,7 +6,7 @@ Claude Code, abierta en la carpeta del repositorio. Las decisiones y sus métric
 
 ---
 
-Trabajás en Colón Quest (lee `CLAUDE.md` y `docs/adr/0004-model-roles.md` antes de empezar). Soy
+Trabajás en ColonQuest (lee `CLAUDE.md` y `docs/adr/0004-model-roles.md` antes de empezar). Soy
 Keylor, dueño del backend. Implementá los cambios de abajo **en el orden dado**, uno por PR
 pequeño hacia `develop`, con varios commits por PR, siguiendo `CONTRIBUTING.md`:
 
@@ -43,7 +43,7 @@ su latencia y su costo en la descripción del PR.
 - **Cómo verificar:** correrlo contra QA, después llamar `GET /api/images/npc_kevin_vendedor` y
   revisar que el encabezado `X-Image-Source` diga `cache`.
 
-## 2. Postal "Tu año en Colón Quest" (sin cifras del modelo)
+## 2. Postal "Tu año en ColonQuest" (sin cifras del modelo)
 
 - Agregar el campo `cardImageKey` a la respuesta de `POST /api/sessions/{id}/summary`. Elige
   `card_year_debt_free`, `card_year_some_debt` o `card_year_heavy_debt` según la deuda final
@@ -122,7 +122,7 @@ El repositorio no tiene nada de Node hoy. Agregar en la raíz:
   - `"webgl:deploy"`: `wrangler pages deploy unity/Builds/webgl --project-name colon-quest`.
 - `.gitignore`: ignorar `node_modules/`.
 - CI: un job `Web / build check` que corra `pnpm install --frozen-lockfile`, sin desplegar.
-- `docs/deployment.md`: cómo compilar el WebGL (menú "Colon Quest > Build > WebGL") y publicarlo con
+- `docs/deployment.md`: cómo compilar el WebGL (menú "ColonQuest > Build > WebGL") y publicarlo con
   `pnpm webgl:deploy`.
 - Agregar el dominio publicado a `ALLOWED_ORIGINS` en Render.
 

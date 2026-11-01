@@ -12,7 +12,7 @@ conversación donde se diseñó. Seguí las fases en orden. Cada fase termina co
 ## 0. Por qué todavía no se ve casi nada (leer antes de tocar código)
 
 Las escenas de Unity (`unity/Assets/Scenes/*.unity`) **no se escriben a mano**: las genera el código de
-`unity/Assets/Editor/MapBuilder*.cs` con el menú **Colon Quest > Build All Scenes**. Los 6 commits que ya
+`unity/Assets/Editor/MapBuilder*.cs` con el menú **ColonQuest > Build All Scenes**. Los 6 commits que ya
 tiene esta rama cambiaron ese código, pero **las escenas nunca se regeneraron**. Por eso:
 
 - El agua nueva (espuma, oleaje, corriente, anillos), el perro animado, las luces 2D y el polvo **no existen**
@@ -85,7 +85,7 @@ Estas reglas existen porque en este proyecto ya se arreglaron muchos bugs causad
 ### Verificación y commits
 
 15. Antes de cada commit, en Unity:
-    1. **Colon Quest > Build All Scenes**, sin errores en la consola.
+    1. **ColonQuest > Build All Scenes**, sin errores en la consola.
     2. **Window > General > Test Runner**: correr EditMode y PlayMode. Todo en verde.
     3. Jugar el pueblo: caminar entre árboles, ir a la playa y al río, entrar a la casa y a 3 locales.
 16. **Commits a nombre de Keylor**, sin líneas `Co-Authored-By` ni menciones a una IA:
@@ -555,7 +555,7 @@ En interiores, hoy los sprites no tienen luz y se ven planos. Para agregar luz:
 
 1. Actualizar `docs/graficos-luces-animacion.md` con lo que se hizo en cada fase.
 2. Build All Scenes, todos los tests en verde y una partida completa de 3 meses sin errores en la consola.
-3. Build WebGL (menú `Colon Quest > Build > WebGL`) y probarla en el navegador:
+3. Build WebGL (menú `ColonQuest > Build > WebGL`) y probarla en el navegador:
    debe cargar y mantener al menos 30 fps al caminar por el pueblo de noche.
 4. Commit final: `chore(unity): regenerate scenes with the visual overhaul [SCRUM-94]`.
 5. Push a `origin feat/SCRUM-94-lighting-water-characters`. No abrir PR a `main`; el PR va a `develop`.

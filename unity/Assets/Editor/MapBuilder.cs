@@ -9,7 +9,7 @@ namespace ColonQuest.EditorTools
 {
     /// <summary>
     /// Builds every scene of the game from code: the town overworld and the Casa, Tienda
-    /// and Banco interiors. Run Colon Quest > Build All Scenes; each scene is rebuilt from
+    /// and Banco interiors. Run ColonQuest > Build All Scenes; each scene is rebuilt from
     /// scratch every time. This file holds the helpers shared by all of them.
     /// </summary>
     public static partial class MapBuilder
@@ -93,7 +93,7 @@ namespace ColonQuest.EditorTools
             return $"Assets/Scenes/{sceneName}.unity";
         }
 
-        [MenuItem("Colon Quest/Build All Scenes")]
+        [MenuItem("ColonQuest/Build All Scenes")]
         public static void BuildAll()
         {
             BuildMenu();

@@ -1,4 +1,4 @@
-# Colón Quest: lista completa de pruebas (2026-10-30)
+# ColonQuest: lista completa de pruebas (2026-10-30)
 
 Build a probar: `C:\Users\USUARIO\ColonQuestBuild\windows_r17\ColonQuest.exe` (develop, commit `b583f2d`).
 Marca cada línea con OK, FALLA (y qué viste) o NO PROBADO. Si algo falla, anota cómo llegaste ahí, para poder repetirlo.

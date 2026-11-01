@@ -36,7 +36,7 @@ namespace ColonQuest.EditorTools
         /// Makes sure the project renders with the 2D Renderer of URP: creates the pipeline asset the first time and sets
         /// it as the default. Another pipeline someone chose on purpose is left alone. Returns true when the town can be lit.
         /// </summary>
-        [MenuItem("Colon Quest/Setup URP 2D Lighting")]
+        [MenuItem("ColonQuest/Setup URP 2D Lighting")]
         public static void SetupUrp2D()
         {
             EnsureUrp2D();

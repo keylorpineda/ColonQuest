@@ -142,7 +142,7 @@ namespace ColonQuest.UI
         private void BuildTitle()
         {
             var topLeft = new Vector2(0f, 1f);
-            var name = UiKit.Label(transform, "Colón Quest", 104, Cream, new Vector2(800f, 130f), topLeft, new Vector2(ColumnX, -70f));
+            var name = UiKit.Label(transform, "ColonQuest", 104, Cream, new Vector2(800f, 130f), topLeft, new Vector2(ColumnX, -70f));
             name.font = UiKit.TitleFont;
             name.horizontalOverflow = HorizontalWrapMode.Overflow;
             Ink(name, 5f);

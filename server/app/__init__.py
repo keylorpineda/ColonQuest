@@ -1,1 +1,1 @@
-"""Colón Quest backend."""
+"""ColonQuest backend."""

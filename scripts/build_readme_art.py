@@ -334,13 +334,13 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negotiate", "by voice"),
         ],
         "rule": ("The AI tells the story.", "The engine keeps the books."),
-        "desc": "Colón Quest, a 2D financial-literacy game for Costa Rican students, from Costa "
+        "desc": "ColonQuest, a 2D financial-literacy game for Costa Rican students, from Costa "
         "Rica to the world. The full content of this card is repeated as text below it.",
         "problem": (
             "THE PROBLEM",
             "Many young Costa Ricans make their first big money decisions alone, and the first "
             "real lesson is usually the debt itself. Nobody teaches you to ask the right question "
-            "while a salesperson is smiling at you. That is the skill Colón Quest trains.",
+            "while a salesperson is smiling at you. That is the skill ColonQuest trains.",
         ),
         "traps": [
             ("card", "Installments", "Just one payment a month, plus hidden insurance."),
@@ -430,7 +430,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negociar", "con la voz"),
         ],
         "rule": ("La IA cuenta la historia.", "El motor lleva las cuentas."),
-        "desc": "Colón Quest, un juego 2D de educación financiera para estudiantes de Costa Rica, "
+        "desc": "ColonQuest, un juego 2D de educación financiera para estudiantes de Costa Rica, "
         "de Costa Rica para el mundo. Todo el contenido de esta tarjeta se repite como texto "
         "debajo de ella.",
         "problem": (
@@ -438,7 +438,7 @@ COPY: dict[str, dict[str, Any]] = {
             "Muchos jóvenes costarricenses toman sus primeras decisiones grandes de plata solos, "
             "y la primera lección real suele ser la deuda misma. Nadie te enseña a hacer la "
             "pregunta correcta mientras un vendedor te sonríe. Esa es la habilidad que entrena "
-            "Colón Quest.",
+            "ColonQuest.",
         ),
         "traps": [
             ("card", "Cuotas", "Solo una cuota al mes, y un seguro escondido."),
@@ -587,7 +587,7 @@ def hero(card: Card, copy: dict[str, Any]) -> None:
     card.add(
         f"{flag(46, 40)}"
         f'<text class="kicker" x="128" y="60">{escape(copy["kicker"])}</text>'
-        f'<text class="title" x="46" y="136">COLÓN QUEST</text>'
+        f'<text class="title" x="46" y="136">COLONQUEST</text>'
         f'<text class="tagline" x="48" y="178">{escape(copy["tagline"])}</text>'
         f'<rect x="46" y="196" width="430" height="30" fill="{INK}"/>'
         f'<text class="event" x="58" y="217">META GLOBAL AI DEVELOPER HACKATHON 2026</text>'
@@ -782,7 +782,7 @@ def build(copy: dict[str, Any]) -> None:
         f'<rect x="2" y="2" width="788" height="{height - 12}" fill="{PAPER}" stroke="{INK}" stroke-width="4"/>'
     )
     document = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {height}" width="{WIDTH}" height="{height}" role="img" aria-labelledby="t d" lang="{copy["lang"]}">
-  <title id="t">Colón Quest</title>
+  <title id="t">ColonQuest</title>
   <desc id="d">{escape(copy["desc"])}</desc>
   <style>{STYLE}{REDUCED}
   </style>

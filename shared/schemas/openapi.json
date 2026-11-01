@@ -1250,8 +1250,8 @@
     }
   },
   "info": {
-    "description": "Backend for the Colón Quest financial-literacy game.",
-    "title": "Colón Quest API",
+    "description": "Backend for the ColonQuest financial-literacy game.",
+    "title": "ColonQuest API",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",

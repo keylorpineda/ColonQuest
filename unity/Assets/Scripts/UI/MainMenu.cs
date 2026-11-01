@@ -274,7 +274,7 @@ namespace ColonQuest.UI
         private void BuildTitle()
         {
             var topLeft = new Vector2(0f, 1f);
-            var title = UiKit.Label(root, "Colón Quest", 104, Cream, new Vector2(800f, 130f), topLeft, new Vector2(ColumnX, -70f));
+            var title = UiKit.Label(root, "ColonQuest", 104, Cream, new Vector2(800f, 130f), topLeft, new Vector2(ColumnX, -70f));
             title.font = UiKit.TitleFont;
             title.name = "Title";
             title.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -375,7 +375,7 @@ namespace ColonQuest.UI
             quitConfirm = UiKit.Overlay(root, "QuitConfirm");
             var card = UiKit.Card(quitConfirm.transform, "Card", UiKit.Paper, new Vector2(820f, 400f), new Vector2(0.5f, 0.5f), Vector2.zero);
             UiKit.Header(card, "Salir del juego", GameUiColors.Loss);
-            UiKit.Label(card, "¿Seguro que querés salir de Colón Quest?", 36, UiKit.Ink, new Vector2(740f, 110f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "¿Seguro que querés salir de ColonQuest?", 36, UiKit.Ink, new Vector2(740f, 110f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), TextAnchor.MiddleCenter);
 
             var bottom = new Vector2(0.5f, 0f);
             UiKit.MakeButton(card, "Cancelar", GameUiColors.Blue, new Vector2(300f, 84f), bottom, new Vector2(-170f, 36f), CloseWindows);

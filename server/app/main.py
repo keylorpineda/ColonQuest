@@ -76,9 +76,9 @@ def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
     app = FastAPI(
-        title="Colón Quest API",
+        title="ColonQuest API",
         version="0.1.0",
-        description="Backend for the Colón Quest financial-literacy game.",
+        description="Backend for the ColonQuest financial-literacy game.",
         lifespan=lifespan,
     )
     app.add_middleware(

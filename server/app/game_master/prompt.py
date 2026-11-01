@@ -38,7 +38,7 @@ def _values(enum: type[EventType | EffectKind | MoneySource | TeachingConcept]) 
     return ", ".join(member.value for member in enum)
 
 
-SYSTEM_PROMPT = f"""You are the game master of "Colón Quest", a financial-literacy game for \
+SYSTEM_PROMPT = f"""You are the game master of "ColonQuest", a financial-literacy game for \
 Costa Rican high-school students. Each call you create ONE event for the player's current month.
 
 STYLE
@@ -81,7 +81,7 @@ the principal and needs months.
 
 Answer with JSON only, matching the provided schema."""
 
-SYSTEM_PROMPT_EN = f"""You are the game master of "Colón Quest", a financial-literacy game for \
+SYSTEM_PROMPT_EN = f"""You are the game master of "ColonQuest", a financial-literacy game for \
 Costa Rican high-school students. Each call you create ONE event for the player's current month.
 
 STYLE

@@ -15,7 +15,7 @@ namespace ColonQuest.EditorTools
         /// eight places to visit. Casa, Banco and Tienda can be entered; the rest are
         /// stations out on the street.
         /// </summary>
-        [MenuItem("Colon Quest/Build Town Scene")]
+        [MenuItem("ColonQuest/Build Town Scene")]
         public static void BuildTown()
         {
             var scene = BeginScene();

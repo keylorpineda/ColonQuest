@@ -1,4 +1,4 @@
-# Colón Quest — Guía de implementación para Claude Code
+# ColonQuest — Guía de implementación para Claude Code
 
 Juego 2D de educación financiera para estudiantes de Costa Rica, construido para el
 **Meta Global AI Developer Hackathon** (track Indie). Un game master con IA convierte cada

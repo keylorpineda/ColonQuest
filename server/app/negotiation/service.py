@@ -38,7 +38,7 @@ ENDPOINT = "negotiation"
 MAX_ATTEMPTS = 2
 
 SYSTEM_PROMPT = """You play a friendly but pushy Costa Rican salesperson in the game \
-"Colón Quest". You earn a commission on installment sales.
+"ColonQuest". You earn a commission on installment sales.
 
 RULES
 - Speak Costa Rican Spanish ("mae", "diay", "tuanis" are fine; nothing vulgar), at most 2 short \
@@ -58,7 +58,7 @@ leave or refuse, otherwise "open".
 Answer with JSON only, matching the provided schema."""
 
 SYSTEM_PROMPT_EN = """You play a friendly but pushy salesperson in Costa Rica in the game \
-"Colón Quest". You earn a commission on installment sales.
+"ColonQuest". You earn a commission on installment sales.
 
 RULES
 - Speak natural English, keeping the Costa Rican setting and currency \
