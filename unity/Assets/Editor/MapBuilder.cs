@@ -64,6 +64,7 @@ namespace ColonQuest.EditorTools
         private static Sprite woodPlankTex;
         private static Sprite facadeBrickTex;
         private static Sprite grassDetailTex;
+        private static Sprite waterCausticTex;
         private static Sprite treeCanopySprite;
         private static Sprite palmFrondSprite;
         private static Sprite beachUmbrellaSprite;
@@ -200,6 +201,7 @@ namespace ColonQuest.EditorTools
             woodPlankTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.WoodPlankTexturePath);
             facadeBrickTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FacadeBrickTexturePath);
             grassDetailTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.GrassDetailTexturePath);
+            waterCausticTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.WaterCausticTexturePath);
             treeCanopySprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.TreeCanopyPath);
             palmFrondSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.PalmFrondPath);
             beachUmbrellaSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.BeachUmbrellaPath);

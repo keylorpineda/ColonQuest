@@ -10,19 +10,31 @@ namespace ColonQuest.World
     /// </summary>
     public sealed class RippleField : MonoBehaviour
     {
-        private const int PoolSize = 10;
-        private const float PlayerRippleEvery = 0.45f;
+        private const int PoolSize = 16;
+        private const int DropPoolSize = 12;
+        private const int DropsPerStep = 3;
+        private const float DropLife = 0.4f;
+        private const float DropHeight = 0.3f;
+        private const float DropSize = 0.08f;
+        private const float MaxRingAlpha = 0.8f;
+        private const float PlayerRippleEvery = 0.3f;
 
         [SerializeField] private Sprite ringSprite;
         [SerializeField] private Rect area;
         [SerializeField] private Rect avoid;
-        [SerializeField] private float every = 1.6f;
+        [SerializeField] private float every = 0.7f;
         [SerializeField] private float life = 2.2f;
         [SerializeField] private string sortingLayer = "Default";
         [SerializeField] private int sortingOrder;
         [SerializeField] private bool followPlayer = true;
+        [SerializeField] private Sprite dropSprite;
 
         private SpriteRenderer[] rings;
+        private SpriteRenderer[] drops;
+        private float[] dropBorn;
+        private Vector2[] dropStart;
+        private float[] dropSide;
+        private int nextDrop;
         private float[] born;
         private float[] growTo;
         private int next;
@@ -43,6 +55,18 @@ namespace ColonQuest.World
             followPlayer = ripplesUnderPlayer;
         }
 
+        /// <summary>Seconds between random rings (each one varies 60 to 140 percent).</summary>
+        public void ConfigureRate(float secondsBetweenRings)
+        {
+            every = Mathf.Max(0.05f, secondsBetweenRings);
+        }
+
+        /// <summary>Sprite for the drops that jump when the player steps in the water. Without it only rings are made.</summary>
+        public void ConfigureDrops(Sprite drop)
+        {
+            dropSprite = drop;
+        }
+
         private void Awake()
         {
             rings = new SpriteRenderer[PoolSize];
@@ -60,6 +84,25 @@ namespace ColonQuest.World
                 renderer.enabled = false;
                 rings[i] = renderer;
                 born[i] = -100f;
+            }
+
+            drops = new SpriteRenderer[DropPoolSize];
+            dropBorn = new float[DropPoolSize];
+            dropStart = new Vector2[DropPoolSize];
+            dropSide = new float[DropPoolSize];
+            for (int i = 0; i < DropPoolSize; i++)
+            {
+                var go = new GameObject("Drop");
+                go.transform.SetParent(transform, false);
+                go.transform.localScale = new Vector3(DropSize, DropSize, 1f);
+                var renderer = go.AddComponent<SpriteRenderer>();
+                renderer.sprite = dropSprite;
+                renderer.sortingLayerName = sortingLayer;
+                renderer.sortingOrder = sortingOrder + 1;
+                renderer.color = new Color(1f, 1f, 1f, 0f);
+                renderer.enabled = false;
+                drops[i] = renderer;
+                dropBorn[i] = -100f;
             }
 
             nextRandom = Time.time + Random.Range(0.2f, every);
@@ -105,7 +148,32 @@ namespace ColonQuest.World
 
                 WaterMath.Ripple(t, 0.2f, growTo[i], out float size, out float alpha);
                 ring.transform.localScale = new Vector3(size, size * 0.42f, 1f);
-                ring.color = new Color(1f, 1f, 1f, alpha * 0.55f);
+                ring.color = new Color(1f, 1f, 1f, alpha * MaxRingAlpha);
+            }
+
+            UpdateDrops(now);
+        }
+
+        private void UpdateDrops(float now)
+        {
+            for (int i = 0; i < DropPoolSize; i++)
+            {
+                var drop = drops[i];
+                if (!drop.enabled)
+                {
+                    continue;
+                }
+
+                float t = (now - dropBorn[i]) / DropLife;
+                if (t >= 1f)
+                {
+                    drop.enabled = false;
+                    continue;
+                }
+
+                Vector2 offset = WaterMath.SplashOffset(t, dropSide[i], DropHeight, 0.18f);
+                drop.transform.position = new Vector3(dropStart[i].x + offset.x, dropStart[i].y + offset.y, transform.position.z);
+                drop.color = new Color(1f, 1f, 1f, 0.8f * WaterMath.SplashAlpha(t));
             }
         }
 
@@ -151,7 +219,29 @@ namespace ColonQuest.World
 
             // The water is on the other side of "away", just past the feet.
             Vector2 feet = (Vector2)position + new Vector2(0f, -0.4f);
-            Spawn(feet - hint.Away * 0.55f, 0.9f);
+            Vector2 splashAt = feet - hint.Away * 0.55f;
+            Spawn(splashAt, 0.9f);
+            if (dropSprite != null)
+            {
+                for (int i = 0; i < DropsPerStep; i++)
+                {
+                    SpawnDrop(splashAt + new Vector2(Random.Range(-0.1f, 0.1f), 0f), i - 1f + Random.Range(-0.3f, 0.3f));
+                }
+            }
+        }
+
+        private void SpawnDrop(Vector2 worldPoint, float side)
+        {
+            int index = nextDrop;
+            nextDrop = (nextDrop + 1) % DropPoolSize;
+            dropStart[index] = worldPoint;
+            dropSide[index] = side;
+            dropBorn[index] = Time.time;
+            var drop = drops[index];
+            drop.sprite = dropSprite;
+            drop.transform.position = new Vector3(worldPoint.x, worldPoint.y, transform.position.z);
+            drop.color = new Color(1f, 1f, 1f, 0.8f);
+            drop.enabled = true;
         }
 
         private void Spawn(Vector2 worldPoint, float size)

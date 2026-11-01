@@ -36,6 +36,7 @@ namespace ColonQuest.EditorTools
         public const string BeachUmbrellaPath = Folder + "/BeachUmbrella.png";
         public const string FacadeBrickTexturePath = Folder + "/FacadeBrickTexture.png";
         public const string GrassDetailTexturePath = Folder + "/GrassDetailTexture.png";
+        public const string WaterCausticTexturePath = Folder + "/WaterCausticTexture.png";
 
         [MenuItem("Colon Quest/Art/Generate Sprites")]
         public static void Generate()
@@ -70,6 +71,7 @@ namespace ColonQuest.EditorTools
             WriteColor(WoodPlankTexturePath, 256, 256, 64, 0, WoodPlankPixel, true);
             WriteColor(FacadeBrickTexturePath, 128, 128, 64, 0, FacadeBrickPixel, true);
             WriteColor(GrassDetailTexturePath, 256, 256, 32, 0, GrassDetailPixel, true);
+            WriteColor(WaterCausticTexturePath, 128, 128, 64, 0, WaterCausticPixel, true);
             WriteColor(TreeCanopyPath, 256, 256, 192, 0, TreeCanopyPixel, false);
             WriteColor(PalmFrondPath, 256, 128, 192, 0, PalmFrondPixel, false);
             WriteColor(BeachUmbrellaPath, 256, 256, 192, 0, BeachUmbrellaPixel, false);
@@ -89,7 +91,7 @@ namespace ColonQuest.EditorTools
                 || !File.Exists(BrickWainscotTexturePath) || !File.Exists(WoodPlankTexturePath)
                 || !File.Exists(TreeCanopyPath) || !File.Exists(PalmFrondPath)
                 || !File.Exists(BeachUmbrellaPath) || !File.Exists(FacadeBrickTexturePath)
-                || !File.Exists(GrassDetailTexturePath))
+                || !File.Exists(GrassDetailTexturePath) || !File.Exists(WaterCausticTexturePath))
             {
                 Generate();
             }
@@ -587,6 +589,20 @@ namespace ColonQuest.EditorTools
         {
             float g = 0.97f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.04f;
             return new Color(g, g, g, 1f);
+        }
+
+        /// <summary>
+        /// Seamless caustic light for the water (128x128): white wavy lines with low alpha, transparent elsewhere. Every
+        /// term repeats a whole number of times across the tile, so the edges meet.
+        /// </summary>
+        private static Color WaterCausticPixel(float x, float y)
+        {
+            float u = x / 128f * Mathf.PI * 2f;
+            float v = y / 128f * Mathf.PI * 2f;
+            float w1 = Mathf.Sin(2f * u + 1.3f * Mathf.Sin(2f * v));
+            float w2 = Mathf.Sin(2f * v + 1.3f * Mathf.Sin(3f * u + 1f));
+            float ridge = Mathf.Clamp01(1f - Mathf.Abs((w1 + w2) * 0.5f) * 6f);
+            return new Color(1f, 1f, 1f, ridge * ridge * 0.35f);
         }
 
         /// <summary>Seamless lush grass texture (256x256) with hand-inked grass blade tufts and sunny clover patches.</summary>
