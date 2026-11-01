@@ -24,8 +24,11 @@ namespace ColonQuest.Api
 
         public const float DefaultTimeoutSeconds = 10f;
 
-        /// <summary>A spoken turn uploads the clip and waits for transcription plus the seller's answer.</summary>
-        public const float VoiceTimeoutSeconds = 20f;
+        /// <summary>A clip goes up and only its words come back; the backend gives up on the transcription at 8 s.</summary>
+        public const float VoiceTimeoutSeconds = 12f;
+
+        /// <summary>Longer than the 10 s the backend gives its seller, so a slow turn gets the backend's own scripted answer.</summary>
+        public const float NegotiationTimeoutSeconds = 13f;
 
 #if UNITY_EDITOR
         public string BaseUrl = LocalUrl;
@@ -37,6 +40,7 @@ namespace ColonQuest.Api
         public float EventTimeout = EventTimeoutSeconds;
         public float Timeout = DefaultTimeoutSeconds;
         public float VoiceTimeout = VoiceTimeoutSeconds;
+        public float NegotiationTimeout = NegotiationTimeoutSeconds;
 
         public static ApiConfig Current { get; private set; } = new ApiConfig();
 

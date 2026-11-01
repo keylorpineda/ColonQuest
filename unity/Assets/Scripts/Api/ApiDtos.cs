@@ -138,6 +138,12 @@ namespace ColonQuest.Api
     }
 
     [Serializable]
+    public sealed class TranscriptDto
+    {
+        public string transcript = string.Empty;
+    }
+
+    [Serializable]
     public sealed class SessionSummaryDto
     {
         public int monthsPlayed;

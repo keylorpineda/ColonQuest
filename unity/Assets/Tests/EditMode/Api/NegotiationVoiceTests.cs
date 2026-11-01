@@ -95,10 +95,10 @@ namespace ColonQuest.Api.Tests
             Run(service.CreateSession(null, _ => { }));
         }
 
-        private ApiResult<NegotiationReply> Send(byte[] wav)
+        private ApiResult<string> Send(byte[] wav)
         {
-            ApiResult<NegotiationReply> result = null;
-            Run(service.SendNegotiationVoice("celular_basico", wav, r => result = r));
+            ApiResult<string> result = null;
+            Run(service.Transcribe(wav, r => result = r));
             return result;
         }
 
@@ -106,20 +106,18 @@ namespace ColonQuest.Api.Tests
         public void Voice_PostsAMultipartClipToTheSession()
         {
             StartSession();
-            transport.Replies.Enqueue(FakeTransport.Ok(
-                "{\"transcript\":\"Cuanto pago en total?\",\"npcReply\":\"Mae, son 31 500.\",\"revealedFacts\":[\"total_cost\"],\"keyQuestionsAsked\":[\"total_cost\"],\"dealStatus\":\"open\"}"));
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"transcript\":\"Cuanto pago en total?\"}"));
 
             var result = Send(Wav);
 
             Assert.IsTrue(result.Ok, result.Error);
-            Assert.AreEqual("Cuanto pago en total?", result.Value.Transcript);
+            Assert.AreEqual("Cuanto pago en total?", result.Value);
             var request = transport.Requests[1];
             Assert.AreEqual("POST", request.Method);
-            Assert.AreEqual("http://test/api/sessions/" + SessionId + "/negotiation/voice", request.Url);
+            Assert.AreEqual("http://test/api/sessions/" + SessionId + "/transcribe", request.Url);
             StringAssert.StartsWith("multipart/form-data; boundary=", request.ContentType);
             Assert.IsNull(request.JsonBody);
             string body = Encoding.UTF8.GetString(request.RawBody);
-            StringAssert.Contains("name=\"offerId\"\r\n\r\ncelular_basico\r\n", body);
             StringAssert.Contains("name=\"audio\"; filename=\"voice.wav\"", body);
             Assert.AreEqual(ApiConfig.VoiceTimeoutSeconds, request.TimeoutSeconds);
         }
@@ -151,8 +149,7 @@ namespace ColonQuest.Api.Tests
         public void Voice_EmptyTranscriptIsAFailure()
         {
             StartSession();
-            transport.Replies.Enqueue(FakeTransport.Ok(
-                "{\"transcript\":\"\",\"npcReply\":\"Diay?\",\"revealedFacts\":[],\"keyQuestionsAsked\":[],\"dealStatus\":\"open\"}"));
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"transcript\":\"\"}"));
 
             Assert.IsFalse(Send(Wav).Ok);
         }

@@ -47,6 +47,12 @@ namespace ColonQuest.Game
         /// <summary>Set when the last spoken turn failed; cleared by the next turn.</summary>
         public string VoiceNotice { get; private set; }
 
+        /// <summary>True while a spoken line is being turned into words.</summary>
+        public bool Transcribing { get; private set; }
+
+        /// <summary>What the player just said while the seller answers it; shown at once. Null when nothing is on its way.</summary>
+        public string PendingLine { get; private set; }
+
         /// <summary>What the last deal cost and how well the player asked; shown with the result.</summary>
         public DealReport LastDeal { get; private set; }
 
@@ -235,6 +241,8 @@ namespace ColonQuest.Game
             CurrentEvent = null;
             CurrentNegotiation = null;
             VoiceNotice = null;
+            Transcribing = false;
+            PendingLine = null;
             LastDeal = null;
             CurrentCar = null;
             CurrentFurniture = null;
@@ -415,10 +423,12 @@ namespace ColonQuest.Game
 
             Busy = true;
             VoiceNotice = null;
+            PendingLine = text;
             Changed?.Invoke();
             ApiClient.Instance.SendNegotiationText(negotiation.Offer.OfferId, text, result =>
             {
                 Busy = false;
+                PendingLine = null;
                 if (CurrentNegotiation == negotiation)
                 {
                     bool local = !result.Ok;
@@ -432,8 +442,9 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// One turn spoken by the player. Only the backend can transcribe, so when it is missing or the
-        /// voice fails nothing is recorded: <see cref="VoiceNotice"/> asks the player to type instead.
+        /// One turn spoken by the player, in two steps so the player sees their words as soon as they are understood: the
+        /// clip becomes text and then goes out like a typed line. Only the backend can transcribe, so when it is missing or
+        /// the voice fails nothing is recorded: <see cref="VoiceNotice"/> asks the player to type instead.
         /// </summary>
         public void SendNegotiationVoice(byte[] wav)
         {
@@ -452,29 +463,26 @@ namespace ColonQuest.Game
             }
 
             Busy = true;
+            Transcribing = true;
             VoiceNotice = null;
             Changed?.Invoke();
-            ApiClient.Instance.SendNegotiationVoice(negotiation.Offer.OfferId, wav, result =>
+            ApiClient.Instance.Transcribe(wav, result =>
             {
                 Busy = false;
+                Transcribing = false;
                 if (CurrentNegotiation == negotiation)
                 {
-                    if (result.Ok && ApiService.LocalTextsOnly())
+                    if (result.Ok)
                     {
-                        // The voice was understood, but the seller of the backend answers in Spanish: the local one replies.
-                        negotiation.Record(result.Value.Transcript, LocalSeller.Reply(negotiation.Offer, result.Value.Transcript), true);
-                    }
-                    else if (result.Ok)
-                    {
-                        negotiation.Record(result.Value.Transcript, result.Value, false);
+                        // The seller answers from here on exactly as if the player had typed it.
+                        SendNegotiation(result.Value);
                     }
                     else
                     {
                         Debug.Log("Voice turn failed: " + result.Error);
                         VoiceNotice = VoiceFailedNotice;
+                        NegotiationUpdated?.Invoke(negotiation);
                     }
-
-                    NegotiationUpdated?.Invoke(negotiation);
                 }
 
                 Changed?.Invoke();
@@ -835,8 +843,8 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// One spoken turn. Only the backend can transcribe: the clip goes through the voice of the store's negotiation and only
-        /// the transcript is kept; the answer is the talk's own. Without the backend the player is asked to type.
+        /// One spoken turn. Only the backend can transcribe, and nothing else is asked of it: the answer is the talk's own.
+        /// Without the backend the player is asked to type.
         /// </summary>
         public void SendTalkVoice(byte[] wav)
         {
@@ -846,8 +854,7 @@ namespace ColonQuest.Game
                 return;
             }
 
-            var offer = SellerOffer.ForMonth(Loop.MonthsPlayed);
-            if (ApiClient.Instance == null || ApiClient.Instance.Service == null || !ApiClient.Instance.Service.HasSession || SellerOffer.Find(offer.OfferId) == null)
+            if (ApiClient.Instance == null || ApiClient.Instance.Service == null || !ApiClient.Instance.Service.HasSession)
             {
                 VoiceNotice = VoiceFailedNotice;
                 TalkUpdated?.Invoke(talk);
@@ -855,16 +862,19 @@ namespace ColonQuest.Game
             }
 
             Busy = true;
+            Transcribing = true;
             VoiceNotice = null;
+            TalkUpdated?.Invoke(talk);
             Changed?.Invoke();
-            ApiClient.Instance.SendNegotiationVoice(offer.OfferId, wav, result =>
+            ApiClient.Instance.Transcribe(wav, result =>
             {
                 Busy = false;
+                Transcribing = false;
                 if (CurrentTalk == talk)
                 {
-                    if (result.Ok && !string.IsNullOrWhiteSpace(result.Value.Transcript))
+                    if (result.Ok)
                     {
-                        talk.Say(result.Value.Transcript);
+                        talk.Say(result.Value);
                     }
                     else
                     {
