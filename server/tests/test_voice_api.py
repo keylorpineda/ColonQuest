@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.negotiation import get_negotiator, get_transcriber
 from app.config import Settings
-from app.db import ModelCall
+from app.db import ModelCall, Negotiation
 from app.db.session import get_session
 from app.main import create_app
 from app.negotiation.service import Negotiator, SellerTurn
@@ -136,6 +136,43 @@ async def test_silence_is_reported(
 
     assert response.status_code == 422
     assert response.json()["detail"] == "no speech detected"
+
+
+async def post_transcribe(
+    client: httpx2.AsyncClient, session_id: str, audio: bytes
+) -> httpx2.Response:
+    return await client.post(
+        f"/api/sessions/{session_id}/transcribe",
+        files={"audio": ("clip.wav", audio, "audio/wav")},
+    )
+
+
+async def test_transcribe_returns_the_words_without_asking_the_seller(
+    client: httpx2.AsyncClient, db: AsyncSession
+) -> None:
+    session_id = await new_session(client)
+
+    response = await post_transcribe(client, session_id, make_wav(48_000, channels=2, seconds=2))
+
+    assert response.status_code == 200
+    assert response.json() == {"transcript": "¿Cuánto pago en total?"}
+    assert (await db.scalars(select(ModelCall.endpoint))).all() == ["transcribe"]
+    assert (await db.scalars(select(Negotiation))).all() == [], "no turn is recorded yet"
+
+
+async def test_transcribe_failures_ask_for_text(
+    client: httpx2.AsyncClient, transcriber: FakeTranscriber
+) -> None:
+    session_id = await new_session(client)
+
+    assert (await post_transcribe(client, session_id, b"OggS not a wav")).status_code == 422
+    assert transcriber.received == [], "a bad clip is not paid for"
+
+    transcriber.text = ""
+    assert (await post_transcribe(client, session_id, make_wav(16_000))).status_code == 422
+
+    transcriber.text = None
+    assert (await post_transcribe(client, session_id, make_wav(16_000))).status_code == 503
 
 
 async def test_unknown_offer(client: httpx2.AsyncClient) -> None:

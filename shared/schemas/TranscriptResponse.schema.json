@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "transcript": {
+      "minLength": 1,
+      "title": "Transcript",
+      "type": "string"
+    }
+  },
+  "required": [
+    "transcript"
+  ],
+  "title": "TranscriptResponse",
+  "type": "object"
+}

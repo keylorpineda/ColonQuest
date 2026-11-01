@@ -20,6 +20,7 @@ from app.schemas.api import (
     DecisionRequest,
     HealthResponse,
     NegotiationRequest,
+    TranscriptResponse,
 )
 
 OUTPUT_DIR = Path(__file__).resolve().parents[2] / "shared" / "schemas"
@@ -31,6 +32,7 @@ CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
     DecisionRequest,
     HealthResponse,
     NegotiationRequest,
+    TranscriptResponse,
 )
 
 
