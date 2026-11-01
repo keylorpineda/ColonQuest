@@ -50,6 +50,23 @@ namespace ColonQuest.UI
             return null;
         }
 
+        /// <summary>Like <see cref="Get"/>, without waiting for a game to be running: the demo lab shows pictures from the menu.</summary>
+        public static Sprite Fetch(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                return null;
+            }
+
+            if (sprites.TryGetValue(key, out var sprite))
+            {
+                return sprite;
+            }
+
+            Download(key);
+            return null;
+        }
+
         /// <summary>Asks for the portraits and the postcard once there is a session, so they are ready when a window needs them.</summary>
         public static void Prefetch()
         {
@@ -72,7 +89,15 @@ namespace ColonQuest.UI
 
         private static void Request(string key)
         {
-            if (!ApiClient.Instance.Service.HasSession || !asked.Add(key))
+            if (ApiClient.Instance.Service.HasSession)
+            {
+                Download(key);
+            }
+        }
+
+        private static void Download(string key)
+        {
+            if (!asked.Add(key))
             {
                 return;
             }
