@@ -20,7 +20,13 @@ from app.db.session import get_sessionmaker
 from app.game_master.ledger import DbLedger
 from app.game_master.planner import SeasonPlanner
 from app.game_master.prompt import PromptContext
-from app.game_master.season import PlannedMonth, SeasonPlan, adjust_plan, default_plan
+from app.game_master.season import (
+    PlannedMonth,
+    SeasonPlan,
+    adjust_plan,
+    default_plan,
+    is_english,
+)
 from app.game_master.service import EventGenerator
 from app.schemas import GameEvent, PlayerState, TeachingConcept
 from app.summary.stats import total_debt
@@ -102,7 +108,12 @@ async def plan_month(
     if plan is None:
         plan = placeholder = default_plan(state)
     else:
-        plan = adjust_plan(plan, state.month, await risky_concepts(db, game_session.id))
+        plan = adjust_plan(
+            plan,
+            state.month,
+            await risky_concepts(db, game_session.id),
+            english=is_english(state),
+        )
     game_session.season_plan = dump_plan(plan)
     return plan.for_month(state.month), placeholder
 

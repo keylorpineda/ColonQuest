@@ -12,6 +12,7 @@ from pydantic import Field, model_validator
 
 from app.schemas import EventType, PlayerState, TeachingConcept
 from app.schemas.base import ContractModel
+from app.schemas.enums import GameLanguage
 
 DECEMBER = 12
 DECEMBER_TYPES = frozenset({EventType.BONUS, EventType.EXPENSE})
@@ -45,6 +46,20 @@ THEMES: dict[TeachingConcept, str] = {
     TeachingConcept.INVEST_IN_YOURSELF: "Cursos del INA o la UNA: invertir en uno mismo",
 }
 DECEMBER_THEME = "Aguinaldo y gastos de fin de año"
+THEMES_EN: dict[TeachingConcept, str] = {
+    TeachingConcept.BUDGET: "Splitting the salary between bills and treats",
+    TeachingConcept.EMERGENCY_FUND: "A surprise that tests your safety cushion",
+    TeachingConcept.COMPOUND_INTEREST: "Interest that grows by itself, for or against you",
+    TeachingConcept.MINIMUM_PAYMENT: "The temptation to pay only the card's minimum",
+    TeachingConcept.INSTALLMENTS_TOTAL_COST: "An installment purchase with hidden costs",
+    TeachingConcept.INFORMAL_LENDING: "Fast cash from a gota a gota lender",
+    TeachingConcept.PYRAMID_SCHEME: "A business that promises to multiply your savings",
+    TeachingConcept.INFLATION: "Everything costs more this month",
+    TeachingConcept.EXCHANGE_RATE: "A purchase in dollars and the exchange rate",
+    TeachingConcept.PAYROLL_DEDUCTIONS: "Checking the pay stub: CCSS, income tax and overtime",
+    TeachingConcept.INVEST_IN_YOURSELF: "Courses at INA or UNA: investing in yourself",
+}
+DECEMBER_THEME_EN = "Aguinaldo (the year-end bonus) and holiday spending"
 
 
 class PlannedMonth(ContractModel):
@@ -89,8 +104,13 @@ def concept_priority(state: PlayerState) -> list[TeachingConcept]:
     return list(dict.fromkeys([TeachingConcept.BUDGET, *priority, *rest]))
 
 
+def is_english(state: PlayerState) -> bool:
+    return state.language is GameLanguage.ENGLISH
+
+
 def default_plan(state: PlayerState) -> SeasonPlan:
     """Deterministic plan: every concept once in months 1-11, December is bonus/budget."""
+    themes = THEMES_EN if is_english(state) else THEMES
     ordered = concept_priority(state)
     concepts = ordered[:11]
     if len(concepts) < 11 and ordered:
@@ -100,7 +120,7 @@ def default_plan(state: PlayerState) -> SeasonPlan:
             month=index + 1,
             teaching_concept=concept,
             event_type=CONCEPT_EVENT_TYPE[concept],
-            theme=THEMES[concept],
+            theme=themes[concept],
         )
         for index, concept in enumerate(concepts)
     ]
@@ -109,14 +129,18 @@ def default_plan(state: PlayerState) -> SeasonPlan:
             month=DECEMBER,
             teaching_concept=TeachingConcept.BUDGET,
             event_type=EventType.BONUS,
-            theme=DECEMBER_THEME,
+            theme=DECEMBER_THEME_EN if is_english(state) else DECEMBER_THEME,
         )
     )
     return SeasonPlan(months=months)
 
 
 def adjust_plan(
-    plan: SeasonPlan, next_month: int, risky_concepts: Sequence[TeachingConcept]
+    plan: SeasonPlan,
+    next_month: int,
+    risky_concepts: Sequence[TeachingConcept],
+    *,
+    english: bool = False,
 ) -> SeasonPlan:
     """Reinforce concepts the player struggled with in a later month (never December).
 
@@ -135,6 +159,10 @@ def adjust_plan(
             month=target,
             teaching_concept=concept,
             event_type=CONCEPT_EVENT_TYPE[concept],
-            theme=("Refuerzo: " + THEMES[concept])[:80],
+            theme=(
+                "Practice again: " + THEMES_EN[concept]
+                if english
+                else "Refuerzo: " + THEMES[concept]
+            )[:80],
         )
     return SeasonPlan(months=months)

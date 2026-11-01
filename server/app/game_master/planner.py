@@ -21,6 +21,7 @@ from app.game_master.season import (
     MIN_DISTINCT_CONCEPTS,
     SeasonPlan,
     default_plan,
+    is_english,
 )
 from app.providers.base import ModelProvider, ProviderError, Usage
 from app.schemas import EventType, PlayerState, TeachingConcept
@@ -46,6 +47,8 @@ pyramid_scheme).
 - theme: a short idea for the month in Costa Rican Spanish, at most 80 characters, no amounts.
 
 Answer with JSON only, matching the provided schema."""
+
+SYSTEM_PROMPT_EN = SYSTEM_PROMPT.replace("in Costa Rican Spanish", "in plain English")
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,7 +92,7 @@ class SeasonPlanner:
             async with asyncio.timeout(self._settings.planner_timeout_s):
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
+                    system=SYSTEM_PROMPT_EN if is_english(state) else SYSTEM_PROMPT,
                     user=build_user_prompt(state),
                     output=SeasonPlan,
                     reasoning_effort=self._settings.live_reasoning_effort,
