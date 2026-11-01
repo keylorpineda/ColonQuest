@@ -98,16 +98,21 @@ namespace ColonQuest.EditorTools
 
             var root = Root(parent, b.Name, new Vector2(cx, b.YBottom), b.YBottom);
             var wall = GamePalette.Hex(b.Wall);
+            if (b.Name.StartsWith("Casa_"))
+            {
+                wall = GamePalette.Hex(ColonQuest.World.BuildingMath.ChooseHouseColorHex(b.Name));
+            }
             var roof = GamePalette.Hex(b.Roof);
+            var (wallMat, roofMat) = MaterialsFor(b);
 
             GroundShadowRect(shadows, new Vector2(cx + 0.35f, b.YBottom - 0.12f), new Vector2(w + 1.4f, 2.0f));
 
             // Main building silhouette & warm plaster facade
             Shape(root, "Outline", rounded, new Vector2(0f, h * 0.5f), new Vector2(w + 0.18f, h + 0.18f), GamePalette.Outline, 0);
             Shape(root, "Facade", rounded, new Vector2(0f, (fh + 0.4f) * 0.5f), new Vector2(w, fh + 0.4f), wall, 1);
-            if (facadeBrickTex != null)
+            if (wallMat != null)
             {
-                TiledShape(root, "Facade_Texture", facadeBrickTex, new Vector2(0f, (fh + 0.4f) * 0.5f), new Vector2(w - 0.12f, fh + 0.24f), wall, 1);
+                TiledShape(root, "Facade_Texture", wallMat, new Vector2(0f, (fh + 0.4f) * 0.5f), new Vector2(w - 0.12f, fh + 0.24f), wall, 1);
             }
 
             // Under-eave cast shadow on the upper wall
@@ -118,6 +123,10 @@ namespace ColonQuest.EditorTools
             {
                 Shape(root, "MarblePlinth_Out", roundedSmall, new Vector2(0f, 0.28f), new Vector2(w + 0.24f, 0.60f), GamePalette.Outline, 2);
                 Shape(root, "MarblePlinth", roundedSmall, new Vector2(0f, 0.28f), new Vector2(w + 0.10f, 0.48f), GamePalette.Hex("#CFD7E6"), 3);
+                if (tileWhiteTex != null)
+                {
+                    TiledShape(root, "MarblePlinth_Tile", tileWhiteTex, new Vector2(0f, 0.28f), new Vector2(w + 0.10f, 0.48f), GamePalette.Hex("#CFD7E6"), 3);
+                }
                 Shape(root, "MarbleStep_Out", roundedSmall, new Vector2(0f, 0.08f), new Vector2(w + 0.46f, 0.28f), GamePalette.Outline, 3);
                 Shape(root, "MarbleStep", roundedSmall, new Vector2(0f, 0.08f), new Vector2(w + 0.34f, 0.18f), GamePalette.Hex("#E2E8F4"), 4);
             }
@@ -159,16 +168,21 @@ namespace ColonQuest.EditorTools
                 Shape(root, "Wainscot_Ledge", roundedSmall, new Vector2(0f, wainscotH + 0.04f), new Vector2(w + 0.04f, 0.10f), GamePalette.Hex("#D8CBB8"), 4);
             }
 
-            // Colonial barrel-tiled roof with high-contrast 3-tone cel shading, scalloped eave trim, and ridge cap
+            // Roof with high-contrast cel shading, eave trim, and ridge cap
             float roofY = fh - 0.15f + roofH * 0.5f;
             Shape(root, "Roof_Outline", rounded, new Vector2(0f, roofY), new Vector2(w + 0.72f, roofH + 0.20f), GamePalette.Outline, 3);
             Shape(root, "Roof", rounded, new Vector2(0f, roofY), new Vector2(w + 0.54f, roofH), roof, 4);
-            if (roofTileTex != null)
+            if (roofMat != null)
             {
-                TiledShape(root, "Roof_TilePattern", roofTileTex, new Vector2(0f, roofY), new Vector2(w + 0.44f, Mathf.Max(0.4f, roofH - 0.12f)), GamePalette.Shade(roof, 1.18f), 5);
+                TiledShape(root, "Roof_TilePattern", roofMat, new Vector2(0f, roofY), new Vector2(w + 0.44f, Mathf.Max(0.4f, roofH - 0.12f)), GamePalette.Shade(roof, 1.18f), 5);
             }
 
-            if (roofEaveTex != null)
+            if (roofMat == zincRoofTex)
+            {
+                Shape(root, "Eave_Outline", roundedSmall, new Vector2(0f, fh - 0.02f), new Vector2(w + 0.56f, 0.36f), GamePalette.Outline, 5);
+                Shape(root, "Eave", roundedSmall, new Vector2(0f, fh - 0.02f), new Vector2(w + 0.44f, 0.24f), GamePalette.Shade(roof, 0.74f), 6);
+            }
+            else if (roofEaveTex != null)
             {
                 TiledShape(root, "Roof_EaveScallops", roofEaveTex, new Vector2(0f, fh - 0.06f), new Vector2(w + 0.52f, 0.54f), GamePalette.Shade(roof, 1.14f), 6);
             }
@@ -181,8 +195,8 @@ namespace ColonQuest.EditorTools
             Shape(root, "Ridge_Outline", roundedSmall, new Vector2(0f, h - 0.24f), new Vector2(w + 0.10f, 0.34f), GamePalette.Outline, 5);
             Shape(root, "Ridge", roundedSmall, new Vector2(0f, h - 0.24f), new Vector2(w - 0.04f, 0.22f), GamePalette.Shade(roof, 1.24f), 6);
 
-            // Lush green moss tufts on terracotta/colonial roofs
-            if (b.Name == "Casa" || b.Name == "Pulperia" || b.Name.StartsWith("Casa_"))
+            // Lush green moss tufts on clay/terracotta roofs (not on zinc)
+            if (roofMat != zincRoofTex && (b.Name == "Casa" || b.Name == "Pulperia" || b.Name.StartsWith("Casa_")))
             {
                 RoofMossPatch(root, new Vector2(-w * 0.32f, fh + 0.55f), 0.9f, 5);
                 RoofMossPatch(root, new Vector2(-w * 0.12f, fh + 1.45f), 0.75f, 5);
@@ -231,10 +245,186 @@ namespace ColonQuest.EditorTools
                 DrawSign(root, b.Sign, dx, fh + 0.62f, wall);
             }
 
+            DecorateFacade(root, b, w, fh, dx);
+
             var collider = root.gameObject.AddComponent<BoxCollider2D>();
             collider.offset = new Vector2(0f, h * 0.5f);
             collider.size = new Vector2(w, h);
             return root;
+        }
+
+        private static (Sprite wall, Sprite roof) MaterialsFor(BuildingSpec b)
+        {
+            if (b.Name == "Casa")
+            {
+                return (stuccoTex, clayRoofTex);
+            }
+            if (b.Name.StartsWith("Casa_"))
+            {
+                int seed = ColonQuest.World.BuildingMath.StableHash(b.Name);
+                Sprite[] wallOptions = { stuccoTex, concreteBlockTex, woodSidingTex };
+                Sprite wall = wallOptions[seed % wallOptions.Length];
+                Sprite roof = ((seed / 3) % 10 < 6) ? zincRoofTex : clayRoofTex;
+                return (wall, roof);
+            }
+            if (b.Name == "Banco")
+            {
+                return (null, concreteRoofTex);
+            }
+            if (b.Name == "Tienda" || b.Name == "Pulperia" || b.Name == "SodaElMuelle")
+            {
+                return (woodSidingTex, zincRoofTex);
+            }
+            if (b.Name == "Taller")
+            {
+                return (zincWallTex, zincRoofTex);
+            }
+            if (b.Name == "Hospital")
+            {
+                return (tileWhiteTex, concreteRoofTex);
+            }
+            if (b.Name == "Comisaria")
+            {
+                return (concreteBlockTex, concreteRoofTex);
+            }
+            if (b.Name == "Cooperativa" || b.Name == "InaCursos" || b.Name == "Inmobiliaria" || b.Name == "AgenciaDeCarros")
+            {
+                return (stuccoTex, concreteRoofTex);
+            }
+            if (b.Name == "Establo" || b.Name == "FincaSanIsidro")
+            {
+                return (woodSidingTex, zincRoofTex);
+            }
+            return (facadeBrickTex, roofTileTex);
+        }
+
+        private static void DecorateFacade(Transform root, BuildingSpec b, float w, float fh, float dx)
+        {
+            float offset = FacadeWindowOffset(b);
+
+            // 1. Grime stains under windows and on wall corners
+            if (grimeTex != null)
+            {
+                if (offset > 0f)
+                {
+                    foreach (float side in new[] { -offset, offset })
+                    {
+                        float wx = dx + side;
+                        if (Mathf.Abs(wx) <= w * 0.5f - 0.6f && Mathf.Abs(wx - dx) >= 0.9f)
+                        {
+                            TiledShape(root, "Grime_Window", grimeTex, new Vector2(wx, 0.65f), new Vector2(0.9f, 1.2f), new Color(1f, 1f, 1f, 0.35f), 2);
+                        }
+                    }
+                }
+
+                float cornerX1 = -w * 0.5f + 0.45f;
+                float cornerX2 = w * 0.5f - 0.45f;
+                if (Mathf.Abs(cornerX1 - dx) >= 0.9f)
+                {
+                    TiledShape(root, "Grime_CornerL", grimeTex, new Vector2(cornerX1, (fh - 0.2f) * 0.5f), new Vector2(0.9f, fh * 0.65f), new Color(1f, 1f, 1f, 0.30f), 2);
+                }
+                if (Mathf.Abs(cornerX2 - dx) >= 0.9f)
+                {
+                    TiledShape(root, "Grime_CornerR", grimeTex, new Vector2(cornerX2, (fh - 0.2f) * 0.5f), new Vector2(0.9f, fh * 0.65f), new Color(1f, 1f, 1f, 0.30f), 2);
+                }
+            }
+
+            // 2. Dirt stripe along bottom of wall, keeping door path clear
+            var dirtCol = GamePalette.Hex("#5A4A3A");
+            dirtCol.a = 0.25f;
+            float leftEnd = Mathf.Min(w * 0.5f, dx - 0.9f);
+            float leftStart = -w * 0.5f;
+            if (leftEnd - leftStart > 0.3f)
+            {
+                float segW = leftEnd - leftStart;
+                float segCx = (leftStart + leftEnd) * 0.5f;
+                Shape(root, "WallDirt_L", square, new Vector2(segCx, 0.125f), new Vector2(segW, 0.25f), dirtCol, 2);
+            }
+
+            float rightStart = Mathf.Max(-w * 0.5f, dx + 0.9f);
+            float rightEnd = w * 0.5f;
+            if (rightEnd - rightStart > 0.3f)
+            {
+                float segW = rightEnd - rightStart;
+                float segCx = (rightStart + rightEnd) * 0.5f;
+                Shape(root, "WallDirt_R", square, new Vector2(segCx, 0.125f), new Vector2(segW, 0.25f), dirtCol, 2);
+            }
+
+            // 3. Security window bars on 70% of houses
+            bool isHouse = b.Name == "Casa" || b.Name.StartsWith("Casa_");
+            if (isHouse && ColonQuest.World.BuildingMath.HasWindowBars(b.Name) && offset > 0f)
+            {
+                foreach (float side in new[] { -offset, offset })
+                {
+                    float wx = dx + side;
+                    if (Mathf.Abs(wx) <= w * 0.5f - 0.6f && Mathf.Abs(wx - dx) >= 0.9f)
+                    {
+                        for (int bi = -2; bi <= 2; bi++)
+                        {
+                            float bx = wx + bi * 0.18f;
+                            Shape(root, "WindowBar_V", square, new Vector2(bx, 1.58f), new Vector2(0.04f, 0.92f), GamePalette.Hex("#2A2F45"), 9);
+                        }
+                        Shape(root, "WindowBar_HTop", square, new Vector2(wx, 1.95f), new Vector2(0.82f, 0.035f), GamePalette.Hex("#2A2F45"), 9);
+                        Shape(root, "WindowBar_HBot", square, new Vector2(wx, 1.21f), new Vector2(0.82f, 0.035f), GamePalette.Hex("#2A2F45"), 9);
+                    }
+                }
+            }
+
+            // 4. Electric meter box beside door at height 1.2m
+            float meterX = dx - 1.15f;
+            if (meterX < -w * 0.5f + 0.3f)
+            {
+                meterX = dx + 1.15f;
+            }
+            if (Mathf.Abs(meterX - dx) >= 0.92f && Mathf.Abs(meterX) <= w * 0.5f - 0.2f)
+            {
+                Shape(root, "Meter_Box", roundedSmall, new Vector2(meterX, 1.2f), new Vector2(0.22f, 0.30f), GamePalette.Hex("#8E93A8"), 7);
+                Shape(root, "Meter_Glass", circle, new Vector2(meterX, 1.22f), Vector2.one * 0.13f, Color.white, 8);
+                Shape(root, "Meter_Dial", square, new Vector2(meterX, 1.22f), new Vector2(0.08f, 0.025f), GamePalette.Hex("#1E293B"), 9);
+            }
+
+            // 5. Overhead power lines running from roof edge
+            var cableCol = GamePalette.Hex("#1D2238");
+            cableCol.a = 0.8f;
+            float cableOriginX = dx >= 0f ? (w * 0.5f - 0.15f) : (-w * 0.5f + 0.15f);
+            float cableDir = cableOriginX > 0f ? 1f : -1f;
+            float cableLen = 1.35f;
+            var wire1 = Shape(root, "PowerCable_1", square, new Vector2(cableOriginX + cableDir * cableLen * 0.45f, fh + 0.22f), new Vector2(cableLen, 0.03f), cableCol, 6);
+            Tilt(wire1, cableDir * 8f);
+            var wire2 = Shape(root, "PowerCable_2", square, new Vector2(cableOriginX + cableDir * cableLen * 0.45f, fh + 0.08f), new Vector2(cableLen, 0.03f), cableCol, 6);
+            Tilt(wire2, cableDir * -6f);
+
+            // 6. Gutter under eave and vertical downspout in corner
+            Shape(root, "EaveGutter_H", roundedSmall, new Vector2(0f, fh - 0.10f), new Vector2(w + 0.32f, 0.08f), GamePalette.Hex("#8E93A8"), 7);
+            float pipeX = -w * 0.5f + 0.10f;
+            if (Mathf.Abs(pipeX - dx) < 0.9f)
+            {
+                pipeX = w * 0.5f - 0.10f;
+            }
+            if (Mathf.Abs(pipeX - dx) >= 0.9f)
+            {
+                float pipeH = fh - 0.25f;
+                Shape(root, "Downspout_V", roundedSmall, new Vector2(pipeX, pipeH * 0.5f + 0.1f), new Vector2(0.08f, pipeH), GamePalette.Hex("#8E93A8"), 7);
+                Shape(root, "Downspout_Boot", roundedSmall, new Vector2(pipeX - 0.05f * Mathf.Sign(pipeX), 0.12f), new Vector2(0.14f, 0.08f), GamePalette.Hex("#64748B"), 8);
+            }
+
+            // 7. TV rooftop antenna on 50% of homes
+            if (isHouse && ColonQuest.World.BuildingMath.HasTvAntenna(b.Name) && b.Name != "Casa")
+            {
+                float antX = w * 0.26f;
+                Shape(root, "TvAntenna_Pole", roundedSmall, new Vector2(antX, fh + 1.15f), new Vector2(0.04f, 0.95f), GamePalette.Hex("#64748B"), 6);
+                Shape(root, "TvAntenna_Bar1", square, new Vector2(antX, fh + 1.50f), new Vector2(0.52f, 0.03f), GamePalette.Hex("#64748B"), 7);
+                Shape(root, "TvAntenna_Bar2", square, new Vector2(antX, fh + 1.32f), new Vector2(0.38f, 0.03f), GamePalette.Hex("#64748B"), 7);
+                Shape(root, "TvAntenna_Bar3", square, new Vector2(antX, fh + 1.14f), new Vector2(0.24f, 0.03f), GamePalette.Hex("#64748B"), 7);
+            }
+
+            // 8. Hand-painted signboard on businesses without their own sign
+            if (!isHouse && b.Name != "Banco" && b.Name != "Hospital" && b.Name != "Comisaria" && b.Name != "Tienda" && b.Name != "Inmobiliaria" && b.Name != "AgenciaDeCarros" && string.IsNullOrEmpty(b.Sign))
+            {
+                Shape(root, "RusticSign_Board", roundedSmall, new Vector2(dx, fh + 0.44f), new Vector2(1.85f, 0.52f), GamePalette.Hex("#C85A32"), 8);
+                Shape(root, "RusticSign_Stripe1", square, new Vector2(dx, fh + 0.51f), new Vector2(1.45f, 0.06f), Color.white, 9);
+                Shape(root, "RusticSign_Stripe2", square, new Vector2(dx, fh + 0.37f), new Vector2(1.05f, 0.05f), GamePalette.Hex("#FFD23F"), 9);
+            }
         }
 
         private static void RoofMossPatch(Transform root, Vector2 pos, float scale, int order)
