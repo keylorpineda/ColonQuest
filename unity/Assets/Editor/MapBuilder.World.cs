@@ -765,7 +765,7 @@ namespace ColonQuest.EditorTools
             var rig = new GameObject("CoffeeRig").transform;
             rig.SetParent(root, false);
             rig.localPosition = new Vector2(0f, 0.1f);
-            rig.gameObject.AddComponent<FoliagePhysics>().Configure(3.0f, 2.0f, x * 1.1f + y * 0.7f, 0.01f, true, 1.5f, 10f, true, 0.1f);
+            rig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 2.0f, x * 1.1f + y * 0.7f, 0.012f, true, 1.6f, 18f, true, 0.1f);
 
             var dark = GamePalette.Hex("#1F5E33");
             var mid = GamePalette.Hex("#2E7D46");
@@ -1003,7 +1003,8 @@ namespace ColonQuest.EditorTools
             crownRig.SetParent(root, false);
             crownRig.localPosition = top;
             // A palm bends along the upper part of its trunk; a lower pivot would open a gap between the crown and the trunk.
-            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(3.4f, 1.55f, x * 0.6f + y * 0.9f, 0.006f, true, 2.1f, 7f, true, 1.0f * scale);
+            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(4.8f, 1.55f, x * 0.6f + y * 0.9f, 0.008f, true, 2.3f, 14f, true, 1.0f * scale);
+            crownRig.gameObject.AddComponent<LeafBurst>().Configure(palmFrondSprite != null ? palmFrondSprite : circle, GamePalette.Hex("#3FA66A"), LayerWorld, 900);
 
             var frondSpr = palmFrondSprite != null ? palmFrondSprite : circle;
             var leaf = GamePalette.Hex("#3FA66A");

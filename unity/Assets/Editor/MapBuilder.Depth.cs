@@ -131,14 +131,25 @@ namespace ColonQuest.EditorTools
             }
         }
 
+        /// <summary>A child at the clump's foot that bends away from the player; the root keeps its sorting group still.</summary>
+        private static Transform BendRig(Transform root)
+        {
+            var rig = new GameObject("BendRig").transform;
+            rig.SetParent(root, false);
+            rig.localPosition = Vector2.zero;
+            rig.gameObject.AddComponent<GrassBend>();
+            return rig;
+        }
+
         private static void GrassClump(Transform parent, float x, float y, float scale)
         {
             var root = Root(parent, "Grass", new Vector2(x, y), y);
+            var rig = BendRig(root);
             var dark = GamePalette.Hex("#3E9457");
             var light = GamePalette.Hex("#5BBE74");
             foreach (var blade in new[] { (-0.22f, 14f), (0f, 0f), (0.22f, -14f), (-0.1f, 7f), (0.12f, -7f) })
             {
-                var shape = Shape(root, "Blade", roundedSmall, new Vector2(blade.Item1, 0.3f) * scale, new Vector2(0.14f, 0.62f) * scale, blade.Item1 == 0f ? light : dark, 0);
+                var shape = Shape(rig, "Blade", roundedSmall, new Vector2(blade.Item1, 0.3f) * scale, new Vector2(0.14f, 0.62f) * scale, blade.Item1 == 0f ? light : dark, 0);
                 Tilt(shape, blade.Item2);
             }
         }
@@ -146,13 +157,14 @@ namespace ColonQuest.EditorTools
         private static void FlowerClump(Transform parent, float x, float y, System.Random random)
         {
             var root = Root(parent, "Flowers", new Vector2(x, y), y);
+            var rig = BendRig(root);
             string[] colors = { "#FF7A8A", "#FFD23F", "#F8F5E8", "#B28DFF" };
             string petal = colors[random.Next(colors.Length)];
             foreach (var offset in new[] { new Vector2(-0.2f, 0.35f), new Vector2(0.15f, 0.5f), new Vector2(0.02f, 0.2f) })
             {
-                Shape(root, "Stem", roundedSmall, offset * 0.8f + new Vector2(0f, -0.12f), new Vector2(0.06f, 0.4f), GamePalette.Hex("#3E9457"), 0);
-                Shape(root, "Petal", circle, offset, Vector2.one * 0.22f, GamePalette.Hex(petal), 1);
-                Shape(root, "Heart", circle, offset, Vector2.one * 0.09f, GamePalette.Hex("#FFD23F"), 2);
+                Shape(rig, "Stem", roundedSmall, offset * 0.8f + new Vector2(0f, -0.12f), new Vector2(0.06f, 0.4f), GamePalette.Hex("#3E9457"), 0);
+                Shape(rig, "Petal", circle, offset, Vector2.one * 0.22f, GamePalette.Hex(petal), 1);
+                Shape(rig, "Heart", circle, offset, Vector2.one * 0.09f, GamePalette.Hex("#FFD23F"), 2);
             }
         }
 

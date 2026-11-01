@@ -1109,7 +1109,8 @@ namespace ColonQuest.EditorTools
             canopyRig.SetParent(root, false);
             canopyRig.localPosition = new Vector2(0f, 1.58f * scale);
             // The crown bends from the foot of the trunk with the breeze that crosses the town, instead of spinning in place.
-            canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(3.2f, 1.45f, x * 0.53f + y * 0.71f, 0.006f, true, 2.2f, 9f, true, 1.58f * scale);
+            canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 1.45f, x * 0.53f + y * 0.71f, 0.008f, true, 2.4f, 16f, true, 1.58f * scale);
+            canopyRig.gameObject.AddComponent<LeafBurst>().Configure(palmFrondSprite != null ? palmFrondSprite : circle, GamePalette.Hex(leaf), LayerWorld, 900);
 
             // Tropical banana/plantain fronds peeking out behind the tree crown
             if (palmFrondSprite != null)
@@ -1253,7 +1254,8 @@ namespace ColonQuest.EditorTools
             var bushRig = new GameObject("BushRig").transform;
             bushRig.SetParent(root, false);
             bushRig.localPosition = new Vector2(0f, 0.42f * scale);
-            bushRig.gameObject.AddComponent<FoliagePhysics>().Configure(4.6f, 1.75f, x * 0.83f + y * 0.47f, 0.032f, true, 1.6f, 13f);
+            bushRig.gameObject.AddComponent<FoliagePhysics>().Configure(5.5f, 1.75f, x * 0.83f + y * 0.47f, 0.02f, true, 1.7f, 22f, true, 0.15f);
+            bushRig.gameObject.AddComponent<LeafBurst>().Configure(palmFrondSprite != null ? palmFrondSprite : circle, GamePalette.Hex("#42A84C"), LayerWorld, 900);
 
             var bushSpr = treeCanopySprite != null ? treeCanopySprite : circle;
             Shape(bushRig, "Bush_Dark", bushSpr, new Vector2(0.05f, -0.04f) * scale, new Vector2(1.38f, 1.18f) * scale, GamePalette.Hex("#26753B"), 1);

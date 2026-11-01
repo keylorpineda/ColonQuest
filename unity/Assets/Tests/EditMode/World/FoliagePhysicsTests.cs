@@ -45,6 +45,22 @@ namespace ColonQuest.World.Tests
     
 
         [Test]
+        public void StepSpring_RustleConstantsBounceVisiblyThenSettle()
+        {
+            float displacement = 0f;
+            float velocity = 40f;
+            float peak = 0f;
+            for (int i = 0; i < 240; i++)
+            {
+                FoliagePhysics.StepSpring(ref displacement, ref velocity, FoliagePhysics.RustleStiffness, FoliagePhysics.RustleDamping, 1f / 60f);
+                peak = Mathf.Max(peak, Mathf.Abs(displacement));
+            }
+
+            Assert.Greater(peak, 4f, "the shake is clearly visible");
+            Assert.Less(Mathf.Abs(displacement), 0.1f, "it settles back to rest");
+        }
+
+        [Test]
         public void GlobalWind_StaysInRangeAndRollsAcrossTheTown()
         {
             for (float t = 0f; t < 60f; t += 0.7f)

@@ -15,10 +15,10 @@ namespace ColonQuest.World
     public sealed class FoliagePhysics : MonoBehaviour
     {
         /// <summary>How stiff the bounce is when the player brushes past.</summary>
-        public const float RustleStiffness = 42f;
+        public const float RustleStiffness = 30f;
 
-        /// <summary>Damping of that bounce: about 0.7 of critical, so it settles in one or two swings instead of wobbling.</summary>
-        public const float RustleDamping = 9f;
+        /// <summary>Damping of that bounce: light enough to bounce two or three times so the shake is clearly visible.</summary>
+        public const float RustleDamping = 4.2f;
 
         /// <summary>How fast a gust travels across the town, in units per second.</summary>
         public const float GustSpeed = 6f;
@@ -41,7 +41,9 @@ namespace ColonQuest.World
         private float bendAngle;
         private float bendVelocity;
         private bool bendStarted;
-        private float lastRustleDistance = float.MaxValue;
+        private float nextRustleTime;
+        private Vector2 lastPlayerPos;
+        private LeafBurst leafBurst;
 
         private static Transform cachedPlayer;
         private static float nextPlayerLookupTime;
@@ -180,6 +182,7 @@ namespace ColonQuest.World
             baseRotation = transform.localRotation;
             baseScale = transform.localScale;
             basePosition = transform.localPosition;
+            leafBurst = GetComponent<LeafBurst>();
         }
 
         private void Update()
@@ -241,16 +244,27 @@ namespace ColonQuest.World
             Vector2 playerPos = player.position;
             float dist = Vector2.Distance(myPos, playerPos);
 
-            if (dist < reactRadius && lastRustleDistance >= reactRadius * 0.85f && dist < lastRustleDistance - 0.01f)
+            float moved = Vector2.Distance(playerPos, lastPlayerPos);
+            lastPlayerPos = playerPos;
+
+            if (dist < reactRadius && moved > 0.01f && Time.time >= nextRustleTime)
             {
                 float dir = myPos.x >= playerPos.x ? -1f : 1f;
                 float strength = Mathf.Clamp01(1f - dist / reactRadius);
-                springVelocity += dir * reactImpulseDegrees * (2.8f + strength * 2.2f);
+                springVelocity += dir * reactImpulseDegrees * (3.5f + strength * 3.5f);
+                nextRustleTime = Time.time + 0.45f;
+                if (leafBurst != null)
+                {
+                    leafBurst.Burst(Random.Range(2, 4));
+                }
             }
-
-            lastRustleDistance = dist;
         }
 
+        /// <summary>Shakes this plant as if something brushed past: direction -1 or 1, strength 0..1.</summary>
+        public void Rustle(float direction, float strength01)
+        {
+            springVelocity += direction * reactImpulseDegrees * (3.5f + Mathf.Clamp01(strength01) * 3.5f);
+        }
         private static Transform FindPlayerTransform()
         {
             if (cachedPlayer != null)
