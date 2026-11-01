@@ -25,7 +25,12 @@ namespace ColonQuest.EditorTools
         private static int LookSeed(Look look)
         {
             int seed = 17;
-            foreach (char c in (look.Skin ?? string.Empty) + look.Seed)
+            foreach (char c in look.Skin ?? string.Empty)
+            {
+                seed = seed * 31 + c;
+            }
+
+            foreach (char c in look.Seed ?? string.Empty)
             {
                 seed = seed * 31 + c;
             }

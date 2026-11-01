@@ -320,7 +320,7 @@ namespace ColonQuest.EditorTools
             };
             for (int i = 0; i < CollectorCar.MenNames.Length; i++)
             {
-                var look = looks[i];
+                var look = looks[i % looks.Length];
                 var man = new GameObject(CollectorCar.MenNames[i]);
                 man.transform.SetParent(parent, false);
                 man.transform.position = new Vector2(MapLayout.PlayWestX - 8f - i, 3.2f);
