@@ -93,7 +93,7 @@ namespace ColonQuest.UI
             ApiResult<GameEvent> result = null;
             yield return gmService.RequestEvent(gmBefore, r => result = r);
             gmEvent = result.Value;
-            gmOrigin = result.Source == ResultSource.Fallback ? "local" : result.Origin;
+            gmOrigin = string.IsNullOrEmpty(result.Origin) ? "local" : result.Origin;
             EndWait();
             Redraw();
             yield return RefreshEvidence();
@@ -109,10 +109,10 @@ namespace ColonQuest.UI
 
             float x = Left + 356f;
             float textWidth = Width - 356f;
-            var title = Plain(gmEvent.Title, 34, UiKit.Ink, new Vector2(textWidth, 46f), new Vector2(x, y), TextAnchor.MiddleLeft);
+            var title = Plain(Loc.T(gmEvent.Title), 34, UiKit.Ink, new Vector2(textWidth, 46f), new Vector2(x, y), TextAnchor.MiddleLeft);
             title.fontStyle = FontStyle.Bold;
             OriginBadge(gmOrigin, new Vector2(textWidth, 44f), new Vector2(x, y - 50f));
-            Plain(gmEvent.Narrative, 24, UiKit.Ink, new Vector2(textWidth, 124f), new Vector2(x, y - 102f));
+            Plain(Loc.T(gmEvent.Narrative), 24, UiKit.Ink, new Vector2(textWidth, 124f), new Vector2(x, y - 102f));
 
             y -= 238f;
             if (gmAfter != null || gmRejected != null)

@@ -112,6 +112,7 @@ namespace ColonQuest.UI
         private void Awake()
         {
             // The game sets these when a run starts; the lab can open before any run.
+            LocalSeller.Translate = Loc.T;
             ApiService.LocalTextsOnly = () => false;
             ApiService.Language = () => Loc.Current == GameLanguage.English ? "en" : "es";
             gmService = NewService();

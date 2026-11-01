@@ -48,6 +48,18 @@ namespace ColonQuest.World
             { "Gracias por jugar", "Thanks for playing" },
             { "Ojalá la próxima vez que un vendedor te sonría, sepás qué preguntarle.", "Next time a seller smiles at you, may you know what to ask." },
 
+            // Last ones found when English became the default (1 Nov)
+            { "Qué hizo la IA", "What the AI did" },
+            { "Unity 6 y C#", "Unity 6 and C#" },
+            { "FastAPI y Pydantic", "FastAPI and Pydantic" },
+            { "PostgreSQL en Neon", "PostgreSQL on Neon" },
+            { "Diseño y desarrollo: {0}", "Design and development: {0}" },
+            { "Llegó el recibo de la luz", "The electric bill came" },
+            { "Llegó el recibo de la luz y hay que pagarlo antes de que se venza.", "The electric bill came and it has to be paid before it is due." },
+            { "[E]  Cobrar el salario y cerrar el mes", "[E]  Collect your salary and close the month" },
+            { "[E]  Revisar tu estado de cuenta", "[E]  Check your statement" },
+            { "[E]  Usar el cajero automático", "[E]  Use the ATM" },
+
             // The demo lab (1 Nov)
             { "Demo de funciones", "Feature demo" },
             { "Cada función del juego, con la IA real y sus datos a la vista", "Every feature of the game, with the real AI and its data in plain sight" },

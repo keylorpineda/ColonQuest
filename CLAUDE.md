@@ -49,7 +49,8 @@ y si para Open Weights basta con que una parte central use el modelo abierto.
    El juego nunca se rompe por una respuesta mala del modelo.
 4. **Cada llamada a un modelo pasa por el control de costos** (ver más abajo).
 5. **El dinero se maneja en enteros** (colones, sin decimales). Nada de `float` para montos.
-6. **Código en inglés** (nombres, comentarios). Textos del juego en español de Costa Rica.
+6. **Código en inglés** (nombres, comentarios). Textos del juego en español de Costa Rica, traducidos en
+   `Translations.cs`. El juego arranca en inglés porque los jueces solo leen inglés; el español queda en Ajustes.
 
 ## Arquitectura
 

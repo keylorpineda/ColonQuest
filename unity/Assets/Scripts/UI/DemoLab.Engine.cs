@@ -105,7 +105,7 @@ namespace ColonQuest.UI
             Action("Sacar un evento de respaldo", GameUiColors.Yellow, new Vector2(400f, 56f), new Vector2(Left + Width - 400f, y), ShowFallback);
             if (localEvent != null)
             {
-                Plain(localEvent.Title + ": " + localEvent.Narrative, 20, GameUiColors.Muted, new Vector2(Width, 66f), new Vector2(Left, y - 62f));
+                Plain(Loc.T(localEvent.Title) + ": " + Loc.T(localEvent.Narrative), 20, GameUiColors.Muted, new Vector2(Width, 66f), new Vector2(Left, y - 62f));
             }
         }
 

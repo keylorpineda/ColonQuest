@@ -34,7 +34,7 @@ commission only come out if you ask.
 
 ### Try every feature in two minutes
 
-Choose **Demo de funciones** in the main menu. You do not need to play a year to reach each feature,
+Choose **Feature demo** in the main menu. You do not need to play a year to reach each feature,
 and the panel on the right shows what really happened, read back from the server: model, provider,
 latency, tokens, cost and tool calls.
 

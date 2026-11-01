@@ -319,7 +319,7 @@ namespace ColonQuest.UI
             y = Heading(spanish, width, y);
             foreach (var row in rows)
             {
-                var name = UiKit.PlainLabel(content, "Name", row[0], 28, Cream, new Vector2(width * 0.42f, 42f), new Vector2(0f, 1f), new Vector2(0f, y), TextAnchor.MiddleRight);
+                var name = UiKit.PlainLabel(content, "Name", Loc.T(row[0]), 28, Cream, new Vector2(width * 0.42f, 42f), new Vector2(0f, 1f), new Vector2(0f, y), TextAnchor.MiddleRight);
                 name.horizontalOverflow = HorizontalWrapMode.Wrap;
                 var what = UiKit.Label(content, row[1], 23, Cream, new Vector2(width * 0.55f, 42f), new Vector2(1f, 1f), new Vector2(0f, y), TextAnchor.MiddleLeft);
                 what.fontStyle = FontStyle.Normal;

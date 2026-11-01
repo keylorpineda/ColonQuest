@@ -436,7 +436,7 @@ namespace ColonQuest.UI
             teamShadow.effectDistance = new Vector2(6f, -6f);
 
             UiKit.Fill(content, "Rule", Beak, new Vector2(420f, 6f), center, new Vector2(0f, -40f));
-            UiKit.Label(content, "Diseño y desarrollo: " + MenuEntries.Team, 34, Cream, new Vector2(1300f, 50f), center, new Vector2(0f, -96f), TextAnchor.MiddleCenter);
+            UiKit.PlainLabel(content, "Credit", Loc.F("Diseño y desarrollo: {0}", MenuEntries.Team), 34, Cream, new Vector2(1300f, 50f), center, new Vector2(0f, -96f), TextAnchor.MiddleCenter);
             UiKit.Label(content, "Hecho para el Meta Global AI Developer Hackathon", 28, muted, new Vector2(1300f, 44f), center, new Vector2(0f, -150f), TextAnchor.MiddleCenter);
 
             UiKit.Label(layer.transform, "Clic o cualquier tecla para saltar", 22, GamePalette.Hex("#7C8580"), new Vector2(800f, 36f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), TextAnchor.MiddleCenter);
