@@ -36,15 +36,44 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void Credits_NameBothMakersAndEveryToolWithAReason()
+        public void Credits_NameBothMakersAndEveryToolWithAReasonAndATime()
         {
-            CollectionAssert.AreEqual(new[] { "Keylor", "Jefferson" }, MenuEntries.Makers);
+            Assert.AreEqual(2, MenuEntries.Makers.Length);
+            foreach (var maker in MenuEntries.Makers)
+            {
+                Assert.AreEqual(2, maker.Length);
+                Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(maker[1]), maker[1]);
+            }
+
             Assert.AreEqual(5, MenuEntries.Tools.Length, "the five models the game uses");
             foreach (var tool in MenuEntries.Tools)
             {
-                Assert.AreEqual(2, tool.Length);
+                Assert.AreEqual(3, tool.Length);
                 StringAssert.StartsWith("Muse ", tool[0]);
-                Assert.IsNotEmpty(tool[1]);
+                Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(tool[1]), tool[1]);
+                Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(tool[2]), tool[2]);
+            }
+        }
+
+        [Test]
+        public void Credits_EveryOtherLineIsTranslated()
+        {
+            foreach (var rows in new[] { MenuEntries.Agents, MenuEntries.Figures, MenuEntries.Stack })
+            {
+                foreach (var row in rows)
+                {
+                    Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(row[1]), row[1]);
+                }
+            }
+        }
+
+        [Test]
+        public void Credits_NameTheFontsInTheBuildWithTheirLicense()
+        {
+            Assert.AreEqual(2, MenuEntries.Fonts.Length);
+            foreach (var font in MenuEntries.Fonts)
+            {
+                StringAssert.Contains("SIL Open Font License", font[1]);
             }
         }
     }
