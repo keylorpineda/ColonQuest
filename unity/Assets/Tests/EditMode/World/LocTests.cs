@@ -51,8 +51,10 @@ namespace ColonQuest.World.Tests
         [Test]
         public void English_TheTextsThatAreNotNamesAreNotLeftInSpanish()
         {
+            // These read the same in both languages, and the signs still need an entry to be known.
+            var sameInBoth = new HashSet<string> { "Cifras de ejemplo del juego.", "HOSPITAL", "SEDAN 2022", "SUV 2024" };
             var sameAsKey = Translations.English.Where(p => p.Key == p.Value).Select(p => p.Key).ToList();
-            CollectionAssert.IsEmpty(sameAsKey.Where(k => k != "Cifras de ejemplo del juego."), "an entry that did not change was never translated");
+            CollectionAssert.IsEmpty(sameAsKey.Where(k => !sameInBoth.Contains(k)), "an entry that did not change was never translated");
         }
 
         [Test]
