@@ -48,6 +48,7 @@ namespace ColonQuest.UI
         private GameObject credits;
         private GameObject quitConfirm;
         private SettingsPanel settings;
+        private MenuToucanMotion toucanMotion;
 
         private void Awake()
         {
@@ -65,6 +66,10 @@ namespace ColonQuest.UI
             settings = new SettingsPanel(root, null);
             openedAt = Time.unscaledTime;
             BuildSplash();
+            if (splash == null && toucanMotion != null)
+            {
+                toucanMotion.PlayArrival();
+            }
         }
 
         private void OnEnable()
@@ -158,8 +163,10 @@ namespace ColonQuest.UI
         private void Slide(RectTransform rect, float from)
         {
             entering.Add(rect);
-            enterTarget.Add(rect.anchoredPosition);
+            var target = rect.anchoredPosition;
+            enterTarget.Add(target);
             enterFrom.Add(from);
+            rect.anchoredPosition = new Vector2(target.x - from, target.y);
         }
 
         /// <summary>True while a window (notice, credits or settings) covers the buttons.</summary>
@@ -238,6 +245,9 @@ namespace ColonQuest.UI
             var image = art.gameObject.AddComponent<Image>();
             image.sprite = Resources.Load<Sprite>("Menu/KeyArt");
             image.raycastTarget = false;
+
+            MenuVolcanoSmoke.Create(art);
+            toucanMotion = MenuToucanMotion.Create(art);
         }
 
         private void BuildTitle()
@@ -481,6 +491,11 @@ namespace ColonQuest.UI
                 {
                     splashLeaving = true;
                     splashLeftAt = now;
+                    openedAt = now;
+                    if (toucanMotion != null)
+                    {
+                        toucanMotion.PlayArrival();
+                    }
                 }
 
                 return true;
@@ -488,12 +503,11 @@ namespace ColonQuest.UI
 
             float leaving = (now - splashLeftAt) / SplashFadeOut;
             splash.alpha = 1f - Mathf.SmoothStep(0f, 1f, leaving);
+            SlideIn(now - openedAt);
             if (leaving >= 1f)
             {
                 Destroy(splash.gameObject);
                 splash = null;
-                // The title and the buttons slide in once the menu is in sight.
-                openedAt = now;
                 return false;
             }
 
