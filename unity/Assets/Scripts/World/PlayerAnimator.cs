@@ -22,6 +22,15 @@ namespace ColonQuest.World
 
         /// <summary>The height of the mouth while it is closed. A smile needs more than a flat bar.</summary>
         public float MouthRest = 0.25f;
+
+        /// <summary>The face and the fringe, hidden while the person walks away from the camera. Optional.</summary>
+        public GameObject Face;
+
+        /// <summary>What is worn on the chest (tie, badge, apron...), hidden from behind. Optional.</summary>
+        public GameObject TorsoFront;
+
+        /// <summary>The back of the head, shown only while walking away. Without it the person always shows the face.</summary>
+        public GameObject BackHead;
     }
 
     /// <summary>
@@ -80,6 +89,21 @@ namespace ColonQuest.World
         /// <summary>How many sorting steps the forearms and hands climb to pass over the torso and stay under the face.</summary>
         private const int HandsFrontLift = 7;
 
+        /// <summary>How long the back stays turned after the upward walk ends, so a short diagonal does not flicker.</summary>
+        private const float AwayGrace = 0.3f;
+
+        /// <summary>A move faster than this in one frame is a jump to another place (a spawn), not a walk.</summary>
+        private const float TeleportSpeed = 25f;
+
+        private Vector3 lastRootPosition;
+        private bool hasLastRoot;
+        private Vector2 walkVelocity;
+        private bool away;
+        private float lastAwayTime = -10f;
+        private float settle;
+        private float settleVelocity;
+        private bool stopKicked = true;
+
         /// <summary>True while the person gestures as if speaking, because the player is close or someone set it.</summary>
         public bool Talking => talking;
 
@@ -104,6 +128,11 @@ namespace ColonQuest.World
         public bool IsWaving => PersonMotion.IsWaving(Time.time - waveStarted);
 
         public bool HasRig => rig != null && rig.Torso != null;
+
+        /// <summary>True while the back of the head shows, because the person walks up the screen.</summary>
+        public bool ShowsBack => away;
+
+        private bool HasBackView => HasRig && rig.BackHead != null && rig.Face != null;
 
         /// <summary>Walking amount from 0 to 1 for characters that have no Rigidbody2D, such as pedestrians.</summary>
         public void SetSpeed01(float amount)
@@ -151,15 +180,41 @@ namespace ColonQuest.World
             nextBlink = Time.time + PersonMotion.NextBlinkDelay(Random.value);
         }
 
+        private void OnDisable()
+        {
+            // No SetActive here: this also runs while the person is being destroyed or switched off, when changing the
+            // active state of its parts is not allowed. Once the animator runs again, the next Update turns the face
+            // back by itself (a person standing still never shows the back for more than the short grace).
+            hasLastRoot = false;
+        }
+
         private void Update()
         {
+            walkVelocity = WalkVelocity();
             float target = body != null ? Mathf.Clamp01(body.linearVelocity.magnitude / referenceSpeed) : externalSpeed;
             moving = Mathf.MoveTowards(moving, target, Time.deltaTime * 8f);
             phase += Time.deltaTime * stepRate * moving;
 
             float step = Mathf.Abs(Mathf.Sin(phase));
             float breathing = Mathf.Sin(Time.time * 2f) * 0.02f * (1f - moving);
-            float squash = HasRig ? 1f + step * 0.03f * moving : 1f + (step - 0.5f) * 0.1f * moving + breathing;
+            float squash = HasRig ? PersonMotion.StepSquash(step, moving) : 1f + (step - 0.5f) * 0.1f * moving + breathing;
+
+            // Stopping: the body sinks a little and comes back up, as if the weight settled on the feet.
+            if (moving > 0.6f)
+            {
+                stopKicked = false;
+            }
+            else if (!stopKicked && target < 0.05f && moving < 0.5f)
+            {
+                stopKicked = true;
+                settleVelocity -= 0.9f;
+            }
+
+            FoliagePhysics.StepSpring(ref settle, ref settleVelocity, 180f, 14f, Time.deltaTime);
+            if (HasRig)
+            {
+                squash = Mathf.Clamp(squash + settle, 0.92f, 1.08f);
+            }
 
             if (pose != PersonPose.None && Time.time > poseUntil)
             {
@@ -168,6 +223,7 @@ namespace ColonQuest.World
 
             poseWeight = Mathf.MoveTowards(poseWeight, pose != PersonPose.None ? 1f : 0f, Time.deltaTime * 5f);
             poseAngles = poseWeight > 0f ? PersonPoses.Evaluate(shownPose, Time.time - poseStarted) : new PoseAngles();
+            UpdateFacing();
 
             transform.localPosition = restPosition + new Vector3(0f, step * bobHeight * moving * (1f - poseWeight) + poseAngles.Drop * poseWeight, 0f);
             transform.localRotation = Z(poseAngles.Roll * poseWeight);
@@ -229,11 +285,76 @@ namespace ColonQuest.World
             // Torso: breathing, and a small lean with every step.
             float breath = 1f + Mathf.Sin(time * 2f) * 0.018f;
             rig.Torso.localScale = new Vector3(1f / breath, breath, 1f);
-            torsoLean = Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight;
+            float speed = walkVelocity.magnitude;
+            float sideways = speed > 0.01f ? Mathf.Abs(walkVelocity.x) / speed : 0f;
+            torsoLean = Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight + PersonMotion.WalkLean(moving, sideways) * (1f - poseWeight);
             rig.Torso.localRotation = Z(torsoLean);
 
             SetHandsInFront(poseWeight > 0.5f && PersonPoses.HandsInFront(shownPose));
             AnimateFace(time);
+        }
+
+        /// <summary>
+        /// The walk in world units per second: the Rigidbody2D's velocity for the player, and for the people moved by a
+        /// script (pedestrians, officers) how far their root went since the last frame.
+        /// </summary>
+        private Vector2 WalkVelocity()
+        {
+            if (body != null)
+            {
+                return body.linearVelocity;
+            }
+
+            var root = transform.parent != null ? transform.parent : transform;
+            Vector3 position = root.position;
+            float dt = Time.deltaTime;
+            Vector2 velocity = Vector2.zero;
+            if (hasLastRoot && dt > 0f)
+            {
+                velocity = (Vector2)(position - lastRootPosition) / dt;
+                if (velocity.magnitude > TeleportSpeed)
+                {
+                    velocity = Vector2.zero;
+                }
+            }
+
+            lastRootPosition = position;
+            hasLastRoot = true;
+            return velocity;
+        }
+
+        /// <summary>Shows the back of the head while the person walks up the screen, and the face otherwise.</summary>
+        private void UpdateFacing()
+        {
+            if (!HasBackView)
+            {
+                return;
+            }
+
+            bool free = pose == PersonPose.None && poseWeight < 0.01f;
+            bool walkingAway = free && PersonMotion.FacingAway(walkVelocity, away);
+            if (walkingAway)
+            {
+                lastAwayTime = Time.time;
+            }
+
+            SetAway(walkingAway || (free && away && Time.time - lastAwayTime < AwayGrace));
+        }
+
+        private void SetAway(bool value)
+        {
+            if (value == away || !HasBackView)
+            {
+                return;
+            }
+
+            away = value;
+            rig.BackHead.SetActive(value);
+            rig.Face.SetActive(!value);
+            if (rig.TorsoFront != null)
+            {
+                rig.TorsoFront.SetActive(!value);
+            }
         }
 
         /// <summary>The forearms, hands and what they hold, with the order each was built with.</summary>
