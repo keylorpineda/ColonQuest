@@ -45,6 +45,10 @@ namespace ColonQuest.World.PlayModeTests
 
         public float Seconds => State == VoiceRecorderState.Recording ? 3f : 0f;
 
+        public float Level => State == VoiceRecorderState.Recording ? 0.5f : 0f;
+
+        public bool StopsOnSilence => true;
+
         public void Start() => State = FailOnStart ? VoiceRecorderState.Failed : VoiceRecorderState.Recording;
 
         public void Stop() => State = VoiceRecorderState.Ready;
@@ -122,10 +126,11 @@ namespace ColonQuest.World.PlayModeTests
             Session.SendNegotiationVoice(Clip);
             yield return new WaitForSeconds(0.2f);
 
-            var voiceCall = transport.Requests.Find(r => r.Url.EndsWith("/negotiation/voice", StringComparison.Ordinal));
+            var voiceCall = transport.Requests.Find(r => r.Url.EndsWith("/transcribe", StringComparison.Ordinal));
             Assert.IsNotNull(voiceCall, "the clip went to the backend");
             StringAssert.StartsWith("multipart/form-data", voiceCall.ContentType);
-            StringAssert.Contains("name=\"offerId\"", Encoding.UTF8.GetString(voiceCall.RawBody));
+            StringAssert.Contains("name=\"audio\"", Encoding.UTF8.GetString(voiceCall.RawBody));
+            Assert.IsFalse(Session.Transcribing);
             Assert.AreEqual(GameSession.VoiceFailedNotice, Session.VoiceNotice);
             Assert.AreEqual(0, Session.CurrentNegotiation.Turns.Count);
 
@@ -135,6 +140,61 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(1, Session.CurrentNegotiation.Turns.Count, "the typed turn is answered");
             Assert.IsTrue(Session.CurrentNegotiation.Turns[0].FromLocalSeller);
             Assert.IsNull(Session.VoiceNotice, "the notice goes away once the player types");
+        }
+
+        /// <summary>A backend whose transcription answers at once and whose seller answers only when the test says so.</summary>
+        private sealed class SlowSellerTransport : IHttpTransport
+        {
+            public bool SellerMayAnswer;
+
+            public IEnumerator Send(HttpRequestData request, Action<HttpResponseData> done)
+            {
+                if (request.Url.EndsWith("/sessions", StringComparison.Ordinal))
+                {
+                    done(new HttpResponseData { StatusCode = 201, Text = "{\"sessionId\":\"11111111-2222-3333-4444-555555555555\"}" });
+                }
+                else if (request.Url.EndsWith("/transcribe", StringComparison.Ordinal))
+                {
+                    done(new HttpResponseData { StatusCode = 200, Text = "{\"transcript\":\"Cuanto pago en total?\"}" });
+                }
+                else
+                {
+                    while (!SellerMayAnswer)
+                    {
+                        yield return null;
+                    }
+
+                    done(new HttpResponseData { StatusCode = 200, Text = "{\"transcript\":\"Cuanto pago en total?\",\"npcReply\":\"Diay, mae.\",\"revealedFacts\":[],\"keyQuestionsAsked\":[\"total_cost\"],\"dealStatus\":\"open\"}" });
+                }
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Voice_ShowsThePlayersWordsBeforeTheSellerAnswers()
+        {
+            var transport = new SlowSellerTransport();
+            yield return StartRun(transport);
+            Session.BeginNegotiation();
+            yield return null;
+
+            Session.SendNegotiationVoice(Clip);
+            yield return null;
+            yield return null;
+
+            Assert.IsFalse(Session.Transcribing);
+            Assert.IsTrue(Session.Busy, "the seller is still answering");
+            Assert.AreEqual("Cuanto pago en total?", Session.PendingLine);
+            Assert.AreEqual(0, Session.CurrentNegotiation.Turns.Count);
+            var bubbles = Ui.Find("Negotiation").GetComponentsInChildren<Text>();
+            Assert.IsTrue(Array.Exists(bubbles, t => t.text == "Cuanto pago en total?"), "the player's line is on screen");
+
+            transport.SellerMayAnswer = true;
+            yield return new WaitForSeconds(0.1f);
+
+            Assert.IsFalse(Session.Busy);
+            Assert.IsNull(Session.PendingLine);
+            Assert.AreEqual(1, Session.CurrentNegotiation.Turns.Count);
+            Assert.AreEqual("Diay, mae.", Session.CurrentNegotiation.Turns[0].Seller);
         }
 
         [UnityTest]
