@@ -407,8 +407,8 @@ namespace ColonQuest.UI
                 }
 
                 case "Thing_Pet":
-                    // The player bends to pet the dog and the dog wiggles with joy.
-                    return new Interaction().Face(me).Pose(PersonPose.Reach, 1.6f).Wobble("Pet", 1.4f)
+                    // The player bends to pet the dog and the dog wiggles with joy (the shake is its cue to wag, jump and show a heart).
+                    return new Interaction().Face(me).Pose(PersonPose.Reach, 1.6f).Wobble("Dog", 1.4f)
                         .Sound(SoundEffectKind.Swish).Wait(0.6f).Sound(SoundEffectKind.Chime).Wait(0.8f).Apply(then);
 
                 case "Thing_Doctor":
