@@ -176,6 +176,37 @@ namespace ColonQuest.World
             prop.AddComponent<PropMover>().Begin(from, to, Mathf.Max(0.1f, seconds), 0f, true, 0.06f);
         }
 
+        /// <summary>Pieces thrown out in a fan from a point: paper of many colors, or a prop. They slow down, spread and fade.</summary>
+        public static void Burst(string kind, Vector2 at, int pieces)
+        {
+            Color[] paper =
+            {
+                new Color(0.91f, 0.31f, 0.36f), new Color(1f, 0.82f, 0.25f), new Color(0.3f, 0.64f, 1f),
+                new Color(0.33f, 0.88f, 0.56f), new Color(0.7f, 0.55f, 1f)
+            };
+            for (int i = 0; i < pieces; i++)
+            {
+                // A spread that looks loose but repeats, so nothing here depends on the random numbers of the game.
+                float along = pieces > 1 ? i / (pieces - 1f) : 0.5f;
+                float angle = Mathf.Lerp(25f, 155f, along) * Mathf.Deg2Rad;
+                float reach = 0.8f + (i * 37 % 11) * 0.07f;
+                var to = at + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle) * 0.9f - 0.15f) * reach;
+                GameObject piece;
+                if (kind == "confetti")
+                {
+                    piece = new GameObject("Confetti");
+                    piece.transform.position = at;
+                    Piece(piece.transform, false, Vector2.zero, new Vector2(0.09f, 0.055f), paper[i % paper.Length], i * 47f, 0);
+                }
+                else
+                {
+                    piece = Make(kind, at);
+                }
+
+                piece.AddComponent<PropMover>().Begin(at, to, 0.8f + (i % 4) * 0.12f, (i % 3) * 0.04f, true, 0.03f);
+            }
+        }
+
         /// <summary>An object that stays in a hand until it is let go: it follows the hand and stays upright as the arm turns.</summary>
         public static GameObject InHand(string kind, Transform hand)
         {
