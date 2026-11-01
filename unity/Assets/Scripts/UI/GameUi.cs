@@ -177,38 +177,136 @@ namespace ColonQuest.UI
         private void BuildHud()
         {
             var topLeft = new Vector2(0f, 1f);
-            var hudPaper = new Color(UiKit.Paper.r, UiKit.Paper.g, UiKit.Paper.b, 0.8f);
-            var card = UiKit.Card(canvas.transform, "Hud", hudPaper, new Vector2(470f, 330f), topLeft, new Vector2(24f, -24f));
+            var hudPaper = new Color(UiKit.Paper.r, UiKit.Paper.g, UiKit.Paper.b, 0.86f);
+            var card = UiKit.Card(canvas.transform, "Hud", hudPaper, new Vector2(470f, HudHeight), topLeft, new Vector2(24f, -24f));
+
+            // A thin ribbon in the colors of the Costa Rican flag over the header: blue, white, red, white, blue.
+            var flag = new[] { FlagBlue, Color.white, FlagRed, Color.white, FlagBlue };
+            for (int i = 0; i < flag.Length; i++)
+            {
+                var stripe = UiKit.Fill(card, "FlagStripe" + i, flag[i], new Vector2(434f, i == 2 ? 4f : 2f), topLeft, new Vector2(12f, -8f - (i <= 2 ? i * 2f : i * 2f + 2f)));
+                stripe.type = Image.Type.Simple;
+            }
 
             // Warm header band under the month and clock.
-            UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.65f), new Vector2(434f, 48f), topLeft, new Vector2(12f, -10f));
-            UiKit.Fill(card, "HeaderDivider", new Color(0.18f, 0.20f, 0.30f, 0.16f), new Vector2(426f, 2f), topLeft, new Vector2(16f, -58f));
+            UiKit.Fill(card, "HeaderBand", new Color(0.93f, 0.89f, 0.78f, 0.7f), new Vector2(434f, 46f), topLeft, new Vector2(12f, -22f));
+            UiKit.Fill(card, "HeaderDivider", new Color(0.18f, 0.20f, 0.30f, 0.16f), new Vector2(426f, 2f), topLeft, new Vector2(16f, -70f));
 
-            // Top line: the month and its week on the left, the hour on the right. The tasks go on the bottom line.
-            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(320f, 44f), topLeft, new Vector2(22f, -12f));
+            // Top line: the month and its week on the left, the hour on the right. Their boxes never touch, and a long
+            // month name shrinks to fit (TextFit) instead of running under the clock.
+            monthText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(316f, 44f), topLeft, new Vector2(22f, -23f));
             monthText.font = UiKit.TitleFont;
             monthText.horizontalOverflow = HorizontalWrapMode.Overflow;
-            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -12f), TextAnchor.MiddleRight);
+            clockText = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(100f, 44f), new Vector2(1f, 1f), new Vector2(-22f, -23f), TextAnchor.MiddleRight);
             clockText.font = UiKit.TitleFont;
-            tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(190f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -276f), TextAnchor.MiddleRight);
+            clockText.horizontalOverflow = HorizontalWrapMode.Overflow;
 
-            cashText = Row(card, "Efectivo", 1);
-            savingsText = Row(card, "Ahorros", 2);
-            cardText = Row(card, "Tarjeta", 3);
-            installmentsText = Row(card, "Cuotas al mes", 4);
+            cashText = Row(card, "Efectivo", 1, HudIcon.Cash);
+            savingsText = Row(card, "Ahorros", 2, HudIcon.Savings);
+            cardText = Row(card, "Tarjeta", 3, HudIcon.Card);
+            installmentsText = Row(card, "Cuotas al mes", 4, HudIcon.Installments);
 
-            UiKit.Label(card, "Ánimo", 26, GameUiColors.Muted, new Vector2(200f, 36f), topLeft, new Vector2(22f, -226f));
-            UiKit.Fill(card, "WellbeingOutline", UiKit.Ink, new Vector2(BarWidth + 6f, 32f), topLeft, new Vector2(247f, -228f));
-            UiKit.Fill(card, "WellbeingBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
-            wellbeingFill = UiKit.Fill(card, "WellbeingFill", GameUiColors.Gain, new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -231f));
-            UiKit.Label(card, "[P]  Celular", 24, GameUiColors.Muted, new Vector2(300f, 36f), topLeft, new Vector2(22f, -276f));
+            DrawHudIcon(card, HudIcon.Mood, -RowTop(5));
+            var mood = UiKit.Label(card, "Ánimo", 26, GameUiColors.Muted, new Vector2(180f, 36f), topLeft, new Vector2(RowTextX, -RowTop(5)));
+            mood.horizontalOverflow = HorizontalWrapMode.Overflow;
+            UiKit.Fill(card, "WellbeingOutline", UiKit.Ink, new Vector2(BarWidth + 6f, 32f), topLeft, new Vector2(247f, -RowTop(5) - 2f));
+            UiKit.Fill(card, "WellbeingBack", new Color(0.82f, 0.84f, 0.9f, 1f), new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -RowTop(5) - 5f));
+            wellbeingFill = UiKit.Fill(card, "WellbeingFill", GameUiColors.Gain, new Vector2(BarWidth, 26f), topLeft, new Vector2(250f, -RowTop(5) - 5f));
+
+            // Bottom line: the phone key on the left, the tasks of the month on the right, in boxes that do not overlap.
+            var phoneKey = UiKit.Label(card, "[P]  Celular", 24, GameUiColors.Muted, new Vector2(226f, 36f), topLeft, new Vector2(22f, -HudHeight + 50f));
+            phoneKey.horizontalOverflow = HorizontalWrapMode.Overflow;
+            tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(186f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -HudHeight + 50f), TextAnchor.MiddleRight);
+            tasksText.horizontalOverflow = HorizontalWrapMode.Overflow;
         }
 
-        private Text Row(RectTransform card, string label, int index)
+        private const float HudHeight = 344f;
+        private const float RowTextX = 62f;
+        private static readonly Color FlagBlue = GamePalette.Hex("#002B7F");
+        private static readonly Color FlagRed = GamePalette.Hex("#CE1126");
+
+        private enum HudIcon
         {
-            float y = -(14f + 44f + index * 40f) + 36f;
-            UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(280f, 36f), new Vector2(0f, 1f), new Vector2(22f, y));
-            return UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(160f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
+            Cash,
+            Savings,
+            Card,
+            Installments,
+            Mood
+        }
+
+        /// <summary>The top of the row <paramref name="index"/> (1 is the first money row), in pixels below the top of the card.</summary>
+        private static float RowTop(int index)
+        {
+            return 36f + index * 40f;
+        }
+
+        private Text Row(RectTransform card, string label, int index, HudIcon icon)
+        {
+            float y = -RowTop(index);
+            DrawHudIcon(card, icon, y);
+
+            // Label on the left (62 to 248) and value on the right (252 to 448): the two boxes never overlap, and a
+            // longer translation or a bigger amount shrinks inside its own box.
+            var name = UiKit.Label(card, label, 26, GameUiColors.Muted, new Vector2(186f, 36f), new Vector2(0f, 1f), new Vector2(RowTextX, y));
+            name.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var value = UiKit.Label(card, string.Empty, 30, UiKit.Ink, new Vector2(196f, 36f), new Vector2(1f, 1f), new Vector2(-22f, y), TextAnchor.MiddleRight);
+            value.horizontalOverflow = HorizontalWrapMode.Overflow;
+            return value;
+        }
+
+        /// <summary>
+        /// A small round badge in front of a row, drawn with shapes (no font glyphs needed): a coin for cash, a piggy bank
+        /// for savings, a card, a calendar page for the installments and a heart for the mood.
+        /// </summary>
+        private static void DrawHudIcon(RectTransform card, HudIcon icon, float rowTop)
+        {
+            var topLeft = new Vector2(0f, 1f);
+            var at = new Vector2(22f, rowTop - 2f);
+            const float size = 32f;
+            UiKit.Round(card, "Icon_" + icon + "_Outline", UiKit.Ink, size, topLeft, at);
+            var center = at + new Vector2(size * 0.5f, -size * 0.5f);
+            switch (icon)
+            {
+                case HudIcon.Cash:
+                    UiKit.Round(card, "Icon_Cash", GamePalette.Hex("#FFD23F"), size - 6f, topLeft, at + new Vector2(3f, -3f));
+                    UiKit.Round(card, "Icon_CashRim", GamePalette.Hex("#E0A800"), size - 16f, topLeft, at + new Vector2(8f, -8f));
+                    UiKit.Round(card, "Icon_CashCore", GamePalette.Hex("#FFE27A"), size - 20f, topLeft, at + new Vector2(10f, -10f));
+                    break;
+                case HudIcon.Savings:
+                    UiKit.Round(card, "Icon_Savings", GamePalette.Hex("#FF9DB5"), size - 6f, topLeft, at + new Vector2(3f, -3f));
+                    IconFill(UiKit.Fill(card, "Icon_SavingsSlot", UiKit.Ink, new Vector2(10f, 3f), topLeft, center + new Vector2(-5f, 8f)));
+                    UiKit.Round(card, "Icon_SavingsSnout", GamePalette.Hex("#E86F8E"), 9f, topLeft, center + new Vector2(4f, 0f));
+                    break;
+                case HudIcon.Card:
+                    UiKit.Round(card, "Icon_CardBack", GamePalette.Hex("#8FD3FF"), size - 6f, topLeft, at + new Vector2(3f, -3f));
+                    IconFill(UiKit.Fill(card, "Icon_Card", GamePalette.Hex("#1D4F8C"), new Vector2(18f, 13f), topLeft, center + new Vector2(-9f, 6.5f)));
+                    IconFill(UiKit.Fill(card, "Icon_CardStripe", GamePalette.Hex("#FFD23F"), new Vector2(18f, 3f), topLeft, center + new Vector2(-9f, 2f)));
+                    break;
+                case HudIcon.Installments:
+                    UiKit.Round(card, "Icon_CalendarBack", GamePalette.Hex("#C9E8B8"), size - 6f, topLeft, at + new Vector2(3f, -3f));
+                    IconFill(UiKit.Fill(card, "Icon_Calendar", Color.white, new Vector2(16f, 15f), topLeft, center + new Vector2(-8f, 6f)));
+                    IconFill(UiKit.Fill(card, "Icon_CalendarTop", FlagRed, new Vector2(16f, 5f), topLeft, center + new Vector2(-8f, 7f)));
+                    break;
+                default:
+                    UiKit.Round(card, "Icon_MoodBack", GamePalette.Hex("#FFE0E0"), size - 6f, topLeft, at + new Vector2(3f, -3f));
+                    UiKit.Round(card, "Icon_HeartL", GameUiColors.Loss, 10f, topLeft, center + new Vector2(-8.5f, 6f));
+                    UiKit.Round(card, "Icon_HeartR", GameUiColors.Loss, 10f, topLeft, center + new Vector2(-1.5f, 6f));
+                    var tip = IconFill(UiKit.Fill(card, "Icon_HeartTip", GameUiColors.Loss, new Vector2(9f, 9f), new Vector2(0.5f, 0.5f), Vector2.zero));
+                    tip.type = Image.Type.Simple;
+                    var tipRect = tip.rectTransform;
+                    tipRect.anchorMin = topLeft;
+                    tipRect.anchorMax = topLeft;
+                    tipRect.anchoredPosition = center + new Vector2(0f, -2f);
+                    tipRect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                    break;
+            }
+        }
+
+        /// <summary>A tiny icon part: the rounded sprite scaled whole, since nine-slicing breaks below its border size.</summary>
+        private static Image IconFill(Image image)
+        {
+            image.type = Image.Type.Simple;
+            return image;
         }
 
         private void BuildPrompt()
