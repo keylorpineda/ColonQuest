@@ -195,6 +195,14 @@ namespace ColonQuest.UI
             var go = new GameObject("CinematicBars", typeof(RectTransform));
             go.transform.SetParent(canvas, false);
             go.transform.SetAsFirstSibling();
+
+            // It covers the whole canvas: the bars are placed against the edges of the screen, not against this object.
+            var area = (RectTransform)go.transform;
+            area.anchorMin = Vector2.zero;
+            area.anchorMax = Vector2.one;
+            area.offsetMin = Vector2.zero;
+            area.offsetMax = Vector2.zero;
+
             var bars = go.AddComponent<CinematicBars>();
             bars.top = Bar(go.transform, new Vector2(0.5f, 1f));
             bars.bottom = Bar(go.transform, new Vector2(0.5f, 0f));

@@ -206,6 +206,30 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator CinematicBars_LeaveTheScreenAndNeverCrossItsMiddle()
+        {
+            yield return null;
+            var bars = CinematicBars.Create(Menu);
+            yield return null;
+            var area = (RectTransform)bars.transform;
+            var canvas = (RectTransform)Menu;
+            Assert.AreEqual(canvas.rect.size, area.rect.size, "the bars are placed against the screen");
+
+            var worldCorners = new Vector3[4];
+            float top = canvas.rect.yMax;
+            float bottom = canvas.rect.yMin;
+            foreach (RectTransform bar in bars.transform)
+            {
+                bar.GetWorldCorners(worldCorners);
+                float low = canvas.InverseTransformPoint(worldCorners[0]).y;
+                float high = canvas.InverseTransformPoint(worldCorners[1]).y;
+                Assert.IsTrue(low >= top - 0.01f || high <= bottom + 0.01f, "hidden, a bar is off the screen: " + low + " to " + high);
+            }
+
+            Object.Destroy(bars.gameObject);
+        }
+
+        [UnityTest]
         public IEnumerator Credits_OpenAndCloseAndNameTheTeam()
         {
             yield return null;
