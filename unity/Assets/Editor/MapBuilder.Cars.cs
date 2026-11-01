@@ -28,7 +28,6 @@ namespace ColonQuest.EditorTools
 
         private static Transform Car(Transform parent, Transform shadows, float x, float y, string hex, float speed = 0f, bool tinted = false, CarShape? style = null)
         {
-            SpriteFactory.EnsureCarsGenerated();
             var shape = style ?? CarShapeAt(x, y);
             var root = Root(parent, "Car", new Vector2(x, y), y - 0.55f);
             bool driving = speed != 0f;
