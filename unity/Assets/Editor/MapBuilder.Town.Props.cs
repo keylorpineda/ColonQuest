@@ -1302,15 +1302,6 @@ namespace ColonQuest.EditorTools
             canopyRig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 1.45f, x * 0.53f + y * 0.71f, 0.008f, true, 2.4f, 16f, true, 1.58f * scale);
             canopyRig.gameObject.AddComponent<LeafBurst>().Configure(palmFrondSprite != null ? palmFrondSprite : circle, GamePalette.Hex(leaf), LayerWorld, 900);
 
-            // Tropical banana/plantain fronds peeking out behind the tree crown
-            if (palmFrondSprite != null)
-            {
-                var frondL = Shape(canopyRig, "BananaFrond_L", palmFrondSprite, new Vector2(-0.88f, 0.18f) * scale, new Vector2(1.65f, 0.78f) * scale, GamePalette.Hex("#4CB848"), 1);
-                Tilt(frondL, 148f);
-                var frondR = Shape(canopyRig, "BananaFrond_R", palmFrondSprite, new Vector2(0.86f, 0.16f) * scale, new Vector2(1.65f, 0.78f) * scale, GamePalette.Hex("#3FA642"), 1);
-                Tilt(frondR, 32f);
-            }
-
             // Multi-layered volumetric hand-inked tree canopy clusters
             var canopySpr = treeCanopySprite != null ? treeCanopySprite : circle;
             var deepLeaf = GamePalette.Hex("#247339");
