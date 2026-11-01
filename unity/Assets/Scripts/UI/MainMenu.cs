@@ -48,7 +48,6 @@ namespace ColonQuest.UI
         private GameObject credits;
         private GameObject quitConfirm;
         private SettingsPanel settings;
-        private MenuToucanMotion toucanMotion;
 
         private void Awake()
         {
@@ -66,10 +65,6 @@ namespace ColonQuest.UI
             settings = new SettingsPanel(root, null);
             openedAt = Time.unscaledTime;
             BuildSplash();
-            if (splash == null && toucanMotion != null)
-            {
-                toucanMotion.PlayArrival();
-            }
         }
 
         private void OnEnable()
@@ -245,9 +240,6 @@ namespace ColonQuest.UI
             var image = art.gameObject.AddComponent<Image>();
             image.sprite = Resources.Load<Sprite>("Menu/KeyArt");
             image.raycastTarget = false;
-
-            MenuVolcanoSmoke.Create(art);
-            toucanMotion = MenuToucanMotion.Create(art);
         }
 
         private void BuildTitle()
@@ -492,10 +484,6 @@ namespace ColonQuest.UI
                     splashLeaving = true;
                     splashLeftAt = now;
                     openedAt = now;
-                    if (toucanMotion != null)
-                    {
-                        toucanMotion.PlayArrival();
-                    }
                 }
 
                 return true;
