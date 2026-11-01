@@ -24,7 +24,22 @@ namespace ColonQuest.World
         HandsUp,
 
         /// <summary>The right hand goes down to the pocket of the pants.</summary>
-        Pocket
+        Pocket,
+
+        /// <summary>Stretches arms up and back slightly.</summary>
+        Stretch,
+
+        /// <summary>Scratches the head with the right hand.</summary>
+        ScratchHead,
+
+        /// <summary>Looks around casually.</summary>
+        LookAround,
+
+        /// <summary>Checks the phone with one hand.</summary>
+        CheckPhone,
+
+        /// <summary>Shifts weight from one leg to the other.</summary>
+        ShiftWeight
     }
 
     /// <summary>
@@ -140,6 +155,24 @@ namespace ColonQuest.World
                 case PersonPose.Wash:
                     return new PoseAngles { ArmR = -26f, ElbowR = -60f + Mathf.Sin(t * 9f) * 8f, ArmL = 26f, ElbowL = 60f - Mathf.Sin(t * 9f) * 8f, Lean = 4f };
 
+                case PersonPose.Stretch:
+                {
+                    float stretch = Mathf.Clamp01(t * 3f);
+                    return new PoseAngles { ArmR = 140f * stretch, ElbowR = 20f * stretch, ArmL = -140f * stretch, ElbowL = -20f * stretch, Lean = -4f * stretch };
+                }
+
+                case PersonPose.ScratchHead:
+                    return new PoseAngles { ArmR = 150f + Mathf.Sin(t * 14f) * 8f, ElbowR = 70f, Lean = 3f };
+
+                case PersonPose.LookAround:
+                    return new PoseAngles { ArmL = 8f, ArmR = -8f, Lean = Mathf.Sin(t * 2f) * 4f };
+
+                case PersonPose.CheckPhone:
+                    return new PoseAngles { ArmR = -18f, ElbowR = -70f, ArmL = 12f, ElbowL = 30f, Lean = 4f };
+
+                case PersonPose.ShiftWeight:
+                    return new PoseAngles { Lean = Mathf.Sin(t * 1.5f) * 3f, Drop = -0.02f, LegL = -4f, LegR = 4f };
+
                 default:
                     return new PoseAngles();
             }
@@ -168,6 +201,8 @@ namespace ColonQuest.World
                 case PersonPose.Wash:
                 case PersonPose.Cook:
                 case PersonPose.Pocket:
+                case PersonPose.ScratchHead:
+                case PersonPose.CheckPhone:
                     return true;
                 default:
                     return false;

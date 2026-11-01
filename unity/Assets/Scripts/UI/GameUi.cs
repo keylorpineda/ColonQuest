@@ -363,11 +363,30 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- frame
 
+        private float nextMoodUpdate;
+
         private void Update()
         {
             if (!canvas.enabled)
             {
                 return;
+            }
+
+            if (Time.time >= nextMoodUpdate)
+            {
+                nextMoodUpdate = Time.time + 1f;
+                if (session?.State != null)
+                {
+                    var hero = GameObject.FindWithTag(Station.PlayerTag);
+                    if (hero != null)
+                    {
+                        var anim = hero.GetComponentInChildren<PlayerAnimator>();
+                        if (anim != null)
+                        {
+                            anim.SetMood(session.State.Wellbeing / 100f);
+                        }
+                    }
+                }
             }
 
             TickIncidents();

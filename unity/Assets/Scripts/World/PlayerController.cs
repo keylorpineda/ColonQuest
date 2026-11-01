@@ -25,17 +25,27 @@ namespace ColonQuest.World
         /// <summary>Set while an animation moves the player (a hit, an arrest): the keys do nothing and the walk does not fight the animation.</summary>
         public static bool Frozen { get; set; }
 
+        private FacingTurn facingTurn;
+
         /// <summary>Sets the child that is mirrored to face the walking direction.</summary>
         public void SetVisual(Transform target)
         {
             visual = target;
+            if (visual != null)
+            {
+                facingTurn = visual.GetComponent<FacingTurn>() ?? visual.gameObject.AddComponent<FacingTurn>();
+            }
         }
 
         /// <summary>Turns the player to face left (-1) or right (1), for the animated scenes.</summary>
         public void Face(int sign)
         {
             facing = sign >= 0 ? 1 : -1;
-            if (visual != null)
+            if (facingTurn != null)
+            {
+                facingTurn.SnapTo(facing);
+            }
+            else if (visual != null)
             {
                 visual.localScale = new Vector3(facing, 1f, 1f);
             }
@@ -72,7 +82,11 @@ namespace ColonQuest.World
             }
 
             facing = MovementMath.FacingSign(input.x, facing);
-            if (visual != null)
+            if (facingTurn != null)
+            {
+                facingTurn.TurnTo(facing);
+            }
+            else if (visual != null)
             {
                 visual.localScale = new Vector3(facing, 1f, 1f);
             }

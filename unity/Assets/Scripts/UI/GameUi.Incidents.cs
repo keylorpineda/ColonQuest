@@ -60,6 +60,7 @@ namespace ColonQuest.UI
         /// </summary>
         private void OnStoppedByOfficer(OffenseKind offense)
         {
+            ReactionBubble.Show(ReactionKind.Alert);
             if (offense == OffenseKind.RedLight && !SceneTransition.IsBusy && !modal.IsOpen)
             {
                 ShowRedLightFine();
@@ -136,6 +137,7 @@ namespace ColonQuest.UI
             }
 
             var player = GameObject.FindWithTag(Station.PlayerTag);
+            ReactionBubble.Show(ReactionKind.Angry);
             effects.Flash(new Color(1f, 1f, 1f, 0.8f), 0.5f);
             HitAnimation.Play(player != null ? player.transform : null, TrafficCar.LastHitFrom, () =>
             {

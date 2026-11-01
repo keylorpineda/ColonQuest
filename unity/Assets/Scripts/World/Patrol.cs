@@ -17,6 +17,7 @@ namespace ColonQuest.World
         [SerializeField] private Vector2 homePoint;
 
         private Transform visual;
+        private FacingTurn facingTurn;
         private PlayerAnimator animator;
         private Collider2D talkCollider;
         private Vector2 target;
@@ -51,9 +52,14 @@ namespace ColonQuest.World
         public void Greet(Vector2 playerPosition, float seconds)
         {
             chatUntil = Time.time + seconds;
-            if (visual != null)
+            int sign = playerPosition.x >= transform.position.x ? 1 : -1;
+            if (facingTurn != null)
             {
-                visual.localScale = new Vector3(playerPosition.x >= transform.position.x ? 1f : -1f, 1f, 1f);
+                facingTurn.SnapTo(sign);
+            }
+            else if (visual != null)
+            {
+                visual.localScale = new Vector3(sign, 1f, 1f);
             }
         }
 
@@ -67,6 +73,10 @@ namespace ColonQuest.World
             {
                 animator = bob.GetComponent<PlayerAnimator>();
                 visual = bob.Find("Visual");
+                if (visual != null)
+                {
+                    facingTurn = visual.GetComponent<FacingTurn>() ?? visual.gameObject.AddComponent<FacingTurn>();
+                }
             }
 
             var talk = transform.Find("Talk");
@@ -115,9 +125,11 @@ namespace ColonQuest.World
                     float dirX = nextPos.x - currentPos.x;
                     transform.position = nextPos;
 
-                    if (visual != null && Mathf.Abs(dirX) > 0.0001f)
+                    if (Mathf.Abs(dirX) > 0.0001f)
                     {
-                        visual.localScale = new Vector3(dirX > 0f ? 1f : -1f, 1f, 1f);
+                        int sign = dirX > 0f ? 1 : -1;
+                        if (facingTurn != null) facingTurn.TurnTo(sign);
+                        else if (visual != null) visual.localScale = new Vector3(sign, 1f, 1f);
                     }
 
                     SetWalking(1f);
@@ -172,9 +184,11 @@ namespace ColonQuest.World
             float dx = next.x - position.x;
             transform.position = next;
 
-            if (visual != null && Mathf.Abs(dx) > 0.0001f)
+            if (Mathf.Abs(dx) > 0.0001f)
             {
-                visual.localScale = new Vector3(dx > 0f ? 1f : -1f, 1f, 1f);
+                int sign = dx > 0f ? 1 : -1;
+                if (facingTurn != null) facingTurn.TurnTo(sign);
+                else if (visual != null) visual.localScale = new Vector3(sign, 1f, 1f);
             }
 
             SetWalking(1f);

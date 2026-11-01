@@ -13,7 +13,7 @@ namespace ColonQuest.World
         /// <summary>The swing of a leg, in degrees. The two legs move in opposite directions.</summary>
         public static float LegAngle(float phase, float moving, bool left)
         {
-            return (left ? 1f : -1f) * Mathf.Sin(phase) * 26f * moving;
+            return (left ? 1f : -1f) * Mathf.Sin(phase) * 30f * moving;
         }
 
         /// <summary>The swing of an arm, opposite to the leg on the same side.</summary>
@@ -156,7 +156,7 @@ namespace ColonQuest.World
         /// </summary>
         public static float StepSquash(float step, float moving)
         {
-            return 1f + (Mathf.Clamp01(step) - 0.4f) * 0.05f * Mathf.Clamp01(moving);
+            return 1f + (Mathf.Clamp01(step) - 0.4f) * 0.09f * Mathf.Clamp01(moving);
         }
 
         /// <summary>
@@ -165,7 +165,73 @@ namespace ColonQuest.World
         /// </summary>
         public static float WalkLean(float moving, float sideways01)
         {
-            return -3f * Mathf.Clamp01(moving) * Mathf.Clamp01(sideways01);
+            return -5f * Mathf.Clamp01(moving) * Mathf.Clamp01(sideways01);
+        }
+
+        /// <summary>
+        /// The bend of an elbow while walking, in degrees, in the arm's own space: 10 to 35 degrees, a little after the
+        /// shoulder (0.6 radians). Zero when standing.
+        /// </summary>
+        public static float ElbowSwing(float phase, float moving, bool left)
+        {
+            return -(left ? -1f : 1f) * (10f + 25f * Mathf.Max(0f, Mathf.Sin(phase - 0.6f * (left ? 1f : -1f)))) * moving;
+        }
+
+        /// <summary>The angle hair or a tie drags toward, in degrees: against the walk, limited, plus half the torso lean.</summary>
+        public static float SwayTarget(float walkVelocityX, float torsoLean)
+        {
+            return Mathf.Clamp(-walkVelocityX * 2.2f, -14f, 14f) + torsoLean * 0.5f;
+        }
+
+        /// <summary>The width of the shadow: it narrows to 85% while the body rises in the step.</summary>
+        public static float ShadowScale(float step, float moving)
+        {
+            return 1f - Mathf.Clamp01(step) * 0.15f * Mathf.Clamp01(moving);
+        }
+
+        /// <summary>Where the pupils wander to while nobody is near, in x and y, from two numbers between 0 and 1.</summary>
+        public static Vector2 EyeWander(float random01X, float random01Y)
+        {
+            return new Vector2((Mathf.Clamp01(random01X) * 2f - 1f) * 0.012f, (Mathf.Clamp01(random01Y) * 2f - 1f) * 0.006f);
+        }
+
+        /// <summary>The delay until the pupils wander again, from 1.5 to 3.5 seconds.</summary>
+        public static float NextWanderDelay(float random01)
+        {
+            return 1.5f + Mathf.Clamp01(random01) * 2f;
+        }
+
+        /// <summary>True when a blink should be followed by a second one a moment later (20% of the time).</summary>
+        public static bool DoubleBlink(float random01)
+        {
+            return random01 < 0.2f;
+        }
+
+        /// <summary>The seconds between the first blink and the second one.</summary>
+        public const float DoubleBlinkGap = 0.18f;
+
+        /// <summary>The brow tilt (degrees, inward) for a mood from 0 to 1: sad under 0.35, neutral otherwise.</summary>
+        public static float BrowTilt(float wellbeing01)
+        {
+            return wellbeing01 < 0.35f ? 10f : 0f;
+        }
+
+        /// <summary>The mouth height at rest for a mood from 0 to 1: flat when sad, a smile when happy, the base otherwise.</summary>
+        public static float MoodMouthRest(float wellbeing01, float baseRest)
+        {
+            if (wellbeing01 < 0.35f)
+            {
+                return 0.25f;
+            }
+
+            return wellbeing01 > 0.75f ? Mathf.Max(baseRest, 0.55f) : baseRest;
+        }
+
+        /// <summary>The scale on x while turning around: |cos(t*pi)| from full width down to 0.15 and back up (the sign flips halfway).</summary>
+        public static float TurnWidth(float progress01)
+        {
+            float t = Mathf.Clamp01(progress01);
+            return Mathf.Max(0.15f, Mathf.Abs(Mathf.Cos(t * Mathf.PI)));
         }
     }
 }

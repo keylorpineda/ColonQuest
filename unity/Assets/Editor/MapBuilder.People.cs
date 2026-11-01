@@ -43,7 +43,7 @@ namespace ColonQuest.EditorTools
 
             var shadowColor = GamePalette.Outline;
             shadowColor.a = 0.45f;
-            Shape(root, "Shadow", softCircle, new Vector2(0f, -0.52f), new Vector2(0.9f * width, 0.3f), shadowColor, OrderPlayer - 1);
+            var shadow = Shape(root, "Shadow", softCircle, new Vector2(0f, -0.52f), new Vector2(0.9f * width, 0.3f), shadowColor, OrderPlayer - 1);
 
             var bob = new GameObject("Bob").transform;
             bob.SetParent(root, false);
@@ -58,6 +58,7 @@ namespace ColonQuest.EditorTools
             var shirt = GamePalette.Hex(look.Skin);
 
             var rig = new PersonRig();
+            rig.Shadow = shadow != null ? shadow.transform : null;
 
             rig.LegL = Leg(visual, "LegL", -0.1f * width, look, pants, skin);
             rig.LegR = Leg(visual, "LegR", 0.1f * width, look, pants, skin);
@@ -158,7 +159,7 @@ namespace ColonQuest.EditorTools
             bool hat = look.Hat != Hat.None;
             var ink = GamePalette.Hex("#2A2F45");
 
-            DrawHairBehind(head, look, hair, hat);
+            DrawHairBehind(head, look, hair, hat, rig);
             if (look.Hat == Hat.Hood)
             {
                 Part2(head, "Hood", rounded, new Vector2(0f, 0.2f), new Vector2(0.62f * h, 0.56f), GamePalette.Hex(look.HatColor), OrderPlayer + 8);
@@ -392,25 +393,38 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>The hair that sits behind the head. With a hat only what falls at the back or the sides stays.</summary>
-        private static void DrawHairBehind(Transform head, Look look, Color hair, bool hat)
+        private static void DrawHairBehind(Transform head, Look look, Color hair, bool hat, PersonRig rig)
         {
             float h = look.Head;
+            Transform hairParent = head;
+            Vector2 swayOffset = Vector2.zero;
+            if (look.Hair == HairStyle.Long || look.Hair == HairStyle.Ponytail || look.Hair == HairStyle.Bun || look.Hair == HairStyle.Bob)
+            {
+                var hairSway = new GameObject("HairSway").transform;
+                hairSway.SetParent(head, false);
+                Vector2 pivotPos = look.Hair == HairStyle.Ponytail ? new Vector2(0.27f * h, 0.18f) : new Vector2(0f, 0.38f);
+                hairSway.localPosition = (Vector3)pivotPos;
+                rig.HairSway = hairSway;
+                hairParent = hairSway;
+                swayOffset = -pivotPos;
+            }
+
             switch (look.Hair)
             {
                 case HairStyle.Long:
-                    Part2(head, "HairLong", rounded, new Vector2(0f, 0.17f), new Vector2(0.6f * h, 0.52f), hair, OrderPlayer + 9);
+                    Part2(hairParent, "HairLong", rounded, new Vector2(0f, 0.17f) + swayOffset, new Vector2(0.6f * h, 0.52f), hair, OrderPlayer + 9);
                     break;
                 case HairStyle.Afro:
                     Part2(head, "HairAfro", circle, new Vector2(0f, 0.36f), new Vector2(0.68f * h, 0.42f), hair, OrderPlayer + 8);
                     break;
                 case HairStyle.Bob:
-                    Part2(head, "HairBob", rounded, new Vector2(0f, 0.2f), new Vector2(0.58f * h, 0.42f), hair, OrderPlayer + 8);
+                    Part2(hairParent, "HairBob", rounded, new Vector2(0f, 0.2f) + swayOffset, new Vector2(0.58f * h, 0.42f), hair, OrderPlayer + 8);
                     break;
                 case HairStyle.Ponytail:
-                    Part2Rot(head, "Tail", rounded, new Vector2(0.27f * h, 0.18f), new Vector2(0.11f, 0.3f), hair, OrderPlayer + 8, -12f);
+                    Part2Rot(hairParent, "Tail", rounded, new Vector2(0.27f * h, 0.18f) + swayOffset, new Vector2(0.11f, 0.3f), hair, OrderPlayer + 8, -12f);
                     if (!hat)
                     {
-                        Part2(head, "HairBack", circle, new Vector2(0f, 0.27f), new Vector2(0.54f * h, 0.4f), hair, OrderPlayer + 9);
+                        Part2(hairParent, "HairBack", circle, new Vector2(0f, 0.27f) + swayOffset, new Vector2(0.54f * h, 0.4f), hair, OrderPlayer + 9);
                     }
 
                     break;
@@ -421,8 +435,8 @@ namespace ColonQuest.EditorTools
                 case HairStyle.Bun:
                     if (!hat)
                     {
-                        Part2(head, "Bun", circle, new Vector2(0f, 0.55f), Vector2.one * 0.17f, hair, OrderPlayer + 7);
-                        Part2(head, "HairBack", circle, new Vector2(0f, 0.27f), new Vector2(0.54f * h, 0.4f), hair, OrderPlayer + 9);
+                        Part2(hairParent, "Bun", circle, new Vector2(0f, 0.55f) + swayOffset, Vector2.one * 0.17f, hair, OrderPlayer + 7);
+                        Part2(hairParent, "HairBack", circle, new Vector2(0f, 0.27f) + swayOffset, new Vector2(0.54f * h, 0.4f), hair, OrderPlayer + 9);
                     }
 
                     break;
@@ -599,14 +613,22 @@ namespace ColonQuest.EditorTools
 
             if (Has(look, Extras.Scarf))
             {
-                Shape(torso, "Scarf", roundedSmall, new Vector2(0f, 0.2f * hh), new Vector2(0.34f * w, 0.09f), wear, order + 2);
-                Shape(torso, "ScarfTail", roundedSmall, new Vector2(-0.06f, 0.1f), new Vector2(0.07f, 0.2f), wear, order + 2);
+                var tieSway = new GameObject("TieSway").transform;
+                tieSway.SetParent(torso, false);
+                tieSway.localPosition = new Vector3(0f, 0.2f * hh, 0f);
+                rig.TieSway = tieSway;
+                Shape(tieSway, "Scarf", roundedSmall, Vector2.zero, new Vector2(0.34f * w, 0.09f), wear, order + 2);
+                Shape(tieSway, "ScarfTail", roundedSmall, new Vector2(-0.06f, 0.1f - 0.2f * hh), new Vector2(0.07f, 0.2f), wear, order + 2);
             }
 
             if (Has(look, Extras.Tie))
             {
-                Part2(torso, "Tie", roundedSmall, new Vector2(0f, 0.04f), new Vector2(0.09f, 0.3f), wear, order + 2);
-                Shape(torso, "Knot", roundedSmall, new Vector2(0f, 0.19f * hh), new Vector2(0.07f, 0.05f), GamePalette.Shade(wear, 0.8f), order + 4);
+                var tieSway = new GameObject("TieSway").transform;
+                tieSway.SetParent(torso, false);
+                tieSway.localPosition = new Vector3(0f, 0.19f * hh, 0f);
+                rig.TieSway = tieSway;
+                Part2(tieSway, "Tie", roundedSmall, new Vector2(0f, 0.04f - 0.19f * hh), new Vector2(0.09f, 0.3f), wear, order + 2);
+                Shape(tieSway, "Knot", roundedSmall, Vector2.zero, new Vector2(0.07f, 0.05f), GamePalette.Shade(wear, 0.8f), order + 4);
             }
 
             if (Has(look, Extras.Lanyard))
