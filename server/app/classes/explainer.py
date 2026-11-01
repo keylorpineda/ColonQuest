@@ -38,6 +38,21 @@ CONCEPT_NAMES = {
     "inflation": "inflación",
     "exchange_rate": "tipo de cambio",
     "payroll_deductions": "rebajos de planilla",
+    "invest_in_yourself": "invertir en uno mismo",
+}
+
+CONCEPT_NAMES_EN = {
+    "budget": "budgeting",
+    "emergency_fund": "emergency fund",
+    "compound_interest": "compound interest",
+    "minimum_payment": "minimum payment",
+    "installments_total_cost": "total cost of installments",
+    "informal_lending": "informal loans",
+    "pyramid_scheme": "pyramid schemes",
+    "inflation": "inflation",
+    "exchange_rate": "exchange rate",
+    "payroll_deductions": "payroll deductions",
+    "invest_in_yourself": "investing in yourself",
 }
 
 SYSTEM_PROMPT = """You explain classroom results of "Colón Quest", a financial-literacy game, to \
@@ -49,6 +64,8 @@ discussion about it. Mention how many negotiation turns caught the hidden costs.
 - Use only the numbers in the data. Never invent figures or students.
 
 Answer with JSON only, matching the provided schema."""
+
+SYSTEM_PROMPT_EN = SYSTEM_PROMPT.replace("- Spanish, clear", "- English, clear")
 
 
 class ExplanationText(ContractModel):
@@ -75,7 +92,12 @@ class Explanation:
     source: str
 
 
-def figures_payload(figures: ClassFigures) -> str:
+def is_english(language: str) -> bool:
+    return language.lower().startswith("en")
+
+
+def figures_payload(figures: ClassFigures, language: str = "es") -> str:
+    names = CONCEPT_NAMES_EN if is_english(language) else CONCEPT_NAMES
     return json.dumps(
         {
             "students": figures.students,
@@ -89,7 +111,7 @@ def figures_payload(figures: ClassFigures) -> str:
             ),
             "concepts": [
                 {
-                    "concept": CONCEPT_NAMES[metric.concept.value],
+                    "concept": names[metric.concept.value],
                     "decisions": metric.decisions,
                     "riskyChoicePct": metric.risky_choice_pct,
                 }
@@ -100,7 +122,29 @@ def figures_payload(figures: ClassFigures) -> str:
     )
 
 
-def fallback_explanation(figures: ClassFigures) -> str:
+def fallback_explanation_en(figures: ClassFigures) -> str:
+    if figures.students == 0:
+        return "Nobody in this class has played yet. Share the code with your students."
+    parts = [f"{figures.students} students played and {figures.finished_games} finished the year."]
+    measured = [m for m in figures.concepts if m.risky_choice_pct is not None]
+    if measured:
+        worst = max(measured, key=lambda metric: metric.risky_choice_pct or 0)
+        parts.append(
+            "The topic with the most decisions that raised their debt was "
+            f"{CONCEPT_NAMES_EN[worst.concept.value]} ({worst.risky_choice_pct}%); "
+            "it is worth discussing in class."
+        )
+    if figures.trap_detection_pct is not None:
+        parts.append(
+            f"In the negotiations, {figures.trap_detection_pct}% of the turns asked about the "
+            "total cost, the insurance or hidden charges."
+        )
+    return " ".join(parts)
+
+
+def fallback_explanation(figures: ClassFigures, language: str = "es") -> str:
+    if is_english(language):
+        return fallback_explanation_en(figures)
     if figures.students == 0:
         return "Todavía nadie de esta clase ha jugado. Compartí el código con tus estudiantes."
     parts = [
@@ -128,23 +172,27 @@ class ClassExplainer:
         self._settings = settings
 
     async def explain(
-        self, ledger: Ledger, figures: ClassFigures, session_id: uuid.UUID | None = None
+        self,
+        ledger: Ledger,
+        figures: ClassFigures,
+        session_id: uuid.UUID | None = None,
+        language: str = "es",
     ) -> Explanation:
         if figures.students == 0:
-            return Explanation(fallback_explanation(figures), "fallback")
+            return Explanation(fallback_explanation(figures, language), "fallback")
         model = select_text_model(
             self._settings.class_report_model, await ledger.budget_mode(), self._settings
         )
         if model is None:
-            return Explanation(fallback_explanation(figures), "fallback")
+            return Explanation(fallback_explanation(figures, language), "fallback")
 
         started = time.perf_counter()
         try:
             async with asyncio.timeout(self._settings.model_timeout_s):
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
-                    user=figures_payload(figures),
+                    system=SYSTEM_PROMPT_EN if is_english(language) else SYSTEM_PROMPT,
+                    user=figures_payload(figures, language),
                     output=ExplanationText,
                     reasoning_effort=self._settings.live_reasoning_effort,
                     max_tokens=2000,  # reasoning tokens count against this
@@ -157,7 +205,7 @@ class ClassExplainer:
                 ok=False,
                 session_id=session_id,
             )
-            return Explanation(fallback_explanation(figures), "fallback")
+            return Explanation(fallback_explanation(figures, language), "fallback")
 
         await ledger.record(
             usage=result.usage,
@@ -169,5 +217,5 @@ class ClassExplainer:
         text = result.value.explanation
         if any(amount not in figures.amounts for amount in quoted_amounts(text)):
             logger.warning("class explanation quoted invented amounts")
-            return Explanation(fallback_explanation(figures), "fallback")
+            return Explanation(fallback_explanation(figures, language), "fallback")
         return Explanation(text, "model")

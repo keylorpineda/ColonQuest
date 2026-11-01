@@ -3,6 +3,8 @@ from typing import Any
 import pytest
 
 from app.classes.explainer import (
+    CONCEPT_NAMES,
+    CONCEPT_NAMES_EN,
     ClassExplainer,
     ClassFigures,
     ExplanationText,
@@ -76,3 +78,25 @@ async def test_empty_class_skips_the_model() -> None:
 def test_fallback_and_payload_mention_trap_detection() -> None:
     assert "35%" in fallback_explanation(FIGURES)
     assert '"trapDetectionPct": 35' in figures_payload(FIGURES)
+
+
+def test_every_concept_has_a_name_in_both_languages() -> None:
+    assert {concept.value for concept in TeachingConcept} == set(CONCEPT_NAMES)
+    assert set(CONCEPT_NAMES) == set(CONCEPT_NAMES_EN)
+
+
+def test_fallback_explanation_in_english() -> None:
+    written = fallback_explanation(FIGURES, "en")
+
+    assert "35%" in written
+    assert "students played" in written
+
+
+async def test_the_model_is_asked_in_english() -> None:
+    provider = FakeProvider(text("Half of the class struggled."))
+
+    explanation = await make_explainer(provider).explain(FakeLedger(), FIGURES, language="en")
+
+    assert explanation.source == "model"
+    assert "- English, clear" in provider.calls[0]["system"]
+    assert '"concept": "minimum payment"' in provider.calls[0]["user"]
