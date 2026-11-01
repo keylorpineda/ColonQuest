@@ -120,7 +120,7 @@ async def client(
 async def test_get_image_generates_once_and_serves_second_request_from_cache(
     client: httpx2.AsyncClient, generator: FakeImageGenerator, db: AsyncSession
 ) -> None:
-    first = await client.get("/api/images/scene_test_only_cache")
+    first = await client.get("/api/images/scene_soda")
 
     assert first.status_code == 200
     assert first.headers["x-image-source"] == "model"
@@ -128,7 +128,7 @@ async def test_get_image_generates_once_and_serves_second_request_from_cache(
     assert first.content == SAMPLE_PNG
     assert len(generator.prompts) == 1
 
-    second = await client.get("/api/images/scene_test_only_cache")
+    second = await client.get("/api/images/scene_soda")
 
     assert second.status_code == 200
     assert second.headers["x-image-source"] == "cache"
@@ -147,16 +147,38 @@ async def test_get_image_does_not_cache_fallback_when_provider_fails(
 ) -> None:
     generator.data = None
 
-    response = await client.get("/api/images/npc_don_rafa")
+    response = await client.get("/api/images/npc_don_rafa_mecanico")
 
     assert response.status_code == 200
     assert response.headers["x-image-source"] == "fallback"
     assert response.content == FALLBACK_PNG
 
     cached = (
-        await db.execute(select(CachedImage).where(CachedImage.key == "npc_don_rafa"))
+        await db.execute(select(CachedImage).where(CachedImage.key == "npc_don_rafa_mecanico"))
     ).scalar_one_or_none()
     assert cached is None
+
+
+async def test_get_image_never_pays_for_a_key_outside_the_set(
+    client: httpx2.AsyncClient, generator: FakeImageGenerator, db: AsyncSession
+) -> None:
+    response = await client.get("/api/images/soda_elmolle")
+
+    assert response.status_code == 200
+    assert response.headers["x-image-source"] == "fallback"
+    assert generator.prompts == []
+
+
+async def test_get_image_still_serves_a_cached_key_outside_the_set(
+    client: httpx2.AsyncClient, generator: FakeImageGenerator, db: AsyncSession
+) -> None:
+    db.add(CachedImage(key="soda_elmolle", media_type="image/png", data=SAMPLE_PNG))
+    await db.commit()
+
+    response = await client.get("/api/images/soda_elmolle")
+
+    assert response.headers["x-image-source"] == "cache"
+    assert generator.prompts == []
 
 
 async def test_get_image_rejects_invalid_key(client: httpx2.AsyncClient) -> None:

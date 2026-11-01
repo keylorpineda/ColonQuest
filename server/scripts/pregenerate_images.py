@@ -13,7 +13,6 @@ waits on Muse Image. Run it against the QA database first. Exits 1 if any image 
 
 import argparse
 import asyncio
-import json
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -26,28 +25,15 @@ from app.config import get_settings
 from app.db import CachedImage
 from app.db.session import get_engine, get_sessionmaker
 from app.game_master.ledger import DbLedger
-from app.images.service import CARD_SUBJECTS, ImageService, shrink_image
+from app.images.keys import CARD_KEYS, PORTRAIT_KEYS, SCENE_KEYS
+from app.images.service import ImageService, shrink_image
 from app.providers.meta import MetaProvider
 
-FALLBACK_EVENTS = Path(__file__).resolve().parents[1] / "app/game_master/fallback_events.json"
-PORTRAIT_KEYS = (
-    "npc_don_rafa_mecanico",
-    "npc_kevin_vendedor",
-    "npc_dona_marta_vendedora",
-    "npc_prestamista_gota_a_gota",
-    "npc_amigo_piramide",
-)
 COST_PER_IMAGE = Decimal("0.01")
 
 
-def scene_keys() -> list[str]:
-    """Every imageKey used by the hand-written fallback events."""
-    events = json.loads(FALLBACK_EVENTS.read_text(encoding="utf-8"))
-    return sorted({event["imageKey"] for event in events if event.get("imageKey")})
-
-
 def all_keys() -> list[str]:
-    return [*PORTRAIT_KEYS, *scene_keys(), *CARD_SUBJECTS]
+    return [*PORTRAIT_KEYS, *SCENE_KEYS, *CARD_KEYS]
 
 
 async def main() -> int:
