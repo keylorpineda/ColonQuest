@@ -88,3 +88,24 @@ def test_risky_concept_is_reinforced_once_in_a_later_month() -> None:
 def test_no_room_left_keeps_the_plan() -> None:
     plan = default_plan(state())
     assert adjust_plan(plan, next_month=11, risky_concepts=[TeachingConcept.INFLATION]) == plan
+
+
+def test_default_plan_follows_the_language_of_the_player() -> None:
+    spanish = default_plan(state())
+    english = default_plan(state(language="en"))
+
+    assert [m.teaching_concept for m in english.months] == [
+        m.teaching_concept for m in spanish.months
+    ]
+    assert english.months[0].theme == "Splitting the salary between bills and treats"
+    assert "Aguinaldo (the year-end bonus)" in english.months[-1].theme
+    assert all(m.theme != n.theme for m, n in zip(english.months, spanish.months, strict=True))
+
+
+def test_adjust_plan_reinforces_in_the_language_of_the_player() -> None:
+    plan = default_plan(state(language="en"))
+    concept = plan.months[1].teaching_concept
+
+    adjusted = adjust_plan(plan, 3, [concept], english=True)
+
+    assert any(m.theme.startswith("Practice again: ") for m in adjusted.months)
