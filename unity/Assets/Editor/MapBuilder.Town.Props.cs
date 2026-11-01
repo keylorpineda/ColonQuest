@@ -550,8 +550,8 @@ namespace ColonQuest.EditorTools
                 Shape(root, "TiendaGable_Wall", triangle, new Vector2(0f, gableY - 0.14f), new Vector2(gableW - 0.72f, gableH - 0.44f), wall, 11);
             }
 
-            // "TIENDA" painted boldly near the apex of the yellow gable, above the red "CRÉDITO FÁCIL" banner
-            Label(root, "TIENDA", new Vector2(dx, fh + 2.48f), GamePalette.Hex("#4A2C18"), 0.040f, TextAnchor.MiddleCenter, 15);
+            // "TIENDA" painted inside the yellow gable, above the red "CRÉDITO FÁCIL" banner, centered on the apex
+            Label(root, "TIENDA", new Vector2(0f, fh + 1.42f), GamePalette.Hex("#4A2C18"), 0.040f, TextAnchor.MiddleCenter, 15);
 
             // Wooden produce display crates flanking the storefront entrance (non-blocking visual props)
             BuildProduceCrate(root, new Vector2(dx - 2.35f, -0.05f), new Vector2(1.75f, 0.95f), true, 12);
