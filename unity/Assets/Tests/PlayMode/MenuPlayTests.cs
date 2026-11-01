@@ -44,6 +44,29 @@ namespace ColonQuest.World.PlayModeTests
 
         private SaveSlots realSlots;
 
+        [UnityTest]
+        public IEnumerator LoadingScreen_ShowsThePictureAndFinishesTheLoad()
+        {
+            LoadingScreen.Load(SceneNames.Menu);
+            yield return null;
+            Assert.IsTrue(LoadingScreen.IsLoading);
+            var screen = GameObject.Find("LoadingScreen");
+            Assert.IsNotNull(screen.transform.Find("KeyArt/VolcanoSmoke"), "the smoke of the menu picture");
+            Assert.IsNotNull(screen.transform.Find("KeyArt/Toucan"), "the toucan of the menu picture");
+
+            float waited = 0f;
+            while (LoadingScreen.IsLoading && waited < 20f)
+            {
+                waited += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            Assert.IsFalse(LoadingScreen.IsLoading, "the bar gets to the end and the screen goes away");
+            yield return null;
+            Assert.IsNull(GameObject.Find("LoadingScreen"));
+            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name);
+        }
+
         private static void ResetSettings()
         {
             var settings = GameSettings.Current;
