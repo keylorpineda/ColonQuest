@@ -155,5 +155,22 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(GameLanguage.English, parsed.Language);
             Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
         }
+    
+
+        [Test]
+        public void LocalizedMesh_ShrinksALongerTranslationToTheOriginalWidth()
+        {
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(100f, 80f), 0.0001f, "a shorter text keeps its size");
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(100f, 100f), 0.0001f);
+            Assert.AreEqual(0.5f, LocalizedMesh.FitScale(100f, 200f), 0.0001f, "twice as long, half the size");
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(0f, 200f), 0.0001f, "an unknown width never shrinks to nothing");
+        }
+
+        [Test]
+        public void Translations_HaveNoRepeatedKeys()
+        {
+            // A repeated key makes the dictionary throw the moment it loads, which would stop the game at the menu.
+            Assert.DoesNotThrow(() => Assert.Greater(Loc.KnownTexts.Count, 1000));
+        }
     }
 }

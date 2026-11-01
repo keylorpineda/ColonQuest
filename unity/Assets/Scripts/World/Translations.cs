@@ -12,6 +12,38 @@ namespace ColonQuest.World
     {
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
+            // Signs and talks that were still only in Spanish (1 Nov)
+            { "CURSOS", "COURSES" },
+            { "GARANTIA 100%", "100% WARRANTY" },
+            { "HOSPITAL", "HOSPITAL" },
+            { "POLICÍA", "POLICE" },
+            { "PRIMA", "DOWN PAYMENT" },
+            { "CUARTOS", "ROOMS" },
+            { "MUEBLES", "FURNITURE" },
+            { "CAJA 5", "TELLER 5" },
+            { "CAJA 6", "TELLER 6" },
+            { "SEDAN 2022", "SEDAN 2022" },
+            { "SUV 2024", "SUV 2024" },
+            { "El dueño", "The owner" },
+            { "Saludar a Don Mario", "Say hi to Don Mario" },
+            { "¡Buenos días, vecino! Qué bonito día hace hoy en el barrio.", "Morning, neighbor! What a lovely day in the barrio today." },
+            { "Cuidar la casa y llevar las cuentas al día da una paz que no tiene precio.", "Looking after the house and keeping the bills up to date gives you a peace of mind money can't buy." },
+            { "Hablar con la asesora del Banco", "Talk to the bank advisor" },
+            { "¡Bienvenido al Banco! Adentro podés abrir tu cuenta de ahorros o consultar tus cuotas.", "Welcome to the bank! Inside you can open a savings account or check your installments." },
+            { "Ahorrar aunque sea un poquito cada mes te salva de cualquier imprevisto.", "Saving even a little every month gets you through any surprise." },
+            { "Hablar con Kevin de la Tienda", "Talk to Kevin from the store" },
+            { "¡Pase adelante! Tenemos fruta fresca afuera y todo para el hogar adentro.", "Come on in! Fresh fruit outside and everything for your home inside." },
+            { "Eso sí: antes de comprar a crédito, fijate bien cuánto terminás pagando en total.", "Just one thing: before buying on credit, check how much you end up paying in total." },
+            { "Conversar con Doña Marta", "Chat with Doña Marta" },
+            { "Vengo de hacer los mandados con mi canasta y mi lista en mano.", "I'm back from my errands, basket and shopping list in hand." },
+            { "El que compra con lista en mano no gasta en lo que no ocupa.", "If you shop with a list, you don't spend on what you don't need." },
+            { "\"¡Pura vida! Diay, ¿ya cobró? Yo apenas cobro y aparto lo del ahorro, antes de que se me vaya.\"", "\"Pura vida! So, got paid yet? As soon as I get paid I put my savings aside, before it slips away.\"" },
+            { "\"Mae, me ofrecieron una plata rápida sin papeleo... después me cobraban el doble. Mejor no.\"", "\"Dude, they offered me quick cash with no paperwork... then they'd charge me double. No thanks.\"" },
+            { "\"Voy para la feria del agricultor. Sale más barato y uno apoya a los productores.\"", "\"I'm off to the farmers' market. It's cheaper and you support the growers.\"" },
+            { "\"Un compa me quiere meter en un negocio que paga 300%. Eso no existe, ¿verdad?\"", "\"A buddy wants me in on a deal that pays 300%. That doesn't exist, right?\"" },
+            { "\"Este mes me cae el marchamo y ni me acordaba. Hay que ir guardando desde antes.\"", "\"The marchamo (yearly car fee) is due this month and I totally forgot. You have to save up ahead.\"" },
+            { "\"Por SINPE Móvil es facilito, pero fíjese bien el número antes de mandar.\"", "\"SINPE Móvil (instant transfer) is super easy, but double-check the number before you send.\"" },
+
             // Playtest batch 3 of the 31st
             { "INA · CURSOS", "INA · COURSES" },
             { "• Horario de clases: de {0}:00 a {1}:00. Efectivo: {2}.", "• Class hours: {0}:00 to {1}:00. Cash: {2}." },
