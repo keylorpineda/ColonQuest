@@ -1311,6 +1311,15 @@
               "title": "Code",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/GameLanguage",
+              "default": "es"
+            }
           }
         ],
         "responses": {
