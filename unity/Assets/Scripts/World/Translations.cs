@@ -734,6 +734,7 @@ namespace ColonQuest.World
             { "Ya resolviste los pendientes de hoy. Descansa hasta mañana.", "You already handled today's errands. Rest until tomorrow." },
             { "Aviso: el mes aún no termina (semana {0} de {1}). Se te rebajarán {2} turnos de trabajo no laborados.", "Notice: the month is not over yet (week {0} of {1}). {2} unworked shifts will be docked from your salary." },
             { "Cargando", "Loading" },
+            { "Consejo", "Tip" },
             { "Antes de comprar a cuotas, pregunta cuánto pagas en total.", "Before buying on installments, ask how much you pay in total." },
             { "Pagar solo el mínimo de la tarjeta es la forma más cara de deber.", "Paying only the card minimum is the most expensive way to owe." },
             { "Un fondo de emergencia te evita pedir plata a quien te cobra de más.", "An emergency fund keeps you from borrowing from someone who charges too much." },
