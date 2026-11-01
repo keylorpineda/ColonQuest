@@ -69,6 +69,25 @@ namespace ColonQuest.EditorTools
         private static Sprite palmFrondSprite;
         private static Sprite beachUmbrellaSprite;
 
+        // Phase 4 - Building Materials & Weathering Textures
+        private static Sprite stuccoTex;
+        private static Sprite concreteBlockTex;
+        private static Sprite woodSidingTex;
+        private static Sprite zincWallTex;
+        private static Sprite tileWhiteTex;
+        private static Sprite zincRoofTex;
+        private static Sprite clayRoofTex;
+        private static Sprite concreteRoofTex;
+        private static Sprite grimeTex;
+
+        // Phase 5 - Interior Floor & Wall Textures
+        private static Sprite floorCeramicTex;
+        private static Sprite floorTerrazzoTex;
+        private static Sprite floorMosaicTex;
+        private static Sprite floorWoodTex;
+        private static Sprite floorCementTex;
+        private static Sprite wallPaintTex;
+
         private static string ScenePathFor(string sceneName)
         {
             return $"Assets/Scenes/{sceneName}.unity";
@@ -205,6 +224,25 @@ namespace ColonQuest.EditorTools
             treeCanopySprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.TreeCanopyPath);
             palmFrondSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.PalmFrondPath);
             beachUmbrellaSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.BeachUmbrellaPath);
+
+            // Phase 4 - Building Materials & Weathering Textures
+            stuccoTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.StuccoTexturePath);
+            concreteBlockTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.ConcreteBlockTexturePath);
+            woodSidingTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.WoodSidingTexturePath);
+            zincWallTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.ZincWallTexturePath);
+            tileWhiteTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.TileWhiteTexturePath);
+            zincRoofTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.ZincRoofTexturePath);
+            clayRoofTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.ClayRoofTexturePath);
+            concreteRoofTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.ConcreteRoofTexturePath);
+            grimeTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.GrimeTexturePath);
+
+            // Phase 5 - Interior Floor & Wall Textures
+            floorCeramicTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FloorCeramicTexturePath);
+            floorTerrazzoTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FloorTerrazzoTexturePath);
+            floorMosaicTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FloorMosaicTexturePath);
+            floorWoodTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FloorWoodTexturePath);
+            floorCementTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.FloorCementTexturePath);
+            wallPaintTex = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFactory.WallPaintTexturePath);
         }
 
         private static int ResolveWorldOrder(Transform parent, int order)

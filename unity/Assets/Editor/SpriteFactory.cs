@@ -38,6 +38,25 @@ namespace ColonQuest.EditorTools
         public const string GrassDetailTexturePath = Folder + "/GrassDetailTexture.png";
         public const string WaterCausticTexturePath = Folder + "/WaterCausticTexture.png";
 
+        // Phase 4 - Building Materials & Weathering Textures
+        public const string StuccoTexturePath = Folder + "/StuccoTexture.png";
+        public const string ConcreteBlockTexturePath = Folder + "/ConcreteBlockTexture.png";
+        public const string WoodSidingTexturePath = Folder + "/WoodSidingTexture.png";
+        public const string ZincWallTexturePath = Folder + "/ZincWallTexture.png";
+        public const string TileWhiteTexturePath = Folder + "/TileWhiteTexture.png";
+        public const string ZincRoofTexturePath = Folder + "/ZincRoofTexture.png";
+        public const string ClayRoofTexturePath = Folder + "/ClayRoofTexture.png";
+        public const string ConcreteRoofTexturePath = Folder + "/ConcreteRoofTexture.png";
+        public const string GrimeTexturePath = Folder + "/GrimeTexture.png";
+
+        // Phase 5 - Interior Floor & Wall Textures
+        public const string FloorCeramicTexturePath = Folder + "/FloorCeramicTexture.png";
+        public const string FloorTerrazzoTexturePath = Folder + "/FloorTerrazzoTexture.png";
+        public const string FloorMosaicTexturePath = Folder + "/FloorMosaicTexture.png";
+        public const string FloorWoodTexturePath = Folder + "/FloorWoodTexture.png";
+        public const string FloorCementTexturePath = Folder + "/FloorCementTexture.png";
+        public const string WallPaintTexturePath = Folder + "/WallPaintTexture.png";
+
         [MenuItem("Colon Quest/Art/Generate Sprites")]
         public static void Generate()
         {
@@ -76,6 +95,25 @@ namespace ColonQuest.EditorTools
             WriteColor(PalmFrondPath, 256, 128, 192, 0, PalmFrondPixel, false);
             WriteColor(BeachUmbrellaPath, 256, 256, 192, 0, BeachUmbrellaPixel, false);
 
+            // Phase 4 - Building Materials & Weathering Textures
+            WriteColor(StuccoTexturePath, 128, 128, 64, 0, StuccoPixel, true);
+            WriteColor(ConcreteBlockTexturePath, 128, 128, 64, 0, ConcreteBlockPixel, true);
+            WriteColor(WoodSidingTexturePath, 128, 128, 64, 0, WoodSidingPixel, true);
+            WriteColor(ZincWallTexturePath, 128, 128, 64, 0, ZincWallPixel, true);
+            WriteColor(TileWhiteTexturePath, 128, 128, 64, 0, TileWhitePixel, true);
+            WriteColor(ZincRoofTexturePath, 256, 256, 64, 0, ZincRoofPixel, true);
+            WriteColor(ClayRoofTexturePath, 256, 256, 64, 0, ClayRoofPixel, true);
+            WriteColor(ConcreteRoofTexturePath, 128, 128, 64, 0, ConcreteRoofPixel, true);
+            WriteColor(GrimeTexturePath, 128, 128, 64, 0, GrimePixel, true);
+
+            // Phase 5 - Interior Floor & Wall Textures
+            WriteColor(FloorCeramicTexturePath, 128, 128, 64, 0, FloorCeramicPixel, true);
+            WriteColor(FloorTerrazzoTexturePath, 128, 128, 64, 0, FloorTerrazzoPixel, true);
+            WriteColor(FloorMosaicTexturePath, 128, 128, 64, 0, FloorMosaicPixel, true);
+            WriteColor(FloorWoodTexturePath, 128, 128, 64, 0, FloorWoodPixel, true);
+            WriteColor(FloorCementTexturePath, 128, 128, 64, 0, FloorCementPixel, true);
+            WriteColor(WallPaintTexturePath, 128, 128, 64, 0, WallPaintPixel, true);
+
             AssetDatabase.Refresh();
         }
 
@@ -91,7 +129,15 @@ namespace ColonQuest.EditorTools
                 || !File.Exists(BrickWainscotTexturePath) || !File.Exists(WoodPlankTexturePath)
                 || !File.Exists(TreeCanopyPath) || !File.Exists(PalmFrondPath)
                 || !File.Exists(BeachUmbrellaPath) || !File.Exists(FacadeBrickTexturePath)
-                || !File.Exists(GrassDetailTexturePath) || !File.Exists(WaterCausticTexturePath))
+                || !File.Exists(GrassDetailTexturePath) || !File.Exists(WaterCausticTexturePath)
+                || !File.Exists(StuccoTexturePath) || !File.Exists(ConcreteBlockTexturePath)
+                || !File.Exists(WoodSidingTexturePath) || !File.Exists(ZincWallTexturePath)
+                || !File.Exists(TileWhiteTexturePath) || !File.Exists(ZincRoofTexturePath)
+                || !File.Exists(ClayRoofTexturePath) || !File.Exists(ConcreteRoofTexturePath)
+                || !File.Exists(GrimeTexturePath) || !File.Exists(FloorCeramicTexturePath)
+                || !File.Exists(FloorTerrazzoTexturePath) || !File.Exists(FloorMosaicTexturePath)
+                || !File.Exists(FloorWoodTexturePath) || !File.Exists(FloorCementTexturePath)
+                || !File.Exists(WallPaintTexturePath))
             {
                 Generate();
             }
@@ -818,6 +864,310 @@ namespace ColonQuest.EditorTools
             float sun = Vector2.Dot(p.normalized, new Vector2(-0.6f, 0.8f));
             float shade = sun > 0.15f ? 1.0f : (sun < -0.25f ? 0.78f : 0.90f);
             return new Color(shade, shade, shade, alpha);
+        }
+
+        // ---------------------------------------------------------------- Phase 4: Building Exterior Pixels
+
+        /// <summary>Fine irregular plaster/stucco with two-scale grain and soft weathering stains (128x128, grayscale).</summary>
+        private static Color StuccoPixel(float x, float y)
+        {
+            float n1 = (GrainAlpha((int)x, (int)y) - 0.5f) * 0.08f;
+            float n2 = (GrainAlpha((int)(x * 0.25f), (int)(y * 0.25f)) - 0.5f) * 0.05f;
+            float u = x * (Mathf.PI * 2f / 128f);
+            float v = y * (Mathf.PI * 2f / 128f);
+            float patch = Mathf.Sin(2f * u + 1f) * Mathf.Cos(2f * v + 0.5f) * 0.035f;
+            float g = Mathf.Clamp01(0.95f + n1 + n2 + patch);
+            return new Color(g, g, g, 1f);
+        }
+
+        /// <summary>Concrete masonry unit blocks in running bond with recessed mortar joints (128x128, grayscale).</summary>
+        private static Color ConcreteBlockPixel(float x, float y)
+        {
+            float blockW = 128f / 3f;  // ~42.67px wide (3 blocks across 128px)
+            float blockH = 128f / 6f;  // ~21.33px tall (6 courses down 128px)
+            int row = Mathf.FloorToInt(y / blockH);
+            float ox = (row % 2) * (blockW * 0.5f);
+            float lx = (x + ox) % blockW;
+            if (lx < 0f) lx += blockW;
+            float ly = y % blockH;
+            int col = Mathf.FloorToInt((x + ox) / blockW);
+            uint hash = (uint)(col * 73856093 ^ row * 19349663);
+
+            // 2px recessed mortar joint (25% darker)
+            if (lx < 2.0f || ly < 2.0f)
+            {
+                return new Color(0.66f, 0.66f, 0.68f, 1f);
+            }
+
+            float blockVar = 0.86f + ((hash & 7u) / 7f) * 0.07f;
+            float grain = (GrainAlpha((int)x, (int)y) - 0.5f) * 0.04f;
+            float b = Mathf.Clamp01(blockVar + grain);
+            return new Color(b, b, b, 1f);
+        }
+
+        /// <summary>Horizontal bevelled wood siding planks with cast seam shadow and fine grain (128x128, grayscale).</summary>
+        private static Color WoodSidingPixel(float x, float y)
+        {
+            float plankH = 16f; // 8 planks across 128px
+            int row = Mathf.FloorToInt(y / plankH);
+            float ly = y % plankH;
+
+            // Seam shadow under each board (3px)
+            if (ly < 1.2f)
+            {
+                return new Color(0.42f, 0.40f, 0.38f, 1f);
+            }
+            if (ly < 3.0f)
+            {
+                return new Color(0.66f, 0.64f, 0.62f, 1f);
+            }
+            // Top bevel highlight
+            if (ly > 14.5f)
+            {
+                return new Color(0.98f, 0.98f, 0.98f, 1f);
+            }
+
+            float wave = Mathf.Sin(x * (Mathf.PI * 2f / 64f) + row * 1.7f);
+            float g = 0.89f + wave * 0.035f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.03f;
+            return new Color(g, g, g, 1f);
+        }
+
+        /// <summary>Vertical corrugated zinc siding with sinusoidal sheen and occasional rivets (128x128, grayscale).</summary>
+        private static Color ZincWallPixel(float x, float y)
+        {
+            float wave = Mathf.Sin(x * (Mathf.PI * 2f / 16f));
+            float tone = 0.85f + wave * 0.12f;
+
+            // Rivet dots on corrugated peaks
+            float ly = y % 64f;
+            if (wave > 0.92f && Mathf.Abs(ly - 32f) < 2.5f)
+            {
+                float peakX = (Mathf.Floor(x / 16f) * 16f) + 4f;
+                float d = Mathf.Sqrt((x - peakX) * (x - peakX) + (ly - 32f) * (ly - 32f));
+                if (d < 1.2f)
+                {
+                    return new Color(0.98f, 0.98f, 0.98f, 1f);
+                }
+                if (d < 2.4f)
+                {
+                    return new Color(0.44f, 0.44f, 0.48f, 1f);
+                }
+            }
+
+            return new Color(tone, tone, tone, 1f);
+        }
+
+        /// <summary>Square ceramic tiles with crisp mortar joints (128x128, grayscale).</summary>
+        private static Color TileWhitePixel(float x, float y)
+        {
+            float lx = x % 32f;
+            float ly = y % 32f;
+            int col = Mathf.FloorToInt(x / 32f);
+            int row = Mathf.FloorToInt(y / 32f);
+
+            if (lx < 2.0f || ly < 2.0f)
+            {
+                return new Color(0.72f, 0.74f, 0.76f, 1f);
+            }
+            if (lx < 3.5f || ly > 30.5f)
+            {
+                return new Color(0.99f, 0.99f, 1.0f, 1f);
+            }
+
+            uint hash = (uint)(col * 31 + row * 17);
+            float varTile = 0.94f + ((hash & 7u) / 7f) * 0.04f;
+            return new Color(varTile, varTile, varTile + 0.01f, 1f);
+        }
+
+        /// <summary>Corrugated zinc roofing with diagonal ridges, metallic sheen, and subtle rust stains (256x256).</summary>
+        private static Color ZincRoofPixel(float x, float y)
+        {
+            float u = (x + y * 0.25f) * (Mathf.PI * 2f / 16f);
+            float wave = Mathf.Sin(u);
+            float baseTone = 0.85f + wave * 0.13f;
+            Color col = new Color(baseTone, baseTone, baseTone, 1f);
+
+            // Two subtle rust stain patches
+            float dx1 = Mathf.Abs(x - 64f); if (dx1 > 128f) dx1 = 256f - dx1;
+            float dy1 = Mathf.Abs(y - 80f); if (dy1 > 128f) dy1 = 256f - dy1;
+            float d1 = Mathf.Sqrt(dx1 * dx1 + dy1 * dy1);
+            if (d1 < 24f)
+            {
+                float rust = (1f - d1 / 24f) * 0.32f;
+                col = Color.Lerp(col, new Color(0.72f, 0.40f, 0.20f, 1f), rust);
+            }
+
+            float dx2 = Mathf.Abs(x - 180f); if (dx2 > 128f) dx2 = 256f - dx2;
+            float dy2 = Mathf.Abs(y - 200f); if (dy2 > 128f) dy2 = 256f - dy2;
+            float d2 = Mathf.Sqrt(dx2 * dx2 + dy2 * dy2);
+            if (d2 < 20f)
+            {
+                float rust = (1f - d2 / 20f) * 0.28f;
+                col = Color.Lerp(col, new Color(0.68f, 0.36f, 0.18f, 1f), rust);
+            }
+
+            return col;
+        }
+
+        /// <summary>Broad clay roof tiles with organic undulating edges and bevel shadows (256x256, grayscale).</summary>
+        private static Color ClayRoofPixel(float x, float y)
+        {
+            float tileW = 256f / 6f; // ~42.67px wide
+            float tileH = 256f / 6f; // ~42.67px tall
+            int row = Mathf.FloorToInt(y / tileH);
+            float ox = (row % 2) * (tileW * 0.5f);
+            float lx = (x + ox) % tileW;
+            if (lx < 0f) lx += tileW;
+            float ly = y % tileH;
+            int col = Mathf.FloorToInt((x + ox) / tileW);
+            uint hash = (uint)(col * 73856093 ^ row * 19349663);
+
+            float wobble = Mathf.Sin(y * 0.25f) * 1.5f;
+            if (ly < 3.2f || (lx + wobble) < 2.4f)
+            {
+                return new Color(0.50f, 0.48f, 0.46f, 1f);
+            }
+
+            float nx = (lx / tileW) * 2f - 1f;
+            float barrel = 1f - nx * nx;
+            float tone = 0.78f + barrel * 0.16f + ((hash & 7u) / 7f) * 0.06f;
+            return new Color(tone, tone, tone, 1f);
+        }
+
+        /// <summary>Monolithic concrete roof slab with expansion joint and faint weathering (128x128, grayscale).</summary>
+        private static Color ConcreteRoofPixel(float x, float y)
+        {
+            float baseTone = 0.83f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.04f;
+            float u = x * (Mathf.PI * 2f / 128f);
+            float v = y * (Mathf.PI * 2f / 128f);
+            float damp = Mathf.Sin(u * 2f) * Mathf.Cos(v * 2f);
+            if (damp > 0.35f)
+            {
+                baseTone -= (damp - 0.35f) * 0.22f;
+            }
+            if (Mathf.Abs(x - 64f) < 1.4f || Mathf.Abs(y - 64f) < 1.4f)
+            {
+                baseTone = 0.56f;
+            }
+            return new Color(baseTone, baseTone, baseTone, 1f);
+        }
+
+        /// <summary>Vertical water and grime streak stains that fade downward (128x128, alpha only).</summary>
+        private static Color GrimePixel(float x, float y)
+        {
+            float ny = y / 128f; // 0 at bottom, 1 at top
+            float u = x * (Mathf.PI * 2f / 32f);
+            float streak = Mathf.Max(0f, Mathf.Sin(u) * 0.7f + Mathf.Sin(x * (Mathf.PI * 2f / 16f)) * 0.3f);
+            float fade = Mathf.Pow(ny, 1.6f);
+            float alpha = Mathf.Clamp01(streak * fade * 0.65f + (ny > 0.88f ? (ny - 0.88f) * 2.5f : 0f) * 0.25f);
+            return new Color(0.14f, 0.10f, 0.08f, alpha);
+        }
+
+        // ---------------------------------------------------------------- Phase 5: Interior Pixels
+
+        /// <summary>Interior residential ceramic tile with mortar joints and sheen variation (128x128, grayscale).</summary>
+        private static Color FloorCeramicPixel(float x, float y)
+        {
+            float lx = x % 32f;
+            float ly = y % 32f;
+            int col = Mathf.FloorToInt(x / 32f);
+            int row = Mathf.FloorToInt(y / 32f);
+            uint hash = (uint)(col * 31 + row * 73);
+
+            if (lx < 1.8f || ly < 1.8f)
+            {
+                return new Color(0.68f, 0.65f, 0.62f, 1f);
+            }
+            float tone = 0.92f + ((hash & 7u) / 7f) * 0.08f;
+            if (lx < 3.2f || ly > 30.2f)
+            {
+                tone = Mathf.Min(1f, tone + 0.04f);
+            }
+            return new Color(tone, tone, tone, 1f);
+        }
+
+        /// <summary>Commercial terrazzo flooring with fine polished stone aggregate chips (128x128, grayscale).</summary>
+        private static Color FloorTerrazzoPixel(float x, float y)
+        {
+            float baseT = 0.92f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.03f;
+            uint h = (uint)((int)x * 374761393 ^ (int)y * 668265263);
+            if ((h % 47u) == 0u)
+            {
+                return new Color(0.42f, 0.40f, 0.38f, 1f);
+            }
+            if ((h % 31u) == 0u)
+            {
+                return new Color(0.68f, 0.65f, 0.60f, 1f);
+            }
+            if ((h % 59u) == 0u)
+            {
+                return new Color(0.78f, 0.55f, 0.45f, 1f);
+            }
+            return new Color(baseT, baseT, baseT, 1f);
+        }
+
+        /// <summary>Two-tone clinical checkerboard mosaic tile (128x128, grayscale).</summary>
+        private static Color FloorMosaicPixel(float x, float y)
+        {
+            int col = Mathf.FloorToInt(x / 16f);
+            int row = Mathf.FloorToInt(y / 16f);
+            float lx = x % 16f;
+            float ly = y % 16f;
+
+            if (lx < 1.4f || ly < 1.4f)
+            {
+                return new Color(0.60f, 0.60f, 0.62f, 1f);
+            }
+            bool dark = ((col + row) % 2) == 0;
+            float t = dark ? 0.82f : 0.95f;
+            return new Color(t, t, t, 1f);
+        }
+
+        /// <summary>Interior tongue-and-groove hardwood parquet floorboards (128x128, grayscale).</summary>
+        private static Color FloorWoodPixel(float x, float y)
+        {
+            float plankH = 16f;
+            float plankW = 64f;
+            int row = Mathf.FloorToInt(y / plankH);
+            float ox = (row % 2) * (plankW * 0.5f);
+            float lx = (x + ox) % plankW;
+            if (lx < 0f) lx += plankW;
+            float ly = y % plankH;
+
+            if (ly < 1.4f || lx < 1.4f)
+            {
+                return new Color(0.50f, 0.42f, 0.36f, 1f);
+            }
+            float grain = 0.88f + Mathf.Sin(x * 0.12f + row * 1.5f) * 0.05f;
+            return new Color(grain, grain, grain, 1f);
+        }
+
+        /// <summary>Polished smooth cement with subtle burnishing and fine hairline crack (128x128, grayscale).</summary>
+        private static Color FloorCementPixel(float x, float y)
+        {
+            float u = x * (Mathf.PI * 2f / 128f);
+            float v = y * (Mathf.PI * 2f / 128f);
+            float patch = Mathf.Sin(u * 2f + 0.5f) * Mathf.Cos(v * 2f);
+            float tone = 0.85f + patch * 0.06f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.03f;
+
+            // Hairline floor crack
+            if (x > 22f && x < 88f)
+            {
+                float crackY = 32f + Mathf.Sin(x * 0.14f) * 7f;
+                if (Mathf.Abs(y - crackY) < 0.8f)
+                {
+                    tone = 0.45f;
+                }
+            }
+
+            return new Color(tone, tone, tone, 1f);
+        }
+
+        /// <summary>Fine-grained painted interior drywall / plaster wall (128x128, grayscale).</summary>
+        private static Color WallPaintPixel(float x, float y)
+        {
+            float g = 0.96f + (GrainAlpha((int)x, (int)y) - 0.5f) * 0.03f;
+            return new Color(g, g, g, 1f);
         }
 
         private static float GrainAlpha(int x, int y)
