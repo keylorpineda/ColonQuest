@@ -15,6 +15,7 @@ from typing import Any
 from pydantic import BaseModel, ValidationError
 
 from app.agents.tools import ToolContext, execute_tool, tool_schemas
+from app.agents.trace import AGENT_TRACES
 from app.game_master.ledger import Ledger
 from app.providers.base import (
     ProviderError,
@@ -95,6 +96,14 @@ async def run_tool_loop[T: BaseModel](
                     result = execute_tool(call, request.context, request.tools)
                     used.append(call.name)
                     results.append(result)
+                    AGENT_TRACES.add(
+                        request.session_id,
+                        request.endpoint,
+                        step,
+                        call.name,
+                        call.arguments,
+                        result,
+                    )
                     messages.append(
                         {
                             "role": "tool",
