@@ -129,5 +129,43 @@ namespace ColonQuest.World
         {
             return Mathf.Clamp(-toTargetX * 2.2f, -9f, 9f);
         }
+
+        /// <summary>Slower than this (units per second) a person is standing, not walking away.</summary>
+        public const float AwaySpeed = 0.6f;
+
+        /// <summary>
+        /// True while a person walks away from the camera (up the screen), so the back of the head shows. It needs a
+        /// clear upward walk to turn around and only gives it up when the walk is clearly something else, so walking
+        /// diagonally does not flicker between the face and the back.
+        /// </summary>
+        public static bool FacingAway(Vector2 velocity, bool wasAway)
+        {
+            float up = velocity.y;
+            float side = Mathf.Abs(velocity.x);
+            if (wasAway)
+            {
+                return up > AwaySpeed * 0.5f && up > side * 0.6f;
+            }
+
+            return up > AwaySpeed && up > side * 1.1f;
+        }
+
+        /// <summary>
+        /// The height of the body with every step: a little shorter as the foot lands, a little taller between steps.
+        /// <paramref name="step"/> is |sin(phase)|: 0 when a foot lands, 1 between the steps.
+        /// </summary>
+        public static float StepSquash(float step, float moving)
+        {
+            return 1f + (Mathf.Clamp01(step) - 0.4f) * 0.05f * Mathf.Clamp01(moving);
+        }
+
+        /// <summary>
+        /// The lean of the torso into the walk, in degrees, in the person's own (possibly mirrored) space: negative leans
+        /// toward the way they face. Only the sideways part of the walk leans, so walking up or down stays upright.
+        /// </summary>
+        public static float WalkLean(float moving, float sideways01)
+        {
+            return -3f * Mathf.Clamp01(moving) * Mathf.Clamp01(sideways01);
+        }
     }
 }

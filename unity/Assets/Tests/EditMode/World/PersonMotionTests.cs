@@ -112,5 +112,38 @@ namespace ColonQuest.World.Tests
             Assert.LessOrEqual(PersonMotion.ElbowAngle(1f), 48.01f);
             Assert.Less(PersonMotion.ElbowAngle(0.05f), PersonMotion.ElbowAngle(1f), "it bends as the arm lifts");
         }
+    
+
+        [Test]
+        public void FacingAway_NeedsAClearWalkUpAndHoldsOnDiagonals()
+        {
+            Assert.IsTrue(PersonMotion.FacingAway(new Vector2(0f, 4f), false), "walking straight up shows the back");
+            Assert.IsFalse(PersonMotion.FacingAway(new Vector2(0f, -4f), false), "walking down shows the face");
+            Assert.IsFalse(PersonMotion.FacingAway(new Vector2(4f, 3f), false), "mostly sideways keeps the face");
+            Assert.IsFalse(PersonMotion.FacingAway(new Vector2(0f, 0.3f), false), "a drift is not a walk");
+            Assert.IsTrue(PersonMotion.FacingAway(new Vector2(3f, 3f), true), "once turned, a diagonal keeps the back");
+            Assert.IsFalse(PersonMotion.FacingAway(new Vector2(4f, 1f), true), "a clearly sideways walk turns back to the face");
+            Assert.IsFalse(PersonMotion.FacingAway(Vector2.zero, true), "standing still shows the face");
+        }
+
+        [Test]
+        public void StepSquash_IsGentleAndOnlyWhileWalking()
+        {
+            Assert.AreEqual(1f, PersonMotion.StepSquash(0f, 0f), 0.0001f);
+            Assert.AreEqual(1f, PersonMotion.StepSquash(1f, 0f), 0.0001f);
+            Assert.Less(PersonMotion.StepSquash(0f, 1f), 1f, "a little shorter as the foot lands");
+            Assert.Greater(PersonMotion.StepSquash(1f, 1f), 1f, "a little taller between steps");
+            Assert.That(PersonMotion.StepSquash(1f, 1f), Is.InRange(0.95f, 1.05f));
+            Assert.That(PersonMotion.StepSquash(0f, 1f), Is.InRange(0.95f, 1.05f));
+        }
+
+        [Test]
+        public void WalkLean_LeansForwardOnlyWhenWalkingSideways()
+        {
+            Assert.AreEqual(0f, PersonMotion.WalkLean(1f, 0f), 0.0001f, "walking up or down stays upright");
+            Assert.AreEqual(0f, PersonMotion.WalkLean(0f, 1f), 0.0001f, "standing stays upright");
+            Assert.Less(PersonMotion.WalkLean(1f, 1f), 0f, "negative leans toward the way the person faces");
+            Assert.GreaterOrEqual(PersonMotion.WalkLean(1f, 1f), -3f);
+        }
     }
 }

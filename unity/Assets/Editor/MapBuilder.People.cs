@@ -88,6 +88,7 @@ namespace ColonQuest.EditorTools
             rig.ArmL = Arm(torso, "ArmL", -1, look, shirt, skin, out rig.ElbowL);
             rig.ArmR = Arm(torso, "ArmR", 1, look, shirt, skin, out rig.ElbowR);
             DrawExtras(torso, rig, look, shirt, skin);
+            GroupTorsoFront(torso, rig);
 
             var head = new GameObject("Head").transform;
             head.SetParent(visual, false);
@@ -179,6 +180,9 @@ namespace ColonQuest.EditorTools
                 Shape(head, "JawCover", rounded, new Vector2(0f, 0.06f), new Vector2(0.44f * h, 0.2f), skin, OrderPlayer + 13);
             }
 
+            // Everything from here to the beard is the face: it is hidden while the person walks away (see BuildBackView).
+            int faceFirst = head.childCount;
+
             // A soft shade over the chin, kept inside the face so it never covers the dark edge of the chin.
             Shape(head, "JawShade", circle, new Vector2(0f, 0.045f), new Vector2(0.26f * h, 0.05f), GamePalette.Shade(skin, 0.9f), OrderPlayer + 13);
 
@@ -234,8 +238,86 @@ namespace ColonQuest.EditorTools
                 Part2(head, "Goatee", roundedSmall, new Vector2(look.MouthX, 0f), new Vector2(0.16f, 0.08f), GamePalette.Hex(look.HairColor), OrderPlayer + 22);
             }
 
+            int faceEnd = head.childCount;
             DrawHairFront(head, look, hair, hat);
+            int hairFrontEnd = head.childCount;
             DrawHat(head, look);
+            BuildBackView(head, look, skin, hair, rig, faceFirst, faceEnd, hairFrontEnd);
+        }
+
+        /// <summary>
+        /// What the animator swaps while the person walks up the screen, away from the camera: the face (and the fringe on
+        /// the forehead) goes into a "Face" group that is hidden, and a "BackHead" of hair (or of the hood, or of skin for
+        /// a bald head) covers the head. Ears, hats, spikes and curls stay, since they show from behind too.
+        /// </summary>
+        private static void BuildBackView(Transform head, Look look, Color skin, Color hair, PersonRig rig, int faceFirst, int faceEnd, int hairFrontEnd)
+        {
+            var move = new System.Collections.Generic.List<Transform>();
+            for (int i = faceFirst; i < faceEnd && i < head.childCount; i++)
+            {
+                move.Add(head.GetChild(i));
+            }
+
+            for (int i = faceEnd; i < hairFrontEnd && i < head.childCount; i++)
+            {
+                var child = head.GetChild(i);
+                if (child.name.StartsWith("Fringe") || child.name.StartsWith("Lock"))
+                {
+                    move.Add(child);
+                }
+            }
+
+            var face = new GameObject("Face").transform;
+            face.SetParent(head, false);
+            foreach (var part in move)
+            {
+                part.SetParent(face, false);
+            }
+
+            float h = look.Head;
+            Color back = look.Hat == Hat.Hood ? GamePalette.Hex(look.HatColor) : (look.Hair == HairStyle.Bald ? GamePalette.Shade(skin, 0.95f) : hair);
+            var backHead = new GameObject("BackHead").transform;
+            backHead.SetParent(head, false);
+            // As big as the face with its outline, so no edge of the face peeks out; under the hats (+26) and the curls.
+            Part2(backHead, "BackHair", circle, new Vector2(0f, 0.2f), new Vector2(0.5f * h + 0.05f, 0.51f), back, OrderPlayer + 22);
+            backHead.gameObject.SetActive(false);
+
+            rig.Face = face.gameObject;
+            rig.BackHead = backHead.gameObject;
+        }
+
+        /// <summary>The things worn on the chest (tie, badge, apron...): hidden from behind with the face.</summary>
+        private static readonly System.Collections.Generic.HashSet<string> TorsoFrontParts = new System.Collections.Generic.HashSet<string>
+        {
+            "Tie", "Tie_Outline", "Knot", "LanyardL", "LanyardR", "Card", "Card_Outline", "Badge", "Badge_Outline", "Pen",
+            "PoliceBadge", "Chain", "ChainCut", "TubeL", "TubeR", "Chestpiece", "Chestpiece_Outline", "Apron", "Apron_Outline",
+            "ApronPocket", "Bib", "Bib_Outline", "Pocket", "RobeCollar"
+        };
+
+        private static void GroupTorsoFront(Transform torso, PersonRig rig)
+        {
+            var move = new System.Collections.Generic.List<Transform>();
+            foreach (Transform child in torso)
+            {
+                if (TorsoFrontParts.Contains(child.name))
+                {
+                    move.Add(child);
+                }
+            }
+
+            if (move.Count == 0)
+            {
+                return;
+            }
+
+            var front = new GameObject("TorsoFront").transform;
+            front.SetParent(torso, false);
+            foreach (var part in move)
+            {
+                part.SetParent(front, false);
+            }
+
+            rig.TorsoFront = front.gameObject;
         }
 
         /// <summary>The mouth is a pivot that PlayerAnimator squashes to talk. A smile is a dark disc cut by a disc of skin.</summary>

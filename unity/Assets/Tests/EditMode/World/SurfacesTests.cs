@@ -100,5 +100,17 @@ namespace ColonQuest.World.Tests
             Thoughts.Said -= listener;
             Assert.AreEqual("hola", heard);
         }
+    
+
+        [Test]
+        public void FootDust_OnlyOnSandAndStreets()
+        {
+            Assert.Greater(FootDust.PuffColor(SurfaceKind.Sand).a, 0f);
+            Assert.Greater(FootDust.PuffColor(SurfaceKind.Road).a, 0f);
+            Assert.Greater(FootDust.PuffColor(SurfaceKind.Sand).a, FootDust.PuffColor(SurfaceKind.Road).a, "sand kicks up more than asphalt");
+            Assert.AreEqual(0f, FootDust.PuffColor(SurfaceKind.Grass).a);
+            Assert.AreEqual(0f, FootDust.PuffColor(SurfaceKind.Wood).a);
+            Assert.AreEqual(0f, FootDust.PuffColor(SurfaceKind.Tile).a);
+        }
     }
 }
