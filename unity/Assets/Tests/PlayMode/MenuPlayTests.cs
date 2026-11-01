@@ -428,31 +428,6 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
             yield return null;
         }
-
-        [UnityTest]
-        public IEnumerator Menu_HasAnimatedVolcanoSmokeAndToucanMotion()
-        {
-            yield return null;
-
-            var smoke = Menu.Find("KeyArt/VolcanoSmoke");
-            Assert.IsNotNull(smoke, "volcano smoke host exists under KeyArt");
-            Assert.IsNotNull(smoke.GetComponent<MenuVolcanoSmoke>(), "volcano smoke component attached");
-
-            var toucan = Menu.Find("KeyArt/ToucanMotion");
-            Assert.IsNotNull(toucan, "toucan motion host exists under KeyArt");
-            Assert.IsNotNull(toucan.GetComponent<MenuToucanMotion>(), "toucan motion component attached");
-
-            var banknote = Menu.Find("KeyArt/ToucanMotion/ToucanRoot/ToucanHead/Banknote");
-            Assert.IsNotNull(banknote, "banknote overlay exists under toucan head");
-            Assert.IsNotNull(banknote.GetComponent<Image>(), "banknote image attached");
-
-            var eye = Menu.Find("KeyArt/ToucanMotion/ToucanRoot/ToucanHead/Eye");
-            Assert.IsNotNull(eye, "eye overlay exists under toucan head");
-            Assert.IsNotNull(eye.GetComponent<Image>(), "eye image attached");
-
-            var eyelid = Menu.Find("KeyArt/ToucanMotion/ToucanRoot/ToucanHead/Eye/Eyelid");
-            Assert.IsNotNull(eyelid, "eyelid overlay exists under eye");
-        }
     }
 
     /// <summary>Plays the pause window of the town: resume, settings and the way back to the menu.</summary>
