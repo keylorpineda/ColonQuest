@@ -599,7 +599,8 @@ namespace ColonQuest.EditorTools
             mesh.font = font;
             mesh.fontSize = 100;
             mesh.characterSize = size;
-            mesh.fontStyle = FontStyle.Bold;
+            // The display font is a static bold file: no synthetic bold on top.
+            mesh.fontStyle = FontStyle.Normal;
             mesh.anchor = anchor;
             mesh.color = color;
             go.AddComponent<LocalizedMesh>().Bind(text);
