@@ -10,7 +10,10 @@ namespace ColonQuest.EditorTools
     /// </summary>
     public static partial class MapBuilder
     {
-        private static readonly string[] SkinTones = { "#F6D8BC", "#EBBE96", "#D29B6E", "#B07A52", "#80553A" };
+        private static readonly string[] SkinTones = { "#F6D8BC", "#EBBE96", "#D29B6E", "#B07A52", "#80553A", "#5E3B26" };
+
+        /// <summary>From this index on, a skin tone goes with dark hair more often than not.</summary>
+        private const int FirstDarkSkinTone = 3;
         private static readonly string[] HairTones = { "#2A1F1A", "#4A2F20", "#8A5A2B", "#D9A441", "#B0452D", "#555A66" };
         private static readonly string[] PantsTones = { "#2F3E66", "#3A3F52", "#6B5B50", "#1F6B58", "#8E4A5A" };
 
@@ -22,12 +25,13 @@ namespace ColonQuest.EditorTools
         private static int LookSeed(Look look)
         {
             int seed = 17;
-            foreach (char c in look.Skin ?? string.Empty)
+            foreach (char c in (look.Skin ?? string.Empty) + look.Seed)
             {
                 seed = seed * 31 + c;
             }
 
-            return Mathf.Abs(seed);
+            // The mask, not Abs: the hash can overflow to the one value Abs cannot make positive.
+            return seed & int.MaxValue;
         }
 
         private static bool Has(Look look, Extras extra)

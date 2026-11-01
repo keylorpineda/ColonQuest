@@ -73,6 +73,9 @@ namespace ColonQuest.EditorTools
             public float LookAside;
             public float MouthX;
             public int BrimSide;
+
+            /// <summary>What sets apart people who were given the same shirt color: the name of the person.</summary>
+            public string Seed;
         }
 
         /// <summary>
@@ -82,14 +85,17 @@ namespace ColonQuest.EditorTools
         private static Look Resolve(Look look, bool isPlayer)
         {
             int seed = LookSeed(look);
+            bool extra = !isPlayer && look.SkinTone == null;
+            int tone = isPlayer ? 1 : seed % SkinTones.Length;
             if (look.SkinTone == null)
             {
-                look.SkinTone = SkinTones[isPlayer ? 1 : seed % SkinTones.Length];
+                look.SkinTone = SkinTones[tone];
             }
 
             if (look.HairColor == null)
             {
-                look.HairColor = HairTones[isPlayer ? 1 : (seed / 7) % HairTones.Length];
+                int hairTones = tone >= FirstDarkSkinTone ? 2 : HairTones.Length;
+                look.HairColor = HairTones[isPlayer ? 1 : (seed / 7) % hairTones];
             }
 
             if (look.Pants == null)
@@ -99,8 +105,27 @@ namespace ColonQuest.EditorTools
 
             if (look.Hair == HairStyle.Auto)
             {
-                HairStyle[] automatic = { HairStyle.Side, HairStyle.Long, HairStyle.Bun, HairStyle.Buzz };
+                HairStyle[] automatic =
+                {
+                    HairStyle.Side, HairStyle.Long, HairStyle.Bun, HairStyle.Buzz, HairStyle.Curly,
+                    HairStyle.Afro, HairStyle.Bob, HairStyle.Ponytail, HairStyle.Spiky, HairStyle.Bald
+                };
                 look.Hair = isPlayer ? HairStyle.Side : automatic[(seed / 3) % automatic.Length];
+            }
+
+            if (extra)
+            {
+                // The people of the town differ in build and in small things, each one always the same.
+                look.Width = look.Width > 0f ? look.Width : 0.92f + (seed / 11) % 5 * 0.04f;
+                look.Height = look.Height > 0f ? look.Height : 0.94f + (seed / 17) % 4 * 0.04f;
+                look.Glasses |= (seed / 19) % 5 == 0;
+                bool longHair = look.Hair == HairStyle.Long || look.Hair == HairStyle.Bun || look.Hair == HairStyle.Ponytail || look.Hair == HairStyle.Bob;
+                look.Skirt |= longHair && (seed / 23) % 3 == 0;
+                look.Mustache |= !longHair && (seed / 29) % 5 == 0;
+                if ((seed / 31) % 3 == 0)
+                {
+                    look.Face = Expression.Warm;
+                }
             }
 
             if (look.Hat == Hat.None && look.Wear == Extras.None)
@@ -275,18 +300,27 @@ namespace ColonQuest.EditorTools
         };
 
         /// <summary>
-        /// The two men of the collectors' car: dark clothes, serious faces. They wait hidden off the map, without a collider, and
-        /// the overlay shows them and walks them to the player when the car stops.
+        /// The two men of the collectors' car: an agency's shirt and tie, serious faces, and nothing else in common. They wait
+        /// hidden off the map, without a collider, and the overlay shows them and walks them to the player when the car stops.
         /// </summary>
         private static void BuildCollectorMen(Transform parent)
         {
+            var looks = new[]
+            {
+                new Look
+                {
+                    Skin = "#5F7692", SkinTone = "#F0CDB0", HairColor = "#8A5A2B", Hair = HairStyle.Side, Pants = "#3A3F52",
+                    Face = Expression.Frown, Width = 1.06f, Height = 1.04f, Glasses = true, Wear = Extras.Tie, WearColor = "#2A3345"
+                },
+                new Look
+                {
+                    Skin = "#5F7692", SkinTone = "#B07A52", HairColor = "#7A7A7A", Hair = HairStyle.Bald, Pants = "#3A3F52",
+                    Face = Expression.Neutral, Width = 1.12f, Height = 0.98f, Mustache = true, Wear = Extras.Tie, WearColor = "#2A3345"
+                }
+            };
             for (int i = 0; i < CollectorCar.MenNames.Length; i++)
             {
-                var look = new Look
-                {
-                    Skin = "#1F2230", SkinTone = i == 0 ? "#C68B59" : "#8A5A3C", HairColor = "#1A1414", Hair = HairStyle.Buzz,
-                    Pants = "#15161C", Face = Expression.Frown, Width = 1.06f, Height = 1.04f, Glasses = i == 0, SquareJaw = true
-                };
+                var look = looks[i];
                 var man = new GameObject(CollectorCar.MenNames[i]);
                 man.transform.SetParent(parent, false);
                 man.transform.position = new Vector2(MapLayout.PlayWestX - 8f - i, 3.2f);
