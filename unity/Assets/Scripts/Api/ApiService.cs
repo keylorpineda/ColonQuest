@@ -135,36 +135,34 @@ namespace ColonQuest.Api
             string lang = Language();
             string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
             HttpResponseData response = null;
-            yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.Timeout), r => response = r);
+            yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.NegotiationTimeout), r => response = r);
             done(Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto));
         }
 
         /// <summary>
-        /// One negotiation turn spoken by the player: a WAV clip goes to the backend, which transcribes
-        /// it and answers like a typed turn. Meta is never called from here. 503 (voice down), 422 (no
-        /// speech or a bad clip) and network errors come back as failures so the UI can ask for text.
+        /// The words of a WAV clip. The backend transcribes it, Meta is never called from here. 503 (voice
+        /// down), 422 (no speech or a bad clip) and network errors come back as failures so the UI can
+        /// ask for text.
         /// </summary>
-        public IEnumerator SendNegotiationVoice(string offerId, byte[] wav, Action<ApiResult<NegotiationReply>> done)
+        public IEnumerator Transcribe(byte[] wav, Action<ApiResult<string>> done)
         {
             if (!HasSession)
             {
-                done(ApiResult<NegotiationReply>.Failure("no session"));
+                done(ApiResult<string>.Failure("no session"));
                 yield break;
             }
 
             if (wav == null || wav.Length == 0)
             {
-                done(ApiResult<NegotiationReply>.Failure("empty audio"));
+                done(ApiResult<string>.Failure("empty audio"));
                 yield break;
             }
 
-            var form = new MultipartForm()
-                .AddField("offerId", offerId)
-                .AddFile("audio", "voice.wav", "audio/wav", wav);
+            var form = new MultipartForm().AddFile("audio", "voice.wav", "audio/wav", wav);
             var request = new HttpRequestData
             {
                 Method = "POST",
-                Url = config.Url($"sessions/{SessionId}/negotiation/voice"),
+                Url = config.Url($"sessions/{SessionId}/transcribe"),
                 RawBody = form.ToBytes(),
                 ContentType = form.ContentType,
                 TimeoutSeconds = config.VoiceTimeout
@@ -172,10 +170,10 @@ namespace ColonQuest.Api
 
             HttpResponseData response = null;
             yield return transport.Send(request, r => response = r);
-            var result = Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto);
-            if (result.Ok && string.IsNullOrWhiteSpace(result.Value.Transcript))
+            var result = Parse<TranscriptDto, string>(response, dto => dto.transcript);
+            if (result.Ok && string.IsNullOrWhiteSpace(result.Value))
             {
-                result = ApiResult<NegotiationReply>.Failure("empty transcript", response.StatusCode);
+                result = ApiResult<string>.Failure("empty transcript", response.StatusCode);
             }
 
             done(result);

@@ -58,9 +58,9 @@ namespace ColonQuest.Api
             return StartCoroutine(Service.SendNegotiationText(offerId, text, done));
         }
 
-        public Coroutine SendNegotiationVoice(string offerId, byte[] wav, Action<ApiResult<NegotiationReply>> done)
+        public Coroutine Transcribe(byte[] wav, Action<ApiResult<string>> done)
         {
-            return StartCoroutine(Service.SendNegotiationVoice(offerId, wav, done));
+            return StartCoroutine(Service.Transcribe(wav, done));
         }
 
         public Coroutine RequestSummary(PlayerState finalState, Action<ApiResult<SessionSummary>> done)
