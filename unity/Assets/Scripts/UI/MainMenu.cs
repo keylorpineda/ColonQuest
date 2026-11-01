@@ -45,7 +45,6 @@ namespace ColonQuest.UI
         private Transform root;
         private Vector2 parallax;
         private float openedAt;
-        private GameObject notice;
         private GameObject credits;
         private GameObject quitConfirm;
         private SettingsPanel settings;
@@ -58,7 +57,6 @@ namespace ColonQuest.UI
             BuildTitle();
             BuildButtons();
             BuildFooter();
-            BuildNotice();
             BuildCredits();
             BuildQuitConfirm();
             BuildSlots();
@@ -170,8 +168,8 @@ namespace ColonQuest.UI
             rect.anchoredPosition = new Vector2(target.x - from, target.y);
         }
 
-        /// <summary>True while a window (notice, credits or settings) covers the buttons.</summary>
-        public bool WindowOpen => notice.activeSelf || credits.activeSelf || quitConfirm.activeSelf || settings.IsOpen || slots.activeSelf || newGame.activeSelf;
+        /// <summary>True while a window (credits, settings or the demo lab) covers the buttons.</summary>
+        public bool WindowOpen => DemoLab.IsOpen || credits.activeSelf || quitConfirm.activeSelf || settings.IsOpen || slots.activeSelf || newGame.activeSelf;
 
         /// <summary>Starts a new life saved in a slot and goes to the opening in the house, behind the loading screen.</summary>
         public void StartStory(int slot, string runName, string characterName, bool female)
@@ -193,7 +191,6 @@ namespace ColonQuest.UI
 
         public void CloseWindows()
         {
-            notice.SetActive(false);
             credits.SetActive(false);
             quitConfirm.SetActive(false);
             slots.SetActive(false);
@@ -346,8 +343,8 @@ namespace ColonQuest.UI
                 case MenuEntry.Story:
                     ShowSlots();
                     break;
-                case MenuEntry.Online:
-                    notice.SetActive(true);
+                case MenuEntry.Demo:
+                    DemoLab.Open();
                     break;
                 case MenuEntry.Settings:
                     settings.Show();
@@ -367,33 +364,6 @@ namespace ColonQuest.UI
             UiKit.Fill(card, "Divider", new Color(UiKit.Ink.r, UiKit.Ink.g, UiKit.Ink.b, 0.18f), new Vector2(width, 4f), new Vector2(0.5f, 1f), new Vector2(0f, y));
         }
 
-        private void BuildNotice()
-        {
-            notice = UiKit.Overlay(root, "Notice");
-            var center = new Vector2(0.5f, 0.5f);
-            var top = new Vector2(0.5f, 1f);
-            var card = UiKit.Card(notice.transform, "Card", UiKit.Paper, new Vector2(960f, 600f), center, Vector2.zero);
-            UiKit.Header(card, "Jugar online", GamePalette.Hex("#2E7D9A"));
-
-            UiKit.Label(card, MenuEntries.OnlineNotice, 38, UiKit.Ink, new Vector2(880f, 56f), top, new Vector2(0f, -134f), TextAnchor.MiddleCenter);
-            Divider(card, -206f, 760f);
-
-            string[] points =
-            {
-                "El game master y los vendedores usan inteligencia artificial en la nube.",
-                "Si no hay conexión, el juego sigue con eventos y vendedores locales.",
-                "No pedimos tu nombre ni datos personales: solo se guardan tus decisiones de juego."
-            };
-            for (int i = 0; i < points.Length; i++)
-            {
-                UiKit.Round(card, "Dot", GameUiColors.Gain, 18f, top, new Vector2(-410f, -256f - i * 76f));
-                UiKit.Label(card, points[i], 30, UiKit.Ink, new Vector2(780f, 70f), top, new Vector2(30f, -236f - i * 76f), TextAnchor.MiddleLeft);
-            }
-
-            UiKit.MakeButton(card, "Entendido", GameUiColors.Green, new Vector2(360f, 84f), new Vector2(0.5f, 0f), new Vector2(0f, 32f), CloseWindows);
-            notice.SetActive(false);
-        }
-
         private void BuildCredits()
         {
             credits = UiKit.Overlay(root, "Credits");
@@ -411,14 +381,14 @@ namespace ColonQuest.UI
             for (int i = 0; i < MenuEntries.Tools.Length; i++)
             {
                 var tool = MenuEntries.Tools[i];
-                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -365f - i * 110f));
-                UiKit.Label(card, tool[0], 34, GameUiColors.Gain, new Vector2(920f, 44f), top, new Vector2(0f, -350f - i * 110f), TextAnchor.MiddleCenter);
-                UiKit.Label(card, tool[1], 26, GameUiColors.Muted, new Vector2(860f, 58f), top, new Vector2(0f, -395f - i * 110f), TextAnchor.UpperCenter);
+                UiKit.Round(card, "ToolDot", GameUiColors.Cycle(i), 22f, top, new Vector2(-460f, -358f - i * 74f));
+                UiKit.PlainLabel(card, "Tool", tool[0], 30, GameUiColors.Gain, new Vector2(920f, 38f), top, new Vector2(0f, -346f - i * 74f), TextAnchor.MiddleCenter);
+                UiKit.Label(card, tool[1], 24, GameUiColors.Muted, new Vector2(860f, 32f), top, new Vector2(0f, -382f - i * 74f), TextAnchor.UpperCenter);
             }
 
-            Divider(card, -740f, 860f);
-            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -765f), TextAnchor.MiddleCenter);
-            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -805f), TextAnchor.MiddleCenter);
+            Divider(card, -722f, 860f);
+            UiKit.Label(card, "Hecho para el Meta Global AI Developer Hackathon", 26, UiKit.Ink, new Vector2(1000f, 36f), top, new Vector2(0f, -745f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, BuildInfo.Label, 24, GameUiColors.Muted, new Vector2(1000f, 32f), top, new Vector2(0f, -785f), TextAnchor.MiddleCenter);
 
             UiKit.MakeButton(card, "Volver", GameUiColors.Yellow, new Vector2(320f, 72f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), CloseWindows);
             credits.SetActive(false);

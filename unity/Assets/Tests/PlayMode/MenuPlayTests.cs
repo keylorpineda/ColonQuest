@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace ColonQuest.World.PlayModeTests
 {
-    /// <summary>Plays the main menu: its buttons, the online notice, the settings and the start of a story run.</summary>
+    /// <summary>Plays the main menu: its buttons, the demo lab, the settings and the start of a story run.</summary>
     public sealed class MenuPlayTests
     {
         private static Transform Menu => GameObject.Find("MainMenu").transform;
@@ -114,28 +114,67 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             Assert.IsNotNull(Menu.Find("Button_Modo historia"));
-            Assert.IsNotNull(Menu.Find("Button_Jugar online"));
+            Assert.IsNotNull(Menu.Find("Button_Demo de funciones"));
             Assert.IsNotNull(Menu.Find("Button_Ajustes"));
             Assert.IsNotNull(Menu.Find("Button_Créditos"));
             Assert.AreEqual(MenuEntries.QuitAvailable(Application.platform), Menu.Find("Button_Salir") != null);
         }
 
         [UnityTest]
-        public IEnumerator Online_OnlyShowsTheNoticeAndStaysInTheMenu()
+        public IEnumerator Demo_OpensEveryStationOverTheMenuWithoutABackend()
         {
             yield return null;
-            Assert.IsFalse(Active("Notice"));
+            Assert.IsFalse(DemoLab.IsOpen);
 
-            ButtonAt("Button_Jugar online").onClick.Invoke();
+            ButtonAt("Button_Demo de funciones").onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(DemoLab.IsOpen);
+            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "it does not start a game");
+
+            var lab = GameObject.Find("DemoLab").GetComponent<DemoLab>();
+            for (int station = 0; station < DemoLab.StationCount; station++)
+            {
+                lab.Show(station);
+                yield return null;
+                Assert.AreEqual(station, lab.Current);
+                Assert.Greater(GameObject.Find("Workspace").transform.childCount, 0, "station " + station);
+            }
+
+            lab.Close();
+            yield return null;
+            Assert.IsFalse(DemoLab.IsOpen);
+            Assert.IsNull(GameObject.Find("DemoLab"));
+        }
+
+        [UnityTest]
+        public IEnumerator Demo_TheGameMasterStationSaysItWhenTheServerDoesNotAnswer()
+        {
+            yield return null;
+            DemoLab.Open();
             yield return null;
 
-            Assert.IsTrue(Active("Notice"));
-            Assert.IsNotNull(Menu.Find("Notice/Card/Body/Label_" + MenuEntries.OnlineNotice));
-            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "it does not start anything");
-
-            ButtonAt("Notice/Card/Body/Button_Entendido").onClick.Invoke();
+            var lab = GameObject.Find("DemoLab").GetComponent<DemoLab>();
+            lab.Show(0);
             yield return null;
-            Assert.IsFalse(Active("Notice"));
+            lab.TryScenario(0);
+
+            float waited = 0f;
+            while (lab.Busy && waited < 5f)
+            {
+                waited += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            Assert.IsFalse(lab.Busy);
+            var shown = GameObject.Find("Workspace").GetComponentsInChildren<Text>();
+            bool saysSo = false;
+            foreach (var text in shown)
+            {
+                saysSo |= text.text.Contains(Loc.T("No hubo respuesta del servidor. Revisá el internet y probá otra vez."));
+            }
+
+            Assert.IsTrue(saysSo, "the demo never passes a local answer off as the model's");
+            lab.Close();
         }
 
         [UnityTest]
@@ -209,7 +248,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(GameLanguage.English, Loc.Current);
             Assert.AreEqual("Language: English", LabelOf("Settings/Card/Body/Button_Idioma"), "the button names the language in its own language");
             Assert.AreEqual("Story mode", LabelOf("Button_Modo historia"));
-            Assert.AreEqual("Play online", LabelOf("Button_Jugar online"));
+            Assert.AreEqual("Feature demo", LabelOf("Button_Demo de funciones"));
             Assert.AreEqual("Sound: on", LabelOf("Settings/Card/Body/Button_Sonido"));
             StringAssert.EndsWith(";en", PlayerPrefs.GetString(GameSettings.StoreKey));
 
