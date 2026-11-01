@@ -9,7 +9,7 @@ namespace ColonQuest.EditorTools
     /// Generates the anti-aliased base shapes and high-contrast 2D cel-shaded textures and sprites
     /// used across the overworld and interiors.
     /// </summary>
-    public static class SpriteFactory
+    public static partial class SpriteFactory
     {
         public const string Folder = "Assets/Art/Sprites";
         public const string RoundedRectPath = Folder + "/RoundedRect.png";
