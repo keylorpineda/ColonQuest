@@ -9,6 +9,7 @@ from app.api.deps import AppSettings, ClientHash, DbSession
 from app.cost_guard import calls_for_client_today
 from app.db import CachedImage
 from app.game_master.ledger import DbLedger
+from app.images.keys import PREGENERATED_KEYS
 from app.images.service import FALLBACK_PNG, ImageService
 
 router = APIRouter(prefix="/images", tags=["images"])
@@ -55,7 +56,11 @@ async def get_image(
             },
         )
 
-    if await calls_for_client_today(db, client) >= settings.max_calls_per_client_per_day:
+    # Only the pre-generated set may be paid for; a key the model made up is not worth 17 s.
+    if (
+        key not in PREGENERATED_KEYS
+        or await calls_for_client_today(db, client) >= settings.max_calls_per_client_per_day
+    ):
         return Response(
             content=FALLBACK_PNG,
             media_type="image/png",
