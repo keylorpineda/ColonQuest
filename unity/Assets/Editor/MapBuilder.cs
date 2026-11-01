@@ -104,6 +104,7 @@ namespace ColonQuest.EditorTools
         private static UnityEngine.SceneManagement.Scene BeginScene()
         {
             SpriteFactory.EnsureGenerated();
+            SpriteFactory.EnsureCarsGenerated();
             LoadSprites();
             LoadLighting();
             EnsureSortingLayers();
