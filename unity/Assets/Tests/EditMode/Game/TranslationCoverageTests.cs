@@ -10,6 +10,22 @@ namespace ColonQuest.Game.Tests
     [TestFixture]
     public sealed class TranslationCoverageTests
     {
+        private GameLanguage savedLanguage;
+
+        // The texts are read through the language saved on this machine; the keys of the table are the Spanish ones.
+        [SetUp]
+        public void SetUp()
+        {
+            savedLanguage = GameSettings.Current.Language;
+            GameSettings.Current.Language = GameLanguage.Spanish;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            GameSettings.Current.Language = savedLanguage;
+        }
+
         private static void AssertKnown(string spanish, string where)
         {
             Assert.IsTrue(Loc.KnownTexts.Contains(spanish), "no English entry for (" + where + "): " + spanish);
