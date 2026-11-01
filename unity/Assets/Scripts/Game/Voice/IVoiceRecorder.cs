@@ -28,6 +28,12 @@ namespace ColonQuest.Game
         /// <summary>Seconds recorded so far.</summary>
         float Seconds { get; }
 
+        /// <summary>How loud the microphone is right now, 0 to 1; stays at 0 when the platform cannot tell.</summary>
+        float Level { get; }
+
+        /// <summary>True when the clip also ends by itself after the player stops talking.</summary>
+        bool StopsOnSilence { get; }
+
         void Start();
 
         /// <summary>Stops listening; the clip becomes <see cref="VoiceRecorderState.Ready"/>.</summary>
