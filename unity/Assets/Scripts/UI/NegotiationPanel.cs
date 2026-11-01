@@ -30,6 +30,7 @@ namespace ColonQuest.UI
         private Text talkLabel;
         private string micNotice;
         private string lastKey = string.Empty;
+        private int lastKnownFeesCount;
 
         private static readonly string[] QuestionLabels =
         {
@@ -65,6 +66,7 @@ namespace ColonQuest.UI
             micNotice = null;
             Clear();
             lastKey = string.Empty;
+            lastKnownFeesCount = 0;
             root.SetActive(false);
         }
 
@@ -217,6 +219,20 @@ namespace ColonQuest.UI
 
         private void Build(Negotiation negotiation)
         {
+            int currentFeesCount = 0;
+            foreach (var fact in negotiation.RevealedFacts)
+            {
+                if (fact == SellerFact.InsuranceFee || fact == SellerFact.Commission)
+                {
+                    currentFeesCount++;
+                }
+            }
+            if (currentFeesCount > lastKnownFeesCount)
+            {
+                ReactionBubble.Show(ReactionKind.Alert);
+            }
+            lastKnownFeesCount = currentFeesCount;
+
             Clear();
             float textWidth = CardWidth - Pad * 2f - UiKit.Outline * 2f;
             var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, CardHeight), new Vector2(0.5f, 0.5f), Vector2.zero);

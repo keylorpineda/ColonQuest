@@ -147,6 +147,7 @@ namespace ColonQuest.World
             heartStarted = Time.time;
             asleep = false;
             lonelySince = Time.time;
+            ReactionBubble.Show(ReactionKind.Love);
         }
 
         private void Awake()

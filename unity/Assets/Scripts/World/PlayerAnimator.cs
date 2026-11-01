@@ -31,6 +31,15 @@ namespace ColonQuest.World
 
         /// <summary>The back of the head, shown only while walking away. Without it the person always shows the face.</summary>
         public GameObject BackHead;
+
+        /// <summary>Pivot at the top or base of hair for secondary motion lag. Optional.</summary>
+        public Transform HairSway;
+
+        /// <summary>Pivot at the neck for tie or scarf secondary motion lag. Optional.</summary>
+        public Transform TieSway;
+
+        /// <summary>The ground shadow that squashes/breathes with the walk. Optional.</summary>
+        public Transform Shadow;
     }
 
     /// <summary>
@@ -44,7 +53,7 @@ namespace ColonQuest.World
         private const float LookRadius = 5f;
 
         [SerializeField] private float referenceSpeed = 4.5f;
-        [SerializeField] private float bobHeight = 0.09f;
+        [SerializeField] private float bobHeight = 0.12f;
         [SerializeField] private float stepRate = 11f;
         [SerializeField] private PersonRig rig;
         [SerializeField] private bool social;
@@ -74,6 +83,14 @@ namespace ColonQuest.World
         private float nextPlayerSearch;
         private float headTilt;
         private float torsoLean;
+        private float startLeanUntil;
+        private float hairAngle;
+        private float hairVel;
+        private float tieAngle;
+        private float tieVel;
+        private float wellbeing = 0.5f;
+        private float nextWander;
+        private Vector2 wanderOffset;
         private Vector2 pupilShift;
         private bool talking;
         private PersonPose pose;
@@ -109,6 +126,12 @@ namespace ColonQuest.World
 
         /// <summary>The pose the person holds now, or None.</summary>
         public PersonPose Pose => pose;
+
+        /// <summary>Sets the character's mood based on wellbeing (0 to 1), altering brows and mouth.</summary>
+        public void SetMood(float wellbeing01)
+        {
+            wellbeing = Mathf.Clamp01(wellbeing01);
+        }
 
         /// <summary>
         /// Holds a pose: lying down, eating, handing over money. It blends in and out. With a duration it ends by itself;
@@ -199,6 +222,13 @@ namespace ColonQuest.World
             float breathing = Mathf.Sin(Time.time * 2f) * 0.02f * (1f - moving);
             float squash = HasRig ? PersonMotion.StepSquash(step, moving) : 1f + (step - 0.5f) * 0.1f * moving + breathing;
 
+            // Starting anticipation: a brief stretch and backward lean before moving.
+            if (target > 0.2f && moving < 0.05f)
+            {
+                settleVelocity += 0.8f;
+                startLeanUntil = Time.time + 0.1f;
+            }
+
             // Stopping: the body sinks a little and comes back up, as if the weight settled on the feet.
             if (moving > 0.6f)
             {
@@ -207,7 +237,7 @@ namespace ColonQuest.World
             else if (!stopKicked && target < 0.05f && moving < 0.5f)
             {
                 stopKicked = true;
-                settleVelocity -= 0.9f;
+                settleVelocity -= 1.6f;
             }
 
             FoliagePhysics.StepSpring(ref settle, ref settleVelocity, 180f, 14f, Time.deltaTime);
@@ -249,8 +279,8 @@ namespace ColonQuest.World
             float armLeft = PersonMotion.ArmAngle(phase, moving, true) - sway;
             float armRight = PersonMotion.ArmAngle(phase, moving, false) + sway;
 
-            float elbowLeft = 0f;
-            float elbowRight = 0f;
+            float elbowLeft = PersonMotion.ElbowSwing(phase, moving, true);
+            float elbowRight = PersonMotion.ElbowSwing(phase, moving, false);
 
             // The greeting and the speech gestures take over an arm. The angles add to the arm's resting pose.
             float sinceWave = time - waveStarted;
@@ -288,7 +318,32 @@ namespace ColonQuest.World
             float speed = walkVelocity.magnitude;
             float sideways = speed > 0.01f ? Mathf.Abs(walkVelocity.x) / speed : 0f;
             torsoLean = Mathf.Sin(phase) * 2.5f * moving + poseAngles.Lean * poseWeight + PersonMotion.WalkLean(moving, sideways) * (1f - poseWeight);
+            if (time < startLeanUntil)
+            {
+                torsoLean += 4f;
+            }
             rig.Torso.localRotation = Z(torsoLean);
+
+            // Secondary motion: hair and tie sway lagging behind movement.
+            float swayTarget = PersonMotion.SwayTarget(walkVelocity.x, torsoLean);
+            FoliagePhysics.StepSpringToward(ref hairAngle, ref hairVel, swayTarget, 90f, 7f, Time.deltaTime);
+            FoliagePhysics.StepSpringToward(ref tieAngle, ref tieVel, swayTarget, 90f, 7f, Time.deltaTime);
+            if (rig.HairSway != null)
+            {
+                rig.HairSway.localRotation = Z(hairAngle);
+            }
+            if (rig.TieSway != null)
+            {
+                rig.TieSway.localRotation = Z(tieAngle);
+            }
+
+            // Shadow breathing with step squash.
+            if (rig.Shadow != null)
+            {
+                float step = Mathf.Abs(Mathf.Sin(phase));
+                float s = PersonMotion.ShadowScale(step, moving);
+                rig.Shadow.localScale = new Vector3(s, 1f, 1f);
+            }
 
             SetHandsInFront(poseWeight > 0.5f && PersonPoses.HandsInFront(shownPose));
             AnimateFace(time);
@@ -396,16 +451,27 @@ namespace ColonQuest.World
 
         private void AnimateFace(float time)
         {
-            // Blink every few seconds.
+            // Blink every few seconds, with 20% chance of double blink.
             if (time >= nextBlink)
             {
                 blinkStarted = time;
-                nextBlink = time + PersonMotion.NextBlinkDelay(Random.value);
+                if (PersonMotion.DoubleBlink(Random.value))
+                {
+                    nextBlink = time + PersonMotion.DoubleBlinkGap;
+                }
+                else
+                {
+                    nextBlink = time + PersonMotion.NextBlinkDelay(Random.value);
+                }
             }
 
             float closed = PersonMotion.BlinkClosed(time - blinkStarted);
             rig.LidL.localScale = new Vector3(1f, closed, 1f);
             rig.LidR.localScale = new Vector3(1f, closed, 1f);
+
+            float browTilt = PersonMotion.BrowTilt(wellbeing);
+            rig.LidL.localRotation = Z(-browTilt);
+            rig.LidR.localRotation = Z(browTilt);
 
             Vector2 pupilGoal = Vector2.zero;
             float tiltGoal = 0f;
@@ -438,6 +504,18 @@ namespace ColonQuest.World
                 }
             }
 
+            // When no player is nearby, pupils wander slightly every few seconds.
+            if (!social || player == null || Vector2.Distance(player.position, transform.position) >= LookRadius)
+            {
+                if (time >= nextWander)
+                {
+                    nextWander = time + PersonMotion.NextWanderDelay(Random.value);
+                    wanderOffset = PersonMotion.EyeWander(Random.value, Random.value);
+                }
+
+                pupilGoal = wanderOffset;
+            }
+
             if (talkRadius > 0f)
             {
                 talking = near;
@@ -455,10 +533,10 @@ namespace ColonQuest.World
             rig.Head.localRotation = Z(headTilt + torsoLean);
             rig.Head.localPosition = onNeck + new Vector3(0f, Mathf.Abs(Mathf.Sin(phase * 2f)) * 0.012f * moving + Mathf.Sin(time * 2f) * 0.006f, 0f);
 
-            // A smile while greeting, a moving mouth while talking.
+            // A smile while greeting, a moving mouth while talking. Mood alters mouth at rest.
             bool greeting = PersonMotion.IsWaving(time - waveStarted);
             float open = PersonMotion.MouthOpen(time, talking);
-            float rest = Mathf.Clamp(rig.MouthRest, 0.25f, 1f);
+            float rest = PersonMotion.MoodMouthRest(wellbeing, Mathf.Clamp(rig.MouthRest, 0.25f, 1f));
             open = Mathf.Lerp(rest, 1f, (open - 0.25f) / 0.75f);
             rig.Mouth.localScale = new Vector3(greeting ? 1.5f : 1f, greeting ? Mathf.Max(open, 0.6f) : open, 1f);
         }

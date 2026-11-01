@@ -170,6 +170,12 @@ namespace ColonQuest.EditorTools
             player.AddComponent<PlayerLookSwitch>();
             if (ySorted)
             {
+                var bob = player.transform.Find("Bob");
+                if (bob != null)
+                {
+                    bob.gameObject.AddComponent<IdleActions>();
+                }
+
                 // Out in the town the steps kick up a little sand or dust (indoors the floors stay clean).
                 var footDust = player.AddComponent<FootDust>();
                 footDust.Configure(softCircle, LayerFloor, 200, -0.45f);
@@ -228,7 +234,32 @@ namespace ColonQuest.EditorTools
                 npc.AddComponent<NightShift>().Configure(exit);
             }
 
+            AddNpcWorkLoop(npc, name);
+
             return npc.transform;
+        }
+
+        private static void AddNpcWorkLoop(GameObject npc, string name)
+        {
+            var bob = npc.transform.Find("Bob");
+            if (bob == null) return;
+
+            if (name == "Cajera" || name == "Cajero" || name == "Cajero2" || name == "AsesoraCoop" || name == "Financiera")
+            {
+                bob.gameObject.AddComponent<WorkLoop>().Configure(PersonPose.Type);
+            }
+            else if (name == "DonaLucia")
+            {
+                bob.gameObject.AddComponent<WorkLoop>().Configure(PersonPose.Cook, PersonPose.Wash);
+            }
+            else if (name == "DonRafa" || name == "Mecanico")
+            {
+                bob.gameObject.AddComponent<WorkLoop>().Configure(PersonPose.Reach);
+            }
+            else if (name.StartsWith("Vendedor"))
+            {
+                bob.gameObject.AddComponent<WorkLoop>().Configure(PersonPose.Wave, PersonPose.None, 5f, 9f);
+            }
         }
 
         /// <summary>The people who close their place at night, and which way they walk off: toward the back of it.</summary>

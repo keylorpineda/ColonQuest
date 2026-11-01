@@ -133,8 +133,8 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(1f, PersonMotion.StepSquash(1f, 0f), 0.0001f);
             Assert.Less(PersonMotion.StepSquash(0f, 1f), 1f, "a little shorter as the foot lands");
             Assert.Greater(PersonMotion.StepSquash(1f, 1f), 1f, "a little taller between steps");
-            Assert.That(PersonMotion.StepSquash(1f, 1f), Is.InRange(0.95f, 1.05f));
-            Assert.That(PersonMotion.StepSquash(0f, 1f), Is.InRange(0.95f, 1.05f));
+            Assert.That(PersonMotion.StepSquash(1f, 1f), Is.InRange(0.94f, 1.08f));
+            Assert.That(PersonMotion.StepSquash(0f, 1f), Is.InRange(0.94f, 1.08f));
         }
 
         [Test]
@@ -143,7 +143,59 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(0f, PersonMotion.WalkLean(1f, 0f), 0.0001f, "walking up or down stays upright");
             Assert.AreEqual(0f, PersonMotion.WalkLean(0f, 1f), 0.0001f, "standing stays upright");
             Assert.Less(PersonMotion.WalkLean(1f, 1f), 0f, "negative leans toward the way the person faces");
-            Assert.GreaterOrEqual(PersonMotion.WalkLean(1f, 1f), -3f);
+            Assert.GreaterOrEqual(PersonMotion.WalkLean(1f, 1f), -5f);
+        }
+
+        [Test]
+        public void ElbowSwing_ZeroWhenStanding_BendsBetweenTenAndThirtyFiveWhenWalking()
+        {
+            Assert.AreEqual(0f, PersonMotion.ElbowSwing(1f, 0f, true), 0.0001f);
+            Assert.AreEqual(0f, PersonMotion.ElbowSwing(1f, 0f, false), 0.0001f);
+
+            float left = Mathf.Abs(PersonMotion.ElbowSwing(1f, 1f, true));
+            float right = Mathf.Abs(PersonMotion.ElbowSwing(1f, 1f, false));
+            Assert.That(left, Is.InRange(10f, 35f));
+            Assert.That(right, Is.InRange(10f, 35f));
+        }
+
+        [Test]
+        public void SwayTarget_LimitsAngleAndAddsTorsoLean()
+        {
+            float normal = PersonMotion.SwayTarget(2f, 4f);
+            Assert.AreEqual(-2f * 2.2f + 2f, normal, 0.001f);
+
+            float extremeFast = PersonMotion.SwayTarget(100f, 0f);
+            Assert.AreEqual(-14f, extremeFast, 0.001f);
+
+            float extremeSlow = PersonMotion.SwayTarget(-100f, 0f);
+            Assert.AreEqual(14f, extremeSlow, 0.001f);
+        }
+
+        [Test]
+        public void ShadowScale_NarrowsToEightyFivePercentWhileWalking()
+        {
+            Assert.AreEqual(1f, PersonMotion.ShadowScale(0f, 0f), 0.001f);
+            Assert.AreEqual(1f, PersonMotion.ShadowScale(1f, 0f), 0.001f);
+            Assert.AreEqual(0.85f, PersonMotion.ShadowScale(1f, 1f), 0.001f);
+        }
+
+        [Test]
+        public void Mood_AltersBrowsAndMouthRest()
+        {
+            Assert.AreEqual(10f, PersonMotion.BrowTilt(0.2f));
+            Assert.AreEqual(0f, PersonMotion.BrowTilt(0.5f));
+
+            Assert.AreEqual(0.25f, PersonMotion.MoodMouthRest(0.2f, 0.4f));
+            Assert.GreaterOrEqual(PersonMotion.MoodMouthRest(0.9f, 0.25f), 0.55f);
+            Assert.AreEqual(0.3f, PersonMotion.MoodMouthRest(0.5f, 0.3f));
+        }
+
+        [Test]
+        public void TurnWidth_FormsCosineCurveBetweenFullAndPointFifteen()
+        {
+            Assert.AreEqual(1f, PersonMotion.TurnWidth(0f), 0.001f);
+            Assert.AreEqual(1f, PersonMotion.TurnWidth(1f), 0.001f);
+            Assert.AreEqual(0.15f, PersonMotion.TurnWidth(0.5f), 0.001f);
         }
     }
 }

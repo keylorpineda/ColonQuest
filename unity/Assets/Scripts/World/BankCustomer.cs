@@ -42,6 +42,7 @@ namespace ColonQuest.World
 
         private readonly Queue<Stop> route = new Queue<Stop>();
         private Transform visual;
+        private FacingTurn facingTurn;
         private PlayerAnimator animator;
         private System.Random random;
         private Stop current;
@@ -123,6 +124,10 @@ namespace ColonQuest.World
             {
                 animator = bob.GetComponent<PlayerAnimator>();
                 visual = bob.Find("Visual");
+                if (visual != null)
+                {
+                    facingTurn = visual.GetComponent<FacingTurn>() ?? visual.gameObject.AddComponent<FacingTurn>();
+                }
             }
 
             // Every customer starts at another moment, so they do not walk in together.
@@ -160,9 +165,11 @@ namespace ColonQuest.World
             Vector2 next = Vector2.MoveTowards(position, current.Point, Speed * Time.deltaTime);
             float dx = next.x - position.x;
             transform.position = next;
-            if (visual != null && Mathf.Abs(dx) > 0.0001f)
+            if (Mathf.Abs(dx) > 0.0001f)
             {
-                visual.localScale = new Vector3(dx > 0f ? 1f : -1f, 1f, 1f);
+                int sign = dx > 0f ? 1 : -1;
+                if (facingTurn != null) facingTurn.TurnTo(sign);
+                else if (visual != null) visual.localScale = new Vector3(sign, 1f, 1f);
             }
 
             SetWalking(1f);
