@@ -1741,7 +1741,7 @@
     },
     "/api/sessions/{session_id}/trace": {
       "get": {
-        "description": "The session's model calls, its agents' tool steps and its season plan. It works after the end.",
+        "description": "The session's model calls, tool steps and season plan. Finished sessions still answer.",
         "operationId": "session_trace_api_sessions__session_id__trace_get",
         "parameters": [
           {
