@@ -92,6 +92,12 @@ namespace ColonQuest.Api
                 yield return transport.Send(Post($"sessions/{SessionId}/event", body, config.EventTimeout), r => response = r);
                 result = Parse<GameEventDto, GameEvent>(response, ApiMapper.FromDto);
                 result.Origin = HeaderOf(response, "X-Event-Source");
+
+                // The backend's own fallback events only exist in Spanish; the local ones are translated.
+                if (result.Ok && result.Origin == "fallback" && Language() == "en")
+                {
+                    result = new ApiResult<GameEvent> { Ok = false, Error = "server fallback", StatusCode = result.StatusCode, Origin = result.Origin };
+                }
             }
             else
             {
@@ -101,8 +107,10 @@ namespace ColonQuest.Api
             if (!result.Ok || result.Value == null)
             {
                 string reason = result.Error;
+                string origin = result.Origin;
                 result = ApiResult<GameEvent>.Success(FallbackEvents.Next(state, seenEvents), ResultSource.Fallback, result.StatusCode);
                 result.Error = reason;
+                result.Origin = origin;
             }
 
             seenEvents.Add(result.Value.EventId);
@@ -271,7 +279,8 @@ namespace ColonQuest.Api
         public IEnumerator RequestClassDashboard(string code, Action<ApiResult<ClassDashboardDto>> done)
         {
             HttpResponseData response = null;
-            var request = new HttpRequestData { Method = "GET", Url = config.Url($"classes/{code}/dashboard"), TimeoutSeconds = config.Timeout };
+            string language = Language() == "en" ? "?language=en" : string.Empty;
+            var request = new HttpRequestData { Method = "GET", Url = config.Url($"classes/{code}/dashboard{language}"), TimeoutSeconds = config.Timeout };
             yield return transport.Send(request, r => response = r);
 
             // JsonUtility reads a null number as 0, and "nobody yet" is not the same as "nobody".
