@@ -29,6 +29,10 @@ namespace ColonQuest.Game
 
         public float Seconds => State == VoiceRecorderState.Recording ? VoiceRecorder_Seconds() : 0f;
 
+        public float Level => 0f;
+
+        public bool StopsOnSilence => false;
+
         public void Start()
         {
             if (State == VoiceRecorderState.Starting || State == VoiceRecorderState.Recording)
