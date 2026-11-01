@@ -82,33 +82,55 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// Where a puff of volcano smoke is after <paramref name="t01"/> of its life, in pixels of the key art from the crater:
-        /// it rises, wavers a little and bends to the right with the wind, like the column in the drawing.
+        /// How far the smoke column of the key art bends at a height over the crater, in pixels of the art: nothing at the
+        /// crater and more the higher it is, with waves that climb the column and a slow lean with the wind.
         /// </summary>
-        public static Vector2 SmokeOffset(float t01, float sway)
+        public static float SmokeSway(float heightPx, float seconds)
         {
-            float t = Mathf.Clamp01(t01);
-            float x = Mathf.Sin(t * 6.5f + sway) * 22f * t + Mathf.Pow(t, 1.6f) * 180f;
-            float y = t * 235f;
-            return new Vector2(x, y);
+            float reach = Mathf.Clamp01(heightPx / 170f);
+            float wave = Mathf.Sin((heightPx / 95f - seconds / 3.4f) * Mathf.PI * 2f) * 7f
+                + Mathf.Sin((heightPx / 47f - seconds / 2.1f) * Mathf.PI * 2f + 1.3f) * 2f;
+            float lean = Mathf.Sin(seconds * 0.4f) * 4f * reach;
+            return reach * wave + lean * reach;
         }
 
-        /// <summary>The size of a puff over its life: small out of the crater, wide high up.</summary>
-        public static float SmokeScale(float t01)
+        // The middle of the drawn column every 15 pixels of height, measured on the key art.
+        private static readonly float[] SmokeAxisPx = { 0f, 2f, 2f, 6f, 6f, 10f, 30f, 55f, 67f, 78f, 88f, 104f };
+
+        /// <summary>The middle of the drawn column at a height over the crater, in pixels of the art from the crater.</summary>
+        public static float SmokeAxis(float heightPx)
         {
-            return Mathf.Lerp(0.12f, 0.72f, Mathf.Pow(Mathf.Clamp01(t01), 0.8f));
+            float at = Mathf.Clamp(heightPx / 15f, 0f, SmokeAxisPx.Length - 1f);
+            int low = Mathf.Min((int)at, SmokeAxisPx.Length - 2);
+            return Mathf.Lerp(SmokeAxisPx[low], SmokeAxisPx[low + 1], at - low);
         }
 
-        /// <summary>The opacity of a puff over its life: it appears quickly and thins away in its last third.</summary>
-        public static float SmokeAlpha(float t01)
+        /// <summary>The size of a wisp over its life: it stays narrower than the column it rises along.</summary>
+        public static float WispScale(float t01)
         {
-            float t = Mathf.Clamp01(t01);
-            if (t < 0.08f)
-            {
-                return t / 0.08f;
-            }
+            return Mathf.Lerp(0.05f, 0.27f, Mathf.Clamp01(t01));
+        }
 
-            return t > 0.65f ? Mathf.Clamp01(1f - (t - 0.65f) / 0.35f) : 1f;
+        /// <summary>The opacity of a wisp over its life: faint, so the drawn column still reads under it.</summary>
+        public static float WispAlpha(float t01)
+        {
+            return Pulse(t01) * 0.5f;
+        }
+
+        /// <summary>
+        /// One step of a spring toward a target, for a head that moves with weight: it gets there quickly, passes it a
+        /// little and settles.
+        /// </summary>
+        public static void SpringStep(ref float value, ref float velocity, float target, float stiffness, float damping, float deltaSeconds)
+        {
+            velocity += (stiffness * (target - value) - damping * velocity) * deltaSeconds;
+            value += velocity * deltaSeconds;
+        }
+
+        /// <summary>The small movement a resting head never stops making, in degrees.</summary>
+        public static float HeadDrift(float seconds)
+        {
+            return Mathf.Sin(seconds * 1.3f) * 1.1f + Mathf.Sin(seconds * 2.9f + 1f) * 0.5f;
         }
     }
 }
