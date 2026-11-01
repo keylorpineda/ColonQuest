@@ -244,6 +244,15 @@ namespace ColonQuest.World
             drop.enabled = true;
         }
 
+        /// <summary>A ring at a point of the water, for something that falls in (a fish landing, a stone).</summary>
+        public void SpawnAt(Vector2 worldPoint, float size)
+        {
+            if (rings != null && ringSprite != null)
+            {
+                Spawn(worldPoint, size);
+            }
+        }
+
         private void Spawn(Vector2 worldPoint, float size)
         {
             int index = next;

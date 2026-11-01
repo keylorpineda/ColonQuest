@@ -306,10 +306,32 @@ namespace ColonQuest.EditorTools
             ripple.a = 0.4f;
             Flickering(Shape(parent, "Pond_Ripple", ring, new Vector2(18.5f, -5.9f), new Vector2(1.6f, 0.9f), ripple, TownPark + 2), 0.6f, 1.4f, 5f);
             Flickering(Shape(parent, "Pond_Ripple", ring, new Vector2(21f, -6.2f), new Vector2(1.2f, 0.7f), ripple, TownPark + 2), 0.6f, 1.8f, 12f);
+            // The pond is alive: rings now and then, lily pads that drift and move away from the player, and a fish
+            // that jumps out once in a while. All of it stays inside the water (the pond's wall keeps the player out).
+            var pond = new Rect(19.5f - 2.8f, -5.9f - 1.3f, 5.6f, 2.6f);
+            var rings = new GameObject("Pond_Rings").transform;
+            rings.SetParent(parent, false);
+            var field = rings.gameObject.AddComponent<RippleField>();
+            field.Configure(ring, new Rect(pond.xMin + 0.5f, pond.yMin + 0.4f, pond.width - 1f, pond.height - 0.8f), new Rect(0f, 0f, 0f, 0f), currentLayer, TownPark + 2, false);
+
+            var shine = GamePalette.White;
+            shine.a = 0.18f;
+            Flickering(Shape(parent, "Pond_Shine", rounded, new Vector2(19.2f, -5.55f), new Vector2(3.6f, 0.9f), shine, TownPark + 2), 0.5f, 0.35f, 2f);
+
+            int padIndex = 0;
             foreach (var pad in new[] { new Vector2(17.6f, -6.4f), new Vector2(20.6f, -5.4f), new Vector2(21.6f, -6.5f) })
             {
-                Shape(parent, "LilyPad", circle, pad, new Vector2(0.55f, 0.4f), GamePalette.Hex("#4CAF6A"), TownPark + 3);
+                var leaf = Shape(parent, "LilyPad", circle, pad, new Vector2(0.55f, 0.4f), GamePalette.Hex("#4CAF6A"), TownPark + 3);
+                Shape(leaf.transform, "LilyPad_Notch", triangle != null ? triangle : square, new Vector2(0.28f, 0.08f), new Vector2(0.35f, 0.3f), GamePalette.Hex("#5DB4DF"), TownPark + 3)
+                    .transform.localRotation = Quaternion.Euler(0f, 0f, -90f);
+                leaf.gameObject.AddComponent<FloatingPad>().Configure(pond, 0.07f + padIndex * 0.02f, padIndex * 2.1f);
+                padIndex++;
             }
+
+            var fish = Shape(parent, "Pond_Fish", circle, new Vector2(19.5f, -5.9f), new Vector2(0.34f, 0.16f), GamePalette.Hex("#FF8A3D"), TownPark + 4);
+            Shape(fish.transform, "Pond_FishTail", triangle != null ? triangle : square, new Vector2(-0.62f, 0f), new Vector2(0.5f, 0.9f), GamePalette.Hex("#E86A1F"), TownPark + 4)
+                .transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            fish.gameObject.AddComponent<FishJump>().Configure(pond, field);
         }
 
         private static void BuildBuildings(Transform parent, Transform shadows)

@@ -122,5 +122,40 @@ namespace ColonQuest.World
             float w = Mathf.PI * 2f / period;
             return degrees * (Mathf.Sin(time * w + phase) * 0.8f + Mathf.Sin(time * w * 2.3f + phase * 1.7f) * 0.2f);
         }
+    
+
+        /// <summary>
+        /// The push the water gives a floating thing when someone walks up to the edge: away from them, stronger the
+        /// closer they are, nothing beyond <paramref name="radius"/>.
+        /// </summary>
+        public static Vector2 Push(Vector2 thing, Vector2 walker, float radius, float strength)
+        {
+            Vector2 away = thing - walker;
+            float distance = away.magnitude;
+            if (radius <= 0f || distance >= radius)
+            {
+                return Vector2.zero;
+            }
+
+            Vector2 direction = distance > 0.0001f ? away / distance : Vector2.right;
+            return direction * strength * (1f - distance / radius);
+        }
+
+        /// <summary>Keeps a point inside a rectangle shrunk by <paramref name="margin"/> on every side.</summary>
+        public static Vector2 KeepInside(Vector2 point, Rect area, float margin)
+        {
+            float xMin = area.xMin + margin;
+            float xMax = Mathf.Max(xMin, area.xMax - margin);
+            float yMin = area.yMin + margin;
+            float yMax = Mathf.Max(yMin, area.yMax - margin);
+            return new Vector2(Mathf.Clamp(point.x, xMin, xMax), Mathf.Clamp(point.y, yMin, yMax));
+        }
+
+        /// <summary>The height of a jumping fish over its jump (0 to 1): up and back down in a parabola.</summary>
+        public static float JumpHeight(float t01, float height)
+        {
+            float t = Mathf.Clamp01(t01);
+            return 4f * height * t * (1f - t);
+        }
     }
 }

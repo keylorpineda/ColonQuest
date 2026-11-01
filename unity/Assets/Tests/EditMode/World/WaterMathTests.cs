@@ -138,5 +138,35 @@ namespace ColonQuest.World.Tests
             Assert.AreEqual(0f, WaterMath.SplashAlpha(1f), 0.0001f);
             Assert.That(WaterMath.SplashAlpha(0.85f), Is.InRange(0.1f, 0.9f));
         }
+
+        [Test]
+        public void Push_MovesThingsAwayFromTheWalkerOnlyWhenClose()
+        {
+            var push = WaterMath.Push(new Vector2(1f, 0f), Vector2.zero, 2f, 4f);
+            Assert.Greater(push.x, 0f, "pushed away from the walker");
+            Assert.AreEqual(2f, push.magnitude, 0.0001f, "half way into the radius, half the strength");
+            Assert.AreEqual(Vector2.zero, WaterMath.Push(new Vector2(3f, 0f), Vector2.zero, 2f, 4f), "too far to feel it");
+            Assert.Greater(WaterMath.Push(Vector2.zero, Vector2.zero, 2f, 4f).magnitude, 0f, "right on top still gets a direction");
+        }
+
+        [Test]
+        public void KeepInside_NeverLeavesTheWater()
+        {
+            var pond = new Rect(0f, 0f, 4f, 2f);
+            Assert.AreEqual(new Vector2(2f, 1f), WaterMath.KeepInside(new Vector2(2f, 1f), pond, 0.3f));
+            var clamped = WaterMath.KeepInside(new Vector2(9f, -5f), pond, 0.3f);
+            Assert.AreEqual(3.7f, clamped.x, 0.0001f);
+            Assert.AreEqual(0.3f, clamped.y, 0.0001f);
+            var tiny = WaterMath.KeepInside(new Vector2(5f, 5f), new Rect(0f, 0f, 0.2f, 0.2f), 0.3f);
+            Assert.AreEqual(0.3f, tiny.x, 0.0001f, "a margin bigger than the pond still gives a point");
+        }
+
+        [Test]
+        public void JumpHeight_IsAnArcThatStartsAndEndsInTheWater()
+        {
+            Assert.AreEqual(0f, WaterMath.JumpHeight(0f, 0.5f), 0.0001f);
+            Assert.AreEqual(0.5f, WaterMath.JumpHeight(0.5f, 0.5f), 0.0001f);
+            Assert.AreEqual(0f, WaterMath.JumpHeight(1f, 0.5f), 0.0001f);
+        }
     }
 }
