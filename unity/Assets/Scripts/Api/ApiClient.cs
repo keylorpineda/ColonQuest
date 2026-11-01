@@ -13,6 +13,9 @@ namespace ColonQuest.Api
     {
         private static ApiClient instance;
 
+        private IHttpTransport transport;
+        private ApiConfig config;
+
         public ApiService Service { get; private set; }
 
         /// <summary>The shared client. It is created the first time it is asked for.</summary>
@@ -25,7 +28,7 @@ namespace ColonQuest.Api
                     var go = new GameObject("ApiClient");
                     DontDestroyOnLoad(go);
                     instance = go.AddComponent<ApiClient>();
-                    instance.Service = new ApiService(new UnityWebRequestTransport(), ApiConfig.Current);
+                    instance.Configure(new UnityWebRequestTransport(), ApiConfig.Current);
                 }
 
                 return instance;
@@ -33,9 +36,17 @@ namespace ColonQuest.Api
         }
 
         /// <summary>Replaces the transport and config, for tests and for pointing at another backend.</summary>
-        public void Configure(IHttpTransport transport, ApiConfig config)
+        public void Configure(IHttpTransport httpTransport, ApiConfig apiConfig)
         {
+            transport = httpTransport;
+            config = apiConfig;
             Service = new ApiService(transport, config);
+        }
+
+        /// <summary>A service of its own for the demo lab: its sessions and longer waits never touch the player's game.</summary>
+        public ApiService NewDemoService()
+        {
+            return new ApiService(transport, config.ForDemo());
         }
 
         public Coroutine CreateSession(string classCode, Action<ApiResult<string>> done)

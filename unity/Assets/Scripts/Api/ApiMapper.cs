@@ -226,7 +226,11 @@ namespace ColonQuest.Api
                 Status = dto.status,
                 Version = dto.version ?? string.Empty,
                 Database = dto.database ?? string.Empty,
-                BudgetMode = dto.budget?.mode ?? string.Empty
+                BudgetMode = dto.budget?.mode ?? string.Empty,
+                MetaSpentUsd = dto.budget?.spentUsd ?? 0f,
+                MetaBudgetUsd = dto.budget?.budgetUsd ?? 0f,
+                OpenWeightsSpentUsd = dto.openWeightsBudget?.spentUsd ?? 0f,
+                OpenWeightsBudgetUsd = dto.openWeightsBudget?.budgetUsd ?? 0f
             };
         }
     }

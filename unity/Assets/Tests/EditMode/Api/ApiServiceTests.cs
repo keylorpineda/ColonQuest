@@ -298,6 +298,89 @@ namespace ColonQuest.Api.Tests
             Assert.IsTrue(result.Ok);
             Assert.AreEqual("downgraded", result.Value.BudgetMode);
             Assert.AreEqual("http://test/api/health", transport.Requests[0].Url);
+            Assert.AreEqual(1.5f, result.Value.MetaSpentUsd);
+            Assert.AreEqual(10f, result.Value.MetaBudgetUsd);
+        }
+
+        [Test]
+        public void Event_SaysWhoWroteIt()
+        {
+            service.RestoreSession(SessionId);
+            var reply = FakeTransport.Ok(EventJson);
+            reply.Headers["x-event-source"] = "agent";
+            transport.Replies.Enqueue(reply);
+            ApiResult<GameEvent> result = null;
+
+            Run(service.RequestEvent(new PlayerState { Month = 1, SalaryNet = 1L }, r => result = r));
+
+            Assert.AreEqual(ResultSource.Remote, result.Source);
+            Assert.AreEqual("agent", result.Origin);
+        }
+
+        [Test]
+        public void Trace_ReadsWhatTheModelsDidAndNeedsASession()
+        {
+            ApiResult<SessionTraceDto> result = null;
+            Run(service.RequestTrace(r => result = r));
+            Assert.IsFalse(result.Ok);
+            Assert.IsEmpty(transport.Requests);
+
+            service.RestoreSession(SessionId);
+            transport.Replies.Enqueue(FakeTransport.Ok(
+                "{\"calls\":[{\"endpoint\":\"event_agent\",\"provider\":\"meta_api\",\"model\":\"muse-spark-1.3\",\"inputTokens\":10,\"outputTokens\":5,\"costUsd\":0.002,\"latencyMs\":3100,\"ok\":true}],"
+                + "\"toolSteps\":[{\"endpoint\":\"event_agent\",\"step\":1,\"tool\":\"project_debt\",\"arguments\":\"{}\",\"result\":\"{}\"}],"
+                + "\"seasonPlan\":[{\"month\":1,\"teachingConcept\":\"budget\",\"eventType\":\"expense\",\"theme\":\"Primer salario\"}],\"totalCostUsd\":0.002}"));
+
+            Run(service.RequestTrace(r => result = r));
+
+            Assert.IsTrue(result.Ok);
+            Assert.AreEqual("http://test/api/sessions/" + SessionId + "/trace", transport.Requests[0].Url);
+            Assert.AreEqual(3100, result.Value.calls[0].latencyMs);
+            Assert.AreEqual("project_debt", result.Value.toolSteps[0].tool);
+            Assert.AreEqual("Primer salario", result.Value.seasonPlan[0].theme);
+        }
+
+        [Test]
+        public void ClassMode_OpensAClassAndReadsItsPanel()
+        {
+            ApiResult<string> created = null;
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"code\":\"AB12\",\"name\":\"Clase\"}"));
+            Run(service.CreateClass("Clase", r => created = r));
+            Assert.AreEqual("AB12", created.Value);
+            Assert.AreEqual("http://test/api/classes", transport.Requests[0].Url);
+
+            ApiResult<ClassDashboardDto> panel = null;
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"code\":\"AB12\",\"students\":3,\"trapDetectionPct\":66,\"averageFinalDebt\":120000,\"concepts\":[{\"concept\":\"budget\",\"decisions\":2,\"riskyChoicePct\":50}],\"explanation\":\"Texto\",\"source\":\"model\"}"));
+            Run(service.RequestClassDashboard("AB12", r => panel = r));
+
+            Assert.AreEqual(3, panel.Value.students);
+            Assert.AreEqual(120000L, panel.Value.averageFinalDebt);
+            Assert.AreEqual(50, panel.Value.concepts[0].riskyChoicePct);
+            Assert.AreEqual("http://test/api/classes/AB12/dashboard", transport.Requests[1].Url);
+        }
+
+        [Test]
+        public void ClassMode_ANullFigureIsNoDataAndNotZero()
+        {
+            ApiResult<ClassDashboardDto> panel = null;
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"trapDetectionPct\":null,\"averageFinalDebt\": null,\"concepts\":[{\"concept\":\"budget\",\"riskyChoicePct\":null},{\"concept\":\"inflation\",\"riskyChoicePct\":0}]}"));
+
+            Run(service.RequestClassDashboard("AB12", r => panel = r));
+
+            Assert.AreEqual(ClassDashboardDto.NoData, panel.Value.trapDetectionPct);
+            Assert.AreEqual(ClassDashboardDto.NoData, panel.Value.averageFinalDebt);
+            Assert.AreEqual(ClassDashboardDto.NoData, panel.Value.concepts[0].riskyChoicePct);
+            Assert.AreEqual(0, panel.Value.concepts[1].riskyChoicePct);
+        }
+
+        [Test]
+        public void DemoConfig_WaitsLongerOnTheSameBackend()
+        {
+            var demo = new ApiConfig { BaseUrl = "http://test/api" }.ForDemo();
+
+            Assert.AreEqual("http://test/api", demo.BaseUrl);
+            Assert.Greater(demo.EventTimeout, ApiConfig.EventTimeoutSeconds);
+            Assert.Greater(demo.Timeout, 60f, "a server that was asleep takes most of a minute");
         }
 
         [Test]

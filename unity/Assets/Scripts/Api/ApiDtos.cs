@@ -174,5 +174,87 @@ namespace ColonQuest.Api
         public string version = string.Empty;
         public string database = string.Empty;
         public BudgetDto budget = new BudgetDto();
+        public BudgetDto openWeightsBudget = new BudgetDto();
+    }
+
+    [Serializable]
+    public sealed class ModelCallDto
+    {
+        public string endpoint = string.Empty;
+        public string provider = string.Empty;
+        public string model = string.Empty;
+        public int inputTokens;
+        public int outputTokens;
+        public float costUsd;
+        public int latencyMs;
+        public bool ok;
+    }
+
+    [Serializable]
+    public sealed class ToolStepDto
+    {
+        public string endpoint = string.Empty;
+        public int step;
+        public string tool = string.Empty;
+        public string arguments = string.Empty;
+        public string result = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class PlanMonthDto
+    {
+        public int month;
+        public string teachingConcept = string.Empty;
+        public string eventType = string.Empty;
+        public string theme = string.Empty;
+    }
+
+    /// <summary>What the models and agents did in a session, as the demo lab shows it.</summary>
+    [Serializable]
+    public sealed class SessionTraceDto
+    {
+        public List<ModelCallDto> calls = new List<ModelCallDto>();
+        public List<ToolStepDto> toolSteps = new List<ToolStepDto>();
+        public List<PlanMonthDto> seasonPlan = new List<PlanMonthDto>();
+        public float totalCostUsd;
+    }
+
+    [Serializable]
+    public sealed class CreateClassRequestDto
+    {
+        public string name = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class ClassCreatedDto
+    {
+        public string code = string.Empty;
+        public string name = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class ConceptStatDto
+    {
+        public string concept = string.Empty;
+        public int decisions;
+        public int riskyChoicePct;
+    }
+
+    [Serializable]
+    public sealed class ClassDashboardDto
+    {
+        /// <summary>What a figure holds when the backend has nothing to compute it from.</summary>
+        public const int NoData = -1;
+
+        public string code = string.Empty;
+        public string name = string.Empty;
+        public int students;
+        public int finishedGames;
+        public int negotiations;
+        public int trapDetectionPct;
+        public long averageFinalDebt;
+        public List<ConceptStatDto> concepts = new List<ConceptStatDto>();
+        public string explanation = string.Empty;
+        public string source = string.Empty;
     }
 }
