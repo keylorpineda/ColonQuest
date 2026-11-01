@@ -70,7 +70,7 @@ namespace ColonQuest.UI
                 balances.Add(state.CreditCard.Balance);
             }
 
-            Plain(Loc.F("Tarjeta de {0} al {1}% mensual, pagando solo el mínimo", Money.Format(start), "3,5"), 25, UiKit.Ink, new Vector2(Width, 34f), new Vector2(Left, y));
+            Plain(Loc.F("Tarjeta de {0} al {1}% mensual, pagando solo el mínimo", Money.Format(start), Loc.Current == GameLanguage.English ? "3.5" : "3,5"), 25, UiKit.Ink, new Vector2(Width, 34f), new Vector2(Left, y));
             y -= 40f;
             const float chartHeight = 150f;
             const float barWidth = 34f;
