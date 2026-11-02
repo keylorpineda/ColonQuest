@@ -43,6 +43,8 @@ class PlayerState(ContractModel):
     character_name: Annotated[ShortText | None, Field(default=None)] = None
     week: Annotated[int | None, Field(default=None, ge=1, le=4)] = None
     job_position: Annotated[ShortText | None, Field(default=None)] = None
+    # What the player's home, car and farm are worth, for the summary. The engine computes it.
+    assets_value: Colones = 0
     language: Annotated[GameLanguage | None, Field(default=None)] = None
 
     @field_validator("character_name", "job_position", mode="before")

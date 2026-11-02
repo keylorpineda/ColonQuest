@@ -108,6 +108,13 @@
     "PlayerState": {
       "additionalProperties": false,
       "properties": {
+        "assetsValue": {
+          "default": 0,
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Assetsvalue",
+          "type": "integer"
+        },
         "cash": {
           "maximum": 100000000,
           "minimum": 0,
