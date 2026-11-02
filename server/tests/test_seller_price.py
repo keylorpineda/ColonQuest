@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 
 from app.agents.tools import QUOTABLE_KEYS, QuoteTermArgs, ToolContext, quote_term
-from app.negotiation.agent import SELLER_TOOLS, term_offer
+from app.negotiation.agent import SELLER_TOOLS, get_agent_system_prompt, term_offer
 from app.negotiation.questions import wrong_cash_prices
 from app.negotiation.seller_sheet import MAX_TERM_MONTHS, OFFERS, offer_on_the_table
 
@@ -12,6 +12,11 @@ PHONE = OFFERS["celular_gama_alta"]
 
 def test_the_seller_has_no_tool_that_takes_a_price() -> None:
     assert SELLER_TOOLS == ("quote_term",)
+
+
+@pytest.mark.parametrize("language", ["en", "es"])
+def test_the_seller_quotes_a_longer_term_at_once(language: str) -> None:
+    assert "never promise to check it later" in get_agent_system_prompt(language)
 
 
 @pytest.mark.parametrize(
