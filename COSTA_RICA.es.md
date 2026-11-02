@@ -1,6 +1,11 @@
 <p align="center"><a href="COSTA_RICA.md">English</a> | <b>Español</b></p>
 
 <p align="center">
+  <a href="README.es.md"><img src="docs/assets/tab-readme-es.svg" alt="README"></a>
+  <a href="RUN_AND_BUILD.es.md"><img src="docs/assets/tab-run-es.svg" alt="Correr y armar, para los jueces"></a>
+</p>
+
+<p align="center">
   <img src="docs/assets/costa-rica-es.svg" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
