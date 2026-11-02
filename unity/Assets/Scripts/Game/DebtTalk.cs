@@ -223,8 +223,8 @@ namespace ColonQuest.Game
             Line(request, TalkFact.TotalCost, Loc.F("Prometes que {0} se vuelven {1} en un mes: {2}% de ganancia.", Money.Format(ExampleLoan), Money.Format(promised), PyramidPromisePct));
             Line(request, TalkFact.WhereMoneyComes, Loc.T("La plata sale de los nuevos que entran: por eso cada uno tiene que traer a tres amigos."));
             Line(request, TalkFact.Guarantee, Loc.T("No hay contrato ni garantía, solo confianza."));
-            Line(request, TalkFact.Legal, Loc.T("No están inscritos en SUGEF."));
-            Line(request, TalkFact.WhatIfNotPaid, Loc.T("Solo les pagan a los primeros que entraron."));
+            Line(request, TalkFact.Legal, Loc.T("Ustedes no están inscritos en SUGEF, y lo sabes."));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.T("Solo les pagas a los primeros que entraron."));
             Line(request, TalkFact.Arrangement, Loc.T("Si mete más plata hoy, lo suben al nivel oro."));
             request.amounts.AddRange(new[] { ExampleLoan, promised });
             request.percents.Add(PyramidPromisePct);
