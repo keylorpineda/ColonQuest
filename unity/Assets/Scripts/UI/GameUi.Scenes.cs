@@ -157,10 +157,12 @@ namespace ColonQuest.UI
                     return SignScene(station, then, "DonBeto", "Don Beto", "La tierra da, pero hay que saber cuándo sembrar y cuándo esperar.", false);
                 case StationType.Thing:
                     return ThingScene(station, then);
-                case StationType.Garage:
-                case StationType.Grocery:
                 case StationType.Lender:
                 case StationType.Pyramid:
+                    // Their offers come from the game, so there is nothing to ask ahead.
+                    return session.Loop.CanDoTask(station.Type) ? TalkScene(station, then) : null;
+                case StationType.Garage:
+                case StationType.Grocery:
                 case StationType.Soda:
                 case StationType.Coop:
                     if (!session.Loop.CanDoTask(station.Type))

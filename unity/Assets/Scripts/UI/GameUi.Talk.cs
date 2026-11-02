@@ -52,7 +52,7 @@ namespace ColonQuest.UI
             options.Add(new ModalOption { Label = Loc.F("{0}.  Hablar y negociar (texto o voz)", options.Count + 1), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(partner) });
             if (session.Loop.CanDoTask(type))
             {
-                options.Add(new ModalOption { Label = Loc.F("{0}.  Escuchar la oferta", options.Count + 1), Color = GameUiColors.Green, OnPress = () => session.BeginTask(type) });
+                options.Add(new ModalOption { Label = Loc.F("{0}.  Escuchar la oferta", options.Count + 1), Color = GameUiColors.Green, OnPress = () => session.BeginOffer(partner) });
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", options.Count + 1)));
@@ -92,7 +92,7 @@ namespace ColonQuest.UI
                     OnPress = () =>
                     {
                         session.EndTalk();
-                        session.BeginTask(type);
+                        session.BeginOffer(talk.Partner);
                     }
                 });
             }
