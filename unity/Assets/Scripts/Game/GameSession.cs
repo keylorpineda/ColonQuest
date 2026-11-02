@@ -809,7 +809,7 @@ namespace ColonQuest.Game
             TalkUpdated?.Invoke(CurrentTalk);
         }
 
-        /// <summary>One typed turn: the answer follows the fixed rules of the talk, at once and without the server.</summary>
+        /// <summary>One turn in the player's words. The model answers from the game's true figures; when it cannot, the talk's own rules do, so it never stops.</summary>
         public void SendTalk(string text)
         {
             var talk = CurrentTalk;
@@ -825,12 +825,41 @@ namespace ColonQuest.Game
             }
 
             VoiceNotice = null;
-            talk.Say(text);
+            if (ApiClient.Instance == null || ApiClient.Instance.Service == null || !ApiClient.Instance.Service.HasSession)
+            {
+                talk.Say(text);
+                TalkUpdated?.Invoke(talk);
+                return;
+            }
+
+            Busy = true;
+            PendingLine = text;
             TalkUpdated?.Invoke(talk);
+            Changed?.Invoke();
+            ApiClient.Instance.SendTalk(talk.ToRequest(text, ApiService.Language()), result =>
+            {
+                Busy = false;
+                PendingLine = null;
+                if (CurrentTalk == talk)
+                {
+                    if (result.Ok)
+                    {
+                        talk.Record(text, result.Value.npcReply, WireEnum<TalkFact>.ParseKnown(result.Value.askedFacts));
+                    }
+                    else
+                    {
+                        talk.Say(text);
+                    }
+
+                    TalkUpdated?.Invoke(talk);
+                }
+
+                Changed?.Invoke();
+            });
         }
 
         /// <summary>
-        /// One spoken turn. Only the backend can transcribe, and nothing else is asked of it: the answer is the talk's own.
+        /// One spoken turn. Only the backend can transcribe; the words then go out like a typed line.
         /// Without the backend the player is asked to type.
         /// </summary>
         public void SendTalkVoice(byte[] wav)
@@ -861,14 +890,14 @@ namespace ColonQuest.Game
                 {
                     if (result.Ok)
                     {
-                        talk.Say(result.Value);
+                        // The answer comes from here on exactly as if the player had typed it.
+                        SendTalk(result.Value);
                     }
                     else
                     {
                         VoiceNotice = VoiceFailedNotice;
+                        TalkUpdated?.Invoke(talk);
                     }
-
-                    TalkUpdated?.Invoke(talk);
                 }
 
                 Changed?.Invoke();

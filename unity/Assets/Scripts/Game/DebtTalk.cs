@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using ColonQuest.Api;
 using ColonQuest.World;
 
 namespace ColonQuest.Game
@@ -34,8 +35,9 @@ namespace ColonQuest.Game
 
     /// <summary>
     /// A conversation in the player's own words, typed or spoken, with the collectors, the lender of quick money or the
-    /// "Invierte Ya 300%" stand. The answers follow fixed rules: the other one never lies about a figure, but only says it
-    /// when asked. Every figure comes from the game's numbers, never from the text. Pure, so it can be tested.
+    /// "Invierte Ya 300%" stand. A model writes the answers from <see cref="ToRequest"/>, which holds the true figures; when
+    /// the backend cannot answer, <see cref="Say"/> follows fixed rules. Either way the other one never lies about a figure,
+    /// only says it when asked, and every figure comes from the game's numbers. Pure, so it can be tested.
     /// </summary>
     public sealed class DebtTalk
     {
@@ -134,6 +136,105 @@ namespace ColonQuest.Game
             return reply;
         }
 
+        /// <summary>Adds a turn the model wrote. What it says was asked adds to what the local rules recognize in the words.</summary>
+        public void Record(string playerText, string reply, IEnumerable<TalkFact> askedFacts)
+        {
+            string text = playerText == null ? string.Empty : playerText.Trim();
+            var recognized = Classify(text);
+            if (recognized.HasValue && !asked.Contains(recognized.Value))
+            {
+                asked.Add(recognized.Value);
+            }
+
+            if (askedFacts != null)
+            {
+                foreach (var fact in askedFacts)
+                {
+                    if (!asked.Contains(fact))
+                    {
+                        asked.Add(fact);
+                    }
+                }
+            }
+
+            turns.Add(new TalkTurn { Player = text, Reply = reply });
+        }
+
+        /// <summary>
+        /// What goes to the model for one turn: the true sheet, in the player's language, and the only amounts and
+        /// percentages the character may say. The model writes the words and never computes a figure.
+        /// </summary>
+        public TalkRequestDto ToRequest(string playerText, string language)
+        {
+            var request = new TalkRequestDto
+            {
+                partner = Partner == TalkPartner.Collectors ? "collectors" : (Partner == TalkPartner.Lender ? "lender" : "pyramid"),
+                text = playerText,
+                language = language
+            };
+
+            switch (Partner)
+            {
+                case TalkPartner.Collectors:
+                    FillCollectors(request);
+                    break;
+                case TalkPartner.Lender:
+                    FillLender(request);
+                    break;
+                default:
+                    FillPyramid(request);
+                    break;
+            }
+
+            foreach (var turn in turns)
+            {
+                request.history.Add(new TalkExchangeDto { player = turn.Player, reply = turn.Reply });
+            }
+
+            return request;
+        }
+
+        private void FillCollectors(TalkRequestDto request)
+        {
+            Line(request, TalkFact.TotalCost, Loc.F("Hoy vienes a cobrar {0}: lo atrasado, nada más.", Money.Format(Demand)));
+            Line(request, TalkFact.Arrangement, Loc.F("Si pide un arreglo: {0} hoy y lo demás queda como deuda nueva de {1}, con {2}% de recargo.",
+                Money.Format(ArrangementToday), Money.Format(ArrangementLater), MarketAssumptions.CollectionNegotiateSurchargePct));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.F("Si no paga hoy: una multa del {0}% a la tarjeta, y vuelves otro día.", MarketAssumptions.CollectionIgnoreFeePct));
+            Line(request, TalkFact.Legal, Loc.T("Cobrar es legal; amenazar no. Si alguien lo amenaza, eso se denuncia."));
+            request.amounts.AddRange(new[] { Demand, ArrangementToday, ArrangementLater });
+            request.percents.AddRange(new[] { MarketAssumptions.CollectionNegotiateSurchargePct, MarketAssumptions.CollectionIgnoreFeePct });
+        }
+
+        private static void FillLender(TalkRequestDto request)
+        {
+            Line(request, TalkFact.Rate, Loc.F("Cobras el {0}% al mes.", LenderRatePct));
+            Line(request, TalkFact.TotalCost, Loc.F("Si prestas {0}, en {1} meses te devuelven {2}.", Money.Format(ExampleLoan), ExampleMonths, Money.Format(LenderTotal())));
+            Line(request, TalkFact.Arrangement, Loc.T("No hay rebajas: pasas todos los días a cobrar la cuota, gota a gota."));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.T("Si se atrasa, los intereses siguen corriendo y mandas a los muchachos del carro negro."));
+            Line(request, TalkFact.Legal, Loc.T("Sin papeles y sin SUGEF: esto es informal, entre los dos."));
+            Line(request, TalkFact.Guarantee, Loc.T("Ningún contrato: solo una firma en tu libreta."));
+            request.amounts.AddRange(new[] { ExampleLoan, LenderTotal() });
+            request.percents.Add(LenderRatePct);
+        }
+
+        private static void FillPyramid(TalkRequestDto request)
+        {
+            long promised = ExampleLoan * (100L + PyramidPromisePct) / 100L;
+            Line(request, TalkFact.TotalCost, Loc.F("Prometes que {0} se vuelven {1} en un mes: {2}% de ganancia.", Money.Format(ExampleLoan), Money.Format(promised), PyramidPromisePct));
+            Line(request, TalkFact.WhereMoneyComes, Loc.T("La plata sale de los nuevos que entran: por eso cada uno tiene que traer a tres amigos."));
+            Line(request, TalkFact.Guarantee, Loc.T("No hay contrato ni garantía, solo confianza."));
+            Line(request, TalkFact.Legal, Loc.T("No están inscritos en SUGEF."));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.T("Solo les pagan a los primeros que entraron."));
+            Line(request, TalkFact.Arrangement, Loc.T("Si mete más plata hoy, lo suben al nivel oro."));
+            request.amounts.AddRange(new[] { ExampleLoan, promised });
+            request.percents.Add(PyramidPromisePct);
+        }
+
+        private static void Line(TalkRequestDto request, TalkFact fact, string text)
+        {
+            request.sheet.Add(new TalkSheetLineDto { fact = WireEnum<TalkFact>.ToWire(fact), text = text });
+        }
+
         /// <summary>The history tags of the questions asked, for the metrics of the pilot.</summary>
         public IEnumerable<string> HistoryTags()
         {
@@ -147,37 +248,37 @@ namespace ColonQuest.Game
         public static TalkFact? Classify(string text)
         {
             string t = Normalize(text);
-            if (Has(t, "de donde sale", "de donde viene", "como ganan", "como funciona", "referid", "meter gente", "nuevos"))
+            if (Has(t, "de donde sale", "de donde viene", "como ganan", "como funciona", "referid", "meter gente", "nuevos", "come from", "comes from", "how does it work", "how do you make", "recruit", "new people", "new members"))
             {
                 return TalkFact.WhereMoneyComes;
             }
 
-            if (Has(t, "garantia", "contrato", "papel", "recibo", "por escrito", "seguro que"))
+            if (Has(t, "garantia", "contrato", "papel", "recibo", "por escrito", "seguro que", "guarantee", "contract", "paper", "receipt", "in writing"))
             {
                 return TalkFact.Guarantee;
             }
 
-            if (Has(t, "legal", "sugef", "permiso", "inscrit", "policia", "denunc", "ley", "amenaz"))
+            if (Has(t, "legal", "sugef", "permiso", "inscrit", "policia", "denunc", "ley", "amenaz", "permit", "licen", "police", "report you", "threat", "the law"))
             {
                 return TalkFact.Legal;
             }
 
-            if (Has(t, "arreglo", "negoci", "mitad", "plazo", "cuotas", "partes", "rebaj", "descuento", "abono", "despues", "otro dia"))
+            if (Has(t, "arreglo", "negoci", "mitad", "plazo", "cuotas", "partes", "rebaj", "descuento", "abono", "despues", "otro dia", "arrangement", "work something out", "half", "installment", "payment plan", "discount", "lower", "later", "another day", "tomorrow", "next week"))
             {
                 return TalkFact.Arrangement;
             }
 
-            if (Has(t, "no pago", "no tengo", "no puedo", "si no", "que pasa"))
+            if (Has(t, "no pago", "no tengo", "no puedo", "si no", "que pasa", "don't pay", "dont pay", "can't pay", "cant pay", "cannot pay", "don't have", "dont have", "what happens", "fall behind", "if i don't"))
             {
                 return TalkFact.WhatIfNotPaid;
             }
 
-            if (Has(t, "interes", "tasa", "porcentaje", "%", "por ciento", "al mes", "cobran"))
+            if (Has(t, "interes", "tasa", "porcentaje", "%", "por ciento", "al mes", "cobran", "interest", "rate", "percent", "a month", "per month"))
             {
                 return TalkFact.Rate;
             }
 
-            if (Has(t, "total", "cuanto", "en total", "al final", "devolver", "pagaria"))
+            if (Has(t, "total", "cuanto", "en total", "al final", "devolver", "pagaria", "how much", "in the end", "pay back", "give back", "owe"))
             {
                 return TalkFact.TotalCost;
             }
