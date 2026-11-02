@@ -107,7 +107,7 @@ en [`docs/prompts/model-roles-session.md`](docs/prompts/model-roles-session.md).
 | Muse Spark | `muse-spark-1.3` | Game master en vivo (evento del mes y game master con herramientas), informe del Modo Clase, respaldo de los vendedores | Único modelo de Meta que responde siempre dentro de los 8 s de Unity: 3,0 a 4,4 s con `minimal` | $1.25 / $4.25 por millón |
 | Muse Wonder | `muse-wonder-1.0` | Planifica el año del jugador en segundo plano y narra el resumen final; escribe el banco de eventos (*pendiente*) | El mejor escritor, pero tarda 5,8 a 10,5 s aun con `minimal`: solo donde el jugador no espera | $4 / $20 por millón |
 | Muse Spark Open | `meta-models/muse-spark-open-1026` (Baseten) | Los vendedores: esconden el seguro y la comisión hasta que les preguntan. Tácticas con herramientas y memoria de la partida *pendientes* | 1,9 a 2,8 s, pagado con los $100 de Baseten, pieza del premio Open Weights | $1.25 / $4.25 por millón (créditos de Baseten) |
-| Muse Image | `muse-image-1.0` | Retratos de los NPC y escenas de los eventos, **sin texto**. El resumen final lo dibuja Unity con cifras del motor | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
+| Muse Image | `muse-image-1.0` | Retratos de los NPC, escenas de los eventos y la imagen del resumen final, elegida por las cifras de la partida (`Game/EndingArt.cs`), **sin texto** | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
 | Muse Voice Transcribe | `muse-voice-transcribe-1.0` | La voz del jugador al negociar | 0,7 a 1,5 s; escribir siempre sirve de respaldo | $0.18 por hora de audio |
 
 Reglas que salen de las mediciones:
@@ -294,7 +294,7 @@ guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador s
 
 ## Imágenes
 
-- **Pre-generar** un set base (retratos de los NPCs fijos y escenas de los eventos) con `server/scripts/pregenerate_images.py` y guardarlas en la tabla
+- **Pre-generar** un set base (retratos de los NPCs fijos, escenas de los eventos y los diez finales) con `server/scripts/pregenerate_images.py` y guardarlas en la tabla
   `images`. Muse Image en tiempo real solo para claves nuevas, con caché por `imageKey` y
   `IMAGE_TIMEOUT_S=30`.
 - **Ninguna imagen lleva texto ni números.** Los créditos y la demo de funciones no muestran el arte (decidido el 2 de noviembre).
