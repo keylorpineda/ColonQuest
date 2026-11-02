@@ -32,6 +32,14 @@ namespace ColonQuest.Game
         public List<int> furniture = new List<int>();
     }
 
+    /// <summary>The money and the debts as one month closed.</summary>
+    [Serializable]
+    public sealed class MonthClose
+    {
+        public long money;
+        public long debts;
+    }
+
     /// <summary>Everything a run needs to go on later: the finances, what the player owns, the month and the hour.</summary>
     [Serializable]
     public sealed class RunSnapshot
@@ -39,6 +47,7 @@ namespace ColonQuest.Game
         public PlayerStateDto state = new PlayerStateDto();
         public HoldingsSnapshot holdings = new HoldingsSnapshot();
         public int monthsPlayed;
+        public List<MonthClose> monthCloses = new List<MonthClose>();
         public int tasksDone;
         public int decisions;
         public int arrests;

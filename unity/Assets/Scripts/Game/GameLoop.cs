@@ -50,6 +50,9 @@ namespace ColonQuest.Game
 
         public PlayerState State { get; private set; }
         public int MonthsPlayed { get; private set; }
+
+        /// <summary>The money and the debts at each close of the month, for the report at the end of the run.</summary>
+        public List<MonthClose> MonthCloses { get; private set; } = new List<MonthClose>();
         public int TasksDone { get; private set; }
         public int Decisions { get; private set; }
 
@@ -100,6 +103,7 @@ namespace ColonQuest.Game
             VisitedRoom = false;
             State = GameRules.NewPlayer();
             MonthsPlayed = 0;
+            MonthCloses = new List<MonthClose>();
             TasksDone = 0;
             TasksToday = 0;
             JailDaysRemaining = 0;
@@ -131,6 +135,7 @@ namespace ColonQuest.Game
                 state = ApiMapper.ToDto(State),
                 holdings = HoldingsSaving.ToSnapshot(Holdings),
                 monthsPlayed = MonthsPlayed,
+                monthCloses = new List<MonthClose>(MonthCloses),
                 tasksDone = TasksDone,
                 tasksToday = TasksToday,
                 jailDaysRemaining = JailDaysRemaining,
@@ -198,6 +203,7 @@ namespace ColonQuest.Game
             State = snapshot.state != null ? ApiMapper.FromDto(snapshot.state) : GameRules.NewPlayer();
             Holdings = HoldingsSaving.FromSnapshot(snapshot.holdings);
             MonthsPlayed = Math.Max(0, snapshot.monthsPlayed);
+            MonthCloses = snapshot.monthCloses != null ? new List<MonthClose>(snapshot.monthCloses) : new List<MonthClose>();
             TasksDone = Math.Max(0, Math.Min(GameRules.TasksPerMonth, snapshot.tasksDone));
             TasksToday = Math.Max(0, snapshot.tasksToday);
             JailDaysRemaining = Math.Max(0, snapshot.jailDaysRemaining);
@@ -970,6 +976,7 @@ namespace ColonQuest.Game
 
             QuincenaPaidThisMonth = 0L;
             MonthsPlayed++;
+            MonthCloses.Add(new MonthClose { money = State.Cash + State.Savings + State.EmergencyFund, debts = GameRules.DebtBalance(State) });
             TasksDone = 0;
             TasksToday = 0;
             HurtThisMonth = false;
