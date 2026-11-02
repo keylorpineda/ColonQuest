@@ -5,6 +5,7 @@ namespace ColonQuest.Game
 {
     public enum MenuEntry
     {
+        Guided,
         Story,
         Demo,
         Settings,
@@ -76,7 +77,7 @@ namespace ColonQuest.Game
         /// <summary>The buttons of the menu, top to bottom, for one platform.</summary>
         public static IReadOnlyList<MenuEntry> For(RuntimePlatform platform)
         {
-            var list = new List<MenuEntry> { MenuEntry.Story, MenuEntry.Demo, MenuEntry.Settings, MenuEntry.Credits };
+            var list = new List<MenuEntry> { MenuEntry.Guided, MenuEntry.Story, MenuEntry.Demo, MenuEntry.Settings, MenuEntry.Credits };
             if (QuitAvailable(platform))
             {
                 list.Add(MenuEntry.Quit);
@@ -89,6 +90,7 @@ namespace ColonQuest.Game
         {
             switch (entry)
             {
+                case MenuEntry.Guided: return "Simulación guiada";
                 case MenuEntry.Story: return "Modo historia";
                 case MenuEntry.Demo: return "Demo de funciones";
                 case MenuEntry.Settings: return "Ajustes";

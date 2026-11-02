@@ -49,7 +49,7 @@ namespace ColonQuest.UI
                 warningText.text = watch.PoliceCalled ? watch.CalledWarning : watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
             }
 
-            CollectorCar.Armed = session.CollectorsDue && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
+            CollectorCar.Armed = !session.Guided && session.CollectorsDue && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
         }
 
         // ---------------------------------------------------------------- the law
@@ -98,7 +98,7 @@ namespace ColonQuest.UI
         private void OnPlayerHit()
         {
             // A window that is open (an officer's fine, for one) is not interrupted by a car that goes by.
-            if (SceneTransition.IsBusy || modal.IsOpen || HitAnimation.Playing || session.Loop.HurtThisMonth)
+            if (session.Guided || SceneTransition.IsBusy || modal.IsOpen || HitAnimation.Playing || session.Loop.HurtThisMonth)
             {
                 return;
             }

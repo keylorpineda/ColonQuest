@@ -6,12 +6,12 @@ namespace ColonQuest.Game.Tests
     public sealed class MenuEntriesTests
     {
         [Test]
-        public void For_Desktop_ListsAllFiveButtonsInOrder()
+        public void For_Desktop_ListsAllSixButtonsInOrder()
         {
             var entries = MenuEntries.For(RuntimePlatform.WindowsPlayer);
 
             CollectionAssert.AreEqual(
-                new[] { MenuEntry.Story, MenuEntry.Demo, MenuEntry.Settings, MenuEntry.Credits, MenuEntry.Quit },
+                new[] { MenuEntry.Guided, MenuEntry.Story, MenuEntry.Demo, MenuEntry.Settings, MenuEntry.Credits, MenuEntry.Quit },
                 entries);
         }
 
@@ -21,10 +21,11 @@ namespace ColonQuest.Game.Tests
             var entries = MenuEntries.For(RuntimePlatform.WebGLPlayer);
 
             CollectionAssert.DoesNotContain(entries, MenuEntry.Quit);
-            Assert.AreEqual(4, entries.Count);
+            Assert.AreEqual(5, entries.Count);
             Assert.IsFalse(MenuEntries.QuitAvailable(RuntimePlatform.WebGLPlayer));
         }
 
+        [TestCase(MenuEntry.Guided, "Simulación guiada")]
         [TestCase(MenuEntry.Story, "Modo historia")]
         [TestCase(MenuEntry.Demo, "Demo de funciones")]
         [TestCase(MenuEntry.Settings, "Ajustes")]

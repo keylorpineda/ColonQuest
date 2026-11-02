@@ -43,6 +43,9 @@ namespace ColonQuest.World
             }
         }
 
+        /// <summary>When set, a door it says no to stays shut: the guided run keeps the player on its way.</summary>
+        public static System.Func<Door, bool> Allowed { get; set; }
+
         /// <summary>True while the player serves a sentence: no door of the cell opens.</summary>
         public static bool Locked { get; set; }
 
@@ -139,7 +142,7 @@ namespace ColonQuest.World
                 return;
             }
 
-            if (Locked)
+            if (Locked || (Allowed != null && !Allowed(this)))
             {
                 if (Time.time >= nextLockedThought && !string.IsNullOrEmpty(LockedThought))
                 {
