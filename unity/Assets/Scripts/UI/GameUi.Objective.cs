@@ -194,7 +194,7 @@ namespace ColonQuest.UI
                 aiCalls.Toggle();
             }
 
-            aiCalls.Tick(!openingPlaying && !LoadingScreen.IsLoading && !townMap.IsOpen && !pause.IsOpen);
+            aiCalls.Tick(!openingPlaying && !LoadingScreen.IsLoading && !townMap.IsOpen && !pause.IsOpen && !endScreen.IsOpen);
             float room = aiCalls.RoomNeeded;
             modal.LeaveRoom(room);
             negotiationPanel.LeaveRoom(room);
@@ -202,8 +202,7 @@ namespace ColonQuest.UI
             ((RectTransform)loadingCard.transform).anchoredPosition = new Vector2(-24f - room, -364f);
 
             // The tab counts the calls too; only a run without a session asks nothing.
-            bool wanted = aiCalls.Expanded || session.Guided;
-            if (wanted && !tracePolling && Time.unscaledTime >= nextTracePoll)
+            if (!tracePolling && Time.unscaledTime >= nextTracePoll)
             {
                 var service = ApiClient.Instance != null ? ApiClient.Instance.Service : null;
                 if (service != null && service.HasSession)

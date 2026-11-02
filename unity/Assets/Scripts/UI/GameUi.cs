@@ -825,9 +825,9 @@ namespace ColonQuest.UI
 
         private void CloseWindows()
         {
-            // A new run has made no calls yet, and only the guided run opens the panel by itself.
+            // A new run has made no calls yet. The panel starts open: seeing the calls is the point, and L hides it.
             aiCalls.Clear();
-            aiCalls.SetExpanded(false);
+            aiCalls.SetExpanded(true);
             endScreen.Hide();
             ResetSentence();
             modal.Hide();
