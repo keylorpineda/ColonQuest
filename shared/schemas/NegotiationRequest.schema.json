@@ -20,6 +20,13 @@
       "title": "Offerid",
       "type": "string"
     },
+    "termMonths": {
+      "default": 0,
+      "maximum": 120,
+      "minimum": 0,
+      "title": "Termmonths",
+      "type": "integer"
+    },
     "text": {
       "maxLength": 500,
       "minLength": 1,

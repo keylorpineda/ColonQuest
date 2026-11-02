@@ -25,7 +25,7 @@ from app.cost_guard import BudgetMode
 from app.db import GameSession, Negotiation
 from app.game_master.ledger import DbLedger
 from app.negotiation.audio import MAX_BYTES, AudioError, normalize_wav
-from app.negotiation.seller_sheet import get_offer
+from app.negotiation.seller_sheet import get_offer, offer_on_the_table
 from app.negotiation.service import NegotiationResponder, PreviousTurn
 from app.providers.base import ProviderError, Transcriber, Usage
 from app.schemas import KeyQuestion, NegotiationReply
@@ -72,11 +72,13 @@ async def run_turn(
     offer_id: str,
     player_text: str,
     language: str | None = None,
+    term_months: int | None = None,
 ) -> NegotiationReply:
     game_session = await get_active_session(db, session_id)
     offer = get_offer(offer_id)
     if offer is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "offer not found")
+    offer = offer_on_the_table(offer, term_months)
 
     previous = (
         await db.scalars(
@@ -123,7 +125,15 @@ async def negotiate_text(
     """One negotiation turn with typed text (always available as the fallback to voice)."""
     lang = body.language.value if body.language else None
     return await run_turn(
-        db, settings, negotiator, response, session_id, body.offer_id, body.text, language=lang
+        db,
+        settings,
+        negotiator,
+        response,
+        session_id,
+        body.offer_id,
+        body.text,
+        language=lang,
+        term_months=body.term_months,
     )
 
 
