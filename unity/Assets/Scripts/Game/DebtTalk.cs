@@ -82,7 +82,7 @@ namespace ColonQuest.Game
         /// <summary>The monthly rate of the player's card, for the neighbor's advice.</summary>
         public decimal CardRatePct { get; }
 
-        public DebtTalk(TalkPartner partner, long demand = 0L, decimal cardRatePct = 3.5m)
+        public DebtTalk(TalkPartner partner, long demand = 0L, decimal cardRatePct = CreditCard.TypicalMonthlyRatePct)
         {
             Partner = partner;
             Demand = demand;

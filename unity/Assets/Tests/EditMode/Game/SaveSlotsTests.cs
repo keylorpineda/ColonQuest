@@ -83,7 +83,7 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(cash, back.State.Cash);
             Assert.AreEqual(12_000L, back.State.Savings);
             Assert.AreEqual(150_000L, back.State.CreditCard.Balance);
-            Assert.AreEqual(3.5m, back.State.CreditCard.MonthlyRatePct);
+            Assert.AreEqual(CreditCard.TypicalMonthlyRatePct, back.State.CreditCard.MonthlyRatePct);
             Assert.AreEqual("Refri", back.State.Installments[back.State.Installments.Count - 1].Item);
             Assert.AreEqual(20m, back.State.InformalLoans[0].MonthlyRatePct);
             Assert.Contains("paid_minimum_only", back.State.History);
