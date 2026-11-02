@@ -7,7 +7,7 @@ in the installments.
 
 import re
 
-from app.schemas import EventType, GameEvent, PlayerState
+from app.schemas import EffectKind, EventType, GameEvent, PlayerState
 
 VEHICLE_WORDS = re.compile(
     r"\b(motos?|motocicletas?|carros?|marchamo|embrague|llantas?|riteve|rtv|gasolina)\b",
@@ -21,6 +21,13 @@ WASHER_WORDS = re.compile(r"\b(lavadora|lavadoras)\b", re.IGNORECASE)
 # In these types something happens to the player's own things. An offer or a scam may well talk
 # about a motorbike the player could buy, or about a lender who comes riding one.
 OWN_THINGS_EVENTS = frozenset({EventType.EXPENSE, EventType.EMERGENCY})
+
+# The close of the month already charges these: a choice that pays them would charge them twice.
+FIXED_COSTS = re.compile(
+    r"\b(rent|room|bus pass|bills?|utilit\w+|alquiler|cuarto|pase de bus|recibos?)\b",
+    re.IGNORECASE,
+)
+AMOUNT = re.compile(r"₡\s?(\d[\d\s.,]*\d|\d)")
 
 
 def owns_vehicle(state: PlayerState) -> bool:
@@ -47,6 +54,32 @@ def assumes_missing_thing(event: GameEvent, state: PlayerState) -> bool:
         or (not owns_fridge(state) and _mentions(event, FRIDGE_WORDS))
         or _mentions(event, WASHER_WORDS)  # the game sells no washing machine for the room
     )
+
+
+def charges_fixed_costs(event: GameEvent) -> bool:
+    """True when a choice charges the rent or the bills, which the month close charges anyway."""
+    return any(
+        FIXED_COSTS.search(choice.label)
+        and any(effect.kind is EffectKind.EXPENSE for effect in choice.effects)
+        for choice in event.choices
+    )
+
+
+def label_lies_about_money(event: GameEvent) -> bool:
+    """True when a choice names an amount that is not what it moves: the label promises one
+    figure and the engine applies another."""
+    for choice in event.choices:
+        amounts = {effect.amount for effect in choice.effects}
+        amounts.add(sum(e.amount for e in choice.effects if e.kind is EffectKind.EXPENSE))
+        for found in AMOUNT.findall(choice.label):
+            if int(re.sub(r"\D", "", found)) not in amounts:
+                return True
+    return False
+
+
+def is_dishonest(event: GameEvent) -> bool:
+    """True when the event would charge something twice or say one figure and apply another."""
+    return charges_fixed_costs(event) or label_lies_about_money(event)
 
 
 def _mentions(event: GameEvent, words: re.Pattern[str]) -> bool:

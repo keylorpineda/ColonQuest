@@ -160,7 +160,8 @@ async def transcribe_clip(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, VOICE_UNAVAILABLE)
 
     started = time.perf_counter()
-    bias = ["English"] if game_session.language == "en" else ["Spanish"]
+    # Whatever the language of the game, the player may well speak the other one.
+    bias = ["English", "Spanish"] if game_session.language == "en" else ["Spanish", "English"]
     try:
         transcription = await transcriber.transcribe(wav, language_bias=bias)
     except ProviderError as error:
