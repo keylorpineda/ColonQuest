@@ -90,6 +90,7 @@ namespace ColonQuest.Game
                 case "event": return Loc.T("Evento del mes");
                 case "negotiation_agent": return Loc.T("Vendedor con herramientas");
                 case "negotiation": return Loc.T("Respuesta del vendedor");
+                case "debt_talk": return Loc.T("Cobrador, prestamista o pirámide");
                 case "transcribe": return Loc.T("Voz a texto");
                 case "season_plan": return Loc.T("Plan del año");
                 case "summary": return Loc.T("Resumen del año");
@@ -108,6 +109,7 @@ namespace ColonQuest.Game
                 case "cache": return Loc.T("Salió de la caché: no gastó nada");
                 case "fallback": return Loc.T("Respaldo del servidor: el modelo no respondió a tiempo");
                 case "local": return Loc.T("Respaldo local: el servidor no respondió");
+                case "rules": return Loc.T("Reglas locales: el modelo no respondió");
                 default: return Loc.T("Respondió el servidor");
             }
         }
