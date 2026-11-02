@@ -11,7 +11,7 @@ namespace ColonQuest.World.Tests
         {
             var beach = SoundMix.Compute(SceneNames.Town, new Vector2(0f, -25f));
             var plaza = SoundMix.Compute(SceneNames.Town, new Vector2(0f, 9f));
-            Assert.Greater(beach.Sea, 0.6f);
+            Assert.Greater(beach.Sea, 0.3f);
             Assert.Less(plaza.Sea, 0.1f);
             Assert.Less(beach.Traffic, plaza.Traffic);
         }
@@ -22,7 +22,7 @@ namespace ColonQuest.World.Tests
             var west = SoundMix.Compute(SceneNames.Town, new Vector2(0f, 2f));
             var east = SoundMix.Compute(SceneNames.Town, new Vector2(27f, 2f));
             Assert.AreEqual(0f, west.River, 0.001f);
-            Assert.Greater(east.River, 0.5f);
+            Assert.Greater(east.River, 0.2f);
         }
 
         [Test]

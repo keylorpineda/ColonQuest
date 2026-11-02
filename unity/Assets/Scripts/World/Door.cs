@@ -54,7 +54,7 @@ namespace ColonQuest.World
         private static float nextLockedThought;
 
         /// <summary>How close to the entry direction the walk must be (1 is straight on, 0 is sideways).</summary>
-        private const float MinimumAlignment = 0.5f;
+        private const float MinimumAlignment = 0.15f;
 
         public string TargetScene => targetScene;
         public string TargetSpawn => targetSpawn;
@@ -154,7 +154,12 @@ namespace ColonQuest.World
             }
 
             var body = other.attachedRigidbody;
-            Vector2 velocity = body != null ? body.linearVelocity : Vector2.zero;
+
+            // What the player is trying to do counts, not what is left after bumping into the door frame.
+            var walker = other.GetComponent<PlayerController>();
+            Vector2 velocity = walker != null && walker.WalkIntent != Vector2.zero
+                ? walker.WalkIntent
+                : (body != null ? body.linearVelocity : Vector2.zero);
             if (AllowsEntry(entryDirection, velocity))
             {
                 if (!string.IsNullOrEmpty(returnSpawn))

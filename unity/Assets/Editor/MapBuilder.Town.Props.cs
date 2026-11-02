@@ -1898,7 +1898,7 @@ namespace ColonQuest.EditorTools
             go.transform.position = position;
 
             var trigger = go.AddComponent<BoxCollider2D>();
-            trigger.size = new Vector2(1.3f, 1.0f);
+            trigger.size = new Vector2(2.1f, 1.3f);
             trigger.isTrigger = true;
             var door = go.AddComponent<Door>();
             door.Configure(targetScene, SpawnIds.FromTown, Vector2.up);
