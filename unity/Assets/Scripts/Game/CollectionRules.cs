@@ -10,8 +10,8 @@ namespace ColonQuest.Game
     public static class CollectionRules
     {
         /// <summary>
-        /// The player is in arrears when an informal loan is open (those are never paid on time by themselves) or
-        /// when the card is almost at its limit.
+        /// The collectors work for the informal lenders, so they come only for an open informal loan. A full card costs
+        /// interest and leaves no credit, but nobody comes to the door for it.
         /// </summary>
         public static bool InArrears(PlayerState state)
         {
@@ -20,21 +20,16 @@ namespace ColonQuest.Game
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (state.InformalLoans.Count > 0)
-            {
-                return true;
-            }
-
-            return state.CreditCard.Limit > 0L
-                && state.CreditCard.Balance * 100L >= state.CreditCard.Limit * MarketAssumptions.ArrearsCardUsagePct;
+            return state.InformalLoans.Count > 0;
         }
 
-        /// <summary>What the collectors ask for: a share of everything owed, inside the minimum and the maximum.</summary>
+        /// <summary>What the collectors ask for: a share of the informal debt, inside the limits, and never more than is owed.</summary>
         public static long Demand(PlayerState state)
         {
             long owed = FinanceEngine.DebtOwed(state);
             long ask = owed * MarketAssumptions.CollectionDemandPct / 100L;
-            return Math.Max(MarketAssumptions.CollectionMinDemand, Math.Min(MarketAssumptions.CollectionMaxDemand, ask));
+            long demand = Math.Max(MarketAssumptions.CollectionMinDemand, Math.Min(MarketAssumptions.CollectionMaxDemand, ask));
+            return Math.Min(owed, demand);
         }
     }
 }

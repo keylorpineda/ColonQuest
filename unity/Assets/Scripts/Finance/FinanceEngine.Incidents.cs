@@ -62,13 +62,13 @@ namespace ColonQuest.Finance
             return (bill * patientSharePct + 99L) / 100L;
         }
 
-        /// <summary>The debt a collector can ask for, in total: the informal loans and the card balance.</summary>
+        /// <summary>The debt a collector can ask for: the informal loans. The card has its own interest and its own bank.</summary>
         public static long DebtOwed(PlayerState state)
         {
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
 
-            long total = state.CreditCard.Balance;
+            long total = 0L;
             foreach (var loan in state.InformalLoans)
             {
                 total += loan.Balance;
@@ -77,21 +77,10 @@ namespace ColonQuest.Finance
             return total;
         }
 
-        /// <summary>
-        /// Pays the collectors out of cash and lowers the debt by what was paid, informal loans first because they
-        /// grow fastest. Pays only what cash allows; returns what was paid.
-        /// </summary>
-        public static long PayCollectors(PlayerState state, long demand)
+        /// <summary>Lowers the informal loans in order, removes the ones paid off and returns what could be lowered.</summary>
+        private static long LowerInformalLoans(PlayerState state, long amount)
         {
-            if (state == null)
-                throw new ArgumentNullException(nameof(state));
-            if (demand < 0L || demand > ContractLimits.MaxColones)
-                throw new ArgumentOutOfRangeException(nameof(demand), "Demand must be between 0 and MaxColones.");
-
-            long paid = Math.Min(state.Cash, demand);
-            state.Cash -= paid;
-
-            long left = paid;
+            long left = amount;
             foreach (var loan in state.InformalLoans)
             {
                 long take = Math.Min(left, loan.Balance);
@@ -100,16 +89,47 @@ namespace ColonQuest.Finance
             }
 
             state.InformalLoans.RemoveAll(loan => loan.Balance <= 0L);
-            long fromCard = Math.Min(left, state.CreditCard.Balance);
-            state.CreditCard.Balance -= fromCard;
+            return amount - left;
+        }
 
+        /// <summary>
+        /// Pays the collectors out of cash and lowers the informal debt by what was paid. Pays only what cash allows and what
+        /// is owed; returns what was paid.
+        /// </summary>
+        public static long PayCollectors(PlayerState state, long demand)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (demand < 0L || demand > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(nameof(demand), "Demand must be between 0 and MaxColones.");
+
+            long paid = Math.Min(state.Cash, Math.Min(demand, DebtOwed(state)));
+            state.Cash -= paid;
+            LowerInformalLoans(state, paid);
             state.RecordHistory("paid_collectors");
             return paid;
         }
 
+        /// <summary>The player pays the lender by choice, out of cash: all of the informal debt or what the cash reaches. Returns what was paid.</summary>
+        public static long PayInformalDebt(PlayerState state)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+
+            long paid = Math.Min(state.Cash, DebtOwed(state));
+            if (paid > 0L)
+            {
+                state.Cash -= paid;
+                LowerInformalLoans(state, paid);
+                state.RecordHistory("paid_informal_debt");
+            }
+
+            return paid;
+        }
+
         /// <summary>
-        /// Talks the collectors down: half of the demand is paid now and the other half becomes a new informal
-        /// loan with a surcharge on top, at the usual rate of those loans.
+        /// Talks the collectors down: half of the demand is paid now and the other half moves out of the old debt into a new
+        /// informal loan, with a surcharge on top, at the usual rate of those loans. Only the surcharge is new debt.
         /// </summary>
         public static CollectionResult NegotiateCollectors(PlayerState state, long demand, int surchargePct)
         {
@@ -119,18 +139,26 @@ namespace ColonQuest.Finance
                 throw new ArgumentOutOfRangeException(nameof(surchargePct), "Surcharge must be between 0 and 100.");
 
             long paid = PayCollectors(state, demand / 2L);
-            long rest = demand - paid;
-            long newDebt = rest + rest * surchargePct / 100L;
-            if (newDebt > 0L && state.InformalLoans.Count < ContractLimits.MaxInformalLoans)
+            long moved = LowerInformalLoans(state, demand - paid);
+            long newDebt = moved + moved * surchargePct / 100L;
+            if (newDebt > 0L)
             {
-                state.InformalLoans.Add(new InformalLoan("Cobradores", ContractLimits.ClampColones(newDebt), DefaultInformalLoanMonthlyRatePct));
+                if (state.InformalLoans.Count < ContractLimits.MaxInformalLoans)
+                {
+                    state.InformalLoans.Add(new InformalLoan("Cobradores", ContractLimits.ClampColones(newDebt), DefaultInformalLoanMonthlyRatePct));
+                }
+                else
+                {
+                    var last = state.InformalLoans[state.InformalLoans.Count - 1];
+                    last.Balance = ContractLimits.ClampColones(last.Balance + newDebt);
+                }
             }
 
             state.RecordHistory("negotiated_collectors");
             return new CollectionResult(paid, newDebt);
         }
 
-        /// <summary>Ignoring the collectors costs a late fee on the card and some peace of mind.</summary>
+        /// <summary>Ignoring the collectors costs a late fee on the informal debt and some peace of mind.</summary>
         public static long IgnoreCollectors(PlayerState state, long demand, int lateFeePct, int wellbeingLoss)
         {
             if (state == null)
@@ -138,8 +166,14 @@ namespace ColonQuest.Finance
             if (lateFeePct < 0 || lateFeePct > 100)
                 throw new ArgumentOutOfRangeException(nameof(lateFeePct), "Fee must be between 0 and 100.");
 
-            long fee = demand * lateFeePct / 100L;
-            state.CreditCard.Balance = ContractLimits.ClampColones(state.CreditCard.Balance + fee);
+            long fee = 0L;
+            if (state.InformalLoans.Count > 0)
+            {
+                fee = demand * lateFeePct / 100L;
+                var first = state.InformalLoans[0];
+                first.Balance = ContractLimits.ClampColones(first.Balance + fee);
+            }
+
             state.Wellbeing = ContractLimits.ClampWellbeing(state.Wellbeing - wellbeingLoss);
             state.RecordHistory("ignored_collectors");
             return fee;

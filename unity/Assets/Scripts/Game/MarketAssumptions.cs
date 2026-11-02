@@ -340,10 +340,7 @@ namespace ColonQuest.Game
 
         public const int HospitalWellbeingLoss = 15;
 
-        /// <summary>A card at or above this share of its limit counts as being in arrears.</summary>
-        public const int ArrearsCardUsagePct = 90;
-
-        /// <summary>The collectors ask for this share of what is owed, between the two limits.</summary>
+        /// <summary>The collectors ask for this share of the informal debt, between the two limits.</summary>
         public const int CollectionDemandPct = 25;
 
         public const long CollectionMinDemand = 20_000L;
@@ -352,7 +349,7 @@ namespace ColonQuest.Game
         /// <summary>When negotiating, the half not paid now comes back with this surcharge, as a new informal loan.</summary>
         public const int CollectionNegotiateSurchargePct = 10;
 
-        /// <summary>Ignoring the collectors adds this share of the demand as a late fee on the card.</summary>
+        /// <summary>Ignoring the collectors adds this share of the demand as a late fee on the informal debt.</summary>
         public const int CollectionIgnoreFeePct = 12;
 
         public const int CollectionIgnoreWellbeingLoss = 10;
