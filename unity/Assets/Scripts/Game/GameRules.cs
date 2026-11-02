@@ -67,7 +67,7 @@ namespace ColonQuest.Game
                 Cash = 120_000L,
                 Savings = 50_000L,
                 EmergencyFund = 0L,
-                CreditCard = new CreditCard(180_000L, 300_000L, 3.5m, 10m),
+                CreditCard = new CreditCard(180_000L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m),
                 Wellbeing = 62
             };
             state.Installments.Add(new Installment("Celular", 25_000L, 33));

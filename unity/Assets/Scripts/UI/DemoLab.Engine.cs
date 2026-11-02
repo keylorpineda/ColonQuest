@@ -57,7 +57,7 @@ namespace ColonQuest.UI
         /// <summary>The real calculation of the card, month by month, drawn as bars.</summary>
         private void DrawMinimumPayment(float y)
         {
-            var state = new PlayerState { CreditCard = new CreditCard(180_000L, 300_000L, 3.5m, 10m), Cash = ContractLimits.MaxColones };
+            var state = new PlayerState { CreditCard = new CreditCard(180_000L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m), Cash = ContractLimits.MaxColones };
             long start = state.CreditCard.Balance;
             long paid = 0L;
             long interest = 0L;

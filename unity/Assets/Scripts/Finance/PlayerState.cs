@@ -33,6 +33,9 @@ namespace ColonQuest.Finance
     [Serializable]
     public sealed class CreditCard
     {
+        /// <summary>36% a year: a typical card in colones, under the usury cap of 36.48% of the second half of 2026 (BCCR).</summary>
+        public const decimal TypicalMonthlyRatePct = 3m;
+
         public long Balance { get; set; }
         public long Limit { get; set; }
         public decimal MonthlyRatePct { get; set; }
@@ -146,7 +149,7 @@ namespace ColonQuest.Finance
         public long Cash { get; set; }
         public long Savings { get; set; }
         public long EmergencyFund { get; set; }
-        public CreditCard CreditCard { get; set; } = new CreditCard(0L, 300_000L, 3.5m, 10m);
+        public CreditCard CreditCard { get; set; } = new CreditCard(0L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m);
         public List<Installment> Installments { get; set; } = new List<Installment>();
         public List<InformalLoan> InformalLoans { get; set; } = new List<InformalLoan>();
         public List<string> History { get; set; } = new List<string>();

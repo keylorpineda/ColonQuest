@@ -36,7 +36,7 @@ namespace ColonQuest.Game
         public static PlayerState CardAtTheLimit()
         {
             var state = Base(4, cash: 38_000L, savings: 0L, wellbeing: 48);
-            state.CreditCard = new CreditCard(285_000L, 300_000L, 3.5m, 10m);
+            state.CreditCard = new CreditCard(285_000L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m);
             state.Installments.Add(new Installment("Celular", 25_000L, 21));
             state.History.Add("paid_minimum_only");
             state.History.Add("skipped_savings");
@@ -54,7 +54,7 @@ namespace ColonQuest.Game
         public static PlayerState December()
         {
             var state = Base(12, cash: 180_000L, savings: 120_000L, wellbeing: 66);
-            state.CreditCard = new CreditCard(60_000L, 300_000L, 3.5m, 10m);
+            state.CreditCard = new CreditCard(60_000L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m);
             return state;
         }
 
@@ -69,7 +69,7 @@ namespace ColonQuest.Game
             var state = Base(12, cash: withDebts ? 40_000L : 260_000L, savings: withDebts ? 0L : 640_000L, wellbeing: withDebts ? 41 : 82);
             if (withDebts)
             {
-                state.CreditCard = new CreditCard(290_000L, 300_000L, 3.5m, 10m);
+                state.CreditCard = new CreditCard(290_000L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m);
                 state.Installments.Add(new Installment("Moto", 48_000L, 40));
                 state.InformalLoans.Add(new InformalLoan("Prestamista", 650_000L, 15m));
             }
