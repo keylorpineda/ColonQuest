@@ -14,7 +14,7 @@ namespace ColonQuest.UI
     /// </summary>
     public sealed partial class DemoLab
     {
-        private const int TalksStation = 6;
+        private const int TalksStation = 5;
 
         /// <summary>What the collector comes for in the demo. In a game it depends on the player's debts.</summary>
         private const long SampleDemand = 80_000L;

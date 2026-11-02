@@ -154,7 +154,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
 
             var lab = GameObject.Find("DemoLab").GetComponent<DemoLab>();
-            lab.Show(6);
+            lab.Show(5);
             yield return null;
             Assert.IsNotNull(GameObject.Find("Fact_total_cost"), "the sheet is on the screen");
 

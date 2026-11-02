@@ -70,14 +70,6 @@ namespace ColonQuest.Game.Tests
         {
             Assert.AreEqual(Loc.T("Sin cambios en la plata"), DemoReadout.DescribeAll(new Choice("skip", "Nada", new List<Effect>())));
         }
-
-        [Test]
-        public void Gallery_HasTheTwentyPicturesOfTheBackend()
-        {
-            Assert.AreEqual(5, DemoReadout.Portraits.Length);
-            Assert.AreEqual(12, DemoReadout.Scenes.Length);
-            Assert.AreEqual(3, PostcardKeys.All.Length);
-        }
     }
 
     public sealed class DemoScenariosTests
@@ -106,10 +98,10 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void YearEnd_GivesThePostcardItIsAbout()
+        public void YearEnd_EndsInDebtOrFreeOfIt()
         {
-            Assert.AreEqual(PostcardKeys.HeavyDebt, PostcardKeys.For(DemoScenarios.TotalDebt(DemoScenarios.YearEnd(true))));
-            Assert.AreEqual(PostcardKeys.DebtFree, PostcardKeys.For(DemoScenarios.TotalDebt(DemoScenarios.YearEnd(false))));
+            Assert.Greater(DemoScenarios.TotalDebt(DemoScenarios.YearEnd(true)), 0L);
+            Assert.AreEqual(0L, DemoScenarios.TotalDebt(DemoScenarios.YearEnd(false)));
         }
 
         [Test]

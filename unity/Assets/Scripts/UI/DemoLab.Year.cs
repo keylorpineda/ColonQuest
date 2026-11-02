@@ -108,12 +108,9 @@ namespace ColonQuest.UI
                 return;
             }
 
-            var postcard = Picture(workspace, PostcardKeys.For(yearSummary.TotalDebt), new Vector2(330f, 212f), TopLeft, new Vector2(Left, y));
-            var frame = (RectTransform)postcard.transform.parent;
-            var band = UiKit.Fill(frame, "Figures", new Color(0.09f, 0.13f, 0.12f, 0.82f), new Vector2(322f, 62f), new Vector2(0.5f, 0f), new Vector2(0f, 4f));
-            UiKit.PlainLabel(band.transform, "NetWorth", Loc.F("Patrimonio {0}", Money.Format(yearSummary.NetWorth)), 19, Cream, new Vector2(304f, 26f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), TextAnchor.MiddleCenter);
-            UiKit.PlainLabel(band.transform, "Debt", Loc.F("Deudas {0}", Money.Format(yearSummary.TotalDebt)), 19, Cream, new Vector2(304f, 26f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), TextAnchor.MiddleCenter);
-            Plain(yearSummary.Narrative, 21, UiKit.Ink, new Vector2(Width - 350f, 212f), new Vector2(Left + 350f, y));
+            Plain(Loc.F("Patrimonio {0}", Money.Format(yearSummary.NetWorth)), 26, UiKit.Ink, new Vector2(Width / 2f, 36f), new Vector2(Left, y));
+            Plain(Loc.F("Deudas {0}", Money.Format(yearSummary.TotalDebt)), 26, yearSummary.TotalDebt > 0L ? GameUiColors.Loss : GameUiColors.Gain, new Vector2(Width / 2f, 36f), new Vector2(Left + Width / 2f, y));
+            Plain(yearSummary.Narrative, 22, UiKit.Ink, new Vector2(Width, 176f), new Vector2(Left, y - 40f));
         }
 
         private void TryPlan(int profile)

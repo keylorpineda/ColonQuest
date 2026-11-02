@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
@@ -31,14 +30,11 @@ namespace ColonQuest.UI
         private static readonly Color Beak = GamePalette.Hex("#F2A23A");
         private static readonly Color Night = GamePalette.Hex("#17201E");
 
-        private readonly List<KeyValuePair<Image, string>> waitingPictures = new List<KeyValuePair<Image, string>>();
-
         private RectTransform viewport;
         private RectTransform content;
         private ScrollRect scroll;
         private float builtWidth;
         private float resumeAt;
-        private float nextPictureCheck;
         private float atTheEndSince = -1f;
 
         /// <summary>Builds the window, closed.</summary>
@@ -85,7 +81,8 @@ namespace ColonQuest.UI
             }
 
             y -= 18f;
-            UiKit.Label(card, "Hecho en Costa Rica", 34, GameUiColors.Gain, new Vector2(620f, 44f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
+            var slogan = UiKit.PlainLabel(card, "Slogan", MenuEntries.Slogan, 36, GameUiColors.Gain, new Vector2(620f, 44f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
+            slogan.font = UiKit.TitleFont;
             y -= 48f;
             var hackathon = UiKit.Label(card, "Para el Meta Global AI Developer Hackathon 2026", 23, UiKit.Ink, new Vector2(620f, 34f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
             hackathon.fontStyle = FontStyle.Normal;
@@ -154,7 +151,6 @@ namespace ColonQuest.UI
                 atTheEndSince = -1f;
             }
 
-            ShowArrivedPictures(now);
             if (now < resumeAt)
             {
                 return;
@@ -181,26 +177,6 @@ namespace ColonQuest.UI
             }
         }
 
-        private void ShowArrivedPictures(float now)
-        {
-            if (waitingPictures.Count == 0 || now < nextPictureCheck)
-            {
-                return;
-            }
-
-            nextPictureCheck = now + 1f;
-            for (int i = waitingPictures.Count - 1; i >= 0; i--)
-            {
-                var sprite = RemoteImages.Fetch(waitingPictures[i].Value);
-                if (sprite != null)
-                {
-                    waitingPictures[i].Key.sprite = sprite;
-                    waitingPictures[i].Key.color = Color.white;
-                    waitingPictures.RemoveAt(i);
-                }
-            }
-        }
-
         // ---------------------------------------------------------------- the roll
 
         private void Lay(float width)
@@ -212,11 +188,9 @@ namespace ColonQuest.UI
                 Destroy(child.gameObject);
             }
 
-            waitingPictures.Clear();
             float y = -46f;
             y = Models(width, y);
             y = AgentCards(width, y);
-            y = Art(width, y);
             y = FiguresRow(width, y);
             y = TwoColumns("La tecnología", MenuEntries.Stack, width, y);
             y = TwoColumns("Las tipografías", MenuEntries.Fonts, width, y);
@@ -271,31 +245,6 @@ namespace ColonQuest.UI
             return y - 196f - SectionGap;
         }
 
-        private float Art(float width, float y)
-        {
-            y = Heading("El arte", width, y);
-            int count = MenuEntries.CreditPortraits.Count;
-            float gap = 12f;
-            float size = Mathf.Min(170f, (width - gap * (count - 1)) / count);
-            float x = (width - (size * count + gap * (count - 1))) / 2f;
-            for (int i = 0; i < count; i++)
-            {
-                var frame = UiKit.Fill(content, "Art", UiKit.Ink, new Vector2(size, size), new Vector2(0f, 1f), new Vector2(x + i * (size + gap), y));
-                var picture = UiKit.Fill(frame.transform, "Picture", new Color(0.3f, 0.34f, 0.33f, 1f), new Vector2(size - UiKit.Outline, size - UiKit.Outline), Middle, Vector2.zero);
-                picture.type = Image.Type.Simple;
-                picture.sprite = null;
-                picture.preserveAspect = true;
-                waitingPictures.Add(new KeyValuePair<Image, string>(picture, MenuEntries.CreditPortraits[i]));
-            }
-
-            y -= size + 14f;
-            var line = UiKit.Label(content, "Generado con Muse Image y un estilo fijo, sin texto ni números: las cifras las dibuja el juego.", 24, Cream, new Vector2(width, 66f), Top, new Vector2(0f, y), TextAnchor.UpperCenter);
-            line.fontStyle = FontStyle.Normal;
-            var sprites = UiKit.Label(content, "Los personajes, los carros y el pueblo se dibujan con código.", 24, Cream, new Vector2(width, 36f), Top, new Vector2(0f, y - 66f), TextAnchor.UpperCenter);
-            sprites.fontStyle = FontStyle.Normal;
-            return y - 102f - SectionGap;
-        }
-
         private float FiguresRow(float width, float y)
         {
             y = Heading("En números", width, y);
@@ -346,7 +295,9 @@ namespace ColonQuest.UI
             outline.effectDistance = new Vector2(3f, -3f);
             var last = UiKit.Label(content, "Ojalá la próxima vez que un vendedor te sonría, sepás qué preguntarle.", 26, Beak, new Vector2(width, 44f), Top, new Vector2(0f, y - 92f), TextAnchor.MiddleCenter);
             last.fontStyle = FontStyle.Normal;
-            return y - 140f;
+            var slogan = UiKit.PlainLabel(content, "SloganEnd", MenuEntries.Slogan, 44, Cream, new Vector2(width, 60f), Top, new Vector2(0f, y - 150f), TextAnchor.MiddleCenter);
+            slogan.font = UiKit.TitleFont;
+            return y - 214f;
         }
     }
 }

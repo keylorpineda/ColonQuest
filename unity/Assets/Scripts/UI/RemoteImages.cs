@@ -81,11 +81,6 @@ namespace ColonQuest.UI
                 Request(key);
             }
 
-            foreach (var key in PostcardKeys.All)
-            {
-                Request(key);
-            }
-
             // An event shows its scene as soon as it opens: asked for only then, it would miss its first time.
             foreach (var key in DemoReadout.Scenes)
             {
