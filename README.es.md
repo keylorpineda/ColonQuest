@@ -1,11 +1,12 @@
 <p align="center"><a href="README.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=2" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <a href="COSTA_RICA.es.md"><img src="docs/assets/tab-costa-rica-es.svg" alt="La situación en Costa Rica, con fuentes"></a>
+  <a href="RUN_AND_BUILD.es.md"><img src="docs/assets/tab-run-es.svg" alt="Correr y armar, para los jueces"></a>
 </p>
 
 <p align="center">
-  <a href="RUN_AND_BUILD.es.md"><b>Correrlo y armarlo</b></a> | <a href="COSTA_RICA.es.md"><b>La situación en Costa Rica, con fuentes</b></a>
+  <img src="docs/assets/readme-es.svg?v=2" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>

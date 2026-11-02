@@ -985,6 +985,26 @@ def build(copy: dict[str, Any]) -> None:
     write_card(card, copy, f"readme-{copy['lang']}.svg", "ColonQuest")
 
 
+# The row of buttons at the top of each page, since GitHub does not let a repository add its own tabs.
+TABS = {
+    "readme": {"en": "README", "es": "README"},
+    "costa-rica": {"en": "COSTA RICA", "es": "COSTA RICA"},
+    "run": {"en": "RUN AND BUILD", "es": "CORRER Y ARMAR"},
+}
+
+
+def build_tab(name: str, lang: str, label: str) -> None:
+    width, height = 250, 56
+    document = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" role="img" aria-label="{escape(label)}">
+  <title>{escape(label)}</title>
+  <rect x="6" y="6" width="{width - 6}" height="{height - 6}" fill="{INK}"/>
+  <rect x="2" y="2" width="{width - 8}" height="{height - 8}" fill="{OCHRE}" stroke="{INK}" stroke-width="3"/>
+  <text x="{(width - 6) / 2:g}" y="33" text-anchor="middle" style="font: 800 20px {MONO}; fill: {INK}; letter-spacing: 1px;">{escape(label)}</text>
+</svg>
+"""
+    (OUT / f"tab-{name}-{lang}.svg").write_text(document, encoding="utf-8", newline="\n")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for copy in COPY.values():
@@ -992,6 +1012,9 @@ def main() -> None:
     for name, languages in PAGES.items():
         for copy in languages.values():
             build_page(name, copy)
+    for name, labels in TABS.items():
+        for lang, label in labels.items():
+            build_tab(name, lang, label)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,11 @@
 <p align="center"><a href="RUN_AND_BUILD.md">English</a> | <b>Español</b></p>
 
 <p align="center">
+  <a href="README.es.md"><img src="docs/assets/tab-readme-es.svg" alt="README"></a>
+  <a href="COSTA_RICA.es.md"><img src="docs/assets/tab-costa-rica-es.svg" alt="La situación en Costa Rica, con fuentes"></a>
+</p>
+
+<p align="center">
   <img src="docs/assets/run-es.svg" width="100%" alt="Cómo correr ColonQuest, apuntarlo a otro backend y armar el ejecutable a partir de los archivos env. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 

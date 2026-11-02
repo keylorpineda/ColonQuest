@@ -1,11 +1,12 @@
 <p align="center"><b>English</b> | <a href="README.es.md">Español</a></p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=2" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
+  <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
 </p>
 
 <p align="center">
-  <a href="RUN_AND_BUILD.md"><b>Run it and build it</b></a> | <a href="COSTA_RICA.md"><b>The situation in Costa Rica, with sources</b></a>
+  <img src="docs/assets/readme-en.svg?v=2" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>

@@ -1,6 +1,11 @@
 <p align="center"><b>English</b> | <a href="COSTA_RICA.es.md">Español</a></p>
 
 <p align="center">
+  <a href="README.md"><img src="docs/assets/tab-readme-en.svg" alt="README"></a>
+  <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
+</p>
+
+<p align="center">
   <img src="docs/assets/costa-rica-en.svg" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
 </p>
 
