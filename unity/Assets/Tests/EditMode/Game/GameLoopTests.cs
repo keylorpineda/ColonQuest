@@ -294,6 +294,73 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(120_000L, loop.State.Cash);
         }
 
+        private static long DockedPay(GameLoop run, int shifts)
+        {
+            return FinanceEngine.CalculateDockedPay(run.State.SalaryNet, 0, shifts);
+        }
+
+        [Test]
+        public void EarlyClose_AfterAWorkedMorningDocksWhatTheWarningSays()
+        {
+            var run = new GameLoop();
+            run.ClockIn();
+            run.FinishShift();
+            Assert.AreEqual(GameRules.DaysPerMonth - 1, run.ShiftsDockedIfClosedNow, "the shift of today was worked");
+
+            var report = run.CloseMonth(dockRemainingShifts: true);
+
+            Assert.AreEqual(DockedPay(run, GameRules.DaysPerMonth - 1), report.SalaryDocked);
+            Assert.Less(report.SalaryDocked, run.State.SalaryNet, "a worked shift is paid");
+        }
+
+        [Test]
+        public void EarlyClose_AnAfternoonWithoutWorkCountsTodayOnce()
+        {
+            var run = new GameLoop();
+            run.Clock.SkipTo(GameRules.WorkEndHour * 60f + 30f);
+            int warned = run.ShiftsDockedIfClosedNow;
+
+            var report = run.CloseMonth(dockRemainingShifts: true);
+
+            Assert.AreEqual(GameRules.DaysPerMonth, warned);
+            Assert.AreEqual(DockedPay(run, warned), report.SalaryDocked);
+        }
+
+        [Test]
+        public void EarlyClose_InTheSecondWeekCountsOnlyTheWeeksLeft()
+        {
+            var run = new GameLoop();
+            run.ClockIn();
+            run.FinishShift();
+            run.Sleep();
+            run.ClockIn();
+            run.FinishShift();
+
+            var report = run.CloseMonth(dockRemainingShifts: true);
+
+            Assert.AreEqual(DockedPay(run, GameRules.DaysPerMonth - 2), report.SalaryDocked);
+        }
+
+        [Test]
+        public void Close_InTheLastWeekDocksNothingForAShiftThatWasWorked()
+        {
+            var run = new GameLoop();
+            for (int day = 1; day < GameRules.DaysPerMonth; day++)
+            {
+                run.ClockIn();
+                run.FinishShift();
+                run.Sleep();
+            }
+
+            run.ClockIn();
+            run.FinishShift();
+            Assert.AreEqual(0, run.ShiftsDockedIfClosedNow);
+
+            var report = run.CloseMonth(dockRemainingShifts: true);
+
+            Assert.AreEqual(0L, report.SalaryDocked);
+        }
+
         [Test]
         public void NetWorth_SubtractsTheDebtAndTheInstallmentsLeft()
         {

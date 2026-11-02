@@ -933,25 +933,33 @@ namespace ColonQuest.Game
             return purchase(State.Clone(), probe).Failure;
         }
 
+        /// <summary>The shifts an early close takes from the salary: the weeks not played and today, unless it was worked. None in the last week.</summary>
+        public int ShiftsDockedIfClosedNow => Clock.Day < GameRules.DaysPerMonth
+            ? GameRules.DaysPerMonth - Clock.Day + (Job.WorkedToday ? 0 : 1)
+            : 0;
+
         /// <summary>Pays the salary and runs the month: installments, the card cycle, interest and living expenses.</summary>
         public MonthlyTickReport CloseMonth(bool dockRemainingShifts = false)
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
             LastRoomRent = Holdings.Home == null ? MarketAssumptions.RoomRent : 0L;
 
+            // Read before the working day ends, which forgets it. An afternoon without work is counted by EndWorkingDay, so an
+            // early close only adds today when the morning is not over yet.
+            int earlyCloseShifts = dockRemainingShifts ? ShiftsDockedIfClosedNow : 0;
+            bool morningOver = Clock.Hour >= GameRules.WorkEndHour;
+            if (morningOver && !Job.WorkedToday)
+            {
+                earlyCloseShifts = Math.Max(0, earlyCloseShifts - 1);
+            }
+
             // The week in course counts once its morning is over: closing the month early in the morning is not an absence for today.
-            if (Clock.Hour >= GameRules.WorkEndHour)
+            if (morningOver)
             {
                 EndWorkingDay();
             }
 
-            int missedShifts = Job.MissedThisMonth;
-            if (dockRemainingShifts && Clock.Day < GameRules.DaysPerMonth)
-            {
-                int unplayedDays = GameRules.DaysPerMonth - Clock.Day;
-                int todayUnworked = !Job.WorkedToday ? 1 : 0;
-                missedShifts += unplayedDays + todayUnworked;
-            }
+            int missedShifts = Job.MissedThisMonth + earlyCloseShifts;
 
             var report = FinanceEngine.RunMonthlyTick(State, new MonthlyTickOptions
             {
