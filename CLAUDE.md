@@ -1,6 +1,7 @@
 # ColonQuest — Guía de implementación para Claude Code
 
-Juego 2D de educación financiera para estudiantes de Costa Rica, construido para el
+Simulador de finanzas personales que se juega como un juego, para Costa Rica, con el lema
+**From Costa Rica to the World**, construido para el
 **Meta Global AI Developer Hackathon** (track Indie). Un game master con IA convierte cada
 decisión de plata en una historia con consecuencias; el jugador negocia por voz con
 personajes que intentan engañarlo (cuotas con cargos escondidos, préstamos "gota a gota",
@@ -106,7 +107,7 @@ en [`docs/prompts/model-roles-session.md`](docs/prompts/model-roles-session.md).
 | Muse Spark | `muse-spark-1.3` | Game master en vivo (evento del mes y game master con herramientas), informe del Modo Clase, respaldo de los vendedores | Único modelo de Meta que responde siempre dentro de los 8 s de Unity: 3,0 a 4,4 s con `minimal` | $1.25 / $4.25 por millón |
 | Muse Wonder | `muse-wonder-1.0` | Planifica el año del jugador en segundo plano y narra el resumen final; escribe el banco de eventos (*pendiente*) | El mejor escritor, pero tarda 5,8 a 10,5 s aun con `minimal`: solo donde el jugador no espera | $4 / $20 por millón |
 | Muse Spark Open | `meta-models/muse-spark-open-1026` (Baseten) | Los vendedores: esconden el seguro y la comisión hasta que les preguntan. Tácticas con herramientas y memoria de la partida *pendientes* | 1,9 a 2,8 s, pagado con los $100 de Baseten, pieza del premio Open Weights | $1.25 / $4.25 por millón (créditos de Baseten) |
-| Muse Image | `muse-image-1.0` | Retratos de los NPC, escenas de los eventos e ilustración **sin texto** de la postal del año (*pendiente*) | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
+| Muse Image | `muse-image-1.0` | Retratos de los NPC y escenas de los eventos, **sin texto**. El resumen final lo dibuja Unity con cifras del motor | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
 | Muse Voice Transcribe | `muse-voice-transcribe-1.0` | La voz del jugador al negociar | 0,7 a 1,5 s; escribir siempre sirve de respaldo | $0.18 por hora de audio |
 
 Reglas que salen de las mediciones:
@@ -170,7 +171,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
   "cash": 120000,
   "savings": 50000,
   "emergencyFund": 0,
-  "creditCard": { "balance": 180000, "limit": 300000, "monthlyRatePct": 3.5, "minPaymentPct": 10 },
+  "creditCard": { "balance": 180000, "limit": 300000, "monthlyRatePct": 3, "minPaymentPct": 10 },
   "installments": [{ "item": "Celular", "monthly": 25000, "monthsLeft": 33 }],
   "informalLoans": [],
   "history": ["paid_minimum_only", "skipped_savings"],
@@ -293,11 +294,10 @@ guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador s
 
 ## Imágenes
 
-- **Pre-generar** un set base (retratos de los NPCs fijos, escenas de los eventos y las tres
-  ilustraciones de la postal) con `server/scripts/pregenerate_images.py` y guardarlas en la tabla
+- **Pre-generar** un set base (retratos de los NPCs fijos y escenas de los eventos) con `server/scripts/pregenerate_images.py` y guardarlas en la tabla
   `images`. Muse Image en tiempo real solo para claves nuevas, con caché por `imageKey` y
   `IMAGE_TIMEOUT_S=30`.
-- **Ninguna imagen lleva texto ni números.** Las cifras de la postal las dibuja Unity encima.
+- **Ninguna imagen lleva texto ni números.** Los créditos y la demo de funciones no muestran el arte (decidido el 2 de noviembre).
 - Prompt de estilo fijo para mantener consistencia: pixel art, paleta limitada, mismo encuadre.
 
 ## Control de costos (obligatorio)
@@ -435,6 +435,9 @@ uv run python scripts/smoke_models.py --audio pregunta.wav
 # Prueba de punta a punta contra un backend corriendo (usar la base de QA, no producción)
 python ../scripts/smoke_test.py
 ```
+
+El ejecutable para los jueces se arma con `python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué
+backend habla el juego; se puede cambiar al lado del exe sin volver a armar. Guía en `docs/run-and-build.md`.
 
 Variables de entorno (`server/.env`, nunca en el repo): `MODEL_API_KEY`, `DATABASE_URL`,
 `GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S`,
