@@ -437,7 +437,7 @@ python ../scripts/smoke_test.py
 ```
 
 El ejecutable para los jueces se arma con `python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué
-backend habla el juego; se puede cambiar al lado del exe sin volver a armar. Guía en `docs/run-and-build.md`.
+backend habla el juego; se puede cambiar al lado del exe sin volver a armar. Guía en `RUN_AND_BUILD.md`.
 
 Variables de entorno (`server/.env`, nunca en el repo): `MODEL_API_KEY`, `DATABASE_URL`,
 `GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S`,

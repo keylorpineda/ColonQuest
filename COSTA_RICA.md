@@ -1,7 +1,7 @@
-<p align="center"><b>English</b> | <a href="costa-rica.es.md">Español</a></p>
+<p align="center"><b>English</b> | <a href="COSTA_RICA.es.md">Español</a></p>
 
 <p align="center">
-  <img src="assets/costa-rica-en.svg" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/costa-rica-en.svg" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
 </p>
 
 <details open>
@@ -79,7 +79,7 @@ The AI tells the story; these numbers are what the engine computes with.
 | In the game | The real rule | Source |
 | --- | --- | --- |
 | Gross salary ₡373 092 | Minimum wage for an unskilled worker in 2026, ₡373 092.30 a month | Decree 45303-MTSS, [^wage] and `GameRules.cs` |
-| 10.83% off the salary | Worker's charges in 2026: SEM 5.50, IVM 4.33, Banco Popular 1.00 | Checked in [the review of the engine](ANALISIS_RUBRICA_README_MOTOR.md) |
+| 10.83% off the salary | Worker's charges in 2026: SEM 5.50, IVM 4.33, Banco Popular 1.00 | Checked in [the review of the engine](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
 | Income tax exempt up to ₡918 000 | 2026 brackets: 10%, 15%, 20% and 25% above that | Decree 45333-H, same review |
 | Aguinaldo of one twelfth | Exempt from charges and income tax | Law 2412, same review |
 | Card at 3% a month | 36% a year, under the cap of 36.48% | [^usury] |

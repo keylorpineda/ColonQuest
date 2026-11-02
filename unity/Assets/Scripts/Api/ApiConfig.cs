@@ -6,7 +6,7 @@ namespace ColonQuest.Api
     /// <summary>
     /// Where the backend lives and how long the game waits for it. There are no keys here: the
     /// model keys only exist on the server. A build asks for its backend in <see cref="EnvVariable"/> and then
-    /// in <see cref="EnvFile"/> beside the exe, so it can change without building again; see docs/run-and-build.md.
+    /// in <see cref="EnvFile"/> beside the exe, so it can change without building again; see RUN_AND_BUILD.md.
     /// </summary>
     public sealed class ApiConfig
     {
