@@ -117,6 +117,34 @@ def invalid_amounts(reply: str, offer: Offer, extra: Collection[int] = ()) -> li
     ]
 
 
+CASH_PRICE_NEAR_AMOUNT = re.compile(
+    r"(?:de contado|al contado|contado|precio|cash price|in cash|the price|price is|price of)"
+    r"[^₡.!?]{0,24}₡\s?(\d{1,3}(?:" + THOUSANDS_SEPARATORS + r"\d{3})+|\d+)",
+    re.IGNORECASE,
+)
+
+
+MONTHLY_AFTER_AMOUNT = re.compile(r"\s*(?:al mes|por mes|mensual|a month|per month|monthly)", re.I)
+
+
+def wrong_cash_prices(reply: str, offer: Offer) -> list[int]:
+    """Amounts the reply calls the price that are not the cash price, which never changes.
+
+    "Total price" and "precio total" are the total cost, which is on the sheet as well.
+    """
+    wrong = []
+    for match in CASH_PRICE_NEAR_AMOUNT.finditer(reply):
+        # "A ese precio son ₡19 600 al mes" gives the payment, not another price.
+        if MONTHLY_AFTER_AMOUNT.match(reply, match.end()):
+            continue
+        amount = int(re.sub(r"\D", "", match.group(1)))
+        before = reply[max(0, match.start() - 8) : match.start()]
+        said_total = "total" in match.group(0).lower() or "total" in before.lower()
+        if amount != offer.cash_price and not (said_total and amount == offer.total_cost):
+            wrong.append(amount)
+    return wrong
+
+
 def facts_answering(questions: set[KeyQuestion]) -> list[SellerFact]:
     facts: list[SellerFact] = []
     for question in KeyQuestion:

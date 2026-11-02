@@ -10,14 +10,15 @@ model calls, or the agent fails, the base negotiator answers exactly as before.
 import logging
 import uuid
 from collections.abc import Sequence
+from typing import Any
 
 from app.agents.loop import AgentRequest, run_tool_loop
 from app.agents.tools import ToolContext, quotable_amounts
 from app.config import Settings
 from app.cost_guard import select_text_model
 from app.game_master.ledger import Ledger
-from app.negotiation.questions import classify_questions, invalid_amounts
-from app.negotiation.seller_sheet import Offer
+from app.negotiation.questions import classify_questions, invalid_amounts, wrong_cash_prices
+from app.negotiation.seller_sheet import Offer, offer_on_the_table
 from app.negotiation.service import (
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_EN,
@@ -34,7 +35,8 @@ from app.schemas import KeyQuestion, NegotiationReply
 logger = logging.getLogger(__name__)
 
 ENDPOINT = "negotiation_agent"
-SELLER_TOOLS = ("quote_term", "simulate_purchase")
+# Only quote_term, which re-prices this offer: a tool taking any price lets the seller invent one.
+SELLER_TOOLS = ("quote_term",)
 
 AGENT_SYSTEM_PROMPT = (
     SYSTEM_PROMPT
@@ -43,7 +45,9 @@ AGENT_SYSTEM_PROMPT = (
 YOUR GOAL AND TOOLS
 - You want to maximize your earnings: the longer the term, the more you earn.
 - quote_term(months) re-prices this exact offer at another term and tells you your private \
-earnings. Call it before mentioning any other term, and quote its figures exactly.
+earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
+quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+the cash price stays the same.
 - Push a longer term by highlighting the lower monthly payment. Never tell the player your \
 earnings.
 - You may omit figures until asked, but never lie: if the player asks for the total cost, the \
@@ -60,7 +64,9 @@ AGENT_SYSTEM_PROMPT_EN = (
 YOUR GOAL AND TOOLS
 - You want to maximize your earnings: the longer the term, the more you earn.
 - quote_term(months) re-prices this exact offer at another term and tells you your private \
-earnings. Call it before mentioning any other term, and quote its figures exactly.
+earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
+quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+the cash price stays the same.
 - Push a longer term by highlighting the lower monthly payment. Never tell the player your \
 earnings.
 - You may omit figures until asked, but never lie: if the player asks for the total cost, the \
@@ -75,6 +81,19 @@ def get_agent_system_prompt(language: str = "es") -> str:
     if language and language.lower().startswith("en"):
         return AGENT_SYSTEM_PROMPT_EN
     return AGENT_SYSTEM_PROMPT
+
+
+def term_offer(offer: Offer, tool_results: Sequence[dict[str, Any]]) -> Offer:
+    """The offer at the last term the seller quoted this turn: that term is now on the table."""
+    for result in reversed(tool_results):
+        months = result.get("months")
+        if isinstance(months, int):
+            return (
+                offer_on_the_table(offer, months)
+                if months >= offer.term_months
+                else offer.at_term(months)
+            )
+    return offer
 
 
 class SellerAgent:
@@ -130,6 +149,7 @@ class SellerAgent:
 
         turn = result.value
         bad = invalid_amounts(turn.npc_reply, offer, quotable_amounts(result.tool_results))
+        bad += wrong_cash_prices(turn.npc_reply, term_offer(offer, result.tool_results))
         if bad:
             logger.warning("seller agent quoted amounts no tool computed: %s", bad)
             return self._base.fallback(offer, player_text, language=language)
@@ -142,5 +162,6 @@ class SellerAgent:
             revealed_facts=turn.revealed_facts,
             key_questions_asked=ordered(classify_questions(player_text)),
             deal_status=turn.deal_status,
+            term_months=term_offer(offer, result.tool_results).term_months,
         )
         return NegotiationOutcome(reply=reply, source="agent")

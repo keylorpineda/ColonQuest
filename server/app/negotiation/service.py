@@ -20,7 +20,12 @@ from pydantic import Field
 from app.config import Settings
 from app.cost_guard import select_text_model
 from app.game_master.ledger import Ledger
-from app.negotiation.questions import classify_questions, fallback_reply, invalid_amounts
+from app.negotiation.questions import (
+    classify_questions,
+    fallback_reply,
+    invalid_amounts,
+    wrong_cash_prices,
+)
 from app.negotiation.seller_sheet import Offer
 from app.providers.base import (
     ModelProvider,
@@ -45,6 +50,8 @@ RULES
 sentences, at most 300 characters.
 - You receive a hidden sheet with the true figures. Never state any amount that is not on it, \
 never change a figure, never invent discounts.
+- The sheet is what is on the table right now. If earlier lines of the conversation say something \
+else, the sheet wins. The cash price never changes; never call any other amount the price.
 - Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
 cash price or total cost ONLY when the player asks about it directly. If they ask, answer honestly.
 - playerHabits, when present, lists the key questions this player asked other sellers in this \
@@ -66,6 +73,8 @@ RULES
 at most 300 characters. Every word is in English, including months and rates: no Spanish.
 - You receive a hidden sheet with the true figures. Never state any amount that is not on it, \
 never change a figure, never invent discounts.
+- The sheet is what is on the table right now. If earlier lines of the conversation say something \
+else, the sheet wins. The cash price never changes; never call any other amount the price.
 - Highlight the low monthly payment. Reveal the insurance, commission, interest rate, term, \
 cash price or total cost ONLY when the player asks about it directly. If they ask, answer honestly.
 - playerHabits, when present, lists the key questions this player asked other sellers in this \
@@ -207,6 +216,7 @@ class Negotiator:
             revealed_facts=turn.revealed_facts,
             key_questions_asked=ordered(questions),
             deal_status=turn.deal_status,
+            term_months=offer.term_months,
         )
         return NegotiationOutcome(reply=reply, source="model")
 
@@ -253,6 +263,7 @@ class Negotiator:
                 session_id=session_id,
             )
             bad_amounts = invalid_amounts(result.value.npc_reply, offer)
+            bad_amounts += wrong_cash_prices(result.value.npc_reply, offer)
             if not bad_amounts:
                 return result.value
             logger.warning("seller quoted amounts not on the sheet: %s", bad_amounts)
@@ -277,5 +288,6 @@ class Negotiator:
             revealed_facts=facts,
             key_questions_asked=ordered(questions),
             deal_status=scripted_deal_status(player_text),
+            term_months=offer.term_months,
         )
         return NegotiationOutcome(reply=reply, source="fallback")
