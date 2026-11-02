@@ -109,12 +109,12 @@ namespace ColonQuest.UI
             Last = trace;
             var text = new StringBuilder();
             AppendPlan(text, trace);
-            text.Append(DemoReadout.Tint(Loc.F("Esta partida lleva gastados {0}", DemoReadout.Dollars(trace.totalCostUsd)), "#F2A23A")).Append("\n\n");
+            text.Append(DemoReadout.Tint(Loc.F("Esta partida lleva gastados unos {0}", DemoReadout.Dollars(trace.totalCostUsd)), "#F2A23A")).Append("\n\n");
 
-            // The newest first: it is the one the player has just seen happen.
-            for (int i = trace.calls.Count - 1; i >= 0; i--)
+            // In the order they happened, and the panel follows the last one down.
+            foreach (var call in trace.calls)
             {
-                DemoReadout.AppendShortCall(text, trace.calls[i]);
+                DemoReadout.AppendShortCall(text, call);
             }
 
             // The tools by name: what they asked and answered is in the feature demo.
@@ -167,7 +167,7 @@ namespace ColonQuest.UI
             float height = body.preferredHeight + 20f;
             body.rectTransform.sizeDelta = new Vector2(body.rectTransform.sizeDelta.x, height);
             content.sizeDelta = new Vector2(content.sizeDelta.x, height);
-            scroll.verticalNormalizedPosition = 1f;
+            scroll.verticalNormalizedPosition = 0f;
         }
     }
 }

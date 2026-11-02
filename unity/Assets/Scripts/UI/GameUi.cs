@@ -24,6 +24,7 @@ namespace ColonQuest.UI
         /// <summary>How many times each everyday object was used, so its lines rotate.</summary>
         private readonly Dictionary<string, int> thingUses = new Dictionary<string, int>();
         private ModalPanel modal;
+        private EndScreen endScreen;
         private SubtitleBar subtitles;
         private ScreenEffects effects;
         private NegotiationPanel negotiationPanel;
@@ -90,6 +91,7 @@ namespace ColonQuest.UI
             aiCalls = new AiCallsPanel(canvas.transform);
             aiCalls.Clear();
             modal = new ModalPanel(canvas.transform);
+            endScreen = new EndScreen(canvas.transform);
             subtitles = new SubtitleBar(canvas.transform);
             effects = new ScreenEffects(canvas.transform);
             Thoughts.Said += OnThought;
@@ -469,6 +471,8 @@ namespace ColonQuest.UI
         // ---------------------------------------------------------------- frame
 
         private float nextMoodUpdate;
+        private float usedAt;
+        private const float UsedPause = 0.6f;
 
         private void Update()
         {
@@ -569,7 +573,8 @@ namespace ColonQuest.UI
                 return;
             }
 
-            bool open = modal.IsOpen;
+            endScreen.Tick();
+            bool open = modal.IsOpen || endScreen.IsOpen;
 
             PlayerController.Blocked = open || session.Busy;
             loadingCard.SetActive(session.Busy && !open);
@@ -647,7 +652,12 @@ namespace ColonQuest.UI
                 return;
             }
 
-            // A place used once waits until the player walks away and comes back, so E cannot repeat it on the spot.
+            // A place used waits a moment, so the E that closed its window does not open it again.
+            if (usedStations.Count > 0 && Time.unscaledTime - usedAt > UsedPause)
+            {
+                usedStations.Clear();
+            }
+
             var station = Nearby;
             string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) && GuidedAllows(station) ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
@@ -657,6 +667,7 @@ namespace ColonQuest.UI
                 if (Input.GetKeyDown(KeyCode.E) && text.StartsWith("[E]  "))
                 {
                     usedStations.Add(station);
+                    usedAt = Time.unscaledTime;
                     Interact(station);
                 }
             }
@@ -800,6 +811,7 @@ namespace ColonQuest.UI
             // A new run has made no calls yet, and only the guided run opens the panel by itself.
             aiCalls.Clear();
             aiCalls.SetExpanded(false);
+            endScreen.Hide();
             ResetSentence();
             modal.Hide();
             phone.Close();
@@ -1169,42 +1181,23 @@ namespace ColonQuest.UI
         private void ShowEnd(SessionSummary summary)
         {
             phone.Close();
-            modal.Backdrop = RemoteImages.Get(PostcardKeys.For(summary.TotalDebt));
-            var text = new StringBuilder();
-            text.AppendLine(Loc.T(summary.Narrative));
-            text.AppendLine();
-            text.AppendLine(Loc.F("Decisiones tomadas: {0}", summary.Decisions));
-            text.AppendLine(Loc.F("Lo que debes: {0}", Money.Format(summary.TotalDebt)));
-            text.AppendLine(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(summary.NetWorth)));
-            text.AppendLine();
-            text.AppendLine(Loc.T("Tus notas"));
-            foreach (var line in ReportCard.Build(session.State, session.Loop.Holdings, session.Loop.Bills))
-            {
-                text.AppendLine($"{Loc.T(line.Concept)}  <b>{line.Grade}</b>");
-            }
-
+            aiCalls.SetExpanded(false);
             if (session.Guided)
             {
                 StopGuided();
-                modal.Show(Loc.T("Tus tres meses"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), GuidedEndOptions());
+                endScreen.Show(Loc.T("Tus tres meses"), summary, session.State, session.Loop.Holdings, session.Loop.Bills, GuidedEndOptions());
                 return;
             }
 
+            var options = new List<ModalOption>();
             var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
-            if (assets.Count == 0)
+            if (assets.Count > 0)
             {
-                modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
-                {
-                    new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
-                });
-                return;
+                options.Add(new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) });
             }
 
-            modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
-            {
-                new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
-                new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
-            });
+            options.Add(new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart });
+            endScreen.Show(Loc.T("Fin de la partida"), summary, session.State, session.Loop.Holdings, session.Loop.Bills, options);
         }
 
         /// <summary>True while the pause window or its settings are up.</summary>

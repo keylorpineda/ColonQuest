@@ -14,7 +14,7 @@ namespace ColonQuest.UI
     public sealed class TalkPanel
     {
         private const float CardWidth = 1300f;
-        private const float CardHeight = 760f;
+        private const float CardHeight = 800f;
         private const float TextWidth = 1220f;
         private const float LogHeight = 370f;
         private const float InputHeight = 64f;
@@ -177,7 +177,7 @@ namespace ColonQuest.UI
 
             BuildConversation(card, talk);
             BuildQuestions(card, talk, -456f);
-            BuildInput(card, -522f);
+            BuildInput(card, -574f);
 
             var actions = actionsFor != null ? actionsFor(talk) : new List<ModalOption>();
             float gap = 16f;
@@ -186,7 +186,7 @@ namespace ColonQuest.UI
             {
                 var action = actions[i];
                 float x = -TextWidth / 2f + width / 2f + i * (width + gap);
-                UiKit.MakeButton(card, action.Label, action.Color, new Vector2(width, InputHeight), top, new Vector2(x, -598f), () => action.OnPress?.Invoke()).interactable = !session.Busy;
+                UiKit.MakeButton(card, action.Label, action.Color, new Vector2(width, InputHeight), top, new Vector2(x, -650f), () => action.OnPress?.Invoke()).interactable = !session.Busy;
             }
 
             if (input != null && !session.Busy)
@@ -228,16 +228,17 @@ namespace ColonQuest.UI
         {
             const float gap = 10f;
             var questions = talk.SuggestedQuestions;
-            float width = (TextWidth - gap * (questions.Length - 1)) / questions.Length;
+            int perRow = questions.Length / 2;
+            float width = (TextWidth - gap * (perRow - 1)) / perRow;
             for (int i = 0; i < questions.Length; i++)
             {
                 string spoken = Loc.T(questions[i]);
                 var fact = DebtTalk.Classify(spoken);
                 bool asked = fact.HasValue && System.Linq.Enumerable.Contains(talk.Asked, fact.Value);
-                float x = -TextWidth / 2f + width / 2f + i * (width + gap);
-                var button = UiKit.MakeButton(card, questions[i], asked ? GameUiColors.Green : Color.white, new Vector2(width, 56f), new Vector2(0.5f, 1f), new Vector2(x, y), () => session.SendTalk(spoken));
+                float x = -TextWidth / 2f + width / 2f + (i % perRow) * (width + gap);
+                var button = UiKit.MakeButton(card, questions[i], asked ? GameUiColors.Green : Color.white, new Vector2(width, 50f), new Vector2(0.5f, 1f), new Vector2(x, y - (i / perRow) * 58f), () => session.SendTalk(spoken));
                 button.name = "Question_" + i;
-                UiKit.SetFontSize(button, 21);
+                UiKit.SetFontSize(button, 23);
                 button.interactable = !session.Busy;
                 if (asked)
                 {
