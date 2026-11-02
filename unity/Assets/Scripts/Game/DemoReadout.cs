@@ -90,7 +90,7 @@ namespace ColonQuest.Game
                 case "event": return Loc.T("Evento del mes");
                 case "negotiation_agent": return Loc.T("Vendedor con herramientas");
                 case "negotiation": return Loc.T("Respuesta del vendedor");
-                case "debt_talk": return Loc.T("Cobrador, prestamista o pirámide");
+                case "debt_talk": return Loc.T("Personaje del pueblo");
                 case "transcribe": return Loc.T("Voz a texto");
                 case "season_plan": return Loc.T("Plan del año");
                 case "summary": return Loc.T("Resumen del año");

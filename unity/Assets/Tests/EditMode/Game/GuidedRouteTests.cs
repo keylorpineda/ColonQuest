@@ -170,5 +170,50 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(TeachingConcept.InformalLending, DebtTalk.OfferEvent(TalkPartner.Lender).TeachingConcept);
             Assert.AreEqual(TeachingConcept.PyramidScheme, DebtTalk.OfferEvent(TalkPartner.Pyramid).TeachingConcept);
         }
+
+        // ---------------------------------------------------------------- the people of the town
+
+        [Test]
+        public void PeopleOfTheTown_TheSamePersonIsAlwaysTheSame()
+        {
+            Assert.AreEqual(DebtTalk.PartnerFor("ClienteBarra"), DebtTalk.PartnerFor("ClienteBarra"));
+            CollectionAssert.Contains(new[] { TalkPartner.Neighbor, TalkPartner.Stranger }, DebtTalk.PartnerFor("Peaton3"));
+        }
+
+        [Test]
+        public void Neighbor_SaysOnlyFiguresFromTheGameAndAnswersWithoutAServer()
+        {
+            var talk = new DebtTalk(TalkPartner.Neighbor, 0L, 3.5m);
+            var request = talk.ToRequest("hello", "en");
+
+            Assert.AreEqual("neighbor", request.partner);
+            CollectionAssert.Contains(request.percents, 3);
+            CollectionAssert.Contains(request.percents, DebtTalk.LenderRatePct);
+            Assert.IsEmpty(request.amounts);
+            StringAssert.Contains("3.5", talk.Say("¿Qué tan caro sale la tarjeta?"));
+        }
+
+        [Test]
+        public void Stranger_AsksForWhatTheGameSays()
+        {
+            var talk = new DebtTalk(TalkPartner.Stranger);
+            var request = talk.ToRequest("who are you?", "en");
+
+            Assert.AreEqual("stranger", request.partner);
+            CollectionAssert.AreEqual(new[] { DebtTalk.StrangerAsk }, request.amounts);
+            Assert.IsNotEmpty(talk.Say("¿Me manda el comprobante?"));
+        }
+
+        [Test]
+        public void PeopleOfTheTown_TheirQuestionsAreTranslated()
+        {
+            foreach (var partner in new[] { TalkPartner.Neighbor, TalkPartner.Stranger })
+            {
+                foreach (string question in new DebtTalk(partner).SuggestedQuestions)
+                {
+                    Assert.IsTrue(Translations.English.ContainsKey(question), question);
+                }
+            }
+        }
     }
 }

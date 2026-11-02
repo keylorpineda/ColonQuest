@@ -13,7 +13,13 @@ namespace ColonQuest.Game
     {
         Collectors,
         Lender,
-        Pyramid
+        Pyramid,
+
+        /// <summary>Someone in town who gives advice about money.</summary>
+        Neighbor,
+
+        /// <summary>Someone in town who tries the SINPE scam.</summary>
+        Stranger
     }
 
     /// <summary>What the player can find out by asking. Each one is a question worth asking before saying yes.</summary>
@@ -50,6 +56,12 @@ namespace ColonQuest.Game
         public const int LenderLongRatePct = (int)Finance.FinanceEngine.DefaultInformalLoanMonthlyRatePct;
         public const int PyramidPromisePct = 300;
 
+        /// <summary>What the stranger of the SINPE scam asks to have sent back.</summary>
+        public const long StrangerAsk = 30_000L;
+
+        /// <summary>The monthly rate of an informal loan, which every neighbor knows to fear.</summary>
+        private const int NeighborLoanRatePct = LenderRatePct;
+
         public const string TakeOffer = "take";
         public const string SkipOffer = "skip";
 
@@ -64,10 +76,41 @@ namespace ColonQuest.Game
         public IReadOnlyList<TalkTurn> Turns => turns;
         public IReadOnlyList<TalkFact> Asked => asked;
 
-        public DebtTalk(TalkPartner partner, long demand = 0L)
+        /// <summary>The monthly rate of the player's card, for the neighbor's advice.</summary>
+        public decimal CardRatePct { get; }
+
+        public DebtTalk(TalkPartner partner, long demand = 0L, decimal cardRatePct = 3.5m)
         {
             Partner = partner;
             Demand = demand;
+            CardRatePct = cardRatePct;
+        }
+
+        /// <summary>The same picks for the same person: a quarter of the people of the town try the scam.</summary>
+        public static TalkPartner PartnerFor(string personName)
+        {
+            int sum = 0;
+            foreach (char letter in personName ?? string.Empty)
+            {
+                sum += letter;
+            }
+
+            return sum % 4 == 0 ? TalkPartner.Stranger : TalkPartner.Neighbor;
+        }
+
+        private string WirePartner
+        {
+            get
+            {
+                switch (Partner)
+                {
+                    case TalkPartner.Collectors: return "collectors";
+                    case TalkPartner.Lender: return "lender";
+                    case TalkPartner.Neighbor: return "neighbor";
+                    case TalkPartner.Stranger: return "stranger";
+                    default: return "pyramid";
+                }
+            }
         }
 
         public string Name
@@ -80,6 +123,10 @@ namespace ColonQuest.Game
                         return "Cobrador";
                     case TalkPartner.Lender:
                         return "Prestamista";
+                    case TalkPartner.Neighbor:
+                        return "Vecino";
+                    case TalkPartner.Stranger:
+                        return "Desconocido";
                     default:
                         return "Invierte Ya";
                 }
@@ -96,6 +143,10 @@ namespace ColonQuest.Game
                         return Loc.F("Mae, usted debe plata. Hoy venimos por {0}. ¿Cómo hacemos?", Money.Format(Demand));
                     case TalkPartner.Lender:
                         return "¿Ocupa platica rápido? Sin papeles, sin fiador, hoy mismo. Usted dice cuánto.";
+                    case TalkPartner.Neighbor:
+                        return "¿Todo bien? Si anda con dudas de plata, pregunte con confianza.";
+                    case TalkPartner.Stranger:
+                        return Loc.F("Disculpe, le mandé {0} por SINPE por error. ¿Me los devuelve ya? Es urgente.", Money.Format(StrangerAsk));
                     default:
                         return Loc.F("¡Duplicá, triplicá tu plata! Te pagamos {0}% en un mes. ¿Entrás o te lo vas a perder?", PyramidPromisePct);
                 }
@@ -113,6 +164,10 @@ namespace ColonQuest.Game
                         return new[] { "No tengo toda esa plata.", "¿Podemos hacer un arreglo?", "¿Qué pasa si no pago?", "¿Esto es legal?" };
                     case TalkPartner.Lender:
                         return new[] { "¿Cuál es el interés?", "¿Cuánto tendría que devolver en total?", "¿Qué pasa si me atraso?", "¿Firmo algún contrato?" };
+                    case TalkPartner.Neighbor:
+                        return new[] { "¿Qué tan caro sale la tarjeta?", "¿Conviene comprar a cuotas?", "¿Cómo logro ahorrar algo?", "¿Y si me ofrecen plata rápida?" };
+                    case TalkPartner.Stranger:
+                        return new[] { "¿De dónde sacó mi número?", "¿Por qué tanta prisa?", "¿Me manda el comprobante?", "¿Puedo llamar al banco primero?" };
                     default:
                         return new[] { "¿Cuánto me van a pagar?", "¿De dónde sale la plata?", "¿Hay algún contrato?", "¿Están inscritos en SUGEF?" };
                 }
@@ -191,7 +246,7 @@ namespace ColonQuest.Game
         {
             var request = new TalkRequestDto
             {
-                partner = Partner == TalkPartner.Collectors ? "collectors" : (Partner == TalkPartner.Lender ? "lender" : "pyramid"),
+                partner = WirePartner,
                 text = playerText,
                 language = language
             };
@@ -203,6 +258,12 @@ namespace ColonQuest.Game
                     break;
                 case TalkPartner.Lender:
                     FillLender(request);
+                    break;
+                case TalkPartner.Neighbor:
+                    FillNeighbor(request);
+                    break;
+                case TalkPartner.Stranger:
+                    FillStranger(request);
                     break;
                 default:
                     FillPyramid(request);
@@ -238,6 +299,26 @@ namespace ColonQuest.Game
             Line(request, TalkFact.Guarantee, Loc.T("Ningún contrato: solo una firma en tu libreta."));
             request.amounts.AddRange(new[] { ExampleLoan, LenderTotal() });
             request.percents.AddRange(new[] { LenderRatePct, LenderLongRatePct });
+        }
+
+        private void FillNeighbor(TalkRequestDto request)
+        {
+            Line(request, TalkFact.Rate, Loc.F("Una tarjeta como la del jugador cobra {0}% al mes sobre lo que queda debiendo: pagar solo el mínimo hace crecer la deuda.", CardRatePct.ToString("0.#", CultureInfo.InvariantCulture)));
+            Line(request, TalkFact.TotalCost, Loc.T("Comprar a cuotas casi siempre sale más caro que de contado: hay que preguntar el total, el seguro y la comisión."));
+            Line(request, TalkFact.Arrangement, Loc.T("Lo que funciona es apartar algo cada quincena, aunque sea poco, antes de gastar."));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.F("Un prestamista gota a gota cobra hasta {0}% al mes y manda a cobrar a la casa: mejor evitarlo.", NeighborLoanRatePct));
+            Line(request, TalkFact.Legal, Loc.T("Si alguien promete ganancias enormes, hay que buscarlo en SUGEF antes de darle un colón."));
+            Line(request, TalkFact.Guarantee, Loc.T("Un SINPE no se devuelve: hay que revisar el nombre antes de enviar."));
+            request.percents.AddRange(new[] { (int)CardRatePct, NeighborLoanRatePct });
+        }
+
+        private static void FillStranger(TalkRequestDto request)
+        {
+            Line(request, TalkFact.TotalCost, Loc.F("Pedís que te devuelvan {0} por SINPE, diciendo que los mandaste por error.", Money.Format(StrangerAsk)));
+            Line(request, TalkFact.WhereMoneyComes, Loc.T("No hay ningún depósito: es mentira, pero solo lo admitís si te presionan mucho."));
+            Line(request, TalkFact.Guarantee, Loc.T("No tenés comprobante, y das excusas si te lo piden."));
+            Line(request, TalkFact.Legal, Loc.T("Si mencionan al banco o a la policía, te ponés nervioso y querés terminar la conversación."));
+            request.amounts.Add(StrangerAsk);
         }
 
         private static void FillPyramid(TalkRequestDto request)
@@ -291,7 +372,7 @@ namespace ColonQuest.Game
         /// <summary>The history tags of the questions asked, for the metrics of the pilot.</summary>
         public IEnumerable<string> HistoryTags()
         {
-            string who = Partner == TalkPartner.Collectors ? "collectors" : (Partner == TalkPartner.Lender ? "lender" : "pyramid");
+            string who = WirePartner;
             foreach (var fact in asked)
             {
                 yield return "asked_" + who + "_" + fact.ToString().ToLowerInvariant();
@@ -306,12 +387,12 @@ namespace ColonQuest.Game
                 return TalkFact.WhereMoneyComes;
             }
 
-            if (Has(t, "garantia", "contrato", "papel", "recibo", "por escrito", "seguro que", "guarantee", "contract", "paper", "receipt", "in writing"))
+            if (Has(t, "garantia", "contrato", "papel", "recibo", "comprobante", "por escrito", "seguro que", "guarantee", "contract", "paper", "receipt", "proof", "in writing"))
             {
                 return TalkFact.Guarantee;
             }
 
-            if (Has(t, "legal", "sugef", "permiso", "inscrit", "policia", "denunc", "ley", "amenaz", "permit", "licen", "police", "report you", "threat", "the law"))
+            if (Has(t, "legal", "sugef", "permiso", "inscrit", "policia", "banco", "denunc", "ley", "amenaz", "permit", "licen", "police", "bank", "report you", "threat", "the law"))
             {
                 return TalkFact.Legal;
             }
@@ -321,17 +402,17 @@ namespace ColonQuest.Game
                 return TalkFact.Arrangement;
             }
 
-            if (Has(t, "no pago", "no tengo", "no puedo", "si no", "que pasa", "don't pay", "dont pay", "can't pay", "cant pay", "cannot pay", "don't have", "dont have", "what happens", "fall behind", "if i don't"))
+            if (Has(t, "no pago", "no tengo", "no puedo", "si no", "que pasa", "plata rapida", "don't pay", "dont pay", "can't pay", "cant pay", "cannot pay", "don't have", "dont have", "what happens", "fall behind", "if i don't", "quick money", "fast money"))
             {
                 return TalkFact.WhatIfNotPaid;
             }
 
-            if (Has(t, "interes", "tasa", "porcentaje", "%", "por ciento", "al mes", "cobran", "interest", "rate", "percent", "a month", "per month"))
+            if (Has(t, "interes", "tasa", "porcentaje", "%", "por ciento", "al mes", "cobran", "tarjeta", "interest", "rate", "percent", "a month", "per month", "card"))
             {
                 return TalkFact.Rate;
             }
 
-            if (Has(t, "total", "cuanto", "en total", "al final", "devolver", "pagaria", "how much", "in the end", "pay back", "give back", "owe"))
+            if (Has(t, "total", "cuanto", "en total", "al final", "devolver", "pagaria", "cuotas", "how much", "in the end", "pay back", "give back", "owe", "installment"))
             {
                 return TalkFact.TotalCost;
             }
@@ -347,6 +428,10 @@ namespace ColonQuest.Game
                     return CollectorsAnswer(fact);
                 case TalkPartner.Lender:
                     return LenderAnswer(fact);
+                case TalkPartner.Neighbor:
+                    return NeighborAnswer(fact);
+                case TalkPartner.Stranger:
+                    return StrangerAnswer(fact);
                 default:
                     return PyramidAnswer(fact);
             }
@@ -389,6 +474,42 @@ namespace ColonQuest.Game
                     return "Ningún papel. Usted me firma aquí en la libreta y listo.";
                 default:
                     return "Usted pregunte lo que quiera, pero la plata vuela. ¿Cuánto ocupa?";
+            }
+        }
+
+        private string NeighborAnswer(TalkFact? fact)
+        {
+            switch (fact)
+            {
+                case TalkFact.Rate:
+                    return Loc.F("La tarjeta cobra {0}% al mes sobre lo que queda. Pagando solo el mínimo no sale nunca.", CardRatePct.ToString("0.#", CultureInfo.InvariantCulture));
+                case TalkFact.TotalCost:
+                case TalkFact.Arrangement:
+                    return "A cuotas casi siempre sale más caro. Pregunte el total, y aparte algo cada quincena, aunque sea poco.";
+                case TalkFact.WhatIfNotPaid:
+                    return Loc.F("Un gota a gota cobra hasta {0}% al mes y le manda gente a la casa. Mejor no.", NeighborLoanRatePct);
+                case TalkFact.Legal:
+                case TalkFact.WhereMoneyComes:
+                    return "Si le prometen ganancias enormes, búsquelos en SUGEF antes de darles un colón.";
+                case TalkFact.Guarantee:
+                    return "Un SINPE no se devuelve. Revise bien el nombre antes de enviar.";
+                default:
+                    return "Yo aprendí a golpes: antes de firmar, pregunte cuánto paga en total.";
+            }
+        }
+
+        private static string StrangerAnswer(TalkFact? fact)
+        {
+            switch (fact)
+            {
+                case TalkFact.Guarantee:
+                    return "¿Comprobante? Ahorita no lo tengo a mano, pero créame, por favor.";
+                case TalkFact.Legal:
+                    return "No, no, no hace falta llamar a nadie. Es rapidito, mándelo y ya.";
+                case TalkFact.WhereMoneyComes:
+                    return "Se lo juro que le cayó. Revise después, ahora ocupo la plata.";
+                default:
+                    return Loc.F("Es urgente, de verdad. Devuélvame los {0} y no le quito más tiempo.", Money.Format(StrangerAsk));
             }
         }
 
