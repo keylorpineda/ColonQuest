@@ -195,6 +195,45 @@ namespace ColonQuest.Game
             return text.Length > 0 ? text.ToString() : Loc.T("Sin cambios en la plata");
         }
 
+        public static string Tint(string value, string hex)
+        {
+            return "<color=" + hex + "><b>" + value + "</b></color>";
+        }
+
+        /// <summary>One real call to a model, as the demo lab and the panel of the game write it.</summary>
+        public static void AppendCall(StringBuilder text, ModelCallDto call)
+        {
+            text.Append(Tint(ModelName(call.model), "#F2A23A")).Append("  ").Append(ProviderName(call.provider)).Append('\n');
+            text.Append(JobOf(call.endpoint)).Append('\n');
+            text.Append(Tint(Whole(call.latencyMs) + " ms", "#A8F0B8"));
+            if (call.inputTokens + call.outputTokens > 0)
+            {
+                text.Append("  ·  ").Append(Loc.F("{0} tokens", Whole(call.inputTokens + call.outputTokens)));
+            }
+
+            text.Append("  ·  ").Append(Dollars(call.costUsd));
+            if (!call.ok)
+            {
+                text.Append("  ·  ").Append(Tint(Loc.T("falló"), "#FF8A8A"));
+            }
+
+            text.Append("\n\n");
+        }
+
+        /// <summary>One use of a tool by an agent: what it asked and what the backend answered.</summary>
+        public static void AppendStep(StringBuilder text, ToolStepDto step)
+        {
+            text.Append(Tint(Loc.F("Herramienta: {0}", step.tool), "#8FD3FF")).Append('\n');
+            text.Append(Tint(Shorten(step.arguments, 150), "#C9C3AE")).Append('\n');
+            text.Append(Shorten(step.result, 220)).Append("\n\n");
+        }
+
+        private static string Shorten(string value, int length)
+        {
+            string safe = (value ?? string.Empty).Replace('<', '‹').Replace('>', '›');
+            return safe.Length <= length ? safe : safe.Substring(0, length) + "...";
+        }
+
         public static string Dollars(float amount)
         {
             return "$" + amount.ToString(amount >= 1f ? "0.00" : "0.0000", CultureInfo.InvariantCulture);

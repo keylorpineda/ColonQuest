@@ -65,6 +65,12 @@ namespace ColonQuest.UI
         /// </summary>
         public System.Action<System.Action> SignContract;
 
+        /// <summary>Keeps the window and its shade out of this much of the right of the screen.</summary>
+        public void LeaveRoom(float right)
+        {
+            ((RectTransform)root.transform).offsetMax = new Vector2(-right, 0f);
+        }
+
         public void Hide()
         {
             recorder.Cancel();
