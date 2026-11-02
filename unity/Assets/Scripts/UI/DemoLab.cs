@@ -522,13 +522,13 @@ namespace ColonQuest.UI
                 foreach (var call in trace.calls)
                 {
                     any = true;
-                    AppendCall(text, call);
+                    DemoReadout.AppendCall(text, call);
                 }
 
                 foreach (var step in trace.toolSteps)
                 {
                     any = true;
-                    AppendStep(text, step);
+                    DemoReadout.AppendStep(text, step);
                 }
             }
 
@@ -558,41 +558,9 @@ namespace ColonQuest.UI
             text.Append(Loc.T("Al 80% del presupuesto el game master baja a Muse Spark. Al 100% solo salen eventos de respaldo. El juego nunca se cae por eso.")).Append("\n\n");
         }
 
-        private static void AppendCall(StringBuilder text, ModelCallDto call)
-        {
-            text.Append(Tint(DemoReadout.ModelName(call.model), "#F2A23A")).Append("  ").Append(DemoReadout.ProviderName(call.provider)).Append('\n');
-            text.Append(DemoReadout.JobOf(call.endpoint)).Append('\n');
-            text.Append(Tint(DemoReadout.Whole(call.latencyMs) + " ms", "#A8F0B8"));
-            if (call.inputTokens + call.outputTokens > 0)
-            {
-                text.Append("  ·  ").Append(Loc.F("{0} tokens", DemoReadout.Whole(call.inputTokens + call.outputTokens)));
-            }
-
-            text.Append("  ·  ").Append(DemoReadout.Dollars(call.costUsd));
-            if (!call.ok)
-            {
-                text.Append("  ·  ").Append(Tint(Loc.T("falló"), "#FF8A8A"));
-            }
-
-            text.Append("\n\n");
-        }
-
-        private static void AppendStep(StringBuilder text, ToolStepDto step)
-        {
-            text.Append(Tint(Loc.F("Herramienta: {0}", step.tool), "#8FD3FF")).Append('\n');
-            text.Append(Tint(Shorten(step.arguments, 150), "#C9C3AE")).Append('\n');
-            text.Append(Shorten(step.result, 220)).Append("\n\n");
-        }
-
-        private static string Shorten(string value, int length)
-        {
-            string safe = (value ?? string.Empty).Replace('<', '‹').Replace('>', '›');
-            return safe.Length <= length ? safe : safe.Substring(0, length) + "...";
-        }
-
         private static string Tint(string value, string hex)
         {
-            return "<color=" + hex + "><b>" + value + "</b></color>";
+            return DemoReadout.Tint(value, hex);
         }
     }
 }
