@@ -15,7 +15,7 @@ namespace ColonQuest.UI
     /// </summary>
     public sealed class AiCallsPanel
     {
-        public const float Width = 430f;
+        public const float Width = 490f;
         private const float TopSpace = 340f;
         private const float BottomSpace = 24f;
         private const float TabWidth = 190f;
@@ -30,7 +30,11 @@ namespace ColonQuest.UI
         private readonly ScrollRect scroll;
         private readonly GameObject tab;
         private readonly Text tabText;
+        private static string Hint => Loc.T("Cada llamada real a un modelo va a aparecer aquí, con su tiempo y su costo.");
+
+        private string written = string.Empty;
         private string shown;
+        private bool waiting;
 
         /// <summary>What the backend said last, or null before the first answer.</summary>
         public SessionTraceDto Last { get; private set; }
@@ -42,15 +46,15 @@ namespace ColonQuest.UI
             var size = new Vector2(Width, 1080f - TopSpace - BottomSpace);
             var card = UiKit.Card(canvas, "AiCalls", Dark, size, Vector2.right, new Vector2(-24f, BottomSpace));
             panel = card.parent.gameObject;
-            var title = UiKit.Label(card, "Qué hizo la IA", 30, Accent, new Vector2(Width - 150f, 44f), Vector2.up, new Vector2(20f, -10f));
+            var title = UiKit.Label(card, "Qué hizo la IA", 34, Accent, new Vector2(Width - 150f, 44f), Vector2.up, new Vector2(20f, -10f));
             title.font = UiKit.TitleFont;
-            var hide = UiKit.Label(card, "[L] Ocultar", 21, new Color(0.8f, 0.8f, 0.76f, 1f), new Vector2(130f, 44f), Vector2.one, new Vector2(-18f, -10f), TextAnchor.MiddleRight);
+            var hide = UiKit.Label(card, "[L] Ocultar", 24, new Color(0.8f, 0.8f, 0.76f, 1f), new Vector2(150f, 44f), Vector2.one, new Vector2(-18f, -10f), TextAnchor.MiddleRight);
             hide.fontStyle = FontStyle.Normal;
 
             var view = UiKit.Rect(card, "View", new Vector2(Width - 36f, size.y - 70f), new Vector2(0.5f, 0f), new Vector2(0f, 14f));
             view.gameObject.AddComponent<RectMask2D>();
             content = UiKit.Rect(view, "Content", new Vector2(Width - 36f, 100f), Vector2.up, Vector2.zero);
-            body = UiKit.PlainLabel(content, "Text", string.Empty, 21, new Color(0.95f, 0.94f, 0.88f, 1f), new Vector2(Width - 56f, 100f), Vector2.up, Vector2.zero, TextAnchor.UpperLeft);
+            body = UiKit.PlainLabel(content, "Text", string.Empty, 27, new Color(0.95f, 0.94f, 0.88f, 1f), new Vector2(Width - 56f, 100f), Vector2.up, Vector2.zero, TextAnchor.UpperLeft);
             body.fontStyle = FontStyle.Normal;
             body.supportRichText = true;
             body.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -96,12 +100,22 @@ namespace ColonQuest.UI
             }
         }
 
+        /// <summary>A model is answering right now: the panel says so at once, before the call can be read back.</summary>
+        public void SetWaiting(bool isWaiting)
+        {
+            if (isWaiting != waiting)
+            {
+                waiting = isWaiting;
+                Render();
+            }
+        }
+
         /// <summary>A new run starts with an empty panel.</summary>
         public void Clear()
         {
             Last = null;
             shown = null;
-            Write(Loc.T("Cada llamada real a un modelo va a aparecer aquí, con su tiempo y su costo."));
+            Write(Hint);
         }
 
         public void Show(SessionTraceDto trace)
@@ -109,6 +123,12 @@ namespace ColonQuest.UI
             Last = trace;
             var text = new StringBuilder();
             AppendPlan(text, trace);
+            if (trace.calls.Count == 0)
+            {
+                Write(text + Hint);
+                return;
+            }
+
             text.Append(DemoReadout.Tint(Loc.F("Esta partida lleva gastados unos {0}", DemoReadout.Dollars(trace.totalCostUsd)), "#F2A23A")).Append("\n\n");
 
             // In the order they happened, and the panel follows the last one down.
@@ -157,6 +177,13 @@ namespace ColonQuest.UI
 
         private void Write(string text)
         {
+            written = text;
+            Render();
+        }
+
+        private void Render()
+        {
+            string text = waiting ? written + "\n" + DemoReadout.Tint(Loc.T("Esperando al modelo..."), "#8FD3FF") : written;
             if (text == shown)
             {
                 return;
