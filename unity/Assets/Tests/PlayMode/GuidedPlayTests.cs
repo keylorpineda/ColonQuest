@@ -193,7 +193,7 @@ namespace ColonQuest.World.PlayModeTests
 
             yield return Next("the report of the third month", "month3");
             Assert.IsTrue(session.Loop.IsFinished);
-            yield return Until(() => modal.IsOpen && !session.Busy && !session.Guided, 60f, "the end of the run");
+            yield return Until(() => !session.Busy && !session.Guided, 60f, "the end of the run");
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("end");
         }

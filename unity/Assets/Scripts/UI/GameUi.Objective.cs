@@ -187,6 +187,7 @@ namespace ColonQuest.UI
         /// <summary>The panel, the room it takes from the windows and, while it matters, what the backend reports.</summary>
         private void TickAiCalls()
         {
+            TrafficCar.PassThrough = session.Guided;
             bool windowsTyping = negotiationPanel.IsOpen || talkPanel.IsOpen || phone.IsTyping;
             if (Input.GetKeyDown(KeyCode.L) && !windowsTyping && !pause.IsOpen)
             {

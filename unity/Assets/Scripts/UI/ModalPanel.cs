@@ -24,6 +24,7 @@ namespace ColonQuest.UI
     public sealed class ModalPanel
     {
         private const float CardWidth = 1100f;
+        private const float FaceRoom = 130f;
         private const float Pad = 40f;
         private const float ButtonHeight = 84f;
         private const float ButtonGap = 16f;
@@ -143,8 +144,11 @@ namespace ColonQuest.UI
 
             // Measure first, so the card can be sized to its content.
             float textWidth = CardWidth - Pad * 2f - UiKit.Outline * 2f;
-            var probe = UiKit.Label(root.transform, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
-            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, textWidth) + 8f, maxBodyHeight > 0f ? maxBodyHeight : MaxBodyHeight);
+
+            // The text keeps clear of the face, which goes down the right side of the card.
+            float bodyWidth = talks ? textWidth - FaceRoom : textWidth;
+            var probe = UiKit.Label(root.transform, body, bodyFontSize, UiKit.Ink, new Vector2(bodyWidth, 10f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            float bodyHeight = string.IsNullOrEmpty(body) ? 0f : Mathf.Min(UiKit.MeasureHeight(probe, bodyWidth) + 8f, maxBodyHeight > 0f ? maxBodyHeight : MaxBodyHeight);
             UnityEngine.Object.Destroy(probe.gameObject);
 
             float titleHeight = 64f;
@@ -174,7 +178,7 @@ namespace ColonQuest.UI
             if (bodyHeight > 0f)
             {
                 y -= 12f + faceGap;
-                var text = UiKit.Label(card, body, bodyFontSize, UiKit.Ink, new Vector2(textWidth, bodyHeight), top, new Vector2(0f, y), TextAnchor.UpperLeft);
+                var text = UiKit.Label(card, body, bodyFontSize, UiKit.Ink, new Vector2(bodyWidth, bodyHeight), top, new Vector2((bodyWidth - textWidth) / 2f, y), TextAnchor.UpperLeft);
                 text.fontStyle = FontStyle.Normal;
                 if (talks)
                 {

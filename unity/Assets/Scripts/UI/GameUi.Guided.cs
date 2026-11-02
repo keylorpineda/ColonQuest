@@ -16,7 +16,7 @@ namespace ColonQuest.UI
     public sealed partial class GameUi
     {
         /// <summary>Where the run starts in the town: on the sidewalk, a few steps from the store.</summary>
-        private static readonly Vector2 GuidedStart = new Vector2(12f, 3.6f);
+        private static readonly Vector2 GuidedStart = new Vector2(11.5f, 4.8f);
 
         private bool guidedPending;
         private Coroutine guidedRun;
