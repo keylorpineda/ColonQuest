@@ -9,6 +9,50 @@ namespace ColonQuest.World
     /// </summary>
     public sealed class Patrol : MonoBehaviour
     {
+        private static readonly System.Collections.Generic.HashSet<Patrol> All = new System.Collections.Generic.HashSet<Patrol>();
+        private static bool passThrough;
+
+        /// <summary>While true the player walks through the people: nobody blocks the way of the guided run.</summary>
+        public static bool PassThrough
+        {
+            get => passThrough;
+            set
+            {
+                if (passThrough == value)
+                {
+                    return;
+                }
+
+                passThrough = value;
+                foreach (var walker in All)
+                {
+                    walker.ApplyPassThrough();
+                }
+            }
+        }
+
+        private void ApplyPassThrough()
+        {
+            foreach (var body in GetComponentsInChildren<Collider2D>(true))
+            {
+                if (!body.isTrigger)
+                {
+                    body.enabled = !passThrough;
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            All.Add(this);
+            ApplyPassThrough();
+        }
+
+        private void OnDisable()
+        {
+            All.Remove(this);
+        }
+
         [SerializeField] private Vector2 pointA;
         [SerializeField] private Vector2 pointB;
         [SerializeField] private float speed = 1.3f;

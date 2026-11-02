@@ -60,6 +60,11 @@ namespace ColonQuest.UI
         /// </summary>
         private void OnStoppedByOfficer(OffenseKind offense)
         {
+            if (session.Guided)
+            {
+                return;
+            }
+
             ReactionBubble.Show(ReactionKind.Alert);
             if (offense != OffenseKind.Trespass || SceneTransition.IsBusy || modal.IsOpen)
             {
