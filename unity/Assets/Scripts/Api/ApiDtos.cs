@@ -125,6 +125,7 @@ namespace ColonQuest.Api
         public string offerId = string.Empty;
         public string text = string.Empty;
         public string language = "es";
+        public int termMonths;
     }
 
     [Serializable]
@@ -135,6 +136,7 @@ namespace ColonQuest.Api
         public List<string> revealedFacts = new List<string>();
         public List<string> keyQuestionsAsked = new List<string>();
         public string dealStatus = string.Empty;
+        public int termMonths;
     }
 
     [Serializable]

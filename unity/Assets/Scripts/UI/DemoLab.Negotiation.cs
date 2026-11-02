@@ -64,7 +64,7 @@ namespace ColonQuest.UI
             for (int i = 0; i < SellerOffer.Catalog.Count; i++)
             {
                 int index = i;
-                bool chosen = SellerOffer.Catalog[i] == offer;
+                bool chosen = SellerOffer.Catalog[i].OfferId == offer.OfferId;
                 Action(OfferNames[i], chosen ? Beak : GameUiColors.Blue, new Vector2(buttonWidth, 62f), new Vector2(Left + i * (buttonWidth + 10f), y), () => ChooseOffer(index, true));
             }
 
@@ -143,7 +143,7 @@ namespace ColonQuest.UI
         {
             for (int i = 0; i < SellerOffer.Catalog.Count; i++)
             {
-                if (SellerOffer.Catalog[i] == offer)
+                if (SellerOffer.Catalog[i].OfferId == offer.OfferId)
                 {
                     return i;
                 }
@@ -199,7 +199,7 @@ namespace ColonQuest.UI
             ApiResult<NegotiationReply> result = null;
             if (connected)
             {
-                yield return negotiationService.SendNegotiationText(offer.OfferId, line, r => result = r);
+                yield return negotiationService.SendNegotiationText(offer.OfferId, line, offer.TermMonths, r => result = r);
             }
 
             pendingLine = null;
@@ -217,6 +217,11 @@ namespace ColonQuest.UI
             revealed.UnionWith(result.Value.RevealedFacts);
             asked.UnionWith(result.Value.KeyQuestionsAsked);
             dealStatus = result.Value.DealStatus;
+            if (result.Value.TermMonths > 0 && result.Value.TermMonths != offer.TermMonths)
+            {
+                offer = offer.AtTerm(result.Value.TermMonths);
+            }
+
             lastOriginNote = Tint(DemoReadout.OriginOf(result.Origin), DemoReadout.WrittenByAModel(result.Origin) ? "#A8F0B8" : "#FF8A8A");
             Redraw();
             yield return RefreshEvidence();

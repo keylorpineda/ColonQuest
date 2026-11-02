@@ -188,7 +188,8 @@ namespace ColonQuest.Api
                 NpcReply = dto.npcReply,
                 RevealedFacts = WireEnum<SellerFact>.ParseKnown(dto.revealedFacts),
                 KeyQuestionsAsked = WireEnum<KeyQuestion>.ParseKnown(dto.keyQuestionsAsked),
-                DealStatus = WireEnum<DealStatus>.Parse(dto.dealStatus, "deal status")
+                DealStatus = WireEnum<DealStatus>.Parse(dto.dealStatus, "deal status"),
+                TermMonths = dto.termMonths
             };
         }
 

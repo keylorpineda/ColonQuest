@@ -133,8 +133,8 @@ namespace ColonQuest.Api
             done(response.IsSuccess ? ApiResult<bool>.Success(true, ResultSource.Remote, response.StatusCode) : Failure<bool>(response));
         }
 
-        /// <summary>One negotiation turn with typed text, the fallback that always exists next to voice.</summary>
-        public IEnumerator SendNegotiationText(string offerId, string text, Action<ApiResult<NegotiationReply>> done)
+        /// <summary>One negotiation turn with typed text, the fallback that always exists next to voice. The term is the one on the table.</summary>
+        public IEnumerator SendNegotiationText(string offerId, string text, int termMonths, Action<ApiResult<NegotiationReply>> done)
         {
             if (!HasSession || LocalTextsOnly())
             {
@@ -143,7 +143,7 @@ namespace ColonQuest.Api
             }
 
             string lang = Language();
-            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang });
+            string body = JsonUtility.ToJson(new NegotiationRequestDto { offerId = offerId, text = text, language = lang, termMonths = termMonths });
             HttpResponseData response = null;
             yield return transport.Send(Post($"sessions/{SessionId}/negotiation", body, config.NegotiationTimeout), r => response = r);
             var result = Parse<NegotiationReplyDto, NegotiationReply>(response, ApiMapper.FromDto);
