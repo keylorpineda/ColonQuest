@@ -180,6 +180,41 @@ namespace ColonQuest.Api
     }
 
     [Serializable]
+    public sealed class TalkSheetLineDto
+    {
+        public string fact = string.Empty;
+        public string text = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class TalkExchangeDto
+    {
+        public string player = string.Empty;
+        public string reply = string.Empty;
+    }
+
+    /// <summary>One turn of a talk: the true sheet and the only figures the character may say, all from the game's engine.</summary>
+    [Serializable]
+    public sealed class TalkRequestDto
+    {
+        public string partner = string.Empty;
+        public string text = string.Empty;
+        public string language = "es";
+        public List<TalkSheetLineDto> sheet = new List<TalkSheetLineDto>();
+        public List<long> amounts = new List<long>();
+        public List<int> percents = new List<int>();
+        public List<TalkExchangeDto> history = new List<TalkExchangeDto>();
+    }
+
+    [Serializable]
+    public sealed class TalkReplyDto
+    {
+        public string npcReply = string.Empty;
+        public List<string> askedFacts = new List<string>();
+        public string source = string.Empty;
+    }
+
+    [Serializable]
     public sealed class ModelCallDto
     {
         public string endpoint = string.Empty;
