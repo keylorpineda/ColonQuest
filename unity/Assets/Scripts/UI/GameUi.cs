@@ -797,6 +797,9 @@ namespace ColonQuest.UI
 
         private void CloseWindows()
         {
+            // A new run has made no calls yet, and only the guided run opens the panel by itself.
+            aiCalls.Clear();
+            aiCalls.SetExpanded(false);
             ResetSentence();
             modal.Hide();
             phone.Close();
