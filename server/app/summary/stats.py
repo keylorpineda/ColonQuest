@@ -15,6 +15,9 @@ YearCardKey = Literal["card_year_debt_free", "card_year_some_debt", "card_year_h
 # net salaries, e.g. a maxed card plus a phone on 36 installments.
 HEAVY_DEBT_FROM = 900_000
 
+# How the finance engine names a lease in the installments. Rent is a cost of living, not a debt.
+RENT_ITEM_PREFIX = "Alquiler: "
+
 
 @dataclass(frozen=True, slots=True)
 class NegotiationRecord:
@@ -45,7 +48,11 @@ class SessionStats:
 
 
 def total_debt(state: PlayerState) -> int:
-    installments = sum(item.monthly * item.months_left for item in state.installments)
+    installments = sum(
+        item.monthly * item.months_left
+        for item in state.installments
+        if not item.item.startswith(RENT_ITEM_PREFIX)
+    )
     informal = sum(loan.balance for loan in state.informal_loans)
     return state.credit_card.balance + installments + informal
 
@@ -60,7 +67,7 @@ def year_card_key(debt: int) -> YearCardKey:
 
 
 def net_worth(state: PlayerState) -> int:
-    assets = state.cash + state.savings + state.emergency_fund
+    assets = state.cash + state.savings + state.emergency_fund + state.assets_value
     return assets - total_debt(state)
 
 
