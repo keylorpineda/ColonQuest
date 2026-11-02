@@ -677,6 +677,8 @@ namespace ColonQuest.UI
             }
 
             promptCard.SetActive(text != null);
+            float promptPop = session.Guided && text != null ? 1f + 0.05f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f)) : 1f;
+            promptCard.transform.localScale = new Vector3(promptPop, promptPop, 1f);
             if (text != null)
             {
                 promptText.text = PromptText(text);

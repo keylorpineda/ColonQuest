@@ -21,6 +21,12 @@ namespace ColonQuest.UI
 
         private static readonly Color MarkColor = GamePalette.Hex("#FF4D6D");
 
+        // The arrow beside the player of the guided run: far from the place, it says which way to walk without looking up.
+        private const float GuideArrowDistance = 1.35f;
+        private const float GuideArrowHidesWithin = 2.6f;
+
+        private GameObject guideControls;
+        private Transform guideArrow;
         private Transform objectiveMark;
         private RectTransform edgeArrow;
         private string objectiveShown;
@@ -87,13 +93,17 @@ namespace ColonQuest.UI
             }
 
             TickObjectiveMark(show && pointing, pointing ? target.transform.position : Vector3.zero);
-            TickEdgeArrow(show && pointing, pointing ? target.transform.position : Vector3.zero);
+            TickEdgeArrow(show && pointing && !session.Guided, pointing ? target.transform.position : Vector3.zero);
+            TickGuideArrow(show && pointing && session.Guided, hero, pointing ? target.transform.position : Vector3.zero);
+            guideControls.SetActive(session.Guided);
             if (!show)
             {
                 return;
             }
 
-            string text = Loc.T(objective.Text);
+            string text = session.Guided
+                ? Loc.F("Mes {0} de {1}", Mathf.Min(session.Loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay) + "  ·  " + Loc.T(objective.Text)
+                : Loc.T(objective.Text);
             if (text != objectiveShown)
             {
                 if (objectiveShown != null && session.Guided)
@@ -133,7 +143,6 @@ namespace ColonQuest.UI
                 drawn.sprite = ArrowSprite();
                 drawn.color = MarkColor;
                 drawn.sortingOrder = 32000;
-                go.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
                 go.transform.rotation = Quaternion.Euler(0f, 0f, 180f);
                 objectiveMark = go.transform;
             }
@@ -141,8 +150,40 @@ namespace ColonQuest.UI
             objectiveMark.gameObject.SetActive(show);
             if (show)
             {
+                float size = session.Guided ? 2.1f : 1.5f;
+                objectiveMark.localScale = new Vector3(size, size, 1f);
                 float bounce = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3.4f)) * MarkBounce;
                 objectiveMark.position = at + new Vector3(0f, MarkHeight + bounce, -1f);
+            }
+        }
+
+        private void TickGuideArrow(bool show, GameObject hero, Vector3 at)
+        {
+            if (guideArrow == null)
+            {
+                if (!show)
+                {
+                    return;
+                }
+
+                var go = new GameObject("GuideArrow");
+                var drawn = go.AddComponent<SpriteRenderer>();
+                drawn.sprite = ArrowSprite();
+                drawn.color = MarkColor;
+                drawn.sortingOrder = 32000;
+                go.transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+                guideArrow = go.transform;
+            }
+
+            Vector2 toPlace = show ? (Vector2)at - (Vector2)hero.transform.position : Vector2.zero;
+            bool far = toPlace.magnitude > GuideArrowHidesWithin;
+            guideArrow.gameObject.SetActive(show && far);
+            if (show && far)
+            {
+                Vector2 way = toPlace.normalized;
+                float push = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3.4f)) * 0.15f;
+                guideArrow.position = hero.transform.position + (Vector3)(way * (GuideArrowDistance + push)) + new Vector3(0f, 0.5f, -1f);
+                guideArrow.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(way.y, way.x) * Mathf.Rad2Deg - 90f);
             }
         }
 
@@ -190,6 +231,7 @@ namespace ColonQuest.UI
         private void TickAiCalls()
         {
             TrafficCar.PassThrough = session.Guided;
+            Patrol.PassThrough = session.Guided;
             bool windowsTyping = negotiationPanel.IsOpen || talkPanel.IsOpen || phone.IsTyping;
             if (Input.GetKeyDown(KeyCode.L) && !windowsTyping && !pause.IsOpen)
             {
