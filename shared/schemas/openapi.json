@@ -749,6 +749,13 @@
             "title": "Revealedfacts",
             "type": "array"
           },
+          "termMonths": {
+            "default": 0,
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Termmonths",
+            "type": "integer"
+          },
           "transcript": {
             "maxLength": 1000,
             "title": "Transcript",
@@ -774,6 +781,13 @@
             "pattern": "^[a-z0-9_]{1,40}$",
             "title": "Offerid",
             "type": "string"
+          },
+          "termMonths": {
+            "default": 0,
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Termmonths",
+            "type": "integer"
           },
           "text": {
             "maxLength": 500,

@@ -18,3 +18,5 @@ class NegotiationReply(ContractModel):
         list[KeyQuestion], Field(default_factory=list, max_length=len(KeyQuestion))
     ]
     deal_status: DealStatus
+    # The term on the table after this turn: the one the player signs. 0 when it is the offer's own.
+    term_months: Annotated[int, Field(ge=0, le=120)] = 0

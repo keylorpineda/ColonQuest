@@ -65,6 +65,13 @@
       "title": "Revealedfacts",
       "type": "array"
     },
+    "termMonths": {
+      "default": 0,
+      "maximum": 120,
+      "minimum": 0,
+      "title": "Termmonths",
+      "type": "integer"
+    },
     "transcript": {
       "maxLength": 1000,
       "title": "Transcript",

@@ -66,6 +66,8 @@ class NegotiationRequest(ContractModel):
     offer_id: Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
     text: Annotated[str, Field(min_length=1, max_length=500)]
     language: GameLanguage = GameLanguage.SPANISH
+    # The term the conversation reached, as the last reply gave it. 0 or absent is the offer's own.
+    term_months: Annotated[int, Field(ge=0, le=120)] = 0
 
 
 class TranscriptResponse(ContractModel):
