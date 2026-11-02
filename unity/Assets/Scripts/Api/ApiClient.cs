@@ -36,6 +36,13 @@ namespace ColonQuest.Api
         }
 
         /// <summary>Replaces the transport and config, for tests and for pointing at another backend.</summary>
+        /// <summary>The log of the player says which backend this build reads, so a wrong env file is easy to spot.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void SayWhichBackend()
+        {
+            Debug.Log("[ColonQuest] Backend: " + ApiConfig.Current.BaseUrl);
+        }
+
         public void Configure(IHttpTransport httpTransport, ApiConfig apiConfig)
         {
             transport = httpTransport;
