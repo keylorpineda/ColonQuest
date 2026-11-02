@@ -574,6 +574,7 @@ namespace ColonQuest.UI
                 return;
             }
 
+            endScreen.Tick();
             bool open = modal.IsOpen || endScreen.IsOpen;
 
             PlayerController.Blocked = open || session.Busy;

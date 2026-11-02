@@ -10,7 +10,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The end of a run as a report to look at: the verdict, three big figures, the money month by month, the grades, what the
-    /// player did and the few words the model wrote. Everything is drawn here from the engine's numbers.
+    /// player did, the picture of how it went and the few words the model wrote. The figures are drawn here: no picture has text.
     /// </summary>
     public sealed class EndScreen
     {
@@ -23,6 +23,7 @@ namespace ColonQuest.UI
         private const float ChartHeight = 250f;
         private const float ChartMaxBar = 136f;
         private const int MostMonthsWithFigures = 4;
+        private const float PictureSize = 256f;
 
         private static readonly Vector2 Top = new Vector2(0.5f, 1f);
         private static readonly Color Band = GamePalette.Hex("#1B2826");
@@ -30,6 +31,8 @@ namespace ColonQuest.UI
         private static readonly Color Accent = GamePalette.Hex("#F2A23A");
 
         private readonly GameObject root;
+        private Image picture;
+        private string pictureKey;
 
         public EndScreen(Transform canvas)
         {
@@ -43,6 +46,22 @@ namespace ColonQuest.UI
         {
             Clear();
             root.SetActive(false);
+        }
+
+        /// <summary>The picture arrives from the backend when it can; until then its place stays plain.</summary>
+        public void Tick()
+        {
+            if (!IsOpen || picture == null || picture.sprite != null)
+            {
+                return;
+            }
+
+            var sprite = RemoteImages.Fetch(pictureKey);
+            if (sprite != null)
+            {
+                picture.sprite = sprite;
+                picture.color = Color.white;
+            }
         }
 
         public void Show(string title, SessionSummary summary, GameLoop loop, SessionTraceDto trace, IList<ModalOption> options)
@@ -62,7 +81,7 @@ namespace ColonQuest.UI
             Heading(card, "Lo que hiciste", RightX, -270f);
             BuildDeeds(card, summary, -306f);
             Heading(card, summary.Source == "model" ? "Tu historia, contada por la IA" : "Tu historia", RightX, -430f);
-            BuildWords(card, summary, -466f);
+            BuildWords(card, summary, EndingArt.KeyFor(loop.State, summary.NetWorth, summary.DealsAccepted), -466f);
 
             BuildOptions(card, options);
             root.SetActive(true);
@@ -220,14 +239,22 @@ namespace ColonQuest.UI
             }
         }
 
-        private static void BuildWords(RectTransform card, SessionSummary summary, float y)
+        private void BuildWords(RectTransform card, SessionSummary summary, string key, float y)
         {
             var tile = UiKit.Fill(card, "Words", Color.white, new Vector2(ColumnWidth, 280f), Top, new Vector2(RightX, y));
-            var words = UiKit.PlainLabel(tile.transform, "Narrative", Loc.T(summary.Narrative), 27, UiKit.Ink, new Vector2(ColumnWidth - 44f, 256f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
+            var left = new Vector2(0f, 0.5f);
+            picture = UiKit.Fill(tile.transform, "Picture", new Color(0.85f, 0.83f, 0.74f, 1f), new Vector2(PictureSize, PictureSize), left, new Vector2(12f, 0f));
+            picture.type = Image.Type.Simple;
+            picture.preserveAspect = true;
+            picture.sprite = null;
+            pictureKey = key;
+
+            float textWidth = ColumnWidth - PictureSize - 44f;
+            var words = UiKit.PlainLabel(tile.transform, "Narrative", Loc.T(summary.Narrative), 27, UiKit.Ink, new Vector2(textWidth, 256f), new Vector2(1f, 0.5f), new Vector2(-16f, 0f), TextAnchor.MiddleLeft);
             words.fontStyle = FontStyle.Normal;
             words.horizontalOverflow = HorizontalWrapMode.Wrap;
             words.resizeTextForBestFit = true;
-            words.resizeTextMinSize = 21;
+            words.resizeTextMinSize = 18;
             words.resizeTextMaxSize = 27;
         }
 
@@ -251,6 +278,7 @@ namespace ColonQuest.UI
 
         private void Clear()
         {
+            picture = null;
             for (int i = root.transform.childCount - 1; i >= 0; i--)
             {
                 Object.Destroy(root.transform.GetChild(i).gameObject);
