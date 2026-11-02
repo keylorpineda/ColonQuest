@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 colonquest.env
+.test-cache.json
 
 # --- Python ---
 __pycache__/

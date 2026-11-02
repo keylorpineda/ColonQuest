@@ -430,6 +430,11 @@ uv run ruff check . && uv run mypy app
 ```
 
 ```bash
+# Solo las suites que el cambio puede afectar (--fast sin PlayMode, --failed lo que falló, --full todo)
+python scripts/run_tests.py
+```
+
+```bash
 # Prueba en vivo de cada modelo de Meta (cobra unos centavos)
 uv run python scripts/smoke_models.py --audio pregunta.wav
 # Prueba de punta a punta contra un backend corriendo (usar la base de QA, no producción)
