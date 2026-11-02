@@ -86,16 +86,16 @@ namespace ColonQuest.UI
             }
 
             y -= 132f;
-            DrawChatInput(y);
+            DrawChatInput(y, dealStatus == DealStatus.Open);
             y -= 88f;
             Action("Empezar otra conversación", Cream, new Vector2(610f, 50f), new Vector2(Left, y), () => ChooseOffer(SellerOfferIndex(), true));
             DrawSheet();
         }
 
-        private void DrawChatInput(float y)
+        private void DrawChatInput(float y, bool open)
         {
             bool voice = recorder.IsSupported;
-            bool free = !Busy && dealStatus == DealStatus.Open;
+            bool free = !Busy && open;
             float talkWidth = voice ? 170f : 0f;
             float sendWidth = 120f;
             float boxWidth = 610f - sendWidth - 10f - (voice ? talkWidth + 10f : 0f);
@@ -180,7 +180,16 @@ namespace ColonQuest.UI
 
         private void SubmitLine()
         {
-            if (chatInput != null && !string.IsNullOrWhiteSpace(chatInput.text))
+            if (chatInput == null || string.IsNullOrWhiteSpace(chatInput.text))
+            {
+                return;
+            }
+
+            if (Current == TalksStation)
+            {
+                TryTalk(chatInput.text);
+            }
+            else
             {
                 Ask(chatInput.text.Trim());
             }
@@ -279,7 +288,7 @@ namespace ColonQuest.UI
         /// <summary>Follows the recording and the dots of the wait, every frame the station is open.</summary>
         private void TickNegotiation()
         {
-            if (Current != 1 || recorder == null)
+            if ((Current != 1 && Current != TalksStation) || recorder == null)
             {
                 return;
             }
@@ -305,7 +314,7 @@ namespace ColonQuest.UI
                 byte[] wav = recorder.TakeWav();
                 if (wav != null && wav.Length > 0)
                 {
-                    StartCoroutine(SendVoice(wav));
+                    StartCoroutine(Current == TalksStation ? SendTalkVoice(wav) : SendVoice(wav));
                 }
             }
             else if (recorder.State == VoiceRecorderState.Failed)
