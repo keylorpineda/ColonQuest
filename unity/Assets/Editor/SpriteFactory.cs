@@ -119,6 +119,7 @@ namespace ColonQuest.EditorTools
 
         public static void EnsureGenerated()
         {
+            EnsureCoffee();
             if (!File.Exists(RoundedRectPath) || !File.Exists(RoundedRectSmallPath)
                 || !File.Exists(CirclePath) || !File.Exists(RingPath) || !File.Exists(TrianglePath)
                 || !File.Exists(SoftCirclePath) || !File.Exists(VignettePath) || !File.Exists(SquarePath)
@@ -391,8 +392,10 @@ namespace ColonQuest.EditorTools
             // y = 64 is top (into the lawn), y = 0 is bottom (overlapping onto the sidewalk)
             float wave1 = Mathf.Sin(x * (Mathf.PI * 2f / 32f)) * 7f;
             float wave2 = Mathf.Sin(x * (Mathf.PI * 2f / 16f) + 0.9f) * 4.5f;
-            float bladeTooth = Mathf.Abs(((x * 0.35f) % 2f) - 1f) * 8f;
-            float edgeY = 22f + wave1 + wave2 + bladeTooth;
+
+            // Round lobes of grass hanging over the concrete, not a row of teeth.
+            float lobes = (1f - Mathf.Abs(Mathf.Sin(x * Mathf.PI / 16f))) * 9f;
+            float edgeY = 24f + wave1 * 0.35f + wave2 * 0.25f + lobes;
 
             if (y < edgeY - 4f)
             {
