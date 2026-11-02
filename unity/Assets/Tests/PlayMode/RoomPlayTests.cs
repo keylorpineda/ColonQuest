@@ -61,6 +61,39 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Room_TheNapIsOnTheBedNotOnTheFloor()
+        {
+            yield return StartOfflineRun();
+            yield return LoadRoom();
+            FindPlayer();
+            var ui = Object.FindFirstObjectByType<UI.GameUi>();
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var modal = (UI.ModalPanel)typeof(UI.GameUi).GetField("modal", flags).GetValue(ui);
+            Vector2 bed = Piece("Thing_Bed").transform.position;
+
+            typeof(UI.GameUi).GetMethod("ShowBedChoices", flags).Invoke(ui, new object[] { bed });
+            yield return null;
+            if (modal.IsRevealing)
+            {
+                modal.Press(0);
+                yield return null;
+            }
+
+            modal.Press(0);
+            yield return null;
+            Assert.IsTrue(Interaction.Playing, "the nap has started");
+
+            float closest = float.MaxValue;
+            for (float waited = 0f; Interaction.Playing && waited < 15f && !modal.IsOpen; waited += Time.unscaledDeltaTime)
+            {
+                closest = Mathf.Min(closest, Vector2.Distance(Body.position, bed));
+                yield return null;
+            }
+
+            Assert.Less(closest, 0.3f, "the player lies down on the bed");
+        }
+
+        [UnityTest]
         public IEnumerator Room_ShowsWhatWasBought()
         {
             yield return StartOfflineRun();

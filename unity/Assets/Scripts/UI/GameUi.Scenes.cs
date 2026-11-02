@@ -493,7 +493,7 @@ namespace ColonQuest.UI
                 new ModalOption
                 {
                     Label = Loc.T("1.  Descansar un par de horas"), Color = GameUiColors.Yellow,
-                    OnPress = () => new Interaction().Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 1.2f)
+                    OnPress = () => new Interaction().WalkInto(bed).Sound(SoundEffectKind.Swish).Pose(PersonPose.Sleep, 1.2f)
                         .Zzz(bed + new Vector2(0.2f, 0.5f), 1.6f).Fade(Night, 0.6f).Wait(0.4f)
                         .Apply(() => { session.Loop.Nap(); Refresh(); })
                         .Fade(Dawn, 0.6f).Pose(PersonPose.None, 0.3f).Say(string.Empty, NapThought).Play()
