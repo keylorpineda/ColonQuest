@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=2" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=3" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -22,17 +22,22 @@ el motor lleva las cuentas.
 
 ### El problema
 
-En Costa Rica el 87% de los adultos tiene alguna deuda y destina en promedio el 34% de su ingreso a
-pagarla, el 58,3% entre quienes ganan menos de ₡500 000 al mes. El 80,88% de los encuestados por la
-Universidad Nacional nunca recibió educación financiera. Nadie te enseña a hacer la pregunta correcta
-mientras un vendedor te sonríe. Esa es la habilidad que entrena ColonQuest, contra cuatro trampas reales:
+| Cifra | En Costa Rica | Fuente |
+| --- | --- | --- |
+| **34%** | del ingreso mensual se va en pagar deudas, en promedio | [OCF, 2025](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion) |
+| **58,3%** | para quienes ganan menos de ₡500 000 (unos $1 000) al mes | Misma encuesta |
+| **80,88%** | de los encuestados nunca recibió educación financiera | [Universidad Nacional, 2024](https://www.elfinancierocr.com/economia-y-politica/una-cartera-muy-estrecha-menos-del-10-de-las/22FABMYC6ZE47JR73C2UYYMBJU/story) |
+| **2 930** | casos de gota a gota contados por los investigadores en 2025 | [OIJ, 2026](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
+
+Nadie te enseña a hacer la pregunta correcta mientras un vendedor te sonríe. Esa es la habilidad que entrena
+ColonQuest, contra cuatro trampas reales:
 
 - **Cuotas:** solo una cuota al mes, y un seguro escondido.
 - **Pago mínimo:** pagás poquito y la deuda sigue creciendo.
-- **Gota a gota:** plata rápida hoy, y cobradores en la puerta. El OIJ contó 2 930 casos en 2025.
+- **Gota a gota:** plata rápida hoy de un prestamista informal, y cobradores en la puerta.
 - **Pirámide:** traé tres amigos y te hacés rico. Seguro.
 
-Cada cifra con su fuente: [La situación en Costa Rica](COSTA_RICA.es.md).
+Explicaciones claras, palabras locales y hasta dónde confiar en cada cifra: [La situación en Costa Rica](COSTA_RICA.es.md).
 
 ### Cómo se juega un mes
 
