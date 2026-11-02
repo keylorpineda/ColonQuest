@@ -58,6 +58,13 @@ namespace ColonQuest.World
             return true;
         }
 
+        /// <summary>Stops where it is, whatever it was doing: the guided run calls it to the player.</summary>
+        public void ForceStop()
+        {
+            Current = Mode.Stopped;
+            Timer = StopSeconds;
+        }
+
         /// <summary>Moves the waits on. Returns true on the step in which the car may enter the map again.</summary>
         public bool Tick(float deltaSeconds)
         {
@@ -129,6 +136,16 @@ namespace ColonQuest.World
         }
 
         private float currentSpeed;
+
+        /// <summary>The car comes to this spot of the street at once and stops for the player.</summary>
+        public void StopFor(Vector2 at)
+        {
+            SetX(at.x - 2f);
+            SetVisible(true);
+            currentSpeed = 0f;
+            patrol.ForceStop();
+            Arrived?.Invoke(this);
+        }
 
         private void OnEnable()
         {

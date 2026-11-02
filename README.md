@@ -32,11 +32,26 @@ borrow. Muse Spark writes one event built for your situation and the C# engine a
 whole colones. When a seller shows up, you negotiate out loud: the real price, rate, insurance and
 commission only come out if you ask.
 
+### Play it in about three minutes
+
+Choose **Guided simulation**, the first entry of the main menu. It is the real game on a short
+stretch of the town, for three months, and you only make the decisions:
+
+1. **Month 1.** You say how you get to the end of the month. Your salary lands by SINPE, Muse Wonder
+   writes your year in the background, and the game master brings an event built for your situation.
+2. **Month 2.** An arrow leads you to the store, where the seller keeps quiet about what you do not
+   ask. Talk or type.
+3. **Month 3.** What comes next depends on your money: short of it, the lender and then the
+   collectors; with some to spare, a pyramid. You can ask them questions before you sign.
+
+The panel on the right shows every real call, read back from the server: model, provider, latency,
+tokens, cost and tool calls. Press **L** to hide it. Every month closes with the engine's real report.
+The objectives, the arrow and the map mark work the same in the full **Story mode**.
+
 ### Try every feature in two minutes
 
-Choose **Feature demo** in the main menu. You do not need to play a year to reach each feature,
-and the panel on the right shows what really happened, read back from the server: model, provider,
-latency, tokens, cost and tool calls.
+Choose **Feature demo** in the main menu to reach each feature on its own, with the same panel of
+real calls.
 
 | Station | Try this | Models |
 | --- | --- | --- |
@@ -56,7 +71,7 @@ It needs internet, because the models run on the backend. A whole tour costs abo
 | --- | --- | --- |
 | Impact | 30% | Telemetry per decision, Class Mode for teachers, a student pilot |
 | Meta tools | 25% | Five Meta models, one clear job each, plus tool-using agents |
-| Demo | 25% | A feature demo in the game's menu; every model call has a timeout and a fallback |
+| Demo | 25% | A guided three-month run and a feature demo in the game's menu; every model call has a timeout and a fallback |
 | Technical depth | 20% | Validated contracts, an exact engine, 260+ tests in CI |
 
 ### Meta models

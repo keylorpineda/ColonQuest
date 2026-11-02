@@ -75,7 +75,7 @@ namespace ColonQuest.Game
         public CourseBook Courses { get; private set; } = new CourseBook();
 
         /// <summary>The goals the phone proposed at the start of the run.</summary>
-        public GoalBook Goals { get; private set; } = new GoalBook();
+        public GoalBook Goals { get; set; } = new GoalBook();
 
         /// <summary>The fuel and upkeep that went out with the last closed month, to show in its report.</summary>
         public long LastRunningCosts { get; private set; }
@@ -939,7 +939,7 @@ namespace ColonQuest.Game
             : 0;
 
         /// <summary>Pays the salary and runs the month: installments, the card cycle, interest and living expenses.</summary>
-        public MonthlyTickReport CloseMonth(bool dockRemainingShifts = false)
+        public MonthlyTickReport CloseMonth(bool dockRemainingShifts = false, bool withBills = true)
         {
             LastRunningCosts = Holdings.MonthlyRunningCosts;
             LastRoomRent = Holdings.Home == null ? MarketAssumptions.RoomRent : 0L;
@@ -977,7 +977,7 @@ namespace ColonQuest.Game
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;
-            if (Bills.CloseMonth(BillAmount) > 0L)
+            if (withBills && Bills.CloseMonth(BillAmount) > 0L)
             {
                 State.RecordHistory("bills_unpaid");
             }

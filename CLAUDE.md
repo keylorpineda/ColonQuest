@@ -268,6 +268,20 @@ Reglas: máximo de pasos por llamada (5), timeout total de 10 s, y si algo falla
 versión base de una sola llamada. Las herramientas nunca escriben el estado del jugador;
 solo lo leen o calculan.
 
+## Simulación guiada (lo primero del menú)
+
+Decidido el 1 de noviembre: una lista de funciones no demuestra que esto sea un simulador. La simulación
+guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador solo decide. Está en
+`unity/Assets/Scripts/UI/GameUi.Guided.cs` y sus reglas puras en `Game/GuidedRoute.cs`.
+
+- **Mes 1:** elige su situación, cae la quincena y el game master trae un evento. Antes de pedir el mes 2 espera
+  a Muse Wonder (`GuidedRoute.PlanWaitSeconds`): si el siguiente evento llega antes, el servidor descarta su plan.
+- **Mes 2:** la flecha lleva a la tienda y al vendedor.
+- **Mes 3:** con poca plata, el prestamista y luego los cobradores; con plata de sobra, la pirámide.
+- Mientras dura: el reloj no corre, sin atropellos ni policía, solo abren las puertas de la ruta y no toca las partidas guardadas.
+- El panel de llamadas (`UI/AiCallsPanel.cs`, tecla L) lee `/trace`. Nunca muestra llaves.
+- Los objetivos (`Game/Objectives.cs`, `UI/GameUi.Objective.cs`) son los mismos en el modo historia.
+
 ## Voz en Unity
 
 - **El `Microphone` de Unity no funciona en builds WebGL.** En WebGL, grabar con un plugin

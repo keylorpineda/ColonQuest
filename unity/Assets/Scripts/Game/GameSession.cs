@@ -95,6 +95,10 @@ namespace ColonQuest.Game
             {
                 clone.AssetsValue = Loop.Holdings.AssetValue;
             }
+            if (Loop != null)
+            {
+                clone.MonthsPlayed = Loop.MonthsPlayed;
+            }
             return clone;
         }
 
@@ -252,6 +256,7 @@ namespace ColonQuest.Game
             CurrentFurniture = null;
             DealNotice = null;
             Summary = null;
+            Guided = false;
 
             // The session id arrives in a moment; until then every event would come from the local catalog.
             ApiClient.Instance.CreateSession(null, result =>
@@ -377,6 +382,66 @@ namespace ColonQuest.Game
             });
 
             ChoiceApplied?.Invoke(outcome);
+            Changed?.Invoke();
+        }
+
+        /// <summary>The offer of the lender or the pyramid stand. Its figures come from the game, so nothing is asked of the backend.</summary>
+        public void BeginOffer(TalkPartner partner)
+        {
+            var station = partner == TalkPartner.Lender ? StationType.Lender : StationType.Pyramid;
+            if (Busy || !Loop.CanDoTask(station))
+            {
+                return;
+            }
+
+            CurrentStation = station;
+            LastDeal = null;
+            CurrentEvent = DebtTalk.OfferEvent(partner);
+            CurrentEventSource = ResultSource.Remote;
+            EventReady?.Invoke(CurrentEvent, CurrentEventSource);
+            Changed?.Invoke();
+        }
+
+        // ---------------------------------------------------------------- the guided run
+
+        /// <summary>True during the guided run: the clock stands still and only the decisions are left to the player.</summary>
+        public bool Guided { get; private set; }
+
+        /// <summary>Starts the guided run: a run of the normal rules with no slot, so it never touches the saved games.</summary>
+        public void StartGuided()
+        {
+            StartNewGame();
+            Guided = true;
+        }
+
+        public void LeaveGuided()
+        {
+            Guided = false;
+        }
+
+        /// <summary>The starting money was set: the screen follows it, and the bills of the home stay out of these three months.</summary>
+        public void GuidedProfileChosen()
+        {
+            Loop.Goals = GoalBook.Propose(State);
+            Changed?.Invoke();
+        }
+
+        public void PayGuidedQuincena()
+        {
+            Loop.PayMidMonthQuincena();
+            Changed?.Invoke();
+        }
+
+        /// <summary>The month closes with the normal report, without the walk to the bank and without shifts or bills that were never offered.</summary>
+        public void CloseGuidedMonth()
+        {
+            if (Busy || Loop.IsFinished)
+            {
+                return;
+            }
+
+            var report = Loop.CloseMonth(dockRemainingShifts: false, withBills: false);
+            MonthClosed?.Invoke(report);
             Changed?.Invoke();
         }
 
@@ -676,7 +741,7 @@ namespace ColonQuest.Game
         /// </summary>
         public bool TickClock(float realSeconds)
         {
-            if (Busy || Loop.IsFinished)
+            if (Busy || Loop.IsFinished || Guided)
             {
                 return false;
             }

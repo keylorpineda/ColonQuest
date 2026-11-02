@@ -189,6 +189,16 @@ namespace ColonQuest.UI
             LoadingScreen.Load(SceneNames.Casa);
         }
 
+        /// <summary>Three months on a short stretch of the town, with no slot: it never touches the saved games.</summary>
+        public void StartGuided()
+        {
+            var session = GameSession.Create();
+            session.StartGuided();
+            GameUi.Create(session).PlayGuidedNext();
+            CloseWindows();
+            LoadingScreen.Load(SceneNames.Town);
+        }
+
         public void CloseWindows()
         {
             credits.SetActive(false);
@@ -302,7 +312,7 @@ namespace ColonQuest.UI
             for (int i = 0; i < entries.Count; i++)
             {
                 var entry = entries[i];
-                bool main = entry == MenuEntry.Story;
+                bool main = entry == MenuEntry.Guided;
                 var button = UiKit.MakeButton(root, MenuEntries.LabelOf(entry), main ? Beak : Cream, new Vector2(ButtonWidth, ButtonHeight), topLeft, new Vector2(ColumnX, ButtonsTop - i * (ButtonHeight + ButtonGap)), () => Press(entry));
                 UiKit.SetFontSize(button, 34);
                 Slide((RectTransform)button.transform, 760f);
@@ -340,6 +350,9 @@ namespace ColonQuest.UI
 
             switch (entry)
             {
+                case MenuEntry.Guided:
+                    StartGuided();
+                    break;
                 case MenuEntry.Story:
                     ShowSlots();
                     break;

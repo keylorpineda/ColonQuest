@@ -50,7 +50,7 @@ namespace ColonQuest.UI
 
             bool free = !modal.IsOpen && !phone.IsOpen && !pause.IsOpen && !negotiationPanel.IsOpen && !openingPlaying && !LoadingScreen.IsLoading;
             var items = TaskList.For(session.Loop);
-            bool show = free && !tasksHidden && !hudHidden && items.Count > 0;
+            bool show = free && !tasksHidden && !hudHidden && items.Count > 0 && !session.Guided;
             tasksCard.SetActive(show);
             if (!show)
             {

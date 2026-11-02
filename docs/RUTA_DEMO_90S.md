@@ -1,5 +1,9 @@
 # Ruta de la demo en 90 segundos
 
+> **Actualizado el 1 de noviembre.** La ruta principal ya existe en el juego: es **Simulación guiada** (Guided simulation),
+> la primera opción del menú, y dura unos 3 minutos jugando. Lo que sigue es el recorrido alterno por la Demo de funciones,
+> que ahora tiene siete estaciones: se agregó **Cobros y trampas** (Debts and traps) después de la negociación.
+
 Para el evaluador que ejecuta el juego en local. Cada paso dice qué tocar, qué debe ver y qué prueba.
 Los nombres de botones y textos salen del código de `DemoLab` y `DemoScenarios` (revisado el 1 de nov). El juego arranca en
 inglés; el texto entre comillas es la clave en español y, si aparece, su versión en inglés.

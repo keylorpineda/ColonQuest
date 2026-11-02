@@ -86,6 +86,9 @@ namespace ColonQuest.UI
             BuildTasks();
             BuildPrompt();
             BuildLoading();
+            BuildObjectiveMarks();
+            aiCalls = new AiCallsPanel(canvas.transform);
+            aiCalls.Clear();
             modal = new ModalPanel(canvas.transform);
             subtitles = new SubtitleBar(canvas.transform);
             effects = new ScreenEffects(canvas.transform);
@@ -341,6 +344,7 @@ namespace ColonQuest.UI
             homeDoor = null;
             RefreshPowerCut();
             TryStartOpening(scene);
+            TryStartGuided(scene);
             BindStations();
             if (session != null && session.Loop.Outfit != PlayerOutfit.Everyday)
             {
@@ -495,6 +499,7 @@ namespace ColonQuest.UI
             TickWorkGuide();
             TickTasks();
             TickMapAndHud();
+            TickAiCalls();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
             TickSpeech();
@@ -644,7 +649,7 @@ namespace ColonQuest.UI
 
             // A place used once waits until the player walks away and comes back, so E cannot repeat it on the spot.
             var station = Nearby;
-            string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) ? PromptFor(station) : null;
+            string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) && GuidedAllows(station) ? PromptFor(station) : null;
             promptCard.SetActive(text != null);
             if (text != null)
             {
@@ -723,6 +728,7 @@ namespace ColonQuest.UI
         /// <summary>What the station does once its scene is over (see GameUi.Scenes.cs): opens its window or starts its task.</summary>
         private void InteractNow(Station station)
         {
+            guidedVisited = station.Type;
             switch (station.Type)
             {
                 case StationType.Bank:
@@ -835,7 +841,7 @@ namespace ColonQuest.UI
             monthText.text = Loc.F("Mes {0} de {1}", Mathf.Min(loop.MonthsPlayed + 1, GameRules.MonthsToPlay), GameRules.MonthsToPlay)
                 + "  ·  " + Loc.F("Semana {0}", loop.Clock.Day);
             clockText.text = loop.Clock.Time;
-            tasksText.text = Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
+            tasksText.text = session.Guided ? string.Empty : Loc.F("Tareas {0}/{1}", loop.TasksDone, GameRules.TasksPerMonth);
             // In the opening the pocket is empty until the mother hands over the present.
             cashText.text = Money.Format(openingPlaying && !openingCashGiven ? 0L : state.Cash);
             savingsText.text = Money.Format(state.Savings + state.EmergencyFund);
@@ -1161,6 +1167,13 @@ namespace ColonQuest.UI
             foreach (var line in ReportCard.Build(session.State, session.Loop.Holdings, session.Loop.Bills))
             {
                 text.AppendLine($"{Loc.T(line.Concept)}  <b>{line.Grade}</b>");
+            }
+
+            if (session.Guided)
+            {
+                StopGuided();
+                modal.Show(Loc.T("Tus tres meses"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), GuidedEndOptions());
+                return;
             }
 
             var assets = AssetsReport.Build(session.Loop.Holdings, session.Loop.MonthsPlayed);
