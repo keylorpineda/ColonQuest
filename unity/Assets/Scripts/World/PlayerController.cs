@@ -14,6 +14,9 @@ namespace ColonQuest.World
 
         private Rigidbody2D body;
         private Vector2 input;
+
+        /// <summary>The way the player is pressing to walk, whether or not something is in the way.</summary>
+        public Vector2 WalkIntent => input;
         private int facing = 1;
 
         /// <summary>Overlay panels turn this off while they are open so the player stands still.</summary>

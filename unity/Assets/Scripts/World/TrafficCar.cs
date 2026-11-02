@@ -29,9 +29,39 @@ namespace ColonQuest.World
             }
         }
 
+        private static bool passThrough;
+
+        /// <summary>While true the cars do not touch the player: the guided run has no traffic accidents.</summary>
+        public static bool PassThrough
+        {
+            get => passThrough;
+            set
+            {
+                if (passThrough == value)
+                {
+                    return;
+                }
+
+                passThrough = value;
+                foreach (var car in all)
+                {
+                    car.ApplyPassThrough();
+                }
+            }
+        }
+
+        private void ApplyPassThrough()
+        {
+            foreach (var collider in GetComponentsInChildren<Collider2D>(true))
+            {
+                collider.enabled = !passThrough;
+            }
+        }
+
         private void OnEnable()
         {
             all.Add(this);
+            ApplyPassThrough();
         }
 
         private void OnDisable()

@@ -66,6 +66,9 @@ namespace ColonQuest.World
         private const float BeachStartY = -19f;
         private const float RiverStartX = 18f;
 
+        /// <summary>The river is scenery: next to it, it still lets the rest of the town be heard.</summary>
+        private const float RiverLevel = 0.28f;
+
         private static readonly Vector2 Plaza = new Vector2(0f, 9f);
 
         public static SoundLevels Compute(string scene, Vector2 position)
@@ -107,10 +110,10 @@ namespace ColonQuest.World
             float beach = Mathf.Clamp01((BeachStartY - p.y) / (BeachStartY - MapLayout.ShoreY));
             // On the sand the waves are loud; before it there is only a faint murmur of them.
             float sea = beach > 0f
-                ? 0.15f + 0.65f * beach
+                ? 0.1f + 0.35f * beach
                 : 0.12f * Mathf.Clamp01((BeachStartY + 8f - p.y) / 8f);
 
-            float river = 0.7f * Mathf.Clamp01((p.x - RiverStartX) / (MapLayout.RiverXMin - RiverStartX));
+            float river = RiverLevel * Mathf.Clamp01((p.x - RiverStartX) / (MapLayout.RiverXMin - RiverStartX));
 
             float roadDistance = Mathf.Min(Mathf.Abs(p.y - StreetA), Mathf.Abs(p.y - StreetB));
             float traffic = (0.25f + 0.75f * Mathf.Clamp01(1f - (roadDistance - 1f) / TrafficReach)) * (1f - beach);
@@ -125,7 +128,7 @@ namespace ColonQuest.World
                 Sea = sea,
                 River = river,
                 Traffic = traffic,
-                Birds = Mathf.Clamp01(1f - Mathf.Max(beach, river / 0.7f))
+                Birds = Mathf.Clamp01(1f - Mathf.Max(beach, river / RiverLevel))
             };
         }
     }

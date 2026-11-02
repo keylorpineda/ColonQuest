@@ -531,7 +531,7 @@ namespace ColonQuest.EditorTools
 
             var collider = go.AddComponent<BoxCollider2D>();
             collider.isTrigger = true;
-            collider.size = new Vector2(2.6f, 2.2f);
+            collider.size = new Vector2(3.2f, 2.8f);
 
             var station = go.AddComponent<Station>();
             station.Configure(type, displayName);
