@@ -1,7 +1,7 @@
-<p align="center"><a href="costa-rica.md">English</a> | <b>Español</b></p>
+<p align="center"><a href="COSTA_RICA.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <img src="assets/costa-rica-es.svg" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/costa-rica-es.svg" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details open>
@@ -78,7 +78,7 @@ La IA cuenta la historia; estos son los números con los que calcula el motor.
 | En el juego | La regla real | Fuente |
 | --- | --- | --- |
 | Salario bruto ₡373 092 | Salario mínimo de un trabajador no calificado en 2026, ₡373 092,30 al mes | Decreto 45303-MTSS, [^wage] y `GameRules.cs` |
-| 10,83% rebajado del salario | Cargas del trabajador en 2026: SEM 5,50, IVM 4,33, Banco Popular 1,00 | Revisado en [el análisis del motor](ANALISIS_RUBRICA_README_MOTOR.md) |
+| 10,83% rebajado del salario | Cargas del trabajador en 2026: SEM 5,50, IVM 4,33, Banco Popular 1,00 | Revisado en [el análisis del motor](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
 | Renta exenta hasta ₡918 000 | Tramos 2026: 10%, 15%, 20% y 25% de ahí para arriba | Decreto 45333-H, mismo análisis |
 | Aguinaldo de un doceavo | Exento de cargas y de renta | Ley 2412, mismo análisis |
 | Tarjeta al 3% mensual | 36% anual, bajo el tope de 36,48% | [^usury] |

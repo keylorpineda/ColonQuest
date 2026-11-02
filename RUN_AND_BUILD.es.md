@@ -1,7 +1,7 @@
-<p align="center"><a href="run-and-build.md">English</a> | <b>Español</b></p>
+<p align="center"><a href="RUN_AND_BUILD.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <img src="assets/run-es.svg" width="100%" alt="Cómo correr ColonQuest, apuntarlo a otro backend y armar el ejecutable a partir de los archivos env. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/run-es.svg" width="100%" alt="Cómo correr ColonQuest, apuntarlo a otro backend y armar el ejecutable a partir de los archivos env. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details open>

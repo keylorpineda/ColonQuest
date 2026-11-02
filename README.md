@@ -1,11 +1,11 @@
 <p align="center"><b>English</b> | <a href="README.es.md">Español</a></p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=2" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <p align="center">
-  <a href="docs/run-and-build.md"><b>Run it and build it</b></a> | <a href="docs/costa-rica.md"><b>The situation in Costa Rica, with sources</b></a>
+  <a href="RUN_AND_BUILD.md"><b>Run it and build it</b></a> | <a href="COSTA_RICA.md"><b>The situation in Costa Rica, with sources</b></a>
 </p>
 
 <details>
@@ -31,7 +31,7 @@ a salesperson is smiling at you. That is the skill ColonQuest trains, against fo
 - **Gota a gota:** fast cash today, and collectors at your door. The police counted 2 930 cases in 2025.
 - **Pyramid:** bring three friends and get rich. Promise.
 
-Every figure and its source: [The situation in Costa Rica](docs/costa-rica.md).
+Every figure and its source: [The situation in Costa Rica](COSTA_RICA.md).
 
 ### How a month plays
 
@@ -138,7 +138,7 @@ own daily budget.
 
 The game reads which backend to use from `colonquest.env`, and the backend reads its keys from
 `server/.env`. Change them and build from there; the keys never go inside the executable. The full
-guide: [Run and build](docs/run-and-build.md).
+guide: [Run and build](RUN_AND_BUILD.md).
 
 ```bash
 cd server

@@ -1,11 +1,11 @@
 <p align="center"><a href="README.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=2" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <p align="center">
-  <a href="docs/run-and-build.es.md"><b>Correrlo y armarlo</b></a> | <a href="docs/costa-rica.es.md"><b>La situación en Costa Rica, con fuentes</b></a>
+  <a href="RUN_AND_BUILD.es.md"><b>Correrlo y armarlo</b></a> | <a href="COSTA_RICA.es.md"><b>La situación en Costa Rica, con fuentes</b></a>
 </p>
 
 <details>
@@ -31,7 +31,7 @@ mientras un vendedor te sonríe. Esa es la habilidad que entrena ColonQuest, con
 - **Gota a gota:** plata rápida hoy, y cobradores en la puerta. El OIJ contó 2 930 casos en 2025.
 - **Pirámide:** traé tres amigos y te hacés rico. Seguro.
 
-Cada cifra con su fuente: [La situación en Costa Rica](docs/costa-rica.es.md).
+Cada cifra con su fuente: [La situación en Costa Rica](COSTA_RICA.es.md).
 
 ### Cómo se juega un mes
 
@@ -138,7 +138,7 @@ falla o se acaba su presupuesto diario.
 
 El juego lee a qué backend hablarle de `colonquest.env`, y el backend lee sus llaves de `server/.env`.
 Cambiálos y armá desde ahí; las llaves nunca van dentro del ejecutable. La guía completa:
-[Correr y armar](docs/run-and-build.es.md).
+[Correr y armar](RUN_AND_BUILD.es.md).
 
 ```bash
 cd server
