@@ -213,9 +213,10 @@ namespace ColonQuest.World
             { "Negociaciones", "Negotiations" },
             { "Preguntas clave", "Key questions" },
             { "Conceptos vistos", "Concepts seen" },
-            { "Ganás el salario mínimo. Seguí la flecha roja y apretá E al llegar: vos solo decidís. A la derecha ves cada llamada real a los modelos de Meta.", "You earn the minimum wage. Follow the red arrow and press E when you arrive: you only decide. On the right you see every real call to Meta's models." },
             { "Un momento: Muse Wonder está escribiendo tu año...", "One moment: Muse Wonder is writing your year..." },
             { "WASD o flechas para caminar  ·  E para usar  ·  M mapa  ·  L panel de IA", "WASD or arrows to walk  ·  E to use  ·  M map  ·  L AI panel" },
+            { "Esta ruta resume tres meses en unos minutos, por eso todo pasa seguido. En el modo historia cada mes se vive con calma.\n\nGanás el salario mínimo. Seguí la flecha roja y apretá E al llegar. A la derecha ves cada llamada real a los modelos de Meta.", "This route packs three months into a few minutes, which is why everything comes one after another. In Story mode each month goes at its own pace.\n\nYou earn the minimum wage. Follow the red arrow and press E when you arrive. On the right you see every real call to Meta's models." },
+            { "Caminá hasta el taller: ahí empieza tu primer mes", "Walk to the garage: your first month starts there" },
             // The demo lab (1 Nov)
             { "Cobros y trampas", "Debts and traps" },
             { "Cobrador, prestamista y pirámide", "Collector, lender and pyramid" },
@@ -1108,7 +1109,6 @@ namespace ColonQuest.World
             { "Un fondo de emergencia te evita pedir plata a quien te cobra de más.", "An emergency fund keeps you from borrowing from someone who charges too much." },
             { "Si te prometen triplicar tu plata en un mes, desconfía.", "If they promise to triple your money in a month, be suspicious." },
             { "Keylor Pineda: backend, IA y motor financiero", "Keylor Pineda: backend, AI and financial engine" },
-            { "Jefferson Abarca: Unity, arte y flujo del juego", "Jefferson Abarca: Unity, art and game flow" },
             { "Hecho para el Meta Global AI Developer Hackathon", "Made for the Meta Global AI Developer Hackathon" },
 
             // ---- animated interactions

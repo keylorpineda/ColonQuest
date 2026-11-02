@@ -1086,14 +1086,13 @@ namespace ColonQuest.UI
 
         private void ShowQuincenaNotice(long amount)
         {
-            // The guided run explains the salary once; after that it is a line, not one more window to close.
-            if (session.Guided && guidedSalarySeen)
+            // In the guided run the salary is a line, not one more window to close before anything happens.
+            if (session.Guided)
             {
                 Thoughts.Say(Loc.F("Cayó la quincena por SINPE: {0}", Money.Format(amount)));
                 return;
             }
 
-            guidedSalarySeen = session.Guided;
             modal.Show(
                 Loc.T("SINPE Móvil"),
                 Loc.T("Pago de quincena"),
