@@ -151,6 +151,28 @@ namespace ColonQuest.Api
             done(result);
         }
 
+        /// <summary>One turn of a talk in the model's words. Any failure comes back as such: the game then answers with its local rules.</summary>
+        public IEnumerator SendTalk(TalkRequestDto talk, Action<ApiResult<TalkReplyDto>> done)
+        {
+            if (!HasSession)
+            {
+                done(ApiResult<TalkReplyDto>.Failure("no session"));
+                yield break;
+            }
+
+            HttpResponseData response = null;
+            yield return transport.Send(Post($"sessions/{SessionId}/talk", JsonUtility.ToJson(talk), config.NegotiationTimeout), r => response = r);
+            done(Parse<TalkReplyDto, TalkReplyDto>(response, dto =>
+            {
+                if (string.IsNullOrWhiteSpace(dto.npcReply))
+                {
+                    throw new ApiFormatException("The talk reply is empty.");
+                }
+
+                return dto;
+            }));
+        }
+
         /// <summary>
         /// The words of a WAV clip. The backend transcribes it, Meta is never called from here. 503 (voice
         /// down), 422 (no speech or a bad clip) and network errors come back as failures so the UI can
