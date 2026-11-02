@@ -135,6 +135,9 @@ namespace ColonQuest.Finance
         public string CharacterName { get; set; } = string.Empty;
         public int Week { get; set; } = 1;
         public string JobPosition { get; set; } = string.Empty;
+
+        /// <summary>What the holdings are worth, sent so the backend's summary counts them. The engine does not use it.</summary>
+        public long AssetsValue { get; set; }
         public int Month { get; set; } = 1;
         public long SalaryNet { get; set; }
         public long Cash { get; set; }
@@ -153,6 +156,7 @@ namespace ColonQuest.Finance
                 CharacterName = CharacterName,
                 Week = Week,
                 JobPosition = JobPosition,
+                AssetsValue = AssetsValue,
                 Month = Month,
                 SalaryNet = SalaryNet,
                 Cash = Cash,

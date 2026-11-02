@@ -59,6 +59,14 @@ namespace ColonQuest.Finance
         public const int MaxDepositMonths = 3;
         public const int HomeWellbeingBoost = 5;
 
+        /// <summary>How the rent of a lease starts in the installments. The summary of the backend reads the same words.</summary>
+        public const string RentItemPrefix = "Alquiler: ";
+
+        public static bool IsRent(Installment installment)
+        {
+            return installment.Item.StartsWith(RentItemPrefix, StringComparison.Ordinal);
+        }
+
         public static RentQuote QuoteRent(long monthlyRent, int leaseMonths, int depositMonths)
         {
             if (monthlyRent <= 0L || monthlyRent > ContractLimits.MaxColones)
@@ -122,7 +130,7 @@ namespace ColonQuest.Finance
                 TrySpendCash(state, quote.UpfrontCost);
             }
 
-            state.Installments.Add(new Installment(TruncateItem("Alquiler: " + name), quote.MonthlyRent, quote.LeaseMonths));
+            state.Installments.Add(new Installment(TruncateItem(RentItemPrefix + name), quote.MonthlyRent, quote.LeaseMonths));
             state.Wellbeing = ContractLimits.ClampWellbeing(state.Wellbeing + HomeWellbeingBoost);
             state.RecordHistory("rented_home");
             holdings.SetHome(new HomeHolding(name, false, 0L, quote.MonthlyRent, quote.LeaseMonths));

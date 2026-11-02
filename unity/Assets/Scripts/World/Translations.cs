@@ -608,7 +608,6 @@ namespace ColonQuest.World
             { "Lo que debes: {0}", "What you owe: {0}" },
             { "Fin de la partida", "End of the run" },
             { "{0} meses jugados", "{0} months played" },
-            { "Con lo que compraste: {0}", "With what you bought: {0}" },
             { "Ver lo que compraste", "See what you bought" },
             { "Celular", "Phone" },
             { "Prestamista", "Loan shark" },

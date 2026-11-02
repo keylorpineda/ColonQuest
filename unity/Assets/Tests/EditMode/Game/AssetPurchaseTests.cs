@@ -97,6 +97,18 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void NetWorth_TheRentOfALeaseIsNotADebt()
+        {
+            loop.State.Cash = 1_000_000L;
+            var house = MarketAssumptions.FindHome("casa_vecina_d");
+            long before = GameRules.NetWorth(loop.State, loop.Holdings);
+
+            loop.RentHome(house);
+
+            Assert.AreEqual(before - MarketAssumptions.QuoteRent(house).UpfrontCost, GameRules.NetWorth(loop.State, loop.Holdings), "only the deposit left");
+        }
+
+        [Test]
         public void BuyCar_PaysDownPaymentAndCommissionAndPutsTheMarchamoOnCashWhenItFits()
         {
             loop.State.Cash = 1_000_000L;

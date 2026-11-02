@@ -968,7 +968,7 @@ namespace ColonQuest.UI
 
             if (session.Loop.Clock.Day < GameRules.DaysPerMonth)
             {
-                int remainingShifts = GameRules.DaysPerMonth - session.Loop.Clock.Day + (!session.Loop.Job.WorkedToday && session.Loop.Clock.Hour >= GameRules.WorkStartHour ? 1 : 0);
+                int remainingShifts = session.Loop.ShiftsDockedIfClosedNow;
                 text.AppendLine();
                 text.Append(Loc.F("Aviso: el mes aún no termina (semana {0} de {1}). Se te rebajarán {2} turnos de trabajo no laborados.", session.Loop.Clock.Day, GameRules.DaysPerMonth, remainingShifts));
             }
@@ -1142,7 +1142,7 @@ namespace ColonQuest.UI
             }
 
             text.AppendLine();
-            text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(GameRules.NetWorth(state))));
+            text.Append(Loc.F("Lo que tienes menos lo que debes: {0}", Money.Format(GameRules.NetWorth(state, session.Loop.Holdings))));
             modal.Show(Loc.T("Tu estado de cuenta"), Loc.F("Salario neto {0} al mes", Money.Format(state.SalaryNet)), text.ToString(), new[] { Continue(null) });
         }
 
@@ -1173,9 +1173,6 @@ namespace ColonQuest.UI
                 return;
             }
 
-            long withAssets = GameRules.NetWorth(session.State, session.Loop.Holdings);
-            text.AppendLine();
-            text.Append(Loc.F("Con lo que compraste: {0}", Money.Format(withAssets)));
             modal.Show(Loc.T("Fin de la partida"), Loc.F("{0} meses jugados", summary.MonthsPlayed), text.ToString(), new[]
             {
                 new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) },
