@@ -36,15 +36,21 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
-        public void Record_AcceptedStatusClosesTheConversation()
+        public void Record_SayingYesDoesNotCloseTheDealByItself()
         {
             Say("hmm");
-            Assert.IsFalse(negotiation.IsClosed);
+            Assert.IsFalse(negotiation.SoundedLikeYes);
 
             Say("trato hecho");
 
+            Assert.IsFalse(negotiation.IsClosed, "the player can still back out");
+            Assert.IsTrue(negotiation.SoundedLikeYes);
+
+            negotiation.ClearYes();
+            Assert.IsFalse(negotiation.SoundedLikeYes);
+
+            negotiation.Close(DealStatus.Accepted);
             Assert.IsTrue(negotiation.IsClosed);
-            Assert.AreEqual(DealStatus.Accepted, negotiation.Status);
         }
 
         [Test]
