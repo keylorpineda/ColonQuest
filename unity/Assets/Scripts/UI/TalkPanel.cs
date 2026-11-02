@@ -199,10 +199,16 @@ namespace ColonQuest.UI
                 lines.Add(new ChatLine(name, Loc.T(turn.Reply), false));
             }
 
+            // What the player said shows at once, and the other one is seen thinking until the answer comes.
             ChatLine? wait = null;
             if (session.Transcribing)
             {
                 wait = new ChatLine(player, Loc.T(Understanding), true);
+            }
+            else if (session.Busy && !string.IsNullOrEmpty(session.PendingLine))
+            {
+                lines.Add(new ChatLine(player, session.PendingLine, true));
+                wait = new ChatLine(name, Loc.F("{0} está pensando...", name), false);
             }
 
             waitText = wait.HasValue ? wait.Value.Text : null;

@@ -12,6 +12,24 @@ namespace ColonQuest.World
     {
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
+            // What the collectors, the lender and the pyramid know, for the model (1 Nov)
+            { "Hoy vienes a cobrar {0}: lo atrasado, nada más.", "You came to collect {0} today: only what is overdue." },
+            { "Si pide un arreglo: {0} hoy y lo demás queda como deuda nueva de {1}, con {2}% de recargo.", "If they ask for an arrangement: {0} today and the rest becomes a new debt of {1}, with a {2}% surcharge." },
+            { "Si no paga hoy: una multa del {0}% a la tarjeta, y vuelves otro día.", "If they do not pay today: a {0}% fine on their card, and you come back another day." },
+            { "Cobrar es legal; amenazar no. Si alguien lo amenaza, eso se denuncia.", "Collecting is legal; threatening is not. A threat can be reported." },
+            { "Cobras el {0}% al mes.", "You charge {0}% a month." },
+            { "Si prestas {0}, en {1} meses te devuelven {2}.", "If you lend {0}, in {1} months they give you back {2}." },
+            { "No hay rebajas: pasas todos los días a cobrar la cuota, gota a gota.", "No discounts: you come by every day to collect, gota a gota (drop by drop)." },
+            { "Si se atrasa, los intereses siguen corriendo y mandas a los muchachos del carro negro.", "If they fall behind, the interest keeps running and you send the boys in the black car." },
+            { "Sin papeles y sin SUGEF: esto es informal, entre los dos.", "No papers and no SUGEF, the financial regulator: this is informal, between the two of you." },
+            { "Ningún contrato: solo una firma en tu libreta.", "No contract: just a signature in your notebook." },
+            { "Prometes que {0} se vuelven {1} en un mes: {2}% de ganancia.", "You promise that {0} becomes {1} in a month: a {2}% gain." },
+            { "La plata sale de los nuevos que entran: por eso cada uno tiene que traer a tres amigos.", "The money comes from the new people who join: that is why each one has to bring three friends." },
+            { "No hay contrato ni garantía, solo confianza.", "There is no contract and no guarantee, only trust." },
+            { "No están inscritos en SUGEF.", "You are not registered with SUGEF, the financial regulator." },
+            { "Solo les pagan a los primeros que entraron.", "Only the first ones who joined get paid." },
+            { "Si mete más plata hoy, lo suben al nivel oro.", "If they put in more money today, they move up to the gold level." },
+
             // The town map (1 Nov)
             { "Pulpería", "Corner store" },
             { "[M] Mapa   [H] Ocultar", "[M] Map   [H] Hide" },
