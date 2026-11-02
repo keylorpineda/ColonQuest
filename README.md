@@ -42,6 +42,7 @@ latency, tokens, cost and tool calls.
 | --- | --- | --- |
 | Game master | Pick a player's situation, then a choice, and see the engine apply it | Muse Spark with tools |
 | Negotiation | Talk or type to a seller and open the hidden sheet line by line | Muse Spark Open, Muse Voice Transcribe |
+| Debts and traps | Talk to the collector, the lender and the pyramid promoter, and open what they hide | Muse Spark Open, Muse Voice Transcribe |
 | Year plan and ending | Compare the plans for two profiles and read how a year ended | Muse Wonder |
 | Game art | Browse the twenty pictures, all without text | Muse Image |
 | Engine and guards | Try to sneak in an amount out of range, see the live budgets | None, by design |
