@@ -4,7 +4,7 @@ The model never invents these numbers. It only decides how and when the seller r
 fact, and replies that quote any other amount are rejected.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import ROUND_CEILING, Decimal
 from functools import cached_property
 
@@ -69,6 +69,10 @@ class Offer:
 
     def facts_in(self, language: str) -> dict[SellerFact, str]:
         return self.facts_en if language.lower().startswith("en") else self.facts
+
+    def at_term(self, months: int) -> "Offer":
+        """The same offer over another term: the cash price, rate, insurance and commission stay."""
+        return replace(self, term_months=months)
 
     def item_in(self, language: str) -> str:
         return self.item_en if language.lower().startswith("en") and self.item_en else self.item
@@ -141,5 +145,16 @@ OFFERS: dict[str, Offer] = {
 }
 
 
+# The longest installment the finance engine accepts (app/game_master/limits.py and EffectLimits).
+MAX_TERM_MONTHS = 48
+
+
 def get_offer(offer_id: str) -> Offer | None:
     return OFFERS.get(offer_id)
+
+
+def offer_on_the_table(offer: Offer, term_months: int | None) -> Offer:
+    """The offer at the term the conversation reached; one the seller could not quote is ignored."""
+    if term_months is None or not offer.term_months <= term_months <= MAX_TERM_MONTHS:
+        return offer
+    return offer.at_term(term_months)

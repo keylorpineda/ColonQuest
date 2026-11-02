@@ -13,7 +13,7 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from app.negotiation.seller_sheet import Offer
+from app.negotiation.seller_sheet import OFFERS, Offer
 from app.providers.base import ToolCall
 from app.schemas import TeachingConcept
 
@@ -73,7 +73,7 @@ class ProjectDebtArgs(ToolArgs):
 
 
 class QuoteTermArgs(ToolArgs):
-    months: Annotated[int, Field(ge=6, le=60)] = Field(description="Installment term to quote")
+    months: Annotated[int, Field(ge=6, le=48)] = Field(description="Installment term to quote")
 
 
 class NoArgs(ToolArgs):
@@ -130,6 +130,10 @@ def quote_term(args: QuoteTermArgs, context: ToolContext) -> dict[str, Any]:
     if context.offer is None:
         return {"error": "no offer in this conversation"}
     offer = context.offer
+    catalog = OFFERS.get(offer.offer_id)
+    shortest = catalog.term_months if catalog is not None else offer.term_months
+    if args.months < shortest:
+        return {"error": f"this offer cannot go below {shortest} months"}
     figures = simulate_purchase(
         SimulatePurchaseArgs(
             price=offer.cash_price,
