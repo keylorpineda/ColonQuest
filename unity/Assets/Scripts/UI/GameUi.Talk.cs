@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.World;
 
@@ -34,18 +35,28 @@ namespace ColonQuest.UI
         {
             var partner = type == StationType.Lender ? TalkPartner.Lender : TalkPartner.Pyramid;
             string title = type == StationType.Lender ? "Prestamista" : "Invierte Ya";
-            var options = new List<ModalOption>
+            var options = new List<ModalOption>();
+            string body = Loc.T("Antes de decir que sí, preguntá: cuánto pagás en total, la tasa, qué garantía hay y si es legal.");
+            long owed = type == StationType.Lender ? FinanceEngine.DebtOwed(session.State) : 0L;
+            if (owed > 0L)
             {
-                new ModalOption { Label = Loc.T("1.  Hablar y negociar (texto o voz)"), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(partner) }
-            };
+                long cash = session.State.Cash;
+                body = Loc.F("Le debés {0} a los prestamistas, y cada mes crece.", Money.Format(owed)) + "\n\n" + body;
+                if (cash > 0L)
+                {
+                    string pay = cash >= owed ? Loc.F("Pagar todo  ·  {0}", Money.Format(owed)) : Loc.F("Abonar  ·  {0}", Money.Format(cash));
+                    options.Add(new ModalOption { Label = "1.  " + pay, Color = GameUiColors.Blue, OnPress = () => session.PayLender() });
+                }
+            }
 
+            options.Add(new ModalOption { Label = Loc.F("{0}.  Hablar y negociar (texto o voz)", options.Count + 1), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(partner) });
             if (session.Loop.CanDoTask(type))
             {
-                options.Add(new ModalOption { Label = Loc.T("2.  Escuchar la oferta"), Color = GameUiColors.Green, OnPress = () => session.BeginTask(type) });
+                options.Add(new ModalOption { Label = Loc.F("{0}.  Escuchar la oferta", options.Count + 1), Color = GameUiColors.Green, OnPress = () => session.BeginTask(type) });
             }
 
             options.Add(Back(Loc.F("{0}.  Salir", options.Count + 1)));
-            modal.Show(Loc.T(title), string.Empty, Loc.T("Antes de decir que sí, preguntá: cuánto pagás en total, la tasa, qué garantía hay y si es legal."), options);
+            modal.Show(Loc.T(title), string.Empty, body, options);
         }
 
         /// <summary>The ways out under the conversation. The arrangement of the collectors shows only once the player asked for it.</summary>

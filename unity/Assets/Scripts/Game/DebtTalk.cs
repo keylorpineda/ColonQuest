@@ -44,7 +44,8 @@ namespace ColonQuest.Game
         /// <summary>The example loan the lender talks about, and the months of the short loan.</summary>
         public const long ExampleLoan = 100_000L;
         public const int ExampleMonths = 3;
-        public const int LenderRatePct = 20;
+        public const int LenderRatePct = (int)Finance.FinanceEngine.ShortInformalLoanMonthlyRatePct;
+        public const int LenderLongRatePct = (int)Finance.FinanceEngine.DefaultInformalLoanMonthlyRatePct;
         public const int PyramidPromisePct = 300;
 
         private readonly List<TalkTurn> turns = new List<TalkTurn>();
@@ -199,7 +200,7 @@ namespace ColonQuest.Game
             Line(request, TalkFact.TotalCost, Loc.F("Hoy vienes a cobrar {0}: lo atrasado, nada más.", Money.Format(Demand)));
             Line(request, TalkFact.Arrangement, Loc.F("Si pide un arreglo: {0} hoy y lo demás queda como deuda nueva de {1}, con {2}% de recargo.",
                 Money.Format(ArrangementToday), Money.Format(ArrangementLater), MarketAssumptions.CollectionNegotiateSurchargePct));
-            Line(request, TalkFact.WhatIfNotPaid, Loc.F("Si no paga hoy: una multa del {0}% a la tarjeta, y vuelves otro día.", MarketAssumptions.CollectionIgnoreFeePct));
+            Line(request, TalkFact.WhatIfNotPaid, Loc.F("Si no paga hoy: una multa del {0}% sobre la deuda, y vuelves otro día.", MarketAssumptions.CollectionIgnoreFeePct));
             Line(request, TalkFact.Legal, Loc.T("Cobrar es legal; amenazar no. Si alguien lo amenaza, eso se denuncia."));
             request.amounts.AddRange(new[] { Demand, ArrangementToday, ArrangementLater });
             request.percents.AddRange(new[] { MarketAssumptions.CollectionNegotiateSurchargePct, MarketAssumptions.CollectionIgnoreFeePct });
@@ -207,14 +208,14 @@ namespace ColonQuest.Game
 
         private static void FillLender(TalkRequestDto request)
         {
-            Line(request, TalkFact.Rate, Loc.F("Cobras el {0}% al mes.", LenderRatePct));
+            Line(request, TalkFact.Rate, Loc.F("Cobras el {0}% al mes a {1} meses o menos, y el {2}% a más plazo.", LenderRatePct, ExampleMonths, LenderLongRatePct));
             Line(request, TalkFact.TotalCost, Loc.F("Si prestas {0}, en {1} meses te devuelven {2}.", Money.Format(ExampleLoan), ExampleMonths, Money.Format(LenderTotal())));
             Line(request, TalkFact.Arrangement, Loc.T("No hay rebajas: pasas todos los días a cobrar la cuota, gota a gota."));
             Line(request, TalkFact.WhatIfNotPaid, Loc.T("Si se atrasa, los intereses siguen corriendo y mandas a los muchachos del carro negro."));
             Line(request, TalkFact.Legal, Loc.T("Sin papeles y sin SUGEF: esto es informal, entre los dos."));
             Line(request, TalkFact.Guarantee, Loc.T("Ningún contrato: solo una firma en tu libreta."));
             request.amounts.AddRange(new[] { ExampleLoan, LenderTotal() });
-            request.percents.Add(LenderRatePct);
+            request.percents.AddRange(new[] { LenderRatePct, LenderLongRatePct });
         }
 
         private static void FillPyramid(TalkRequestDto request)
@@ -307,7 +308,7 @@ namespace ColonQuest.Game
                     return Loc.F("Bueno, mae. Deme {0} hoy y lo otro queda como deuda nueva: {1}, con el {2}% de recargo.",
                         Money.Format(ArrangementToday), Money.Format(ArrangementLater), MarketAssumptions.CollectionNegotiateSurchargePct);
                 case TalkFact.WhatIfNotPaid:
-                    return Loc.F("Si no paga hoy, le cae una multa del {0}% a la tarjeta y volvemos. Usted verá.", MarketAssumptions.CollectionIgnoreFeePct);
+                    return Loc.F("Si no paga hoy, le cae una multa del {0}% sobre la deuda y volvemos. Usted verá.", MarketAssumptions.CollectionIgnoreFeePct);
                 case TalkFact.Legal:
                     return "Tranquilo, nadie lo va a tocar. Cobrar es legal; amenazar no. Si alguien lo amenaza, eso se denuncia.";
                 case TalkFact.TotalCost:
@@ -323,7 +324,7 @@ namespace ColonQuest.Game
             switch (fact)
             {
                 case TalkFact.Rate:
-                    return Loc.F("Es el {0}% al mes, mae. Poquito, ¿verdad?", LenderRatePct);
+                    return Loc.F("Es el {0}% al mes a {1} meses o menos, y el {2}% a más plazo, mae. Poquito, ¿verdad?", LenderRatePct, ExampleMonths, LenderLongRatePct);
                 case TalkFact.TotalCost:
                     return Loc.F("Si le presto {0}, en {1} meses me devuelve {2}.", Money.Format(ExampleLoan), ExampleMonths, Money.Format(LenderTotal()));
                 case TalkFact.Arrangement:
