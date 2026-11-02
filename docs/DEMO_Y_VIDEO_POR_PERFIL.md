@@ -14,7 +14,7 @@ y las Official Rules completas piden login y no se leyeron.
 
 Actualización: los patrones de los proyectos ganadores (usuario concreto, agente que trabaja,
 wow de 10 s, funciona en vivo) están en [INVESTIGACION_EVALUADORES_Y_GANADORES.md](INVESTIGACION_EVALUADORES_Y_GANADORES.md).
-De ahí sale el encuadre: "un agente de IA que entrena contra estafas financieras, en formato de juego".
+De ahí sale el encuadre: "un simulador de finanzas personales con IA para manejar un salario durante el mes y evitar estafas".
 
 ## Quién prueba qué
 

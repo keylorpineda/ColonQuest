@@ -79,9 +79,10 @@ Fuentes: [LlamaCon, Meta](https://ai.meta.com/blog/llamacon-hackathon/), [Llama 
 | 6 | Encaja con la herramienta del organizador | Premio aparte de "mejor uso de Llama API" | Cinco modelos de Meta con un trabajo cada uno, más Muse Spark Open |
 | 7 | Alcance angosto y terminado | Todos son una sola cosa bien hecha | Un mes jugable pulido, no un año a medias |
 
-Observación incómoda: entre los ganadores documentados no aparece ningún juego ni producto de entretenimiento.
-Ganan herramientas con un usuario y una utilidad claros. ColonQuest debe presentarse como
-"un agente de IA que entrena a jóvenes a no caer en trampas financieras, en formato de juego", no como "un juego con IA".
+Observación: entre los ganadores documentados no aparece ningún juego ni producto de entretenimiento.
+Ganan herramientas con un usuario y una utilidad claros. Decisión del equipo (1 nov): ColonQuest no se presenta como
+un juego sino como un simulador de finanzas personales con IA, para aprender a manejar un salario durante el mes y a evitar estafas.
+El formato interactivo es el método de enseñanza, no el producto.
 
 ## 7. Modelo de la "ecuación"
 
@@ -91,13 +92,20 @@ Es un modelo cualitativo, multiplicativo a propósito: si un factor es cero, no 
 Gana  ~  Problema real  x  Agente que trabaja  x  Wow de 10 s  x  Funciona en vivo   (+ bono: encaje con Meta)
 ```
 
-| Factor | Qué lo hace 3 de 3 | Estimación para ColonQuest (a verificar) | Qué falta |
-| --- | --- | --- | --- |
-| Problema real | Usuario concreto con evidencia de uso | 2 de 3 | Datos de la prueba piloto (N y resultados) |
-| Agente que trabaja | Herramientas, decisiones de varios pasos, números exactos | 3 de 3 | Mostrarlo dentro de la escena (chips), no solo en el panel |
-| Wow de 10 s | Un momento que se entiende sin explicar | 2 de 3 | Animación de revelación con barra de costo real |
-| Funciona en vivo | Link que abre, sin errores, con respaldo | Sin verificar | Link web público, keep-alive de Render, prueba en incógnito |
-| Bono Meta | Varios modelos con rol claro, open weights | 3 de 3 | Declararlo en el envío |
+El factor "problema real" se separa en dos, porque son cosas distintas: que el problema exista y esté documentado,
+y que haya evidencia de que la solución sirve.
+
+| Factor | Qué lo hace 3 de 3 | Nota (a verificar) | Base | Qué falta |
+| --- | --- | --- | --- | --- |
+| 1a. Problema documentado | Cifra oficial, usuario concreto, vigente | 3 de 3 | OCF, Tercera Encuesta Nacional de Endeudamiento 2025: 87% tiene alguna deuda y destina en promedio 34% de sus ingresos a pagarla. CINPE y UNA: más del 80% no ha tenido educación financiera | Citar la fuente en el video y el README, con el matiz de que el 87% mide cualquier deuda; el dato fuerte es el 34% del ingreso |
+| 1b. Evidencia de que la solución sirve | Resultados con usuarios reales | 1 de 3 (sin datos) | Prueba piloto con adultos, aún sin cifras en el repositorio | N y porcentajes agregados, sin nombres |
+| 2. Agente que trabaja | Herramientas, decisiones de varios pasos, números exactos | 3 de 3 | Game master con herramientas, vendedor agente, planificador de temporada, motor C# | Mostrarlo dentro de la escena (chips), no solo en el panel |
+| 3. Wow de 10 s | Un momento que se entiende sin explicar | 2 de 3 | Negociación por voz con ficha oculta ya existe | Animación de revelación con barra de costo real |
+| 4. Funciona en vivo | Link que abre, sin errores, con respaldo | Sin verificar | Respaldo local ya existe | Link web público, keep-alive de Render, prueba en incógnito |
+| Bono Meta | Varios modelos con rol claro, open weights | 3 de 3 | Cinco modelos, Muse Spark Open en Baseten | Declararlo en el envío |
+
+Aviso de lectura: la nota de 1a sube de 2 a 3 por la fuente oficial, no por el piloto. Lo que el piloto cambia es 1b.
+Un juez de impacto (perfil C) puede preguntar "¿y funcionó?"; sin 1b la respuesta es una promesa.
 
 Cómo se mapea a los criterios oficiales: Problema real y wow alimentan Impacto (30%) y Demo (25%);
 Agente que trabaja y bono Meta alimentan Meta (25%) y Profundidad técnica (20%); Funciona en vivo es la puerta
@@ -105,7 +113,7 @@ de la Demo y condiciona todo lo demás.
 
 ## 8. Decisiones que salen de la investigación
 
-1. Encuadre del proyecto: agente de IA que entrena contra estafas financieras, en formato de juego. Primera frase del video y del README.
+1. Encuadre del proyecto: simulador de finanzas personales con IA para aprender a manejar un salario durante el mes y a evitar estafas. Primera frase del video y del README, apoyada en el dato de la OCF (87% con deudas, 34% del ingreso para pagarlas).
 2. Prioridad 1: que el link abra y aguante (factor "funciona en vivo"). Sin eso la ecuación da cero.
 3. Prioridad 2: la revelación de la ficha oculta con barra de costo real. Es el equivalente de los "lentes de 20 USD".
 4. Prioridad 3: evidencia del piloto en pantalla (N, porcentajes agregados, sin nombres). Sube el factor 2 a 3.
