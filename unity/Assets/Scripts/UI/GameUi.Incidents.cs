@@ -49,7 +49,7 @@ namespace ColonQuest.UI
                 warningText.text = watch.PoliceCalled ? watch.CalledWarning : watch.Warning + "  " + Mathf.CeilToInt(watch.Remaining) + " s";
             }
 
-            CollectorCar.Armed = session.InArrears && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
+            CollectorCar.Armed = session.CollectorsDue && !modal.IsOpen && !negotiationPanel.IsOpen && !talkPanel.IsOpen && !phone.IsOpen && !pause.IsOpen;
         }
 
         // ---------------------------------------------------------------- the law

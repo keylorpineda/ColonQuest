@@ -68,6 +68,7 @@ namespace ColonQuest.Game
         public List<long> goalStarts = new List<long>();
         public List<bool> goalsDone = new List<bool>();
         public long quincenaPaidThisMonth;
+        public bool collectorsCameThisMonth;
         public int tasksToday;
         public int jailDaysRemaining;
         public bool visitedRoom;

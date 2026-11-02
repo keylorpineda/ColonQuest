@@ -26,7 +26,7 @@ namespace ColonQuest.Game
         public const string FirstShift = "Tu primer turno en la soda El Muelle";
         public const string Work = "Trabajar en la soda (7:00 a 12:00)";
         public const string PayBills = "Pagar los recibos en el banco";
-        public const string CatchUp = "Ponerte al día con lo que debés";
+        public const string CatchUp = "Pagarle al prestamista lo que debés";
         public const string CloseMonth = "Cerrar el mes en el banco";
         public const string Sleep = "Dormir en tu cuarto";
 
