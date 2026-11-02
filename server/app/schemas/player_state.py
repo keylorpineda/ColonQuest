@@ -45,6 +45,8 @@ class PlayerState(ContractModel):
     job_position: Annotated[ShortText | None, Field(default=None)] = None
     # What the player's home, car and farm are worth, for the summary. The engine computes it.
     assets_value: Colones = 0
+    # The months already closed, for the summary: "month" has moved on to the next one by then.
+    months_played: Annotated[int, Field(ge=0, le=120)] = 0
     language: Annotated[GameLanguage | None, Field(default=None)] = None
 
     @field_validator("character_name", "job_position", mode="before")

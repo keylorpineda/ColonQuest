@@ -201,6 +201,13 @@
           "title": "Month",
           "type": "integer"
         },
+        "monthsPlayed": {
+          "default": 0,
+          "maximum": 120,
+          "minimum": 0,
+          "title": "Monthsplayed",
+          "type": "integer"
+        },
         "salaryNet": {
           "maximum": 100000000,
           "minimum": 0,

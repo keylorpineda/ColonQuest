@@ -138,6 +138,9 @@ namespace ColonQuest.Finance
 
         /// <summary>What the holdings are worth, sent so the backend's summary counts them. The engine does not use it.</summary>
         public long AssetsValue { get; set; }
+
+        /// <summary>The months of the run already closed, for the summary: <see cref="Month"/> has moved on to the next one by then.</summary>
+        public int MonthsPlayed { get; set; }
         public int Month { get; set; } = 1;
         public long SalaryNet { get; set; }
         public long Cash { get; set; }
@@ -157,6 +160,7 @@ namespace ColonQuest.Finance
                 Week = Week,
                 JobPosition = JobPosition,
                 AssetsValue = AssetsValue,
+                MonthsPlayed = MonthsPlayed,
                 Month = Month,
                 SalaryNet = SalaryNet,
                 Cash = Cash,
