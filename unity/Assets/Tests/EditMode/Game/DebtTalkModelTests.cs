@@ -27,7 +27,7 @@ namespace ColonQuest.Game.Tests
             var request = new DebtTalk(TalkPartner.Lender).ToRequest("How much?", "en");
 
             CollectionAssert.AreEquivalent(new[] { 100_000L, 172_800L }, request.amounts);
-            CollectionAssert.AreEqual(new[] { 20 }, request.percents);
+            CollectionAssert.AreEqual(new[] { 20, 15 }, request.percents);
         }
 
         [Test]
