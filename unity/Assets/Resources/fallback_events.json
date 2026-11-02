@@ -110,6 +110,11 @@
               "kind": "expense",
               "amount": 18000,
               "source": "cash"
+            },
+            {
+              "kind": "income",
+              "amount": 18000,
+              "source": "credit_card"
             }
           ]
         },
