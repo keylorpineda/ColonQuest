@@ -41,6 +41,9 @@ namespace ColonQuest.Api
         public List<SellerFact> RevealedFacts = new List<SellerFact>();
         public List<KeyQuestion> KeyQuestionsAsked = new List<KeyQuestion>();
         public DealStatus DealStatus;
+
+        /// <summary>The term on the table after this turn, which is the one the player signs. 0 when the backend does not say.</summary>
+        public int TermMonths;
     }
 
     public sealed class SessionSummary

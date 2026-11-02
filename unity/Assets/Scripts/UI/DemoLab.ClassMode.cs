@@ -183,7 +183,7 @@ namespace ColonQuest.UI
                     yield return service.RecordDecision(month, sample, sample.Choices[0].Id, state.Clone(), _ => { });
                 }
 
-                yield return service.SendNegotiationText(SellerOffer.Catalog[index].OfferId, Loc.T(StudentQuestions[index]), _ => { });
+                yield return service.SendNegotiationText(SellerOffer.Catalog[index].OfferId, Loc.T(StudentQuestions[index]), 0, _ => { });
                 yield return service.RequestSummary(state, _ => { });
             }
 

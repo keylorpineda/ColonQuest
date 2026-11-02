@@ -45,6 +45,12 @@ namespace ColonQuest.Api
             DownPayment = downPayment;
         }
 
+        /// <summary>The same offer over another term: the cash price, rate, insurance and commission stay.</summary>
+        public SellerOffer AtTerm(int months)
+        {
+            return new SellerOffer(OfferId, Item, SellerName, CashPrice, months, MonthlyRatePct, InsuranceMonthly, Commission, DownPayment);
+        }
+
         /// <summary>The part of the price that the installments pay for.</summary>
         public long Financed => CashPrice - DownPayment;
 

@@ -148,7 +148,7 @@ namespace ColonQuest.Api.Tests
                 ApiResult<GameEvent> gameEvent = null;
                 ApiResult<NegotiationReply> reply = null;
                 Run(service.RequestEvent(State(), r => gameEvent = r));
-                Run(service.SendNegotiationText("phone", "¿Cuánto pago en total?", r => reply = r));
+                Run(service.SendNegotiationText("phone", "¿Cuánto pago en total?", 0, r => reply = r));
 
                 Assert.AreEqual(ResultSource.Fallback, gameEvent.Source);
                 Assert.IsFalse(reply.Ok, "the game answers with the local seller");
@@ -267,7 +267,7 @@ namespace ColonQuest.Api.Tests
                 "{\"transcript\":\"hola\",\"npcReply\":\"Mae, son 31 500.\",\"revealedFacts\":[\"monthly_payment\"],\"keyQuestionsAsked\":[\"total_cost\"],\"dealStatus\":\"open\"}"));
             ApiResult<NegotiationReply> result = null;
 
-            Run(service.SendNegotiationText("celular_kevin", "cuanto pago en total", r => result = r));
+            Run(service.SendNegotiationText("celular_kevin", "cuanto pago en total", 0, r => result = r));
 
             Assert.IsTrue(result.Ok);
             Assert.AreEqual("Mae, son 31 500.", result.Value.NpcReply);
@@ -281,7 +281,7 @@ namespace ColonQuest.Api.Tests
             transport.Replies.Enqueue(FakeTransport.Timeout());
             ApiResult<NegotiationReply> result = null;
 
-            Run(service.SendNegotiationText("celular_kevin", "hola", r => result = r));
+            Run(service.SendNegotiationText("celular_kevin", "hola", 0, r => result = r));
 
             Assert.IsFalse(result.Ok);
         }
@@ -355,6 +355,19 @@ namespace ColonQuest.Api.Tests
             {
                 ApiService.Language = () => "es";
             }
+        }
+
+        [Test]
+        public void Negotiation_SendsTheTermOnTheTableAndReadsTheNewOne()
+        {
+            service.RestoreSession(SessionId);
+            transport.Replies.Enqueue(FakeTransport.Ok("{\"transcript\":\"t\",\"npcReply\":\"r\",\"revealedFacts\":[],\"keyQuestionsAsked\":[],\"dealStatus\":\"open\",\"termMonths\":36}"));
+            ApiResult<NegotiationReply> result = null;
+
+            Run(service.SendNegotiationText("celular_gama_alta", "hola", 24, r => result = r));
+
+            StringAssert.Contains("\"termMonths\":24", transport.Requests[0].JsonBody);
+            Assert.AreEqual(36, result.Value.TermMonths);
         }
 
         [Test]

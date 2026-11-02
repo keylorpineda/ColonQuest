@@ -425,7 +425,7 @@ namespace ColonQuest.Game
             VoiceNotice = null;
             PendingLine = text;
             Changed?.Invoke();
-            ApiClient.Instance.SendNegotiationText(negotiation.Offer.OfferId, text, result =>
+            ApiClient.Instance.SendNegotiationText(negotiation.Offer.OfferId, text, negotiation.Offer.TermMonths, result =>
             {
                 Busy = false;
                 PendingLine = null;

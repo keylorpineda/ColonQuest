@@ -45,7 +45,8 @@ namespace ColonQuest.Game
 
         public const string StoreVenue = "Tienda";
 
-        public SellerOffer Offer { get; }
+        /// <summary>The offer on the table. It moves to the term the seller last quoted, so what is signed is what was said.</summary>
+        public SellerOffer Offer { get; private set; }
 
         /// <summary>Where the conversation happens, for the title of the window.</summary>
         public string Venue { get; set; } = StoreVenue;
@@ -90,6 +91,11 @@ namespace ColonQuest.Game
                 {
                     revealed.Add(fact);
                 }
+            }
+
+            if (reply.TermMonths > 0 && reply.TermMonths != Offer.TermMonths)
+            {
+                Offer = Offer.AtTerm(reply.TermMonths);
             }
 
             Status = reply.DealStatus;
