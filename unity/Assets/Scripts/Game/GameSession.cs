@@ -770,6 +770,8 @@ namespace ColonQuest.Game
 
         public bool InArrears => !Loop.IsFinished && Loop.InArrears;
 
+        public bool CollectorsDue => !Loop.IsFinished && Loop.CollectorsDue;
+
         public long CollectionDemand => Loop.CollectionDemand;
 
         public void PayCollectors()
@@ -788,6 +790,11 @@ namespace ColonQuest.Game
         {
             ChoiceApplied?.Invoke(Loop.IgnoreCollectors());
             Changed?.Invoke();
+        }
+
+        public bool PayLender()
+        {
+            return Apply(Loop.PayLender());
         }
 
         // ---------------------------------------------------------------- talks in the player's own words

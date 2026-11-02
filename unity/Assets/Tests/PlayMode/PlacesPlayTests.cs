@@ -481,8 +481,9 @@ namespace ColonQuest.World.PlayModeTests
         {
             var session = PlaceTestSetup.StartOfflineRun();
             session.State.InformalLoans.Clear();
+            session.State.CreditCard.Balance = session.State.CreditCard.Limit;
             yield return null;
-            Assert.IsFalse(session.InArrears);
+            Assert.IsFalse(session.InArrears, "a full card alone does not bring them");
 
             var car = CollectorCar.Instance;
             Teleport((Vector2)car.transform.position + new Vector2(1.5f, 2.0f));

@@ -108,6 +108,7 @@ namespace ColonQuest.Game
             LastRunningCosts = 0L;
             LastRoomRent = 0L;
             HurtThisMonth = false;
+            CollectorsCameThisMonth = false;
             Arrests = 0;
             HasSwimsuit = false;
             Outfit = 0;
@@ -136,6 +137,7 @@ namespace ColonQuest.Game
                 decisions = Decisions,
                 arrests = Arrests,
                 hurtThisMonth = HurtThisMonth,
+                collectorsCameThisMonth = CollectorsCameThisMonth,
                 hasSwimsuit = HasSwimsuit,
                 outfit = Outfit,
                 swamThisMonth = SwamThisMonth,
@@ -202,6 +204,7 @@ namespace ColonQuest.Game
             Decisions = Math.Max(0, snapshot.decisions);
             Arrests = Math.Max(0, snapshot.arrests);
             HurtThisMonth = snapshot.hurtThisMonth;
+            CollectorsCameThisMonth = snapshot.collectorsCameThisMonth;
             HasSwimsuit = snapshot.hasSwimsuit;
             Outfit = Math.Max(0, snapshot.outfit);
             SwamThisMonth = snapshot.swamThisMonth;
@@ -738,8 +741,14 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>True when the player owes enough, and late enough, that the collectors come: an informal loan, or a card that is almost full.</summary>
+        /// <summary>True while an informal loan is open.</summary>
         public bool InArrears => CollectionRules.InArrears(State);
+
+        /// <summary>True once the collectors had their say this month: they come once a month at most.</summary>
+        public bool CollectorsCameThisMonth { get; private set; }
+
+        /// <summary>True when the car stops for this player if they meet it.</summary>
+        public bool CollectorsDue => InArrears && !CollectorsCameThisMonth;
 
         public long CollectionDemand => CollectionRules.Demand(State);
 
@@ -747,6 +756,7 @@ namespace ColonQuest.Game
         {
             var before = State.Clone();
             FinanceEngine.PayCollectors(State, CollectionRules.Demand(State));
+            CollectorsCameThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Pagar a los cobradores"));
         }
@@ -755,6 +765,7 @@ namespace ColonQuest.Game
         {
             var before = State.Clone();
             FinanceEngine.NegotiateCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionNegotiateSurchargePct);
+            CollectorsCameThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Negociar con los cobradores"));
         }
@@ -763,8 +774,22 @@ namespace ColonQuest.Game
         {
             var before = State.Clone();
             FinanceEngine.IgnoreCollectors(State, CollectionRules.Demand(State), MarketAssumptions.CollectionIgnoreFeePct, MarketAssumptions.CollectionIgnoreWellbeingLoss);
+            CollectorsCameThisMonth = true;
             Decisions++;
             return OutcomeFrom(before, Loc.T("Ignorar a los cobradores"));
+        }
+
+        /// <summary>The player pays the lender by choice, out of cash. Null when nothing is owed or there is no cash.</summary>
+        public ChoiceOutcome PayLender()
+        {
+            var before = State.Clone();
+            if (FinanceEngine.PayInformalDebt(State) <= 0L)
+            {
+                return null;
+            }
+
+            Decisions++;
+            return OutcomeFrom(before, Loc.T("Le pagaste al prestamista"));
         }
 
         /// <summary>Applies the chosen option through the finance engine and counts the task.</summary>
@@ -934,6 +959,7 @@ namespace ColonQuest.Game
             TasksDone = 0;
             TasksToday = 0;
             HurtThisMonth = false;
+            CollectorsCameThisMonth = false;
             SwamThisMonth = false;
             SleptThisMonth = false;
             CookedThisMonth = false;

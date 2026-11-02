@@ -158,70 +158,118 @@ namespace ColonQuest.Game.Tests
 
         // ---------------------------------------------------------------- collectors
 
-        [Test]
-        public void Arrears_ANewPlayerWithACardAtSixtyPercentIsNotInArrears()
+        private static GameLoop Owing(long cash, long loan)
         {
-            Assert.IsFalse(CollectionRules.InArrears(GameRules.NewPlayer()));
+            var loop = Loop(cash);
+            loop.State.InformalLoans.Add(new InformalLoan("Prestamista", loan, 15m));
+            return loop;
         }
 
         [Test]
-        public void Arrears_AnInformalLoanOrAFullCardIs()
+        public void Arrears_OnlyAnInformalLoanCounts()
         {
+            Assert.IsFalse(CollectionRules.InArrears(GameRules.NewPlayer()));
+
+            var full = GameRules.NewPlayer();
+            full.CreditCard.Balance = full.CreditCard.Limit;
+            Assert.IsFalse(CollectionRules.InArrears(full), "a full card brings interest, not the black car");
+
             var loan = GameRules.NewPlayer();
             loan.InformalLoans.Add(new InformalLoan("Prestamista", 50_000L, 15m));
             Assert.IsTrue(CollectionRules.InArrears(loan));
-
-            var full = GameRules.NewPlayer();
-            full.CreditCard.Balance = 270_000L;
-            Assert.IsTrue(CollectionRules.InArrears(full), "90 percent of the limit");
-
-            full.CreditCard.Balance = 269_999L;
-            Assert.IsFalse(CollectionRules.InArrears(full));
         }
 
         [Test]
-        public void Demand_IsAShareOfTheDebtInsideTheLimits()
+        public void Demand_IsAShareOfTheLoansInsideTheLimitsAndNeverMoreThanOwed()
         {
-            var small = GameRules.NewPlayer();
-            small.CreditCard.Balance = 10_000L;
-            Assert.AreEqual(MarketAssumptions.CollectionMinDemand, CollectionRules.Demand(small));
+            var small = Owing(0L, 5_000L);
+            Assert.AreEqual(5_000L, CollectionRules.Demand(small.State), "the minimum never passes what is owed");
 
-            var middle = GameRules.NewPlayer();
-            middle.CreditCard.Balance = 400_000L;
-            Assert.AreEqual(100_000L, CollectionRules.Demand(middle));
+            var low = Owing(0L, 40_000L);
+            Assert.AreEqual(MarketAssumptions.CollectionMinDemand, CollectionRules.Demand(low.State));
 
-            var huge = GameRules.NewPlayer();
-            huge.CreditCard.Balance = 3_000_000L;
-            Assert.AreEqual(MarketAssumptions.CollectionMaxDemand, CollectionRules.Demand(huge));
+            var middle = Owing(0L, 400_000L);
+            middle.State.CreditCard.Balance = 3_000_000L;
+            Assert.AreEqual(100_000L, CollectionRules.Demand(middle.State), "the card does not count");
+
+            var huge = Owing(0L, 3_000_000L);
+            Assert.AreEqual(MarketAssumptions.CollectionMaxDemand, CollectionRules.Demand(huge.State));
         }
 
         [Test]
         public void Collectors_PayingLowersTheDebtAndIgnoringRaisesIt()
         {
-            var pay = Loop(500_000L);
-            pay.State.CreditCard.Balance = 280_000L;
-            long before = FinanceEngine.DebtOwed(pay.State);
+            var pay = Owing(500_000L, 280_000L);
             pay.PayCollectors();
-            Assert.Less(FinanceEngine.DebtOwed(pay.State), before);
+            Assert.Less(FinanceEngine.DebtOwed(pay.State), 280_000L);
 
-            var ignore = Loop(500_000L);
-            ignore.State.CreditCard.Balance = 280_000L;
-            long start = FinanceEngine.DebtOwed(ignore.State);
+            var ignore = Owing(500_000L, 280_000L);
             ignore.IgnoreCollectors();
-            Assert.Greater(FinanceEngine.DebtOwed(ignore.State), start);
+            Assert.Greater(FinanceEngine.DebtOwed(ignore.State), 280_000L);
             Assert.AreEqual(500_000L, ignore.State.Cash);
         }
 
         [Test]
-        public void Collectors_NegotiatingLeavesANewInformalLoan()
+        public void Collectors_NegotiatingLowersTheDebtWithCashAndLeavesANewLoan()
         {
-            var loop = Loop(500_000L);
-            loop.State.CreditCard.Balance = 280_000L;
+            var loop = Owing(500_000L, 280_000L);
 
             var outcome = loop.NegotiateCollectors();
 
-            Assert.Greater(outcome.InformalDebtDelta, 0L);
+            Assert.Less(outcome.InformalDebtDelta, 0L);
             Assert.IsTrue(loop.State.InformalLoans.Exists(l => l.Lender == "Cobradores"));
+        }
+
+        [Test]
+        public void Collectors_ComeOnceAMonth()
+        {
+            var loop = Owing(500_000L, 280_000L);
+            Assert.IsTrue(loop.CollectorsDue);
+
+            loop.IgnoreCollectors();
+            Assert.IsFalse(loop.CollectorsDue, "not again this month");
+            Assert.IsTrue(loop.InArrears, "the debt is still there");
+
+            loop.CloseMonth();
+            Assert.IsTrue(loop.CollectorsDue, "next month they are back");
+        }
+
+        [Test]
+        public void Collectors_TheirVisitOfTheMonthSurvivesASavedGame()
+        {
+            var loop = Owing(500_000L, 280_000L);
+            loop.PayCollectors();
+
+            var restored = new GameLoop();
+            restored.Restore(loop.Snapshot());
+
+            Assert.IsFalse(restored.CollectorsDue);
+        }
+
+        [Test]
+        public void Lender_TakesAPaymentByChoice()
+        {
+            var loop = Owing(50_000L, 80_000L);
+
+            var outcome = loop.PayLender();
+
+            Assert.AreEqual(-50_000L, outcome.CashDelta);
+            Assert.AreEqual(-50_000L, outcome.InformalDebtDelta);
+            Assert.IsNull(Owing(0L, 80_000L).PayLender(), "no cash, no payment");
+            Assert.IsNull(Loop(50_000L).PayLender(), "nothing owed, nothing to pay");
+        }
+
+        [Test]
+        public void Lender_QuotesTheRatesTheEngineCharges()
+        {
+            var state = Loop(0L).State;
+            FinanceEngine.ApplyEffect(state, EventType.Offer, new Effect(EffectKind.NewInformalLoan, 50_000L, null, DebtTalk.ExampleMonths));
+            FinanceEngine.ApplyEffect(state, EventType.Offer, new Effect(EffectKind.NewInformalLoan, 50_000L, null, DebtTalk.ExampleMonths + 1));
+
+            Assert.AreEqual((decimal)DebtTalk.LenderRatePct, state.InformalLoans[0].MonthlyRatePct);
+            Assert.AreEqual((decimal)DebtTalk.LenderLongRatePct, state.InformalLoans[1].MonthlyRatePct);
+            var request = new DebtTalk(TalkPartner.Lender).ToRequest("rate", "en");
+            CollectionAssert.Contains(request.percents, DebtTalk.LenderLongRatePct);
         }
     }
 }
