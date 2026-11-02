@@ -15,6 +15,7 @@ from app.api import (
     negotiation,
     sessions,
     summary,
+    talk,
     trace,
 )
 from app.classes.explainer import ClassExplainer
@@ -34,6 +35,7 @@ from app.providers.routing import build_npc_provider
 from app.response_cache import TTLCache
 from app.schemas import GameEvent
 from app.summary.writer import SummaryWriter
+from app.talks.service import TalkResponder
 
 
 @asynccontextmanager
@@ -59,6 +61,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
     npc_provider = build_npc_provider(settings, provider, open_weights, budget)
     app.state.negotiator = SellerAgent(Negotiator(npc_provider, settings), npc_provider, settings)
+    app.state.talker = TalkResponder(npc_provider, settings)
     # Only consulted when SEASON_PLANNER is on (see app.api.events.get_season_planner).
     app.state.season_planner = SeasonPlanner(provider, settings)
     app.state.summary_writer = SummaryWriter(provider, settings)
@@ -94,6 +97,7 @@ def create_app() -> FastAPI:
     app.include_router(dashboard.router, prefix="/api")
     app.include_router(events.router, prefix="/api")
     app.include_router(negotiation.router, prefix="/api")
+    app.include_router(talk.router, prefix="/api")
     app.include_router(summary.router, prefix="/api")
     app.include_router(images.router, prefix="/api")
     app.include_router(trace.router, prefix="/api")

@@ -23,6 +23,7 @@ from app.schemas.api import (
     SessionTrace,
     TranscriptResponse,
 )
+from app.schemas.talk import TalkReply, TalkRequest
 
 OUTPUT_DIR = Path(__file__).resolve().parents[2] / "shared" / "schemas"
 CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
@@ -35,6 +36,8 @@ CONTRACT_MODELS: tuple[type[BaseModel], ...] = (
     NegotiationRequest,
     SessionTrace,
     TranscriptResponse,
+    TalkRequest,
+    TalkReply,
 )
 
 

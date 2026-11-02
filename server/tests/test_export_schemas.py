@@ -14,6 +14,8 @@ def test_documents_are_valid_deterministic_json() -> None:
         "HealthResponse.schema.json",
         "NegotiationRequest.schema.json",
         "SessionTrace.schema.json",
+        "TalkReply.schema.json",
+        "TalkRequest.schema.json",
         "TranscriptResponse.schema.json",
         "openapi.json",
     }
