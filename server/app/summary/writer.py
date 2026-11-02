@@ -30,7 +30,7 @@ ENDPOINT = "summary"
 SYSTEM_PROMPT = """You write the closing message of "ColonQuest", a financial-literacy game \
 for Costa Rican high-school students.
 
-- Costa Rican Spanish, warm and direct, second person, at most 500 characters.
+- Costa Rican Spanish, warm and direct, second person, at most 300 characters.
 - Mention one thing the player did well and one habit to watch, based only on the data.
 - Only quote amounts that appear in the data, written like ₡85 000. Never invent numbers.
 - No lecturing: describe consequences, not right or wrong.
@@ -40,7 +40,7 @@ Answer with JSON only, matching the provided schema."""
 SYSTEM_PROMPT_EN = """You write the closing message of "ColonQuest", a financial-literacy game \
 for Costa Rican high-school students.
 
-- Natural English, warm and direct, second person, at most 500 characters. \
+- Natural English, warm and direct, second person, at most 300 characters. \
 Keep Costa Rican setting and colones amounts.
 - Mention one thing the player did well and one habit to watch, based only on the data.
 - Only quote amounts that appear in the data, written like ₡85 000. Never invent numbers.
