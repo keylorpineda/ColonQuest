@@ -999,7 +999,7 @@ def build_tab(name: str, lang: str, label: str) -> None:
   <title>{escape(label)}</title>
   <rect x="6" y="6" width="{width - 6}" height="{height - 6}" fill="{INK}"/>
   <rect x="2" y="2" width="{width - 8}" height="{height - 8}" fill="{OCHRE}" stroke="{INK}" stroke-width="3"/>
-  <text x="{(width - 6) / 2:g}" y="33" text-anchor="middle" style="font: 800 20px {MONO}; fill: {INK}; letter-spacing: 1px;">{escape(label)}</text>
+  <text x="{(width - 6) / 2:g}" y="33" text-anchor="middle" font-family="{escape(MONO, quote=True)}" font-weight="800" font-size="20" letter-spacing="1" fill="{INK}">{escape(label)}</text>
 </svg>
 """
     (OUT / f"tab-{name}-{lang}.svg").write_text(document, encoding="utf-8", newline="\n")
