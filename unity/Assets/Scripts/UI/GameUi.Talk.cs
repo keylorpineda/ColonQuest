@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.World;
+using UnityEngine;
 
 namespace ColonQuest.UI
 {
@@ -60,6 +61,17 @@ namespace ColonQuest.UI
                 return options;
             }
 
+            if (talk.Partner == TalkPartner.Neighbor || talk.Partner == TalkPartner.Stranger)
+            {
+                if (talk.Partner == TalkPartner.Stranger)
+                {
+                    options.Add(new ModalOption { Label = Loc.F("Enviarle {0}", Money.Format(DebtTalk.StrangerAsk)), Color = GameUiColors.Blue, OnPress = FallForTheStranger });
+                }
+
+                options.Add(new ModalOption { Label = Loc.T("Irme"), Color = GameUiColors.Pink, OnPress = session.EndTalk });
+                return options;
+            }
+
             var type = talk.Partner == TalkPartner.Lender ? StationType.Lender : StationType.Pyramid;
             long owed = talk.Partner == TalkPartner.Lender ? FinanceEngine.DebtOwed(session.State) : 0L;
             long cash = session.State.Cash;
@@ -92,6 +104,76 @@ namespace ColonQuest.UI
 
             options.Add(new ModalOption { Label = Loc.T("Irme"), Color = GameUiColors.Pink, OnPress = session.EndTalk });
             return options;
+        }
+
+        /// <summary>The money leaves the account like any SINPE, and there was never a deposit to return.</summary>
+        private void FallForTheStranger()
+        {
+            session.EndTalk();
+            bool sent = session.SendSinpe(DebtTalk.StrangerAsk);
+            string body = sent
+                ? Loc.F("Revisás tu cuenta: nunca te cayó nada. Le mandaste {0} a un desconocido, y un SINPE no se devuelve.", Money.Format(DebtTalk.StrangerAsk))
+                : Loc.T("No te alcanza en la cuenta, y por suerte: nunca te cayó ningún depósito.");
+            modal.Show(Loc.T("Era una estafa"), string.Empty, body, new[] { Continue(null) });
+        }
+
+        // ---------------------------------------------------------------- the people of the town
+
+        private const float PersonReach = 1.7f;
+
+        /// <summary>Who sits or stands around town without a place of their own, besides those who walk.</summary>
+        private static readonly string[] Bystanders =
+        {
+            "ClienteBarra", "ClienteMesa1", "ClienteMesa2", "ClienteMesa3", "PlayeroTowel", "PlayeraTowel", "PlayeroSombra", "DonMario", "Cajero", "Reo1", "Reo2", "Reo3"
+        };
+
+        private readonly List<Transform> people = new List<Transform>();
+
+        private void BindPeople()
+        {
+            people.Clear();
+            foreach (var walker in FindObjectsByType<Patrol>(FindObjectsSortMode.None))
+            {
+                people.Add(walker.transform);
+            }
+
+            foreach (string name in Bystanders)
+            {
+                var person = GameObject.Find(name);
+                if (person != null)
+                {
+                    people.Add(person.transform);
+                }
+            }
+        }
+
+        /// <summary>The closest person within reach, or null. The guided run has its own characters to meet.</summary>
+        private Transform NearbyPerson()
+        {
+            var hero = GameObject.FindWithTag(Station.PlayerTag);
+            if (hero == null || session.Guided)
+            {
+                return null;
+            }
+
+            Transform closest = null;
+            float best = PersonReach;
+            foreach (var person in people)
+            {
+                if (person == null || !person.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                float distance = Vector2.Distance(person.position, hero.transform.position);
+                if (distance < best)
+                {
+                    best = distance;
+                    closest = person;
+                }
+            }
+
+            return closest;
         }
 
         private void CloseCollectorsTalk(System.Action choice)

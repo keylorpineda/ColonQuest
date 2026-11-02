@@ -391,6 +391,7 @@ namespace ColonQuest.UI
         {
             inside.Clear();
             homeDoor = GameObject.Find(HomeDoorName);
+            BindPeople();
             foreach (var station in FindObjectsByType<Station>(FindObjectsSortMode.None))
             {
                 station.PlayerEntered += OnStationEntered;
@@ -660,6 +661,22 @@ namespace ColonQuest.UI
 
             var station = Nearby;
             string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) && GuidedAllows(station) ? PromptFor(station) : null;
+
+            // Nothing else to do here: the person next to the player can be talked to.
+            Transform person = text == null && station == null && !session.Busy && !Interaction.Playing && Time.unscaledTime - usedAt > UsedPause ? NearbyPerson() : null;
+            if (person != null)
+            {
+                promptCard.SetActive(true);
+                promptText.text = "[E]  " + Loc.T("Hablar");
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    usedAt = Time.unscaledTime;
+                    session.BeginTalk(DebtTalk.PartnerFor(person.name));
+                }
+
+                return;
+            }
+
             promptCard.SetActive(text != null);
             if (text != null)
             {
