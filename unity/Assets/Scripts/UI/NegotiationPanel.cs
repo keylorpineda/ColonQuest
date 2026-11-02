@@ -51,7 +51,7 @@ namespace ColonQuest.UI
 
         private static readonly string[] FactNames =
         {
-            "Precio de contado", "Pagás al mes", "Plazo", "Tasa de interés", "Seguro", "Comisión", "Costo total"
+            "Precio de contado", "Al mes, con todo", "Plazo", "Tasa de interés", "Seguro", "Comisión", "Costo total"
         };
 
         public NegotiationPanel(Transform canvas, GameSession gameSession, IVoiceRecorder voiceRecorder = null)
