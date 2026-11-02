@@ -1,9 +1,9 @@
-"""Generate the README card: the whole page drawn as one tall pixel-art SVG per language.
+"""Generate the cards of the README and the docs: each page drawn as one tall pixel-art SVG per language.
 
 Usage:
     python scripts/build_readme_art.py
 
-Writes docs/assets/readme-en.svg and docs/assets/readme-es.svg. Both share one palette (paper
+Writes readme-*.svg, costa-rica-*.svg and run-*.svg in docs/assets. They share one palette (paper
 and ink, Costa Rican blue and red, colón ochre), hard offset shadows and stepped, sprite-like
 animation. Each card carries a title and description for screen readers and stops moving under
 prefers-reduced-motion; the README repeats the full content as text below the card.
@@ -50,6 +50,7 @@ STYLE = f"""
     .detail-sm {{ font: 500 19px {SERIF}; fill: {MUTED}; }}
     .step {{ font: 700 15px {MONO}; fill: {RED}; }}
     .pct {{ font: 800 26px {MONO}; fill: {RED}; }}
+    .stat {{ font: 800 38px {MONO}; fill: {RED}; }}
     .stamp {{ font: 800 18px {MONO}; fill: {RED}; letter-spacing: 2px; }}
     .chip {{ font: 800 15px {MONO}; letter-spacing: 1px; }}
     .code {{ font: 600 20px {MONO}; fill: {CARD}; }}
@@ -334,13 +335,14 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negotiate", "by voice"),
         ],
         "rule": ("The AI tells the story.", "The engine keeps the books."),
-        "desc": "ColonQuest, a 2D financial-literacy game for Costa Rican students, from Costa "
-        "Rica to the world. The full content of this card is repeated as text below it.",
+        "desc": "ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica "
+        "to the world. The full content of this card is repeated as text below it.",
         "problem": (
             "THE PROBLEM",
-            "Many young Costa Ricans make their first big money decisions alone, and the first "
-            "real lesson is usually the debt itself. Nobody teaches you to ask the right question "
-            "while a salesperson is smiling at you. That is the skill ColonQuest trains.",
+            "In Costa Rica 87% of adults carry some debt and spend on average 34% of their income "
+            "paying it, and 80.88% of people surveyed never received any financial education. "
+            "Nobody teaches you to ask the right question while a salesperson is smiling at you. "
+            "That is the skill ColonQuest trains.",
         ),
         "traps": [
             ("card", "Installments", "Just one payment a month, plus hidden insurance."),
@@ -358,10 +360,10 @@ COPY: dict[str, dict[str, Any]] = {
         ),
         "criteria_title": "JUDGING CRITERIA",
         "criteria": [
-            ("Impact", 30, "Telemetry per decision, Class Mode for teachers, a student pilot."),
+            ("Impact", 30, "Real Costa Rican figures, telemetry, Class Mode."),
             ("Meta tools", 25, "Five Meta models, one clear job each, plus tool-using agents."),
-            ("Demo", 25, "One link. Every model call has a timeout and a fallback."),
-            ("Technical depth", 20, "Validated contracts, an exact engine, 260+ tests in CI."),
+            ("Demo", 25, "A guided three-month run. Every call has a fallback."),
+            ("Technical depth", 20, "Validated contracts, an exact engine, 1 300+ tests."),
         ],
         "models_title": "META MODELS",
         "models": [
@@ -369,7 +371,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("spark", "Muse Wonder", "Plans your year, writes the summary and event bank."),
             ("person", "Muse Spark Open", "The sellers on Baseten: tactics and memory."),
             ("mic", "Voice Transcribe", "You negotiate out loud; typing always works too."),
-            ("picture", "Muse Image", "Portraits, scenes and the year card, no text."),
+            ("picture", "Muse Image", "Portraits and event scenes, pre-generated, no text."),
         ],
         "agents_title": "AGENTS",
         "agents": [
@@ -412,8 +414,8 @@ COPY: dict[str, dict[str, Any]] = {
             ("progress", "Not by color alone", "Every color also has a label or an icon."),
             ("planned", "Adjustable text", "A larger font for panels and dialogue."),
         ],
-        "run_title": "RUN IT LOCALLY",
-        "run_note": "On Windows, start the server with: uv run python -m app.dev",
+        "run_title": "RUN IT AND BUILD IT",
+        "run_note": "The full guide, with the env files: docs/run-and-build.md",
         "team_title": "TEAM",
         "team_line": "Built together for the Meta Global AI Developer Hackathon 2026.",
         "footer": "FROM COSTA RICA TO THE WORLD",
@@ -421,7 +423,7 @@ COPY: dict[str, dict[str, Any]] = {
     },
     "es": {
         "lang": "es",
-        "kicker": "DE COSTA RICA PARA EL MUNDO",
+        "kicker": "FROM COSTA RICA TO THE WORLD",
         "tagline": "Cada decisión de plata se vuelve una historia.",
         "steps": [
             ("Decidir", "pagar o ahorrar"),
@@ -430,15 +432,15 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negociar", "con la voz"),
         ],
         "rule": ("La IA cuenta la historia.", "El motor lleva las cuentas."),
-        "desc": "ColonQuest, un juego 2D de educación financiera para estudiantes de Costa Rica, "
-        "de Costa Rica para el mundo. Todo el contenido de esta tarjeta se repite como texto "
-        "debajo de ella.",
+        "desc": "ColonQuest, un simulador de finanzas personales que se juega como un juego, de "
+        "Costa Rica para el mundo. Todo el contenido de esta tarjeta se repite como texto debajo "
+        "de ella.",
         "problem": (
             "EL PROBLEMA",
-            "Muchos jóvenes costarricenses toman sus primeras decisiones grandes de plata solos, "
-            "y la primera lección real suele ser la deuda misma. Nadie te enseña a hacer la "
-            "pregunta correcta mientras un vendedor te sonríe. Esa es la habilidad que entrena "
-            "ColonQuest.",
+            "En Costa Rica el 87% de los adultos tiene alguna deuda y destina en promedio el 34% de "
+            "su ingreso a pagarla, y el 80,88% de los encuestados nunca recibió educación "
+            "financiera. Nadie te enseña a hacer la pregunta correcta mientras un vendedor te "
+            "sonríe. Esa es la habilidad que entrena ColonQuest.",
         ),
         "traps": [
             ("card", "Cuotas", "Solo una cuota al mes, y un seguro escondido."),
@@ -456,10 +458,10 @@ COPY: dict[str, dict[str, Any]] = {
         ),
         "criteria_title": "CRITERIOS DEL JURADO",
         "criteria": [
-            ("Impacto", 30, "Telemetría por decisión, Modo Clase y una prueba piloto."),
+            ("Impacto", 30, "Cifras reales de Costa Rica, telemetría, Modo Clase."),
             ("Meta", 25, "Cinco modelos de Meta con un rol claro, más agentes."),
-            ("Demo", 25, "Un link. Cada llamada a un modelo tiene respaldo."),
-            ("Técnica", 20, "Contratos validados, motor exacto, 260+ tests en CI."),
+            ("Demo", 25, "Una ruta guiada de tres meses. Cada llamada tiene respaldo."),
+            ("Técnica", 20, "Contratos validados, motor exacto, más de 1 300 pruebas."),
         ],
         "models_title": "MODELOS DE META",
         "models": [
@@ -467,7 +469,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("spark", "Muse Wonder", "Planifica tu año, escribe el resumen y los eventos."),
             ("person", "Muse Spark Open", "Los vendedores en Baseten: tácticas y memoria."),
             ("mic", "Voice Transcribe", "Negociás en voz alta; escribir siempre sirve."),
-            ("picture", "Muse Image", "Retratos, escenas y la postal del año, sin texto."),
+            ("picture", "Muse Image", "Retratos y escenas de eventos, pre-generados, sin texto."),
         ],
         "agents_title": "AGENTES",
         "agents": [
@@ -510,24 +512,159 @@ COPY: dict[str, dict[str, Any]] = {
             ("progress", "No solo color", "Cada color lleva también etiqueta o ícono."),
             ("planned", "Texto ajustable", "Letra más grande en paneles y diálogos."),
         ],
-        "run_title": "CORRERLO LOCAL",
-        "run_note": "En Windows, levantá el servidor con: uv run python -m app.dev",
+        "run_title": "CORRERLO Y ARMARLO",
+        "run_note": "La guía completa, con los archivos env: docs/run-and-build.es.md",
         "team_title": "EQUIPO",
         "team_line": "Hecho en equipo para el Meta Global AI Developer Hackathon 2026.",
-        "footer": "DE COSTA RICA PARA EL MUNDO",
+        "footer": "FROM COSTA RICA TO THE WORLD",
         "license": "Licencia MIT",
     },
 }
+
+# The other pages of the docs, per language: what each one says, block by block.
+COSTA_RICA_ICONS = ["coin", "person", "warning", "chart", "spark"]
+RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
+PAGES: dict[str, dict[str, dict[str, Any]]] = {
+    "costa-rica": {
+        "en": {
+            "lang": "en",
+            "kicker": "FROM COSTA RICA TO THE WORLD",
+            "title": "COSTA RICA",
+            "tagline": "Why this simulator is set here.",
+            "desc": "The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is repeated as text below it.",
+            "icons": COSTA_RICA_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Every figure, with its source, in the text below",
+            "blocks": [
+                ("header", "DEBT IS ORDINARY"),
+                ("stats", [
+                    ("87%", "of adults have some kind of debt (OCF, 2025). It was 91% in 2023."),
+                    ("34%", "of monthly income goes to debts, on average. It was 38% in 2023."),
+                    ("58.3%", "for people who earn under ₡500 000 a month."),
+                    ("14.7%", "at ages 18 to 24: the moment to learn is before it grows."),
+                ]),
+                ("header", "NOBODY TEACHES IT"),
+                ("stats", [
+                    ("80.88%", "of people surveyed never received financial education (CINPE-IDESPO, UNA)."),
+                    ("73.89%", "say at least one course would be useful to them."),
+                ]),
+                ("header", "THE TRAPS ARE REAL"),
+                ("stats", [
+                    ("2 930", "gota a gota cases in 2025, and 2 050 by August 2026, says the OIJ."),
+                    ("20-100%", "interest found by the OIJ in those loans."),
+                    ("14%", "got loan offers by WhatsApp, Facebook or TikTok in a year (OCF)."),
+                    ("36.48%", "a year: the legal cap on cards in colones, late 2026 (BCCR)."),
+                ]),
+                ("header", "THE ENGINE USES REAL RULES"),
+                ("stats", [
+                    ("₡373 092", "the 2026 minimum wage for an unskilled worker: the player's salary."),
+                    ("10.83%", "worker's social charges in 2026, taken off the salary."),
+                    ("3%", "a month on the card: 36% a year, under the cap."),
+                    ("20%", "a month from the lender: the low end of what the OIJ found."),
+                ]),
+            ],
+        },
+        "es": {
+            "lang": "es",
+            "kicker": "FROM COSTA RICA TO THE WORLD",
+            "title": "COSTA RICA",
+            "tagline": "Por qué este simulador pasa aquí.",
+            "desc": "La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
+            "icons": COSTA_RICA_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Cada cifra, con su fuente, en el texto de abajo",
+            "blocks": [
+                ("header", "LA DEUDA ES LO NORMAL"),
+                ("stats", [
+                    ("87%", "de los adultos tiene alguna deuda (OCF, 2025). En 2023 era el 91%."),
+                    ("34%", "del ingreso mensual va a deudas, en promedio. En 2023 era el 38%."),
+                    ("58,3%", "para quienes ganan menos de ₡500 000 al mes."),
+                    ("14,7%", "de 18 a 24 años: el momento de aprender es antes de que crezca."),
+                ]),
+                ("header", "NADIE LO ENSEÑA"),
+                ("stats", [
+                    ("80,88%", "de los encuestados nunca recibió educación financiera (CINPE-IDESPO, UNA)."),
+                    ("73,89%", "dice que al menos un curso le sería útil."),
+                ]),
+                ("header", "LAS TRAMPAS SON REALES"),
+                ("stats", [
+                    ("2 930", "casos de gota a gota en 2025, y 2 050 a agosto de 2026, según el OIJ."),
+                    ("20-100%", "de interés encontró el OIJ en esos préstamos."),
+                    ("14%", "recibió ofertas de préstamo por WhatsApp, Facebook o TikTok en un año (OCF)."),
+                    ("36,48%", "anual: el tope legal de las tarjetas en colones, fin de 2026 (BCCR)."),
+                ]),
+                ("header", "EL MOTOR USA REGLAS REALES"),
+                ("stats", [
+                    ("₡373 092", "el salario mínimo 2026 de un trabajador no calificado: el del jugador."),
+                    ("10,83%", "de cargas sociales del trabajador en 2026, rebajadas del salario."),
+                    ("3%", "al mes en la tarjeta: 36% anual, bajo el tope."),
+                    ("20%", "al mes con el prestamista: lo más bajo de lo que halló el OIJ."),
+                ]),
+            ],
+        },
+    },
+    "run": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR THE JUDGES",
+            "title": "RUN AND BUILD",
+            "tagline": "Change the env files, build from there.",
+            "desc": "How to run ColonQuest, point it to another backend and build the executable from the env files. The full content of this card is repeated as text below it.",
+            "icons": RUN_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "The keys never go inside the executable",
+            "blocks": [
+                ("header", "JUST PLAY IT"),
+                ("paragraph", "Unzip the Windows build and open ColonQuest.exe. It uses our hosted backend, so it only needs internet. Choose Guided simulation."),
+                ("header", "TWO ENV FILES"),
+                ("tiles", [
+                    ("stack", "server/.env", "API keys, models, budgets, database. Backend only."),
+                    ("folder", "colonquest.env", "Which backend the game talks to. No secrets."),
+                ]),
+                ("header", "YOUR OWN BACKEND"),
+                ("terminal", ["cd server", "cp .env.example .env", "uv sync", "uv run alembic upgrade head", "uv run python -m app.dev"]),
+                ("header", "BUILD THE EXECUTABLE"),
+                ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
+            ],
+        },
+        "es": {
+            "lang": "es",
+            "kicker": "PARA LOS JUECES",
+            "title": "CORRER Y ARMAR",
+            "tagline": "Cambiá los env y armá desde ahí.",
+            "desc": "Cómo correr ColonQuest, apuntarlo a otro backend y armar el ejecutable a partir de los archivos env. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
+            "icons": RUN_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Las llaves nunca van dentro del ejecutable",
+            "blocks": [
+                ("header", "SOLO JUGARLO"),
+                ("paragraph", "Descomprimí el build de Windows y abrí ColonQuest.exe. Usa nuestro backend en línea, así que solo ocupa internet. Elegí Simulación guiada."),
+                ("header", "DOS ARCHIVOS ENV"),
+                ("tiles", [
+                    ("stack", "server/.env", "Llaves, modelos, presupuestos y base. Solo el backend."),
+                    ("folder", "colonquest.env", "A qué backend habla el juego. Sin secretos."),
+                ]),
+                ("header", "TU PROPIO BACKEND"),
+                ("terminal", ["cd server", "cp .env.example .env", "uv sync", "uv run alembic upgrade head", "uv run python -m app.dev"]),
+                ("header", "ARMAR EL EJECUTABLE"),
+                ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
+            ],
+        },
+    },
+}
+
 
 COMMANDS = [
     "cd server",
     "cp .env.example .env",
     "uv sync",
     "uv run alembic upgrade head",
-    "uv run uvicorn app.main:app --reload",
-    "uv run pytest",
+    "uv run python -m app.dev",
+    "cd ..",
+    "cp colonquest.env.example colonquest.env",
+    "python scripts/build_game.py",
 ]
-MEMBERS = ["Keylor Pineda", "Jefferson"]
+MEMBERS = ["Keylor Pineda", "Jefferson Abarca"]
 SECTION_ICONS = ["warning", "coin", "chart", "spark", "bolt", "stack", "person", "terminal", "team"]
 
 
@@ -545,17 +682,18 @@ def lines(x: float, y: float, rows: Sequence[str], cls: str, step: float) -> str
 class Card:
     """Stacks sections vertically; each section draws in local coordinates from y = 0."""
 
-    def __init__(self) -> None:
+    def __init__(self, icons: Sequence[str] = SECTION_ICONS) -> None:
         self.parts: list[str] = []
         self.y = 0
         self.number = 0
+        self.icons = icons
 
     def add(self, body: str, height: int) -> None:
         self.parts.append(f'<g transform="translate(0 {self.y})">{body}</g>')
         self.y += height
 
     def header(self, title: str) -> None:
-        icon_name = SECTION_ICONS[self.number]
+        icon_name = self.icons[self.number % len(self.icons)]
         self.number += 1
         cursor_x = 152 + len(title) * 19.2 + 10
         self.add(
@@ -709,15 +847,20 @@ def accessibility(card: Card, copy: dict[str, Any]) -> None:
     card.add(body, 16 + 84 * len(copy["access"]))
 
 
-def run_locally(card: Card, copy: dict[str, Any]) -> None:
-    height = 40 + 36 * len(COMMANDS)
+def terminal(commands: Sequence[str]) -> tuple[str, int]:
+    height = 40 + 36 * len(commands)
     body = f'<rect x="{LEFT + 6}" y="22" width="{RIGHT - LEFT - 6}" height="{height}" fill="{OCHRE_DARK}"/>'
     body += f'<rect x="{LEFT}" y="16" width="{RIGHT - LEFT - 6}" height="{height}" fill="{INK}"/>'
-    for i, command in enumerate(COMMANDS):
+    for i, command in enumerate(commands):
         y = 56 + 36 * i
         body += f'<text class="prompt" x="{LEFT + 24}" y="{y}">$</text>'
         body += f'<text class="code" x="{LEFT + 52}" y="{y}">{escape(command)}</text>'
-    body += f'<rect class="blink" x="{LEFT + 52}" y="{40 + 36 * len(COMMANDS)}" width="12" height="22" fill="{OCHRE}"/>'
+    body += f'<rect class="blink" x="{LEFT + 52}" y="{40 + 36 * len(commands)}" width="12" height="22" fill="{OCHRE}"/>'
+    return body, height
+
+
+def run_locally(card: Card, copy: dict[str, Any]) -> None:
+    body, height = terminal(COMMANDS)
     # The note ends with a command; keep the command whole on its own line.
     note, windows_command = copy["run_note"].split(": ", 1)
     note_y = height + 62
@@ -751,6 +894,69 @@ def footer(card: Card, copy: dict[str, Any]) -> None:
     )
 
 
+def page_hero(card: Card, copy: dict[str, Any]) -> None:
+    card.add(
+        f"{flag(46, 40)}"
+        f'<text class="kicker" x="128" y="60">{escape(copy["kicker"])}</text>'
+        f'<text class="title" x="46" y="136">{escape(copy["title"])}</text>'
+        f'<text class="tagline" x="48" y="178">{escape(copy["tagline"])}</text>'
+        f'<rect x="46" y="196" width="430" height="30" fill="{INK}"/>'
+        f'<text class="event" x="58" y="217">META GLOBAL AI DEVELOPER HACKATHON 2026</text>'
+        f'<g class="bob">{big_coin(630, 40, 7)}</g>',
+        250,
+    )
+
+
+def stats(card: Card, items: Sequence[tuple[str, str]]) -> None:
+    body, y = "", 16
+    for value, text in items:
+        rows = wrap(text, 38)
+        height = max(92, 28 + 32 * len(rows))
+        body += panel(LEFT, y, RIGHT - LEFT - 6, height)
+        body += f'<text class="stat" x="{LEFT + 18}" y="{y + height / 2 + 13:g}">{escape(value)}</text>'
+        body += lines(LEFT + 232, y + 36, rows, "detail", 32)
+        y += height + 22
+    card.add(body, y + 4)
+
+
+def build_page(name: str, copy: dict[str, Any]) -> None:
+    card = Card(copy["icons"])
+    card.y = 8
+    page_hero(card, copy)
+    for kind, content in copy["blocks"]:
+        if kind == "header":
+            card.header(content)
+        elif kind == "paragraph":
+            card.paragraph(content)
+        elif kind == "stats":
+            stats(card, content)
+        elif kind == "tiles":
+            tile_rows(card, content)
+        elif kind == "terminal":
+            body, height = terminal(content)
+            card.add(body, height + 40)
+    footer(card, copy)
+    write_card(card, copy, f"{name}-{copy['lang']}.svg", copy["title"])
+
+
+def write_card(card: Card, copy: dict[str, Any], file_name: str, title: str) -> None:
+    height = card.y + 24
+    frame = (
+        f'<rect x="10" y="10" width="788" height="{height - 12}" fill="{INK}"/>'
+        f'<rect x="2" y="2" width="788" height="{height - 12}" fill="{PAPER}" stroke="{INK}" stroke-width="4"/>'
+    )
+    document = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {height}" width="{WIDTH}" height="{height}" role="img" aria-labelledby="t d">
+  <title id="t">{escape(title)}</title>
+  <desc id="d">{escape(copy["desc"])}</desc>
+  <style>{STYLE}{REDUCED}
+  </style>
+  {frame}
+  {"".join(card.parts)}
+</svg>
+"""
+    (OUT / file_name).write_text(document, encoding="utf-8", newline="\n")
+
+
 def build(copy: dict[str, Any]) -> None:
     card = Card()
     card.y = 8
@@ -776,27 +982,16 @@ def build(copy: dict[str, Any]) -> None:
     team(card, copy)
     footer(card, copy)
 
-    height = card.y + 24
-    frame = (
-        f'<rect x="10" y="10" width="788" height="{height - 12}" fill="{INK}"/>'
-        f'<rect x="2" y="2" width="788" height="{height - 12}" fill="{PAPER}" stroke="{INK}" stroke-width="4"/>'
-    )
-    document = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {height}" width="{WIDTH}" height="{height}" role="img" aria-labelledby="t d" lang="{copy["lang"]}">
-  <title id="t">ColonQuest</title>
-  <desc id="d">{escape(copy["desc"])}</desc>
-  <style>{STYLE}{REDUCED}
-  </style>
-  {frame}
-  {"".join(card.parts)}
-</svg>
-"""
-    (OUT / f"readme-{copy['lang']}.svg").write_text(document, encoding="utf-8", newline="\n")
+    write_card(card, copy, f"readme-{copy['lang']}.svg", "ColonQuest")
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for copy in COPY.values():
         build(copy)
+    for name, languages in PAGES.items():
+        for copy in languages.values():
+            build_page(name, copy)
 
 
 if __name__ == "__main__":
