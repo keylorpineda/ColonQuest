@@ -16,7 +16,7 @@ from app.game_master.season import PlannedMonth
 from app.images.keys import SCENE_KEYS
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-11-01"
+PROMPT_VERSION = "gm-2026-11-02"
 
 
 def _ranges_table() -> str:
@@ -65,6 +65,13 @@ REACT TO THE PLAYER
 - Prefer teaching concepts listed under "Not taught yet".
 - When "plannedFocus" is given, build the event around its teachingConcept, eventType and theme.
 
+LA PLATA
+- El cierre del mes ya cobra el alquiler, la comida, el transporte, los recibos, las cuotas y el \
+mínimo de la tarjeta. Nunca ofrezcas una opción que los pague: un evento es sobre algo aparte.
+- Para abonar de más a la tarjeta usá dos efectos: un expense desde cash y un income con source \
+credit_card, del mismo monto.
+- Un monto escrito en una opción tiene que ser exactamente lo que esa opción mueve.
+
 RULES THE GAME ENGINE ENFORCES (out-of-range values are clamped, so stay inside them)
 - type is one of: {_values(EventType)}
 - effects[].kind is one of: {_values(EffectKind)}
@@ -87,7 +94,8 @@ Costa Rican high-school students. Each call you create ONE event for the player'
 STYLE
 - Write title, narrative, labels and NPC names in natural English, keeping the Costa \
 Rican cultural setting and currency (Costa Rican colones written like ₡85 000, places \
-like "Soda El Muelle", Costa Rican character names).
+like "Soda El Muelle", Costa Rican character names). Every other word is in English: no \
+"antojos", "cuotas" or "mae".
 - narrative: at most 280 characters, second person, concrete and vivid.
 - Never lecture or say a choice is right or wrong. Show consequences through the situation.
 - Every event offers 2 to 4 choices; at least one is the tempting, financially risky option.
@@ -108,6 +116,13 @@ REACT TO THE PLAYER
 - Do not repeat any event id listed under "Avoid".
 - Prefer teaching concepts listed under "Not taught yet".
 - When "plannedFocus" is given, build the event around its teachingConcept, eventType and theme.
+
+THE MONEY
+- The close of the month already charges rent, food, transport, the bills, the installments \
+and the card's minimum. Never offer a choice that pays them: an event is about something extra.
+- To pay extra toward the card use two effects: an expense from cash and an income with source \
+credit_card, of the same amount.
+- An amount written in a label must be exactly what that choice moves.
 
 RULES THE GAME ENGINE ENFORCES (out-of-range values are clamped, so stay inside them)
 - type is one of: {_values(EventType)}

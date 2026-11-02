@@ -5,10 +5,11 @@ cost a million colones just because the model said so. The Unity finance engine 
 again on its side.
 """
 
+import re
 from dataclasses import dataclass
 
 from app.images.keys import SCENE_BY_CONCEPT, SCENE_KEYS
-from app.schemas import Effect, EffectKind, EventType, GameEvent
+from app.schemas import Effect, EffectKind, EventType, GameEvent, MoneySource
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,6 +20,8 @@ class Range:
     def clamp(self, value: int) -> int:
         return max(self.low, min(self.high, value))
 
+
+MAX_EFFECTS = 5
 
 # Cash-flow effects (expense / income) by event type.
 CASH_FLOW_RANGES: dict[EventType, Range] = {
@@ -73,6 +76,31 @@ def clamp_effect(event_type: EventType, effect: Effect) -> tuple[Effect, list[st
     return (effect.model_copy(update=update) if update else effect), notes
 
 
+# A choice that pays toward the card out of cash.
+PAYS_THE_CARD = re.compile(
+    r"\b(pay|paying|pays|abon\w*|pag\w*)\b.*\b(minimum|card|balance|interest|m[ií]nimo|tarjeta|saldo)\b",
+    re.IGNORECASE,
+)
+
+
+def repair_card_payment(label: str, effects: list[Effect]) -> list[Effect]:
+    """Money paid toward the card has to lower the card. A model may only write the expense."""
+    if not PAYS_THE_CARD.search(label):
+        return effects
+    pays_down = any(
+        e.kind is EffectKind.INCOME and e.source is MoneySource.CREDIT_CARD for e in effects
+    )
+    cash = next(
+        (e for e in effects if e.kind is EffectKind.EXPENSE and e.source is MoneySource.CASH), None
+    )
+    if pays_down or cash is None or len(effects) >= MAX_EFFECTS:
+        return effects
+    return [
+        *effects,
+        Effect(kind=EffectKind.INCOME, amount=cash.amount, source=MoneySource.CREDIT_CARD),
+    ]
+
+
 def clamp_event(event: GameEvent) -> tuple[GameEvent, list[str]]:
     """Clamp every effect of every choice and the scene. Returns the safe event and the changes."""
     notes: list[str] = []
@@ -88,5 +116,6 @@ def clamp_event(event: GameEvent) -> tuple[GameEvent, list[str]]:
             clamped, effect_notes = clamp_effect(event.type, effect)
             effects.append(clamped)
             notes.extend(f"{choice.id}.{note}" for note in effect_notes)
+        effects = repair_card_payment(choice.label, effects)
         choices.append(choice.model_copy(update={"effects": effects}))
     return event.model_copy(update={"choices": choices, "image_key": image_key}), notes
