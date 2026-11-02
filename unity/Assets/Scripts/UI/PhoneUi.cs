@@ -370,7 +370,7 @@ namespace ColonQuest.UI
 
             text.AppendLine();
             text.AppendLine(Loc.F("SINPE enviado en esta partida: {0}", Money.Format(session.SinpeSent)));
-            text.Append(Loc.F("Lo que tenés menos lo que debés: {0}", Money.Format(GameRules.NetWorth(state))));
+            text.Append(Loc.F("Lo que tenés menos lo que debés: {0}", Money.Format(GameRules.NetWorth(state, session.Holdings))));
             Label(text.ToString(), 26, UiKit.Ink, InnerWidth, new Vector2(0f, -64f));
             AddBankMoves();
         }

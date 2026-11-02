@@ -100,13 +100,16 @@ namespace ColonQuest.Game
             return total;
         }
 
-        /// <summary>Everything owned minus the card, the lenders and the installments still to pay.</summary>
+        /// <summary>Everything owned minus the card, the lenders and the installments still to pay. Rent is a cost of living, not a debt.</summary>
         public static long NetWorth(PlayerState state)
         {
             long installmentsLeft = 0L;
             foreach (var installment in state.Installments)
             {
-                installmentsLeft += installment.Monthly * installment.MonthsLeft;
+                if (!FinanceEngine.IsRent(installment))
+                {
+                    installmentsLeft += installment.Monthly * installment.MonthsLeft;
+                }
             }
 
             return state.Cash + state.Savings + state.EmergencyFund - DebtBalance(state) - installmentsLeft;

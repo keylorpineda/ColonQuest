@@ -136,7 +136,7 @@ namespace ColonQuest.UI
 
             var st = ApiMapper.FromDto(saved.run.state);
             long debt = GameRules.DebtBalance(st);
-            long netWorth = GameRules.NetWorth(st);
+            long netWorth = GameRules.NetWorth(st, HoldingsSaving.FromSnapshot(saved.run.holdings));
 
             reportTitle.text = Loc.T("Reporte Final de la Partida");
             reportSubtitle.text = saved.name + "  ·  " + Loc.F("{0} meses jugados", saved.run.monthsPlayed);

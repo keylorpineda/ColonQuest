@@ -91,6 +91,10 @@ namespace ColonQuest.Game
             {
                 clone.JobPosition = Loop.Job.Position.ToString();
             }
+            if (Loop != null && Loop.Holdings != null)
+            {
+                clone.AssetsValue = Loop.Holdings.AssetValue;
+            }
             return clone;
         }
 
@@ -1133,7 +1137,7 @@ namespace ColonQuest.Game
                 MonthsPlayed = Loop.MonthsPlayed,
                 Decisions = Loop.Decisions,
                 TotalDebt = GameRules.DebtBalance(State),
-                NetWorth = GameRules.NetWorth(State),
+                NetWorth = GameRules.NetWorth(State, Loop.Holdings),
                 Narrative = "Terminaste tus meses. Cada decisión de plata tuvo su consecuencia, y estos son tus números.",
                 Source = "local"
             };
