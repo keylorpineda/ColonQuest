@@ -328,6 +328,15 @@ namespace ColonQuest.UI
         /// <summary>
         /// A full-screen layer that dims what is behind it and catches every click. The window goes inside it.
         /// </summary>
+        /// <summary>A question already asked: it cannot be pressed again, but keeps its color so it reads as a record, not as an error.</summary>
+        public static void MarkDone(Button button)
+        {
+            var colors = button.colors;
+            colors.disabledColor = Color.white;
+            button.colors = colors;
+            button.interactable = false;
+        }
+
         public static GameObject Overlay(Transform parent, string name)
         {
             var go = new GameObject(name, typeof(RectTransform));

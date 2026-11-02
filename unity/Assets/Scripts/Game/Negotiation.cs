@@ -101,6 +101,15 @@ namespace ColonQuest.Game
             Status = reply.DealStatus;
         }
 
+        /// <summary>The player asked this one with its button: it counts whatever the answer says.</summary>
+        public void MarkAsked(KeyQuestion question)
+        {
+            if (!asked.Contains(question))
+            {
+                asked.Add(question);
+            }
+        }
+
         /// <summary>Closes the conversation from a button instead of from the typed text.</summary>
         public void Close(DealStatus status)
         {
