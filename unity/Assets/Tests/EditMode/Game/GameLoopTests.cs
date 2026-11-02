@@ -35,6 +35,26 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void CloseMonth_KeepsTheMoneyAndTheDebtsForTheReport()
+        {
+            var loop = new GameLoop();
+            loop.NewGame();
+            loop.CloseMonth();
+            loop.CloseMonth();
+
+            Assert.AreEqual(2, loop.MonthCloses.Count);
+            Assert.AreEqual(loop.State.Cash + loop.State.Savings + loop.State.EmergencyFund, loop.MonthCloses[1].money);
+            Assert.AreEqual(GameRules.DebtBalance(loop.State), loop.MonthCloses[1].debts);
+
+            var back = new GameLoop();
+            back.Restore(loop.Snapshot());
+            Assert.AreEqual(2, back.MonthCloses.Count);
+
+            loop.NewGame();
+            Assert.AreEqual(0, loop.MonthCloses.Count);
+        }
+
+        [Test]
         public void NewPlayer_StartsWithTheContractExampleSituation()
         {
             var state = GameRules.NewPlayer();

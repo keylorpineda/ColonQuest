@@ -574,7 +574,6 @@ namespace ColonQuest.UI
                 return;
             }
 
-            endScreen.Tick();
             bool open = modal.IsOpen || endScreen.IsOpen;
 
             PlayerController.Blocked = open || session.Busy;
@@ -1202,7 +1201,7 @@ namespace ColonQuest.UI
             if (session.Guided)
             {
                 StopGuided();
-                endScreen.Show(Loc.T("Tus tres meses"), summary, session.State, session.Loop.Holdings, session.Loop.Bills, GuidedEndOptions());
+                endScreen.Show(Loc.T("Tus tres meses"), summary, session.Loop, aiCalls.Last, GuidedEndOptions());
                 return;
             }
 
@@ -1214,7 +1213,7 @@ namespace ColonQuest.UI
             }
 
             options.Add(new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart });
-            endScreen.Show(Loc.T("Fin de la partida"), summary, session.State, session.Loop.Holdings, session.Loop.Bills, options);
+            endScreen.Show(Loc.T("Fin de la partida"), summary, session.Loop, aiCalls.Last, options);
         }
 
         /// <summary>True while the pause window or its settings are up.</summary>

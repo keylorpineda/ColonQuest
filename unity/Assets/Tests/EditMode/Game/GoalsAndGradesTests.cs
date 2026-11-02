@@ -15,6 +15,16 @@ namespace ColonQuest.Game.Tests
             return ReportCard.Build(loop.State, loop.Holdings, loop.Bills).First(l => l.Concept == concept).Grade;
         }
 
+        [TestCase(-5L, 100L, true, "Terminaste debiéndole a un prestamista")]
+        [TestCase(500L, 0L, false, "Terminaste sin deudas")]
+        [TestCase(-5L, 100L, false, "Debés más de lo que tenés")]
+        [TestCase(5L, 100L, false, "Tenés más de lo que debés")]
+        public void Verdict_ComesFromTheFigures(long netWorth, long debt, bool lender, string expected)
+        {
+            Assert.AreEqual(expected, ReportCard.Verdict(netWorth, debt, lender));
+            Assert.IsTrue(ColonQuest.World.Translations.English.ContainsKey(expected), expected);
+        }
+
         [Test]
         public void Propose_ThreeGoalsFromTheSituation()
         {

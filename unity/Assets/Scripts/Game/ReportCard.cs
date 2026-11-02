@@ -34,6 +34,22 @@ namespace ColonQuest.Game
             };
         }
 
+        /// <summary>The run in one sentence, from its figures.</summary>
+        public static string Verdict(long netWorth, long totalDebt, bool owesALender)
+        {
+            if (owesALender)
+            {
+                return "Terminaste debiéndole a un prestamista";
+            }
+
+            if (totalDebt <= 0L)
+            {
+                return "Terminaste sin deudas";
+            }
+
+            return netWorth < 0L ? "Debés más de lo que tenés" : "Tenés más de lo que debés";
+        }
+
         private static char Budget(PlayerState state, BillBook bills)
         {
             int late = 0;
