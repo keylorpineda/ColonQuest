@@ -105,12 +105,14 @@ namespace ColonQuest.UI
             line.alignment = TextAnchor.UpperLeft;
         }
 
-        /// <summary>The two moves of the bank app, under the numbers.</summary>
+        /// <summary>The moves of the bank app, under the numbers.</summary>
         private void AddBankMoves()
         {
             string fund = Loc.F("Apartar {0} al fondo", Money.Format(BankStep));
             string card = Loc.F("Abonar {0} a la tarjeta", Money.Format(BankStep));
-            AddButton(fund, GameUiColors.Green, new Vector2(InnerWidth, 56f), new Vector2(0f, -664f), () => { session.PutInFund(BankStep); Show(App.Bank); });
+            string back = Loc.F("Sacar {0} del fondo", Money.Format(BankStep));
+            AddButton(fund, GameUiColors.Green, new Vector2(InnerWidth, 56f), new Vector2(0f, -600f), () => { session.PutInFund(BankStep); Show(App.Bank); });
+            AddButton(back, GameUiColors.Blue, new Vector2(InnerWidth, 56f), new Vector2(0f, -664f), () => { session.TakeFromFund(BankStep); Show(App.Bank); });
             AddButton(card, GameUiColors.Yellow, new Vector2(InnerWidth, 56f), new Vector2(0f, -728f), () => { session.PayTowardCard(BankStep); Show(App.Bank); });
         }
     }

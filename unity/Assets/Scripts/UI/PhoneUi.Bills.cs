@@ -1,3 +1,4 @@
+using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.World;
 using UnityEngine;
@@ -8,7 +9,10 @@ namespace ColonQuest.UI
     /// <summary>The bills of the month on the phone. It only shows them and asks; the finance engine takes the money.</summary>
     public sealed partial class PhoneUi
     {
+        private static readonly MoneySource[] BillSources = { MoneySource.Cash, MoneySource.Savings, MoneySource.CreditCard };
+
         private string billsResult = string.Empty;
+        private MoneySource billSource = MoneySource.Cash;
 
         private static string NameOf(BillKind kind)
         {
@@ -21,10 +25,48 @@ namespace ColonQuest.UI
             }
         }
 
+        private static string SourceName(MoneySource source)
+        {
+            switch (source)
+            {
+                case MoneySource.Savings: return "Cuenta";
+                case MoneySource.CreditCard: return "Tarjeta";
+                default: return "Efectivo";
+            }
+        }
+
+        /// <summary>What the chosen source has, on the line under the title. Only cash is kept up to date by itself.</summary>
+        private void SourceLine(float y)
+        {
+            var state = session.State;
+            switch (billSource)
+            {
+                case MoneySource.Savings:
+                    Label(Loc.F("En la cuenta  {0}", Money.Format(state.Savings)), 30, GameUiColors.Muted, InnerWidth, new Vector2(0f, y));
+                    break;
+                case MoneySource.CreditCard:
+                    Label(Loc.F("Crédito disponible  {0}  ·  {1}% al mes", Money.Format(state.CreditCard.AvailableCredit), state.CreditCard.MonthlyRatePct), 26, GameUiColors.Muted, InnerWidth, new Vector2(0f, y));
+                    break;
+                default:
+                    CashLine(y);
+                    break;
+            }
+        }
+
+        private string NotEnough()
+        {
+            switch (billSource)
+            {
+                case MoneySource.Savings: return Loc.T("No te alcanza lo que hay en la cuenta para pagar ese recibo.");
+                case MoneySource.CreditCard: return Loc.T("No te alcanza el crédito de la tarjeta para pagar ese recibo.");
+                default: return Loc.T("No te alcanza el efectivo para pagar ese recibo.");
+            }
+        }
+
         private void BuildBills()
         {
             Heading("Recibos");
-            CashLine(-54f);
+            SourceLine(-54f);
             var book = session.Loop.Bills;
             if (book.Due.Count == 0)
             {
@@ -32,7 +74,20 @@ namespace ColonQuest.UI
                 return;
             }
 
-            float y = -100f;
+            float gap = 8f;
+            float width = (InnerWidth - 2f * gap) / BillSources.Length;
+            for (int i = 0; i < BillSources.Length; i++)
+            {
+                var source = BillSources[i];
+                AddButton(SourceName(source), source == billSource ? GameUiColors.Yellow : Color.white, new Vector2(width, 54f), new Vector2(i * (width + gap), -100f), () =>
+                {
+                    billSource = source;
+                    billsResult = string.Empty;
+                    Show(App.Bills);
+                });
+            }
+
+            float y = -164f;
             foreach (var due in book.Due)
             {
                 var bill = due;
@@ -56,8 +111,8 @@ namespace ColonQuest.UI
 
         private void Pay(BillKind kind)
         {
-            bool paid = session.PayBill(kind);
-            billsResult = paid ? string.Empty : Loc.T("No te alcanza el efectivo para pagar ese recibo.");
+            bool paid = session.PayBill(kind, billSource);
+            billsResult = paid ? string.Empty : NotEnough();
             if (paid)
             {
                 AudioDirector.Effect(SoundEffectKind.Coin);
@@ -69,7 +124,7 @@ namespace ColonQuest.UI
         private void PayAll()
         {
             int before = session.Loop.Bills.Due.Count;
-            int paid = session.PayAllBills();
+            int paid = session.PayAllBills(billSource);
             billsResult = paid < before ? Loc.T("No te alcanzó para pagarlos todos.") : string.Empty;
             if (paid > 0)
             {

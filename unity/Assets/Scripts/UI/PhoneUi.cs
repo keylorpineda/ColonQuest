@@ -262,19 +262,20 @@ namespace ColonQuest.UI
                 return;
             }
 
-            CashLine(-54f);
+            Label(Loc.F("Cuenta asociada  {0}", Money.Format(session.State.Savings)), 30, GameUiColors.Muted, InnerWidth, new Vector2(0f, -54f));
 
             for (int i = 0; i < Contacts.Length; i++)
             {
                 int index = i;
                 var color = index == sinpeContact ? GameUiColors.Yellow : Color.white;
-                AddButton(Loc.T(Contacts[i].Name) + "   " + Contacts[i].Number, color, new Vector2(InnerWidth, 64f), new Vector2(0f, -96f - i * 72f), () =>
+                var contactButton = AddButton(Loc.T(Contacts[i].Name) + "   " + Contacts[i].Number, color, new Vector2(InnerWidth, 64f), new Vector2(0f, -96f - i * 72f), () =>
                 {
                     sinpeContact = index;
                     sinpeChecked = false;
                     sinpeResult = string.Empty;
                     Show(App.Sinpe);
                 });
+                contactButton.GetComponentInChildren<Text>().fontSize = 24;
             }
 
             if (sinpeContact < 0)
@@ -324,7 +325,7 @@ namespace ColonQuest.UI
             long amount = SinpeAmounts[sinpeAmount];
             if (!session.SendSinpe(amount))
             {
-                sinpeResult = "No te alcanza el efectivo para enviar eso.";
+                sinpeResult = "No te alcanza lo que hay en la cuenta para enviar eso.";
                 sinpeResultColor = GameUiColors.Loss;
             }
             else if (contact.Scam)
