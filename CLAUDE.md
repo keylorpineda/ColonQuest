@@ -154,6 +154,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 | `POST /api/sessions/{id}/event` | Recibe el estado financiero del mes y devuelve un `GameEvent` |
 | `POST /api/sessions/{id}/decisions` | Registra la decisión tomada y el estado resultante (telemetría) |
 | `POST /api/sessions/{id}/negotiation` | Recibe audio (o texto de respaldo) y devuelve un `NegotiationReply` |
+| `POST /api/sessions/{id}/talk` | Cobradores, prestamista y pirámide en palabras del modelo. Unity manda la ficha y las únicas cifras permitidas; 503 significa usar las reglas locales de `DebtTalk` |
 | `GET /api/images/{key}` | Devuelve un retrato o escena cacheada; la genera solo si no existe |
 | `POST /api/sessions/{id}/summary` | Genera el resumen final con Muse Spark |
 | `GET /api/classes/{code}/dashboard` | Métricas agregadas del grupo para el panel del profesor |
@@ -227,6 +228,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 - El vendedor tiene una **ficha oculta con la verdad** (precio de contado, cuota, plazo,
   seguros, comisiones) generada y calculada por el motor, no por el modelo. El modelo solo
   decide cómo revelarla según las preguntas del jugador.
+- `termMonths` va y vuelve en cada turno: el plazo que el vendedor cotizó de último es el que se firma. El precio de contado nunca cambia.
 - `keyQuestionsAsked` alimenta la métrica de impacto: ¿el jugador hizo las preguntas correctas?
 - Siempre ofrecer **entrada de texto como respaldo** si el micrófono falla.
 
