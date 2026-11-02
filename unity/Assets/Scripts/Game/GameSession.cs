@@ -894,7 +894,7 @@ namespace ColonQuest.Game
             }
 
             VoiceNotice = null;
-            CurrentTalk = new DebtTalk(partner, partner == TalkPartner.Collectors ? CollectionDemand : 0L);
+            CurrentTalk = new DebtTalk(partner, partner == TalkPartner.Collectors ? CollectionDemand : 0L, State.CreditCard.MonthlyRatePct);
             TalkUpdated?.Invoke(CurrentTalk);
         }
 
