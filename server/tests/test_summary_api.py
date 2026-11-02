@@ -73,6 +73,7 @@ async def test_summary_closes_the_session(client: httpx2.AsyncClient, db: AsyncS
     assert game_session is not None and game_session.finished_at is not None
     assert game_session.final_state == FINAL_STATE | {
         "assetsValue": 0,
+        "monthsPlayed": 0,
         "installments": [],
         "informalLoans": [],
         "history": [],

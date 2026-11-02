@@ -40,6 +40,7 @@ namespace ColonQuest.Api
         public int week = 1;
         public string jobPosition = string.Empty;
         public long assetsValue;
+        public int monthsPlayed;
         public int month;
         public long salaryNet;
         public long cash;

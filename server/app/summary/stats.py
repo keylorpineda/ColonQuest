@@ -80,7 +80,7 @@ def build_stats(
     records = list(negotiations)
     asked = {KeyQuestion(question) for record in records for question in record.key_questions}
     return SessionStats(
-        months_played=state.month,
+        months_played=state.months_played or state.month,
         decisions=len(decision_concepts),
         concepts_taught=[concept for concept in TeachingConcept if concept in taught],
         negotiations=len(records),

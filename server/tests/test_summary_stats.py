@@ -81,3 +81,9 @@ def test_rent_is_not_a_debt_and_what_was_bought_counts() -> None:
 
     assert total_debt(state) == total_debt(STATE), "the lease adds nothing to what is owed"
     assert net_worth(state) == net_worth(STATE) + 2720000
+
+
+def test_the_months_played_come_from_the_run_when_it_says_them() -> None:
+    assert build_stats(STATE, [], []).months_played == 12
+    closed = STATE.model_copy(update={"month": 4, "months_played": 3})
+    assert build_stats(closed, [], []).months_played == 3
