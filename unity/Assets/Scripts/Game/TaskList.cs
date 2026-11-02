@@ -25,7 +25,7 @@ namespace ColonQuest.Game
         public const string TakeInsurance = "Sacar el seguro de salud en el hospital";
         public const string FirstShift = "Tu primer turno en la soda El Muelle";
         public const string Work = "Trabajar en la soda (7:00 a 12:00)";
-        public const string PayBills = "Pagar los recibos en el banco";
+        public const string PayBills = "Pagar los recibos desde el teléfono";
         public const string CatchUp = "Pagarle al prestamista lo que debés";
         public const string CloseMonth = "Cerrar el mes en el banco";
         public const string Sleep = "Dormir en tu cuarto";
@@ -47,7 +47,7 @@ namespace ColonQuest.Game
             }
 
             list.Add(new TaskItem(Work, loop.Job.WorkedToday && !loop.Job.OnShift));
-            if (loop.Bills.ArrivedThisMonth)
+            if (loop.Bills.ArrivedThisMonth || loop.Bills.Due.Count > 0)
             {
                 list.Add(new TaskItem(PayBills, loop.Bills.Due.Count == 0));
             }

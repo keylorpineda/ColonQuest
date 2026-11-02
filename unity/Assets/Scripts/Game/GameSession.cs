@@ -975,7 +975,6 @@ namespace ColonQuest.Game
         /// <summary>Everything sent by SINPE from the phone in this run.</summary>
         public long SinpeSent { get; private set; }
 
-        /// <summary>Sends money by SINPE from the phone. Only the finance engine moves the cash; false when there is not enough.</summary>
         public bool TakeClass(CourseKind kind)
         {
             if (Busy || Loop.IsFinished || !Loop.TakeClass(kind))
@@ -1007,6 +1006,15 @@ namespace ColonQuest.Game
             }
         }
 
+        public void TakeFromFund(long amount)
+        {
+            if (!Busy && !Loop.IsFinished)
+            {
+                Loop.TakeFromFund(amount);
+                Changed?.Invoke();
+            }
+        }
+
         public void PayTowardCard(long amount)
         {
             if (!Busy && !Loop.IsFinished)
@@ -1016,9 +1024,9 @@ namespace ColonQuest.Game
             }
         }
 
-        public bool PayBill(BillKind kind)
+        public bool PayBill(BillKind kind, MoneySource source = MoneySource.Cash)
         {
-            if (Busy || Loop.IsFinished || !Loop.PayBill(kind))
+            if (Busy || Loop.IsFinished || !Loop.PayBill(kind, source))
             {
                 return false;
             }
@@ -1027,21 +1035,22 @@ namespace ColonQuest.Game
             return true;
         }
 
-        public int PayAllBills()
+        public int PayAllBills(MoneySource source = MoneySource.Cash)
         {
             if (Busy || Loop.IsFinished)
             {
                 return 0;
             }
 
-            int paid = Loop.PayAllBills();
+            int paid = Loop.PayAllBills(source);
             Changed?.Invoke();
             return paid;
         }
 
+        /// <summary>Sends money by SINPE Movil: it leaves the account linked to the number. False when the account does not reach.</summary>
         public bool SendSinpe(long amount)
         {
-            if (Busy || Loop.IsFinished || amount <= 0L || !FinanceEngine.TrySpendCash(State, amount))
+            if (Busy || Loop.IsFinished || amount <= 0L || !FinanceEngine.TrySpendFromAccount(State, amount))
             {
                 return false;
             }
