@@ -55,7 +55,7 @@ stretch of the town, for three months, and you only make the decisions:
 
 The panel on the right shows every real call as it happens, read back from the server: model,
 provider, latency and cost. Press **L** to hide it. The run ends with a report drawn from the engine's
-numbers: what you have, what you owe, your money month by month and your grades.
+numbers: what you have, what you owe, your money month by month, your grades and a picture chosen by what happened in your run.
 The objectives, the arrow and the map marks work the same in the full **Story mode**, where the people
 on the street also talk to you through Muse Spark Open.
 
@@ -92,7 +92,7 @@ It needs internet, because the models run on the backend. A whole tour costs abo
 | Muse Wonder | Plans your year in the background and writes the year-end summary |
 | Muse Spark Open (Baseten) | The sellers, with commission tactics and memory of what you asked; the collectors, the lender, the pyramid promoter and the people of the town |
 | Muse Voice Transcribe | You negotiate out loud; typing always works too |
-| Muse Image | Portraits and event scenes, pre-generated and without text |
+| Muse Image | Portraits, event scenes and the picture of your ending, chosen by what happened in your run; pre-generated and without text |
 
 Each role follows measured latency: only Spark answers inside the game's 8 s every time, so the
 slow writer, Wonder, only runs where you are not waiting. See

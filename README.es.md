@@ -55,7 +55,7 @@ durante tres meses, y vos solo tomás las decisiones:
 
 El panel de la derecha muestra cada llamada real mientras pasa, leída del servidor: modelo, proveedor,
 tiempo y costo. Se oculta con **L**. La partida termina con un informe hecho con los números del motor:
-lo que tenés, lo que debés, tu plata mes a mes y tus notas. Los objetivos, la flecha y las marcas del
+lo que tenés, lo que debés, tu plata mes a mes, tus notas y una imagen elegida por lo que pasó en tu partida. Los objetivos, la flecha y las marcas del
 mapa funcionan igual en el **Modo historia** completo, donde la gente de la calle también te habla con
 Muse Spark Open.
 
@@ -92,7 +92,7 @@ Ocupa internet, porque los modelos corren en el backend. Un recorrido completo c
 | Muse Wonder | Planifica tu año en segundo plano y escribe el resumen final |
 | Muse Spark Open (Baseten) | Los vendedores, con tácticas de comisión y memoria de lo que preguntaste; los cobradores, el prestamista, el de la pirámide y la gente del pueblo |
 | Muse Voice Transcribe | Negociás en voz alta; escribir siempre sirve |
-| Muse Image | Retratos y escenas de los eventos, pre-generados y sin texto |
+| Muse Image | Retratos, escenas de los eventos y la imagen de tu final, elegida por lo que pasó en tu partida; pre-generados y sin texto |
 
 Cada rol sale de latencias medidas: solo Spark responde siempre dentro de los 8 s del juego, así
 que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver

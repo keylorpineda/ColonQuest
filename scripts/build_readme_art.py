@@ -371,7 +371,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("spark", "Muse Wonder", "Plans your year, writes the summary and event bank."),
             ("person", "Muse Spark Open", "The sellers on Baseten: tactics and memory."),
             ("mic", "Voice Transcribe", "You negotiate out loud; typing always works too."),
-            ("picture", "Muse Image", "Portraits and event scenes, pre-generated, no text."),
+            ("picture", "Muse Image", "Portraits, event scenes and your ending, no text."),
         ],
         "agents_title": "AGENTS",
         "agents": [
@@ -469,7 +469,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("spark", "Muse Wonder", "Planifica tu año, escribe el resumen y los eventos."),
             ("person", "Muse Spark Open", "Los vendedores en Baseten: tácticas y memoria."),
             ("mic", "Voice Transcribe", "Negociás en voz alta; escribir siempre sirve."),
-            ("picture", "Muse Image", "Retratos y escenas de eventos, pre-generados, sin texto."),
+            ("picture", "Muse Image", "Retratos, escenas y tu final, pre-generados, sin texto."),
         ],
         "agents_title": "AGENTES",
         "agents": [
