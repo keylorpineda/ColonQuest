@@ -11,6 +11,9 @@ namespace ColonQuest.UI
         public string Label;
         public Color Color;
         public Action OnPress;
+
+        /// <summary>False shows the option without letting it be chosen.</summary>
+        public bool Enabled = true;
     }
 
     /// <summary>
@@ -191,7 +194,8 @@ namespace ColonQuest.UI
                 {
                     var option = options[i];
                     var press = option.OnPress;
-                    UiKit.MakeButton(card, option.Label, option.Color, new Vector2(textWidth, ButtonHeight), top, new Vector2(0f, y), () => Activate(press));
+                    var button = UiKit.MakeButton(card, option.Label, option.Color, new Vector2(textWidth, ButtonHeight), top, new Vector2(0f, y), () => Activate(press));
+                    button.interactable = option.Enabled;
                     y -= ButtonHeight + ButtonGap;
                 }
             }
@@ -208,7 +212,7 @@ namespace ColonQuest.UI
         /// <summary>Presses the option with this index, as if it was clicked. Used for the number keys.</summary>
         public void Press(int index)
         {
-            if (IsOpen && index >= 0 && index < options.Count)
+            if (IsOpen && index >= 0 && index < options.Count && options[index].Enabled)
             {
                 Activate(options[index].OnPress);
             }

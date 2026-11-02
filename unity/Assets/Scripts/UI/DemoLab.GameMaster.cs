@@ -126,11 +126,12 @@ namespace ColonQuest.UI
             foreach (var choice in gmEvent.Choices)
             {
                 string id = choice.Id;
-                var button = Action(choice.Label, GameUiColors.Yellow, new Vector2(Width, 76f), new Vector2(Left, y), () => Pick(id));
+                bool open = FinanceEngine.ChoiceIsOpen(gmBefore, gmEvent, choice);
+                var button = Action(choice.Label, GameUiColors.Yellow, new Vector2(Width, 76f), new Vector2(Left, y), () => Pick(id), open);
                 var label = button.transform.Find("Body/Text") as RectTransform;
                 label.anchoredPosition = new Vector2(0f, 12f);
                 label.sizeDelta = new Vector2(Width - 40f, 40f);
-                UiKit.PlainLabel(button.transform.Find("Body"), "Effects", DemoReadout.DescribeAll(choice), 19, GameUiColors.Muted, new Vector2(Width - 40f, 26f), Center, new Vector2(0f, -18f), TextAnchor.MiddleCenter);
+                UiKit.PlainLabel(button.transform.Find("Body"), "Effects", open ? DemoReadout.DescribeAll(choice) : Loc.T("Sin crédito en la tarjeta"), 19, GameUiColors.Muted, new Vector2(Width - 40f, 26f), Center, new Vector2(0f, -18f), TextAnchor.MiddleCenter);
                 y -= 82f;
             }
         }

@@ -872,7 +872,9 @@ namespace ColonQuest.UI
             {
                 var choice = gameEvent.Choices[i];
                 string id = choice.Id;
-                options.Add(new ModalOption { Label = $"{i + 1}.  {Loc.T(choice.Label)}", Color = GameUiColors.Cycle(i), OnPress = () => session.Choose(id) });
+                bool open = FinanceEngine.ChoiceIsOpen(session.State, gameEvent, choice);
+                string label = $"{i + 1}.  {Loc.T(choice.Label)}" + (open ? string.Empty : "  ·  " + Loc.T("Sin crédito en la tarjeta"));
+                options.Add(new ModalOption { Label = label, Color = GameUiColors.Cycle(i), OnPress = () => session.Choose(id), Enabled = open });
             }
 
             string who = gameEvent.Npc != null ? gameEvent.Npc.Name + "  ·  " + gameEvent.Npc.Role : string.Empty;
@@ -1014,6 +1016,10 @@ namespace ColonQuest.UI
             {
                 text.AppendLine(Loc.F("Pago mínimo de la tarjeta  {0}", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>-{Money.Format(card.AmountPaid)}</color>"));
                 text.AppendLine(Loc.F("Intereses de la tarjeta  {0} de deuda", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(card.InterestCharged)}</color>"));
+                if (card.LateFee > 0L)
+                {
+                    text.AppendLine(Loc.F("Recargo por no llegar al mínimo  {0} de deuda", $"<color={GameUiColors.Hex(GameUiColors.Loss)}>+{Money.Format(card.LateFee)}</color>"));
+                }
             }
 
             if (report.InformalLoanInterestAccrued > 0L)
@@ -1023,6 +1029,11 @@ namespace ColonQuest.UI
 
             text.AppendLine();
             text.Append(Loc.F("Te queda {0} en efectivo y la tarjeta debe {1}.", Money.Format(report.EndingCash), Money.Format(report.EndingCardBalance)));
+            if (report.EndingCardBalance > session.State.CreditCard.Limit)
+            {
+                text.AppendLine();
+                text.Append(Loc.T("Lo que no alcanzó se fue a la tarjeta y pasó del límite: ya no le podés cargar nada más."));
+            }
 
             bool last = session.Loop.IsFinished;
             modal.Show(Loc.F("Mes {0} cerrado", report.MonthProcessed), Loc.T("Estado de cuenta del mes"), text.ToString(), new[]
