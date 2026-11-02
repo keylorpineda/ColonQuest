@@ -1,0 +1,43 @@
+{
+  "$defs": {
+    "TalkFact": {
+      "enum": [
+        "total_cost",
+        "rate",
+        "arrangement",
+        "what_if_not_paid",
+        "where_money_comes",
+        "guarantee",
+        "legal"
+      ],
+      "title": "TalkFact",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "askedFacts": {
+      "items": {
+        "$ref": "#/$defs/TalkFact"
+      },
+      "title": "Askedfacts",
+      "type": "array"
+    },
+    "npcReply": {
+      "title": "Npcreply",
+      "type": "string"
+    },
+    "source": {
+      "const": "model",
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "npcReply",
+    "askedFacts",
+    "source"
+  ],
+  "title": "TalkReply",
+  "type": "object"
+}

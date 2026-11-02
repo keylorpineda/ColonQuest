@@ -1155,6 +1155,162 @@
         "title": "SessionTrace",
         "type": "object"
       },
+      "TalkExchange": {
+        "additionalProperties": false,
+        "properties": {
+          "player": {
+            "maxLength": 500,
+            "title": "Player",
+            "type": "string"
+          },
+          "reply": {
+            "maxLength": 500,
+            "title": "Reply",
+            "type": "string"
+          }
+        },
+        "required": [
+          "player",
+          "reply"
+        ],
+        "title": "TalkExchange",
+        "type": "object"
+      },
+      "TalkFact": {
+        "enum": [
+          "total_cost",
+          "rate",
+          "arrangement",
+          "what_if_not_paid",
+          "where_money_comes",
+          "guarantee",
+          "legal"
+        ],
+        "title": "TalkFact",
+        "type": "string"
+      },
+      "TalkPartner": {
+        "enum": [
+          "collectors",
+          "lender",
+          "pyramid"
+        ],
+        "title": "TalkPartner",
+        "type": "string"
+      },
+      "TalkReply": {
+        "additionalProperties": false,
+        "properties": {
+          "askedFacts": {
+            "items": {
+              "$ref": "#/components/schemas/TalkFact"
+            },
+            "title": "Askedfacts",
+            "type": "array"
+          },
+          "npcReply": {
+            "title": "Npcreply",
+            "type": "string"
+          },
+          "source": {
+            "const": "model",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "npcReply",
+          "askedFacts",
+          "source"
+        ],
+        "title": "TalkReply",
+        "type": "object"
+      },
+      "TalkRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "amounts": {
+            "items": {
+              "maximum": 100000000.0,
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 20,
+            "title": "Amounts",
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/TalkExchange"
+            },
+            "maxItems": 20,
+            "title": "History",
+            "type": "array"
+          },
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/TalkPartner"
+          },
+          "percents": {
+            "items": {
+              "maximum": 1000.0,
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 10,
+            "title": "Percents",
+            "type": "array"
+          },
+          "sheet": {
+            "items": {
+              "$ref": "#/components/schemas/TalkSheetLine"
+            },
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Sheet",
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "partner",
+          "text",
+          "sheet",
+          "amounts",
+          "percents"
+        ],
+        "title": "TalkRequest",
+        "type": "object"
+      },
+      "TalkSheetLine": {
+        "additionalProperties": false,
+        "description": "One true thing about the deal, from the game's engine, worded for the character.",
+        "properties": {
+          "fact": {
+            "$ref": "#/components/schemas/TalkFact"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact",
+          "text"
+        ],
+        "title": "TalkSheetLine",
+        "type": "object"
+      },
       "TeachingConcept": {
         "enum": [
           "budget",
@@ -1759,6 +1915,60 @@
         "summary": "Finish Session",
         "tags": [
           "summary"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/talk": {
+      "post": {
+        "description": "The character's words, from the true sheet the game sends. 503 means: use the local rules.",
+        "operationId": "talk_api_sessions__session_id__talk_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TalkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TalkReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Talk",
+        "tags": [
+          "talk"
         ]
       }
     },
