@@ -18,6 +18,7 @@ namespace ColonQuest.UI
         private const string NotReadyLine = "Antes del primer turno: conocé tu cuarto y sacá el seguro de salud.";
         private const string NotReadyBossLine = "Antes de empezar, pasá por tu cuarto y sacá el seguro de salud en el hospital. Aquí te espero.";
         private const int ArrowSize = 48;
+        private const float ObjectiveCardWidth = 860f;
 
         private GameObject workGuide;
         private RectTransform workArrow;
@@ -33,7 +34,7 @@ namespace ColonQuest.UI
 
         private void BuildWorkGuide()
         {
-            var card = UiKit.Card(canvas.transform, "WorkGuide", GamePalette.Hex("#FFF3C9"), new Vector2(540f, 68f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
+            var card = UiKit.Card(canvas.transform, "WorkGuide", GamePalette.Hex("#FFF3C9"), new Vector2(ObjectiveCardWidth, 68f), new Vector2(0.5f, 1f), new Vector2(0f, -24f));
             workGuide = card.parent.gameObject;
 
             UiKit.Round(card, "ArrowBadgeOutline", UiKit.Ink, 48f, new Vector2(0f, 0.5f), new Vector2(14f, 0f));
@@ -47,7 +48,7 @@ namespace ColonQuest.UI
             image.color = UiKit.Ink;
             image.raycastTarget = false;
 
-            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(440f, 50f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), TextAnchor.MiddleCenter);
+            workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(ObjectiveCardWidth - 100f, 58f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), TextAnchor.MiddleCenter);
             workGuideText.font = UiKit.TitleFont;
             workGuide.SetActive(false);
         }
@@ -74,74 +75,6 @@ namespace ColonQuest.UI
             texture.SetPixels(pixels);
             texture.Apply();
             return Sprite.Create(texture, new Rect(0f, 0f, ArrowSize, ArrowSize), new Vector2(0.5f, 0.5f));
-        }
-
-        /// <summary>
-        /// In the morning, until the player clocks in, it points at the time clock; at night, at the door of the room. Inside a
-        /// building, where the arrow means nothing, it only says what to do.
-        /// </summary>
-        private void TickWorkGuide()
-        {
-            townMap.GoalPosition = null;
-            var clock = session.Loop.Clock;
-            bool free = !modal.IsOpen && !phone.IsOpen && !pause.IsOpen && !negotiationPanel.IsOpen && !openingPlaying && !LoadingScreen.IsLoading;
-            bool toWork = session.Loop.Job.ExpectedAt(clock.Minutes);
-            bool show = free && !session.Loop.IsFinished && (toWork || clock.IsNight);
-            workGuide.SetActive(show);
-            if (!show)
-            {
-                return;
-            }
-
-            if (toWork && !session.Loop.ReadyForFirstShift)
-            {
-                // The day of arrival: the arrow waits until the room and the insurance are done; the list says what is left.
-                workArrow.gameObject.SetActive(false);
-                workGuideText.text = Loc.T(NotReadyLine);
-                return;
-            }
-
-            bool late = JobRecord.IsLate(clock.Minutes);
-            string homeScene = CurrentHomeScene;
-            if (homeDoor == null)
-            {
-                homeDoor = GameObject.Find("Door_" + homeScene);
-            }
-
-            GameObject target = toWork
-                ? (workStation != null ? workStation.gameObject : GameObject.Find("Door_" + SceneNames.Soda))
-                : homeDoor;
-            var hero = GameObject.FindWithTag(Station.PlayerTag);
-            if (target == null || hero == null)
-            {
-                workArrow.gameObject.SetActive(false);
-                if (toWork)
-                {
-                    workGuideText.text = Loc.T(late ? "¡Vas tarde! Salí para la soda" : "Salí para la soda: entrás a las 7:00");
-                }
-                else
-                {
-                    bool inHome = SceneManager.GetActiveScene().name == homeScene;
-                    string dest = homeScene == SceneNames.Casa ? "casa" : "cuarto";
-                    workGuideText.text = Loc.T(inHome ? "Ya es tarde: acostate a dormir" : "Ya es tarde: andá a tu " + dest);
-                }
-
-                return;
-            }
-
-            townMap.GoalPosition = target.transform.position;
-            Vector2 direction = (Vector2)target.transform.position - (Vector2)hero.transform.position;
-            workArrow.gameObject.SetActive(true);
-            workArrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);
-            if (toWork)
-            {
-                workGuideText.text = Loc.T(late ? "¡Vas tarde al trabajo!" : "Al trabajo: entrás a las 7:00");
-            }
-            else
-            {
-                string dest = homeScene == SceneNames.Casa ? "casa" : "cuarto";
-                workGuideText.text = Loc.T("Ya es tarde: andá a tu " + dest);
-            }
         }
 
         private string WorkPrompt()
