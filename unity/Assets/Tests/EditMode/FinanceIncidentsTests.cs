@@ -96,79 +96,132 @@ namespace ColonQuest.Finance.Tests
 
         // ---------------------------------------------------------------- collectors
 
-        [Test]
-        public void DebtOwed_AddsTheCardAndEveryInformalLoan()
+        private static PlayerState Owing(long cash, long loan, long card = 0L)
         {
-            var state = State(0L, card: 100_000L);
-            state.InformalLoans.Add(new InformalLoan("Don Beto", 60_000L, 15m));
-            state.InformalLoans.Add(new InformalLoan("Prestamista", 40_000L, 15m));
-
-            Assert.AreEqual(200_000L, FinanceEngine.DebtOwed(state));
+            var state = State(cash, card: card);
+            state.InformalLoans.Add(new InformalLoan("Prestamista", loan, 15m));
+            return state;
         }
 
         [Test]
-        public void PayCollectors_LowersTheInformalLoanBeforeTheCard()
+        public void DebtOwed_IsTheInformalLoansAndNotTheCard()
         {
-            var state = State(100_000L, card: 90_000L);
-            state.InformalLoans.Add(new InformalLoan("Prestamista", 60_000L, 15m));
+            var state = Owing(0L, 60_000L, card: 100_000L);
+            state.InformalLoans.Add(new InformalLoan("Don Beto", 40_000L, 15m));
+
+            Assert.AreEqual(100_000L, FinanceEngine.DebtOwed(state));
+        }
+
+        [Test]
+        public void PayCollectors_LowersTheLoansAndLeavesTheCardAlone()
+        {
+            var state = Owing(100_000L, 60_000L, card: 90_000L);
+            state.InformalLoans.Add(new InformalLoan("Don Beto", 40_000L, 15m));
 
             long paid = FinanceEngine.PayCollectors(state, 80_000L);
 
             Assert.AreEqual(80_000L, paid);
             Assert.AreEqual(20_000L, state.Cash);
-            Assert.AreEqual(0, state.InformalLoans.Count, "the loan is gone");
-            Assert.AreEqual(70_000L, state.CreditCard.Balance, "the rest of the payment went to the card");
+            Assert.AreEqual(1, state.InformalLoans.Count, "the first loan is gone");
+            Assert.AreEqual(20_000L, state.InformalLoans[0].Balance);
+            Assert.AreEqual(90_000L, state.CreditCard.Balance);
         }
 
         [Test]
         public void PayCollectors_NeverPaysMoreThanTheCashThePlayerHas()
         {
-            var state = State(15_000L, card: 90_000L);
+            var state = Owing(15_000L, 90_000L);
 
             long paid = FinanceEngine.PayCollectors(state, 80_000L);
 
             Assert.AreEqual(15_000L, paid);
             Assert.AreEqual(0L, state.Cash);
-            Assert.AreEqual(75_000L, state.CreditCard.Balance);
+            Assert.AreEqual(75_000L, state.InformalLoans[0].Balance);
         }
 
         [Test]
-        public void NegotiateCollectors_PaysHalfNowAndTheRestComesBackWithASurcharge()
+        public void PayCollectors_NeverTakesMoreThanIsOwed()
         {
-            var state = State(200_000L, card: 100_000L);
+            var state = Owing(100_000L, 5_000L);
 
-            var result = FinanceEngine.NegotiateCollectors(state, 100_000L, 10);
+            long paid = FinanceEngine.PayCollectors(state, 20_000L);
 
-            Assert.AreEqual(50_000L, result.Paid);
-            Assert.AreEqual(55_000L, result.NewDebt, "the unpaid half plus 10 percent");
-            Assert.AreEqual(150_000L, state.Cash);
-            Assert.AreEqual(1, state.InformalLoans.Count);
-            Assert.AreEqual(55_000L, state.InformalLoans[0].Balance);
-            Assert.AreEqual("Cobradores", state.InformalLoans[0].Lender);
+            Assert.AreEqual(5_000L, paid);
+            Assert.AreEqual(95_000L, state.Cash, "the rest of the money stays with the player");
+            Assert.AreEqual(0, state.InformalLoans.Count);
         }
 
         [Test]
-        public void NegotiateCollectors_WithoutCashTheWholeDemandBecomesDebt()
+        public void NegotiateCollectors_MovesTheRestInsteadOfAddingIt()
         {
-            var state = State(0L, card: 100_000L);
+            var state = Owing(200_000L, 300_000L);
+
+            var result = FinanceEngine.NegotiateCollectors(state, 75_000L, 10);
+
+            Assert.AreEqual(37_500L, result.Paid);
+            Assert.AreEqual(41_250L, result.NewDebt, "the unpaid half plus 10 percent");
+            Assert.AreEqual(162_500L, state.Cash);
+            Assert.AreEqual(266_250L, FinanceEngine.DebtOwed(state), "only the surcharge is new debt");
+            Assert.AreEqual("Cobradores", state.InformalLoans[1].Lender);
+            Assert.AreEqual(41_250L, state.InformalLoans[1].Balance);
+        }
+
+        [Test]
+        public void NegotiateCollectors_WithoutCashTheWholeDemandMovesWithItsSurcharge()
+        {
+            var state = Owing(0L, 300_000L);
 
             var result = FinanceEngine.NegotiateCollectors(state, 100_000L, 10);
 
             Assert.AreEqual(0L, result.Paid);
             Assert.AreEqual(110_000L, result.NewDebt);
+            Assert.AreEqual(310_000L, FinanceEngine.DebtOwed(state));
         }
 
         [Test]
-        public void IgnoreCollectors_AddsALateFeeToTheCardAndLowersTheMood()
+        public void NegotiateCollectors_AtTheLimitOfLoansTheDebtIsNotLost()
         {
-            var state = State(100_000L, card: 100_000L);
+            var state = Owing(0L, 300_000L);
+            while (state.InformalLoans.Count < ContractLimits.MaxInformalLoans)
+            {
+                state.InformalLoans.Add(new InformalLoan("Otro", 10_000L, 15m));
+            }
+
+            long before = FinanceEngine.DebtOwed(state);
+            FinanceEngine.NegotiateCollectors(state, 100_000L, 10);
+
+            Assert.AreEqual(before + 10_000L, FinanceEngine.DebtOwed(state));
+            Assert.AreEqual(ContractLimits.MaxInformalLoans, state.InformalLoans.Count);
+        }
+
+        [Test]
+        public void IgnoreCollectors_AddsALateFeeToTheLoanAndLowersTheMood()
+        {
+            var state = Owing(100_000L, 200_000L, card: 100_000L);
 
             long fee = FinanceEngine.IgnoreCollectors(state, 100_000L, 12, 10);
 
             Assert.AreEqual(12_000L, fee);
-            Assert.AreEqual(112_000L, state.CreditCard.Balance);
+            Assert.AreEqual(212_000L, FinanceEngine.DebtOwed(state));
+            Assert.AreEqual(100_000L, state.CreditCard.Balance);
             Assert.AreEqual(100_000L, state.Cash, "ignoring them costs no cash today");
             Assert.AreEqual(50, state.Wellbeing);
+        }
+
+        [Test]
+        public void PayInformalDebt_PaysWhatTheCashReaches()
+        {
+            var some = Owing(30_000L, 100_000L);
+            Assert.AreEqual(30_000L, FinanceEngine.PayInformalDebt(some));
+            Assert.AreEqual(70_000L, FinanceEngine.DebtOwed(some));
+
+            var all = Owing(150_000L, 100_000L, card: 50_000L);
+            Assert.AreEqual(100_000L, FinanceEngine.PayInformalDebt(all));
+            Assert.AreEqual(0, all.InformalLoans.Count);
+            Assert.AreEqual(50_000L, all.Cash);
+            Assert.AreEqual(50_000L, all.CreditCard.Balance, "the card is another debt");
+
+            Assert.AreEqual(0L, FinanceEngine.PayInformalDebt(State(50_000L)));
         }
 
         [Test]
