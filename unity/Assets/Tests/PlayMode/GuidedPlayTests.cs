@@ -178,7 +178,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return Shot("talk");
             session.EndTalk();
             session.BeginOffer(lender ? TalkPartner.Lender : TalkPartner.Pyramid);
-            yield return Next("the offer", "offer", TookTheOffer ? 0 : 1);
+            yield return Next("the offer", "offer", TookTheOffer ? 0 : DebtTalk.OfferEvent(lender ? TalkPartner.Lender : TalkPartner.Pyramid).Choices.Count - 1);
             yield return Next("the outcome of the offer", "offer_outcome");
             if (TookTheOffer)
             {
@@ -196,6 +196,39 @@ namespace ColonQuest.World.PlayModeTests
             yield return Until(() => !session.Busy && !session.Guided, 60f, "the end of the run");
             yield return new WaitForSecondsRealtime(0.5f);
             yield return Shot("end");
+        }
+    }
+
+    public sealed class PlazaPlayTests
+    {
+        [UnityTest]
+        public IEnumerator Plaza_ThePlayerCanWalkAllTheWayAroundTheFountain()
+        {
+            yield return SceneManager.LoadSceneAsync(SceneNames.Town);
+            yield return null;
+            var hero = GameObject.FindWithTag(Station.PlayerTag);
+            var feet = hero.GetComponent<Collider2D>();
+            var filter = new ContactFilter2D { useTriggers = false };
+            filter.NoFilter();
+            filter.useTriggers = false;
+            var hits = new RaycastHit2D[8];
+
+            foreach (float side in new[] { -3f, 3f })
+            {
+                var at = new Vector2(side, 7.2f);
+                hero.transform.position = at;
+                hero.GetComponent<Rigidbody2D>().position = at;
+                Physics2D.SyncTransforms();
+                yield return new WaitForFixedUpdate();
+                Assert.AreEqual(0, feet.Cast(Vector2.up, filter, hits, 3.6f), "the way up beside the fountain, on the side " + side);
+            }
+
+            var above = new Vector2(-3f, 10.9f);
+            hero.transform.position = above;
+            hero.GetComponent<Rigidbody2D>().position = above;
+            Physics2D.SyncTransforms();
+            yield return new WaitForFixedUpdate();
+            Assert.AreEqual(0, feet.Cast(Vector2.right, filter, hits, 6f), "the way across above the fountain");
         }
     }
 
