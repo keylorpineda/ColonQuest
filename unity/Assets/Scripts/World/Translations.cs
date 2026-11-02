@@ -138,7 +138,6 @@ namespace ColonQuest.World
             { "Lo que ya sabés", "What you know so far" },
             { "Me lo llevo  ·  {0}", "I'll take it  ·  {0}" },
             { "Cayó la quincena por SINPE: {0}", "Your half-month pay landed by SINPE: {0}" },
-            { "Ganás el salario mínimo. Vos solo decidís; a la derecha ves cada llamada real a los modelos de Meta.", "You earn the minimum wage. You only decide; on the right you see every real call to Meta's models." },
             { "Andá a la tienda y preguntá el costo real", "Go to the store and ask for the real cost" },
             { "Andá a Préstamos Rápidos y preguntá antes de firmar", "Go to Quick Loans and ask before you sign" },
             { "Andá a Invierte Ya y preguntá de dónde sale la ganancia", "Go to Invest Now and ask where the profit comes from" },
@@ -214,6 +213,9 @@ namespace ColonQuest.World
             { "Negociaciones", "Negotiations" },
             { "Preguntas clave", "Key questions" },
             { "Conceptos vistos", "Concepts seen" },
+            { "Ganás el salario mínimo. Seguí la flecha roja y apretá E al llegar: vos solo decidís. A la derecha ves cada llamada real a los modelos de Meta.", "You earn the minimum wage. Follow the red arrow and press E when you arrive: you only decide. On the right you see every real call to Meta's models." },
+            { "Un momento: Muse Wonder está escribiendo tu año...", "One moment: Muse Wonder is writing your year..." },
+            { "WASD o flechas para caminar  ·  E para usar  ·  M mapa  ·  L panel de IA", "WASD or arrows to walk  ·  E to use  ·  M map  ·  L AI panel" },
             // The demo lab (1 Nov)
             { "Cobros y trampas", "Debts and traps" },
             { "Cobrador, prestamista y pirámide", "Collector, lender and pyramid" },

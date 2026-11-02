@@ -175,7 +175,7 @@ namespace ColonQuest.UI
             modal.Show(
                 Loc.T("Tres meses con un salario real"),
                 Loc.T("Simulador de finanzas personales"),
-                Loc.T("Ganás el salario mínimo. Vos solo decidís; a la derecha ves cada llamada real a los modelos de Meta."),
+                Loc.T("Ganás el salario mínimo. Seguí la flecha roja y apretá E al llegar: vos solo decidís. A la derecha ves cada llamada real a los modelos de Meta."),
                 new List<ModalOption>
                 {
                     new ModalOption { Label = Loc.T("1.  Llego justo y con la tarjeta cargada"), Color = GameUiColors.Yellow, OnPress = () => choose(GuidedProfile.Tight) },
@@ -186,7 +186,7 @@ namespace ColonQuest.UI
         /// <summary>The plan of Muse Wonder arrives in the background. The player walks meanwhile; the next event has to wait for it, or the plan would be lost.</summary>
         private IEnumerator WaitForThePlan()
         {
-            guidedObjective = new Objective("Muse Wonder está escribiendo tu año...");
+            guidedObjective = new Objective("Un momento: Muse Wonder está escribiendo tu año...");
             float started = Time.unscaledTime;
             while (Time.unscaledTime - started < GuidedRoute.PlanWaitSeconds && !DemoReadout.PlannerAnswered(aiCalls.Last))
             {

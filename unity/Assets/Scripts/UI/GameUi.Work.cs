@@ -18,7 +18,7 @@ namespace ColonQuest.UI
         private const string NotReadyLine = "Antes del primer turno: conocé tu cuarto y sacá el seguro de salud.";
         private const string NotReadyBossLine = "Antes de empezar, pasá por tu cuarto y sacá el seguro de salud en el hospital. Aquí te espero.";
         private const int ArrowSize = 48;
-        private const float ObjectiveCardWidth = 860f;
+        private const float ObjectiveCardWidth = 1000f;
 
         private GameObject workGuide;
         private RectTransform workArrow;
@@ -50,6 +50,10 @@ namespace ColonQuest.UI
 
             workGuideText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(ObjectiveCardWidth - 100f, 58f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), TextAnchor.MiddleCenter);
             workGuideText.font = UiKit.TitleFont;
+            guideControls = UiKit.Fill(card, "GuideControls", GamePalette.Hex("#1B2826"), new Vector2(ObjectiveCardWidth - 80f, 38f), new Vector2(0.5f, 0f), new Vector2(0f, -44f)).gameObject;
+            var controls = UiKit.Label(guideControls.transform, "WASD o flechas para caminar  ·  E para usar  ·  M mapa  ·  L panel de IA", 22, GamePalette.Hex("#F8F1DC"), new Vector2(ObjectiveCardWidth - 100f, 34f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+            controls.fontStyle = FontStyle.Normal;
+            guideControls.SetActive(false);
             workGuide.SetActive(false);
         }
 
