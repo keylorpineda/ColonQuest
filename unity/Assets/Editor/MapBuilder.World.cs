@@ -820,57 +820,59 @@ namespace ColonQuest.EditorTools
             Tree(parent, shadows, 41.5f, 6.4f, 1.0f, "#3B9660", false);
         }
 
-        /// <summary>A coffee bush in cartoon style: tall and cone-shaped, dark glossy leaves in pairs, red and green berries.</summary>
+        /// <summary>
+        /// A coffee shrub: wider than tall, a dense crown of glossy leaves on a few thin stems, with boughs of cherries growing
+        /// out of it. The crown leans with the town's breeze, and each bough swings on its own joint, follows the breeze a beat
+        /// after the others and shakes when the player brushes past, so the plant never moves as one piece.
+        /// </summary>
         private static void CoffeeBush(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Coffee", new Vector2(x, y), y);
-            GroundShadow(shadows, new Vector2(x + 0.1f, y), new Vector2(1.1f, 0.4f), 0.24f);
+            GroundShadow(shadows, new Vector2(x + 0.08f, y), new Vector2(1.5f, 0.46f), 0.26f);
 
-            var rig = new GameObject("CoffeeRig").transform;
-            rig.SetParent(root, false);
-            rig.localPosition = new Vector2(0f, 0.1f);
-            rig.gameObject.AddComponent<FoliagePhysics>().Configure(4.5f, 2.0f, x * 1.1f + y * 0.7f, 0.012f, true, 1.6f, 18f, true, 0.1f);
+            // The same place always gives the same plant, and no two neighbours are alike.
+            int seed = Mathf.Abs(Mathf.RoundToInt(x * 7f + y * 13f));
+            float size = 0.92f + seed % 5 * 0.04f;
+            bool flip = seed % 2 == 0;
+            bool ripe = seed % 3 != 0;
+            float phase = x * 1.1f + y * 0.7f;
+            var leafTint = Color.Lerp(Color.white, GamePalette.Hex("#D8F0C8"), seed % 4 * 0.2f);
 
-            var dark = GamePalette.Hex("#1F5E33");
-            var mid = GamePalette.Hex("#2E7D46");
-            var light = GamePalette.Hex("#4FA36A");
-
-            // Tall body: three stacked rounded layers, wide at the bottom and narrower at the top, each with its outline.
-            Shape(rig, "Outline_Base", circle, new Vector2(0f, 0.28f), new Vector2(1.06f, 0.64f), GamePalette.Outline, 0);
-            Shape(rig, "Outline_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.94f, 0.62f), GamePalette.Outline, 0);
-            Shape(rig, "Outline_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.68f, 0.56f), GamePalette.Outline, 0);
-            Shape(rig, "Cone_Base", circle, new Vector2(0f, 0.28f), new Vector2(0.98f, 0.56f), dark, 1);
-            Shape(rig, "Cone_Mid", circle, new Vector2(0f, 0.62f), new Vector2(0.86f, 0.54f), mid, 1);
-            Shape(rig, "Cone_Top", circle, new Vector2(0f, 0.95f), new Vector2(0.6f, 0.48f), mid, 1);
-            Shape(rig, "Cone_Shine", circle, new Vector2(-0.12f, 1.0f), new Vector2(0.22f, 0.18f), light, 2);
-
-            // Pairs of oval leaves along three horizontal branches, drooping a little at the tips.
-            foreach (float by in new[] { 0.3f, 0.62f, 0.92f })
+            foreach (float stem in new[] { -0.09f, 0.02f, 0.11f })
             {
-                float reach = 0.36f - (by - 0.3f) * 0.22f;
-                Shape(rig, "Branch", square, new Vector2(0f, by), new Vector2(reach * 2f, 0.04f), GamePalette.Outline, 2);
-                foreach (float side in new[] { -1f, 1f })
-                {
-                    var leaf = Shape(rig, "Leaf", circle, new Vector2(side * reach, by + 0.02f), new Vector2(0.34f, 0.14f), side < 0f ? light : GamePalette.Shade(mid, 1.1f), 3);
-                    Tilt(leaf, side * -18f);
-                }
-            }
-            // Berry clusters stuck to the branches: mostly red, a few green and yellow.
-            var berries = new[]
-            {
-                new Vector3(0.30f, 0.26f, 0f), new Vector3(0.36f, 0.31f, 1f), new Vector3(-0.30f, 0.28f, 0f), new Vector3(-0.24f, 0.22f, 2f),
-                new Vector3(0.22f, 0.58f, 1f), new Vector3(0.27f, 0.62f, 0f), new Vector3(-0.22f, 0.6f, 0f), new Vector3(-0.28f, 0.56f, 3f),
-                new Vector3(0.12f, 0.9f, 0f), new Vector3(-0.1f, 0.88f, 1f)
-            };
-            var berryColors = new[] { "#C0392B", "#E74C3C", "#7FB241", "#F1C40F" };
-            foreach (var berry in berries)
-            {
-                float size = (berry.x * 37f + berry.y * 11f) % 1f > 0.5f ? 0.08f : 0.07f;
-                Shape(rig, "Berry", circle, new Vector2(berry.x, berry.y), Vector2.one * size, GamePalette.Hex(berryColors[(int)berry.z]), 4);
+                var trunk = Shape(root, "Stem", roundedSmall, new Vector2(stem, 0.16f), new Vector2(0.07f, 0.36f), GamePalette.Hex("#3B2A1C"), 0);
+                Tilt(trunk, stem * -120f);
             }
 
-            root.gameObject.AddComponent<CircleCollider2D>().radius = 0.3f;
+            var crownRig = new GameObject("CoffeeCrown").transform;
+            crownRig.SetParent(root, false);
+            crownRig.localPosition = new Vector2(0f, 0.2f);
+            crownRig.gameObject.AddComponent<FoliagePhysics>().Configure(2.6f, 1.7f, phase, 0.012f, true, 1.5f, 9f, true, 0.16f);
+            crownRig.gameObject.AddComponent<LeafBurst>().Configure(palmFrondSprite != null ? palmFrondSprite : circle, GamePalette.Hex("#2E7D46"), LayerWorld, 900);
+            var crown = Shape(crownRig, "Crown", coffeeCrownSprite, new Vector2(0f, 0.36f * size), new Vector2(1.5f, 1.12f) * size, leafTint, 1);
+            crown.flipX = flip;
+
+            // Low boughs reach out to the sides, higher ones are shorter, and the ripe ones hang in front of the leaves.
+            CoffeeBough(root, new Vector2(-0.16f, 0.44f) * size, -1f, 0.9f * size, ripe, phase + 1.3f, 2);
+            CoffeeBough(root, new Vector2(0.16f, 0.40f) * size, 1f, 0.94f * size, ripe, phase + 2.9f, 2);
+            CoffeeBough(root, new Vector2(-0.1f, 0.72f) * size, -1f, 0.7f * size, !ripe, phase + 4.1f, 3);
+            CoffeeBough(root, new Vector2(0.12f, 0.78f) * size, 1f, 0.66f * size, ripe, phase + 5.3f, 3);
+
+            root.gameObject.AddComponent<CircleCollider2D>().radius = 0.36f;
         }
+
+        /// <summary>One bough, hung from its joint: the joint turns, so the bough swings from where it grows.</summary>
+        private static void CoffeeBough(Transform root, Vector2 joint, float side, float length, bool ripe, float phase, int order)
+        {
+            var rig = new GameObject("CoffeeBough").transform;
+            rig.SetParent(root, false);
+            rig.localPosition = joint;
+            rig.gameObject.AddComponent<FoliagePhysics>().Configure(5f, 2.3f, phase, 0f, true, 1.5f, 24f, true, 0f);
+            var sprite = ripe ? coffeeBoughSprite : coffeeBoughGreenSprite;
+            var bough = Shape(rig, "Bough", sprite, new Vector2(side * length * 0.5f, 0f), new Vector2(length, length * 0.5f), Color.white, order);
+            bough.flipX = side < 0f;
+        }
+
         private static void Silo(Transform parent, Transform shadows, float x, float y)
         {
             var root = Root(parent, "Silo", new Vector2(x, y), y);
