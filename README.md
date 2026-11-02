@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=2" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=3" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -22,17 +22,22 @@ story; the engine keeps the books.
 
 ### The problem
 
-In Costa Rica 87% of adults have some kind of debt and spend on average 34% of their income paying
-it, 58.3% for those who earn under ₡500 000 a month. 80.88% of the people surveyed by the Universidad
-Nacional never received any financial education. Nobody teaches you to ask the right question while
-a salesperson is smiling at you. That is the skill ColonQuest trains, against four real traps:
+| Figure | In Costa Rica | Source |
+| --- | --- | --- |
+| **34%** | of monthly income goes to paying debts, on average | [OCF, 2025](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion) |
+| **58.3%** | for people who earn under ₡500 000 (about $1 000) a month | Same survey |
+| **80.88%** | of people surveyed never had any financial education | [Universidad Nacional, 2024](https://www.elfinancierocr.com/economia-y-politica/una-cartera-muy-estrecha-menos-del-10-de-las/22FABMYC6ZE47JR73C2UYYMBJU/story) |
+| **2 930** | cases of street lenders counted by investigators in 2025 | [OIJ, 2026](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
+
+Nobody teaches you to ask the right question while a salesperson is smiling at you. That is the skill
+ColonQuest trains, against four real traps:
 
 - **Installments:** just one payment a month, plus hidden insurance.
 - **Minimum payment:** you pay a little and the debt keeps growing.
-- **Gota a gota:** fast cash today, and collectors at your door. The police counted 2 930 cases in 2025.
+- **Gota a gota ("drop by drop"):** fast cash from a street lender today, and collectors at your door.
 - **Pyramid:** bring three friends and get rich. Promise.
 
-Every figure and its source: [The situation in Costa Rica](COSTA_RICA.md).
+Plain explanations, local terms and how far to trust each number: [The situation in Costa Rica](COSTA_RICA.md).
 
 ### How a month plays
 
