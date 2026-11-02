@@ -26,8 +26,8 @@ namespace ColonQuest.World
             { "Prometes que {0} se vuelven {1} en un mes: {2}% de ganancia.", "You promise that {0} becomes {1} in a month: a {2}% gain." },
             { "La plata sale de los nuevos que entran: por eso cada uno tiene que traer a tres amigos.", "The money comes from the new people who join: that is why each one has to bring three friends." },
             { "No hay contrato ni garantía, solo confianza.", "There is no contract and no guarantee, only trust." },
-            { "No están inscritos en SUGEF.", "You are not registered with SUGEF, the financial regulator." },
-            { "Solo les pagan a los primeros que entraron.", "Only the first ones who joined get paid." },
+            { "Ustedes no están inscritos en SUGEF, y lo sabes.", "Your outfit is not registered with SUGEF, the financial regulator, and you know it." },
+            { "Solo les pagas a los primeros que entraron.", "You only pay the first ones who joined." },
             { "Si mete más plata hoy, lo suben al nivel oro.", "If they put in more money today, they move up to the gold level." },
 
             // The town map (1 Nov)
