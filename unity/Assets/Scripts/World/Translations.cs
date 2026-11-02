@@ -12,6 +12,27 @@ namespace ColonQuest.World
     {
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
+            // The town map (1 Nov)
+            { "[M] Mapa   [H] Ocultar", "[M] Map   [H] Hide" },
+            { "[H] Mostrar", "[H] Show" },
+            { "Mapa", "Map" },
+            { "Cerrar  [M]", "Close  [M]" },
+            { "Vos", "You" },
+            { "A dónde ir", "Where to go" },
+            { "Dónde vivís", "Where you live" },
+            { "Tu trabajo", "Your job" },
+            { "Tu plata", "Your money" },
+            { "Comprar", "Buy" },
+            { "Servicios", "Services" },
+            { "Ojo: cuidado aquí", "Careful here" },
+            { "Salí al pueblo y el mapa se dibuja solo.", "Walk out to the town and the map draws itself." },
+            { "Estás adentro. Esto es donde entraste.", "You are inside. This is where you went in." },
+            { "Casa de mamá", "Mom's house" },
+            { "Tu cuarto", "Your room" },
+            { "Cooperativa", "Credit union" },
+            { "Finca", "Farm" },
+            { "Playa", "Beach" },
+
             // The credits (1 Nov)
             { "3 a 4,4 s: el único que siempre llega a tiempo", "3 to 4.4 s: the only one that is always on time" },
             { "1,9 a 2,8 s, con pesos abiertos", "1.9 to 2.8 s, on open weights" },
