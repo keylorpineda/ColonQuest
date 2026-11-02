@@ -9,7 +9,7 @@ namespace ColonQuest.Game
     /// </summary>
     public sealed class SilenceGate
     {
-        public const float PauseSeconds = 1.1f;
+        public const float PauseSeconds = 1.5f;
         private const float LearnSeconds = 0.25f;
         private const float MaxNoise = 0.03f;
         private const float MinVoice = 0.015f;
@@ -45,7 +45,7 @@ namespace ColonQuest.Game
             }
 
             peak = Math.Max(peak, level);
-            quiet = level < Math.Max(MinQuiet, peak * 0.2f) ? quiet + deltaSeconds : 0f;
+            quiet = level < Math.Max(MinQuiet, peak * 0.12f) ? quiet + deltaSeconds : 0f;
             return quiet >= PauseSeconds;
         }
     }
