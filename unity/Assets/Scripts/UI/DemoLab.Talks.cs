@@ -21,13 +21,6 @@ namespace ColonQuest.UI
 
         private static readonly TalkPartner[] Partners = { TalkPartner.Collectors, TalkPartner.Lender, TalkPartner.Pyramid };
 
-        private static readonly string[][] PartnerQuestions =
-        {
-            new[] { "No tengo toda esa plata.", "¿Podemos hacer un arreglo?", "¿Qué pasa si no pago?", "¿Esto es legal?" },
-            new[] { "¿Cuál es el interés?", "¿Cuánto tendría que devolver en total?", "¿Qué pasa si me atraso?", "¿Firmo algún contrato?" },
-            new[] { "¿Cuánto me van a pagar?", "¿De dónde sale la plata?", "¿Hay algún contrato?", "¿Están inscritos en SUGEF?" }
-        };
-
         private static readonly Dictionary<string, string> TalkFactNames = new Dictionary<string, string>
         {
             { "total_cost", "Cuánto es" },
@@ -90,7 +83,7 @@ namespace ColonQuest.UI
             chatWaitLabel = ChatView.Build(workspace, new Vector2(610f, 372f), TopLeft, new Vector2(Left, y), lines, wait);
             y -= 382f;
 
-            var questions = PartnerQuestions[talkPartner];
+            var questions = talk.SuggestedQuestions;
             for (int i = 0; i < questions.Length; i++)
             {
                 string question = Loc.T(questions[i]);

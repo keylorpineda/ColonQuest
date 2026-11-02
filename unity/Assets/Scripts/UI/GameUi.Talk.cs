@@ -30,33 +30,10 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>At the lender's or the pyramid stand: talk first in the player's words, hear the offer, or leave.</summary>
+        /// <summary>At the lender's or the pyramid stand the character speaks at once; the offer and the way out are under the conversation.</summary>
         private void AskHowToTalk(StationType type)
         {
-            var partner = type == StationType.Lender ? TalkPartner.Lender : TalkPartner.Pyramid;
-            string title = type == StationType.Lender ? "Prestamista" : "Invierte Ya";
-            var options = new List<ModalOption>();
-            string body = Loc.T("Antes de decir que sí, preguntá: cuánto pagás en total, la tasa, qué garantía hay y si es legal.");
-            long owed = type == StationType.Lender ? FinanceEngine.DebtOwed(session.State) : 0L;
-            if (owed > 0L)
-            {
-                long cash = session.State.Cash;
-                body = Loc.F("Le debés {0} a los prestamistas, y cada mes crece.", Money.Format(owed)) + "\n\n" + body;
-                if (cash > 0L)
-                {
-                    string pay = cash >= owed ? Loc.F("Pagar todo  ·  {0}", Money.Format(owed)) : Loc.F("Abonar  ·  {0}", Money.Format(cash));
-                    options.Add(new ModalOption { Label = "1.  " + pay, Color = GameUiColors.Blue, OnPress = () => session.PayLender() });
-                }
-            }
-
-            options.Add(new ModalOption { Label = Loc.F("{0}.  Hablar y negociar (texto o voz)", options.Count + 1), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(partner) });
-            if (session.Loop.CanDoTask(type))
-            {
-                options.Add(new ModalOption { Label = Loc.F("{0}.  Escuchar la oferta", options.Count + 1), Color = GameUiColors.Green, OnPress = () => session.BeginOffer(partner) });
-            }
-
-            options.Add(Back(Loc.F("{0}.  Salir", options.Count + 1)));
-            modal.Show(Loc.T(title), string.Empty, body, options);
+            session.BeginTalk(type == StationType.Lender ? TalkPartner.Lender : TalkPartner.Pyramid);
         }
 
         /// <summary>The ways out under the conversation. The arrangement of the collectors shows only once the player asked for it.</summary>
@@ -84,6 +61,22 @@ namespace ColonQuest.UI
             }
 
             var type = talk.Partner == TalkPartner.Lender ? StationType.Lender : StationType.Pyramid;
+            long owed = talk.Partner == TalkPartner.Lender ? FinanceEngine.DebtOwed(session.State) : 0L;
+            long cash = session.State.Cash;
+            if (owed > 0L && cash > 0L)
+            {
+                string pay = cash >= owed ? Loc.F("Pagar todo  ·  {0}", Money.Format(owed)) : Loc.F("Abonar  ·  {0}", Money.Format(cash));
+                options.Add(new ModalOption
+                {
+                    Label = pay, Color = GameUiColors.Blue,
+                    OnPress = () =>
+                    {
+                        session.EndTalk();
+                        session.PayLender();
+                    }
+                });
+            }
+
             if (session.Loop.CanDoTask(type))
             {
                 options.Add(new ModalOption
