@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using ColonQuest.Api;
+using ColonQuest.Finance;
 using ColonQuest.World;
+using EventType = ColonQuest.Finance.EventType;
 
 namespace ColonQuest.Game
 {
@@ -47,6 +49,9 @@ namespace ColonQuest.Game
         public const int LenderRatePct = (int)Finance.FinanceEngine.ShortInformalLoanMonthlyRatePct;
         public const int LenderLongRatePct = (int)Finance.FinanceEngine.DefaultInformalLoanMonthlyRatePct;
         public const int PyramidPromisePct = 300;
+
+        public const string TakeOffer = "take";
+        public const string SkipOffer = "skip";
 
         private readonly List<TalkTurn> turns = new List<TalkTurn>();
         private readonly List<TalkFact> asked = new List<TalkFact>();
@@ -234,6 +239,36 @@ namespace ColonQuest.Game
         private static void Line(TalkRequestDto request, TalkFact fact, string text)
         {
             request.sheet.Add(new TalkSheetLineDto { fact = WireEnum<TalkFact>.ToWire(fact), text = text });
+        }
+
+        /// <summary>
+        /// The offer of the lender or of the pyramid as an event: what the player signs, with the figures of the sheet. It is not
+        /// asked of a model, because the game master does not know where the player is standing.
+        /// </summary>
+        public static GameEvent OfferEvent(TalkPartner partner)
+        {
+            bool lender = partner == TalkPartner.Lender;
+            var take = lender
+                ? new List<Effect> { new Effect(EffectKind.NewInformalLoan, ExampleLoan, null, ExampleMonths) }
+                : new List<Effect> { new Effect(EffectKind.Expense, ExampleLoan, MoneySource.Savings) };
+            string narrative = lender
+                ? Loc.F("{0} hoy mismo, sin papeles. A {1} meses, con el {2}% al mes, devolvés {3}.", Money.Format(ExampleLoan), ExampleMonths, LenderRatePct, Money.Format(LenderTotal()))
+                : Loc.F("Ponés {0} y en un mes te prometen {1}. No hay contrato: es de confianza.", Money.Format(ExampleLoan), Money.Format(ExampleLoan * (100L + PyramidPromisePct) / 100L));
+            return new GameEvent
+            {
+                EventId = lender ? "evt_offer_lender" : "evt_offer_pyramid",
+                Type = lender ? EventType.Offer : EventType.Scam,
+                Title = lender ? Loc.T("Plata rápida") : Loc.F("Tu plata, {0}% en un mes", PyramidPromisePct),
+                Narrative = narrative,
+                Npc = lender ? new Npc("prestamista_gota_a_gota", Loc.T("Prestamista"), "lender") : new Npc("amigo_piramide", "Invierte Ya", "promoter"),
+                ImageKey = "scene_esquina_barrio",
+                TeachingConcept = lender ? TeachingConcept.InformalLending : TeachingConcept.PyramidScheme,
+                Choices = new List<Choice>
+                {
+                    new Choice(TakeOffer, lender ? Loc.F("Agarrar los {0}", Money.Format(ExampleLoan)) : Loc.F("Meter {0}", Money.Format(ExampleLoan)), take),
+                    new Choice(SkipOffer, Loc.T("Mejor no"), new List<Effect>())
+                }
+            };
         }
 
         /// <summary>The history tags of the questions asked, for the metrics of the pilot.</summary>
