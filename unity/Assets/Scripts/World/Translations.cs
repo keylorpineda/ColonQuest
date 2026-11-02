@@ -156,7 +156,7 @@ namespace ColonQuest.World
             { "Los primeros cobraron con la plata de los que entraron después. Tus {0} no vuelven.", "The first ones were paid with the money of those who came later. Your {0} are not coming back." },
             { "Tu año, por Muse Wonder", "Your year, by Muse Wonder" },
             { "Herramientas usadas", "Tools used" },
-            { "Pagás al mes", "You pay a month" },
+            { "Al mes, con todo", "A month, all in" },
             { "2.  Hablar con ellos", "2.  Talk to them" },
             // The demo lab (1 Nov)
             { "Cobros y trampas", "Debts and traps" },
