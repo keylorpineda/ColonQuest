@@ -64,7 +64,7 @@ It needs internet, because the models run on the backend. A whole tour costs abo
 | --- | --- |
 | Muse Spark | Live game master: the monthly event, with tools; Class Mode reports |
 | Muse Wonder | Plans your year in the background, writes the year-end summary and the offline event bank |
-| Muse Spark Open (Baseten) | The sellers: commission tactics with tools and memory of what you asked |
+| Muse Spark Open (Baseten) | The sellers, with commission tactics and memory of what you asked; the collectors, the lender and the pyramid promoter |
 | Muse Voice Transcribe | You negotiate out loud; typing always works too |
 | Muse Image | Portraits, event scenes and the year card art, pre-generated and without text |
 
