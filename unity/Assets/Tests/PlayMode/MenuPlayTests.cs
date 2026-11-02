@@ -147,6 +147,35 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Demo_TheTalksAnswerWithTheLocalRulesAndSaySo()
+        {
+            yield return null;
+            DemoLab.Open();
+            yield return null;
+
+            var lab = GameObject.Find("DemoLab").GetComponent<DemoLab>();
+            lab.Show(6);
+            yield return null;
+            Assert.IsNotNull(GameObject.Find("Fact_total_cost"), "the sheet is on the screen");
+
+            lab.TryTalk("¿Podemos hacer un arreglo?");
+            float waited = 0f;
+            while (lab.Busy && waited < 5f)
+            {
+                waited += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            yield return null;
+            Assert.IsFalse(lab.Busy);
+            var evidence = lab.transform.Find("Stage/EvidenceCard/Body/View/Content/Text").GetComponent<Text>().text;
+            StringAssert.Contains(Loc.T("Reglas locales: el modelo no respondió"), evidence, "never passes the rules off as the model");
+
+            Assert.AreEqual(GameUiColors.Green, GameObject.Find("Fact_arrangement").transform.Find("Body").GetComponent<Image>().color, "what was asked opens on the sheet");
+            lab.Close();
+        }
+
+        [UnityTest]
         public IEnumerator Demo_TheGameMasterStationSaysItWhenTheServerDoesNotAnswer()
         {
             yield return null;
