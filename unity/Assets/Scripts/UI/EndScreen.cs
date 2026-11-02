@@ -253,8 +253,11 @@ namespace ColonQuest.UI
             var words = UiKit.PlainLabel(tile.transform, "Narrative", Loc.T(summary.Narrative), 27, UiKit.Ink, new Vector2(textWidth, 256f), new Vector2(1f, 0.5f), new Vector2(-16f, 0f), TextAnchor.MiddleLeft);
             words.fontStyle = FontStyle.Normal;
             words.horizontalOverflow = HorizontalWrapMode.Wrap;
+
+            // Best fit only measures against the box when the text cannot overflow it.
+            words.verticalOverflow = VerticalWrapMode.Truncate;
             words.resizeTextForBestFit = true;
-            words.resizeTextMinSize = 18;
+            words.resizeTextMinSize = 16;
             words.resizeTextMaxSize = 27;
         }
 
