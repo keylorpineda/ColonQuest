@@ -1207,7 +1207,9 @@
         "enum": [
           "collectors",
           "lender",
-          "pyramid"
+          "pyramid",
+          "neighbor",
+          "stranger"
         ],
         "title": "TalkPartner",
         "type": "string"

@@ -15,6 +15,8 @@ class TalkPartner(StrEnum):
     COLLECTORS = "collectors"
     LENDER = "lender"
     PYRAMID = "pyramid"
+    NEIGHBOR = "neighbor"
+    STRANGER = "stranger"
 
 
 class TalkFact(StrEnum):

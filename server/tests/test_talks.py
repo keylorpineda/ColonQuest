@@ -203,3 +203,11 @@ async def test_a_talk_needs_at_least_one_true_fact(
     response = await http.post(f"/api/sessions/{session.id}/talk", json=LENDER | {"sheet": []})
 
     assert response.status_code == 422
+
+
+def test_the_people_of_the_town_have_their_own_character() -> None:
+    from app.talks.service import CHARACTERS
+
+    for partner in TalkPartner:
+        assert partner in CHARACTERS
+    assert "SINPE" in CHARACTERS[TalkPartner.STRANGER]
