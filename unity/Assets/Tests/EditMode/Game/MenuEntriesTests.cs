@@ -52,6 +52,14 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Credits_CarryTheSloganAndNoWordAboutTheArt()
+        {
+            Assert.AreEqual("From Costa Rica to the World", MenuEntries.Slogan);
+            Assert.IsFalse(ColonQuest.World.Translations.English.ContainsKey("El arte"));
+            Assert.IsFalse(ColonQuest.World.Translations.English.ContainsKey("Arte del juego"));
+        }
+
+        [Test]
         public void Credits_EveryOtherLineIsTranslated()
         {
             foreach (var rows in new[] { MenuEntries.Agents, MenuEntries.Figures, MenuEntries.Stack })

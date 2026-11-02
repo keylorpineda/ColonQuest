@@ -18,7 +18,7 @@ namespace ColonQuest.UI
     /// </summary>
     public sealed partial class DemoLab : MonoBehaviour
     {
-        public const int StationCount = 7;
+        public const int StationCount = 6;
 
         private const float StageWidth = 1920f;
         private const float StageHeight = 1080f;
@@ -47,19 +47,21 @@ namespace ColonQuest.UI
         private static readonly Color Soft = GamePalette.Hex("#C9C3AE");
         private static readonly Color Locked = new Color(0.88f, 0.88f, 0.9f, 1f);
 
+        private const int EngineStation = 3;
+        private const int ClassStation = 4;
+
         private static readonly string[,] Stations =
         {
             { "Game master", "Muse Spark con herramientas" },
             { "Negociación", "Muse Spark Open y Voice Transcribe" },
             { "Plan y cierre", "Muse Wonder" },
-            { "Arte del juego", "Muse Image" },
             { "Motor y controles", "Lo que le pone reglas a la IA" },
             { "Modo Clase", "El panel del profesor, con Muse Spark" },
             { "Cobros y trampas", "Cobrador, prestamista y pirámide" }
         };
 
         /// <summary>The order on the rail: the talks go next to the negotiation, the other conversation.</summary>
-        private static readonly int[] RailOrder = { 0, 1, 6, 2, 3, 4, 5 };
+        private static readonly int[] RailOrder = { 0, 1, 5, 2, 3, 4 };
 
         /// <summary>Why each model has its job, with the times measured for docs/adr/0004-model-roles.md.</summary>
         private static readonly string[] WhyThisModel =
@@ -67,7 +69,6 @@ namespace ColonQuest.UI
             "Muse Spark es el único que responde siempre dentro de los 8 s del juego (3 a 4,4 s). Sus herramientas leen el historial y calculan deudas, pero nunca escriben el estado del jugador.",
             "Muse Spark Open corre con pesos abiertos en Baseten (1,9 a 2,8 s). Voice Transcribe pasa tu voz a texto (0,7 a 1,5 s). Si Baseten falla, contesta la API de Meta y el juego ni se entera.",
             "Muse Wonder es el mejor escritor, pero suele tardar de 6 a 10 s. Por eso solo trabaja donde nadie espera: planifica en segundo plano y narra detrás de una pantalla de carga.",
-            "Muse Image tarda de 14 a 17 s por imagen. Por eso todas se generan antes y se guardan: el juego nunca la espera en vivo.",
             "Esta estación no llama a ningún modelo: es lo que mantiene a la IA dentro de las reglas.",
             "Las cifras salen de la base de datos. Muse Spark solo las explica en lenguaje claro; no inventa números.",
             "Muse Spark Open corre con pesos abiertos en Baseten. El juego le manda la ficha con las únicas cifras que puede decir: si dice otra, se rechaza y responden las reglas locales."
@@ -283,8 +284,7 @@ namespace ColonQuest.UI
                 case 0: DrawGameMaster(); break;
                 case 1: DrawNegotiation(); break;
                 case 2: DrawYear(); break;
-                case 3: DrawGallery(); break;
-                case 4: DrawEngine(); break;
+                case EngineStation: DrawEngine(); break;
                 case TalksStation: DrawTalks(); break;
                 default: DrawClass(); break;
             }
@@ -298,7 +298,7 @@ namespace ColonQuest.UI
                 case 0: return new[] { gmService };
                 case 1: return new[] { negotiationService };
                 case 2: return new[] { planService, yearService };
-                case 5: return classServices;
+                case ClassStation: return classServices;
                 case TalksStation: return new[] { talkService };
                 default: return new ApiService[0];
             }
@@ -429,11 +429,6 @@ namespace ColonQuest.UI
                     pictures.RemoveAt(i);
                 }
             }
-
-            if (Current == 3)
-            {
-                UpdateGalleryCount();
-            }
         }
 
         // ---------------------------------------------------------------- evidence
@@ -454,7 +449,7 @@ namespace ColonQuest.UI
                 serverStatus.color = GameUiColors.Pink;
             }
 
-            if (Current == 4)
+            if (Current == EngineStation)
             {
                 RenderEvidence(new List<SessionTraceDto>());
             }
@@ -491,13 +486,9 @@ namespace ColonQuest.UI
         {
             var text = new StringBuilder();
             text.Append(Loc.T(WhyThisModel[Current])).Append("\n\n");
-            if (Current == 4)
+            if (Current == EngineStation)
             {
                 AppendBudgets(text);
-            }
-            else if (Current == 3)
-            {
-                text.Append(Loc.T("Cada imagen costó $0.01 una sola vez. Las veinte juntas: $0.20. Verlas aquí no gasta nada.")).Append("\n\n");
             }
 
             float total = 0f;

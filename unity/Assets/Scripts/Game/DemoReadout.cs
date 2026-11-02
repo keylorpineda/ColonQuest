@@ -13,12 +13,7 @@ namespace ColonQuest.Game
     /// </summary>
     public static class DemoReadout
     {
-        /// <summary>The twenty pictures of the backend (server/app/images/keys.py), all pregenerated with Muse Image.</summary>
-        public static readonly string[] Portraits =
-        {
-            "npc_don_rafa_mecanico", "npc_kevin_vendedor", "npc_dona_marta_vendedora", "npc_prestamista_gota_a_gota", "npc_amigo_piramide"
-        };
-
+        /// <summary>The scenes of the events, all pregenerated on the backend (server/app/images/keys.py).</summary>
         public static readonly string[] Scenes =
         {
             "scene_consultorio", "scene_cooperativa", "scene_esquina_barrio", "scene_estado_cuenta", "scene_gasolinera", "scene_ins",
