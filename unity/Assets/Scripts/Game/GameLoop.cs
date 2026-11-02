@@ -629,11 +629,17 @@ namespace ColonQuest.Game
             return FinanceEngine.PayTowardCard(State, amount);
         }
 
-        /// <summary>Pays one bill out of cash. False when nothing is owed for it or the cash is not enough.</summary>
-        public bool PayBill(BillKind kind)
+        /// <summary>Moves money from the emergency fund to cash. Returns what moved.</summary>
+        public long TakeFromFund(long amount)
+        {
+            return FinanceEngine.WithdrawFromEmergencyFund(State, amount);
+        }
+
+        /// <summary>Pays one bill from cash, the account or the card. False when nothing is owed for it or that source does not reach.</summary>
+        public bool PayBill(BillKind kind, MoneySource source = MoneySource.Cash)
         {
             var bill = Bills.Find(kind);
-            if (bill == null || !FinanceEngine.TryPayBill(State, bill.Amount))
+            if (bill == null || !FinanceEngine.TryPayBill(State, bill.Amount, source))
             {
                 return false;
             }
@@ -643,13 +649,13 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>Pays every bill the cash reaches, in order. Returns how many were paid.</summary>
-        public int PayAllBills()
+        /// <summary>Pays every bill that source reaches, in order. Returns how many were paid.</summary>
+        public int PayAllBills(MoneySource source = MoneySource.Cash)
         {
             int paid = 0;
             foreach (var bill in new List<BillDue>(Bills.Due))
             {
-                if (PayBill(bill.Kind))
+                if (PayBill(bill.Kind, source))
                 {
                     paid++;
                 }

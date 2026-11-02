@@ -170,5 +170,46 @@ namespace ColonQuest.Game.Tests
         {
             Assert.AreNotEqual(spanish, Loc.Translate(spanish, GameLanguage.English));
         }
+
+        [Test]
+        public void PayBill_CanLeaveFromTheAccountOrTheCard()
+        {
+            var loop = new GameLoop();
+            loop.State.Cash = 0L;
+            loop.State.Savings = 100_000L;
+            loop.Bills.Arrive(_ => 5_000L);
+
+            Assert.IsFalse(loop.PayBill(BillKind.Water), "no cash");
+            Assert.IsTrue(loop.PayBill(BillKind.Water, ColonQuest.Finance.MoneySource.Savings));
+            Assert.AreEqual(95_000L, loop.State.Savings);
+
+            long card = loop.State.CreditCard.Balance;
+            Assert.IsTrue(loop.PayBill(BillKind.Internet, ColonQuest.Finance.MoneySource.CreditCard));
+            Assert.AreEqual(card + 5_000L, loop.State.CreditCard.Balance);
+        }
+
+        [Test]
+        public void TaskList_ShowsLateBillsBeforeTheLastWeek()
+        {
+            var loop = new GameLoop();
+            loop.Bills.Arrive(_ => 5_000L);
+            loop.CloseMonth();
+
+            Assert.IsFalse(loop.Bills.ArrivedThisMonth, "this month's have not come");
+            Assert.IsTrue(new System.Collections.Generic.List<TaskItem>(TaskList.For(loop)).Exists(item => item.Text == TaskList.PayBills && !item.Done));
+        }
+
+        [Test]
+        public void TakeFromFund_GivesTheMoneyBack()
+        {
+            var loop = new GameLoop();
+            loop.State.Cash = 0L;
+            loop.State.EmergencyFund = 15_000L;
+
+            Assert.AreEqual(10_000L, loop.TakeFromFund(10_000L));
+            Assert.AreEqual(10_000L, loop.State.Cash);
+            Assert.AreEqual(5_000L, loop.TakeFromFund(10_000L), "only what is there");
+            Assert.AreEqual(0L, loop.State.EmergencyFund);
+        }
     }
 }

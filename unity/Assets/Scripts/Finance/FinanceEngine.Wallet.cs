@@ -5,8 +5,8 @@ namespace ColonQuest.Finance
     public static partial class FinanceEngine
     {
         /// <summary>
-        /// Takes money out of the player's cash for something that cannot be put on credit, such as a SINPE
-        /// transfer or a casino bet. Returns false and changes nothing when the cash is not enough.
+        /// Takes money out of the player's cash for something that cannot be put on credit, such as a casino bet.
+        /// Returns false and changes nothing when the cash is not enough.
         /// </summary>
         public static bool TrySpendCash(PlayerState state, long amountColones)
         {
@@ -19,6 +19,55 @@ namespace ColonQuest.Finance
 
             state.Cash -= amountColones;
             return true;
+        }
+
+        /// <summary>
+        /// Takes money out of the bank account, as SINPE Movil does through the number linked to it. Returns false and changes
+        /// nothing when the account does not reach.
+        /// </summary>
+        public static bool TrySpendFromAccount(PlayerState state, long amountColones)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (amountColones <= 0L || amountColones > ContractLimits.MaxColones)
+                throw new ArgumentOutOfRangeException(nameof(amountColones), "Amount must be between 1 and MaxColones.");
+            if (state.Savings < amountColones)
+                return false;
+
+            state.Savings -= amountColones;
+            return true;
+        }
+
+        /// <summary>True when what this choice puts on the card fits under its limit.</summary>
+        public static bool CardCovers(PlayerState state, Choice choice)
+        {
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
+            if (choice == null)
+                throw new ArgumentNullException(nameof(choice));
+
+            long onCard = 0L;
+            foreach (var effect in choice.Effects)
+            {
+                if (effect.Kind == EffectKind.Expense && effect.Source == MoneySource.CreditCard)
+                {
+                    onCard += effect.Amount;
+                }
+            }
+
+            return onCard <= state.CreditCard.AvailableCredit;
+        }
+
+        /// <summary>
+        /// True when the player can take this choice: what goes on the card has to fit. An event where nothing fits leaves all
+        /// its choices open, because the event still has to end somehow.
+        /// </summary>
+        public static bool ChoiceIsOpen(PlayerState state, GameEvent gameEvent, Choice choice)
+        {
+            if (gameEvent == null)
+                throw new ArgumentNullException(nameof(gameEvent));
+
+            return CardCovers(state, choice) || !gameEvent.Choices.Exists(other => CardCovers(state, other));
         }
 
         /// <summary>Adds money to the player's cash, never past the contract limit.</summary>

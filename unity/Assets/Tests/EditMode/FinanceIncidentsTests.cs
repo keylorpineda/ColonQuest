@@ -224,6 +224,114 @@ namespace ColonQuest.Finance.Tests
             Assert.AreEqual(0L, FinanceEngine.PayInformalDebt(State(50_000L)));
         }
 
+        // ---------------------------------------------------------------- where the money leaves from
+
+        [Test]
+        public void TryPayBill_LeavesFromTheChosenSource()
+        {
+            var state = State(10_000L, card: 100_000L);
+            state.Savings = 40_000L;
+
+            Assert.IsTrue(FinanceEngine.TryPayBill(state, 8_000L, MoneySource.Cash));
+            Assert.AreEqual(2_000L, state.Cash);
+            Assert.IsTrue(FinanceEngine.TryPayBill(state, 30_000L, MoneySource.Savings));
+            Assert.AreEqual(10_000L, state.Savings);
+            Assert.IsTrue(FinanceEngine.TryPayBill(state, 20_000L, MoneySource.CreditCard));
+            Assert.AreEqual(120_000L, state.CreditCard.Balance);
+        }
+
+        [Test]
+        public void TryPayBill_ChangesNothingWhenTheSourceDoesNotReach()
+        {
+            var state = State(1_000L, card: 100_000L);
+            state.Savings = 1_000L;
+            state.CreditCard.Limit = 100_500L;
+
+            Assert.IsFalse(FinanceEngine.TryPayBill(state, 5_000L, MoneySource.Cash));
+            Assert.IsFalse(FinanceEngine.TryPayBill(state, 5_000L, MoneySource.Savings));
+            Assert.IsFalse(FinanceEngine.TryPayBill(state, 5_000L, MoneySource.CreditCard), "the card keeps its limit");
+            Assert.AreEqual(1_000L, state.Cash);
+            Assert.AreEqual(1_000L, state.Savings);
+            Assert.AreEqual(100_000L, state.CreditCard.Balance);
+        }
+
+        [Test]
+        public void TrySpendFromAccount_TouchesOnlyTheAccount()
+        {
+            var state = State(50_000L);
+            state.Savings = 20_000L;
+
+            Assert.IsFalse(FinanceEngine.TrySpendFromAccount(state, 30_000L), "the cash in the pocket does not help");
+            Assert.IsTrue(FinanceEngine.TrySpendFromAccount(state, 20_000L));
+            Assert.AreEqual(0L, state.Savings);
+            Assert.AreEqual(50_000L, state.Cash);
+        }
+
+        private static GameEvent CardEvent(long onCard)
+        {
+            return new GameEvent
+            {
+                EventId = "evt_test",
+                Type = EventType.Emergency,
+                Title = "Test",
+                Narrative = "Test",
+                TeachingConcept = TeachingConcept.Budget,
+                Choices = new System.Collections.Generic.List<Choice>
+                {
+                    new Choice("card", "Card", new System.Collections.Generic.List<Effect> { new Effect(EffectKind.Expense, onCard, MoneySource.CreditCard) }),
+                    new Choice("cash", "Cash", new System.Collections.Generic.List<Effect> { new Effect(EffectKind.Expense, onCard, MoneySource.Cash) })
+                }
+            };
+        }
+
+        [Test]
+        public void ChoiceIsOpen_ClosesWhatDoesNotFitOnTheCard()
+        {
+            var state = State(0L, card: 100_000L);
+            state.CreditCard.Limit = 120_000L;
+
+            var fits = CardEvent(20_000L);
+            Assert.IsTrue(FinanceEngine.ChoiceIsOpen(state, fits, fits.Choices[0]));
+
+            var tooMuch = CardEvent(20_001L);
+            Assert.IsFalse(FinanceEngine.ChoiceIsOpen(state, tooMuch, tooMuch.Choices[0]));
+            Assert.IsTrue(FinanceEngine.ChoiceIsOpen(state, tooMuch, tooMuch.Choices[1]));
+        }
+
+        [Test]
+        public void ChoiceIsOpen_AnEventWhereNothingFitsStaysOpen()
+        {
+            var state = State(0L, card: 100_000L);
+            state.CreditCard.Limit = 100_000L;
+            var onlyCard = CardEvent(20_000L);
+            onlyCard.Choices[1] = new Choice("card2", "Card", new System.Collections.Generic.List<Effect> { new Effect(EffectKind.Expense, 30_000L, MoneySource.CreditCard) });
+
+            Assert.IsTrue(FinanceEngine.ChoiceIsOpen(state, onlyCard, onlyCard.Choices[0]));
+        }
+
+        [Test]
+        public void CardCycle_MissingTheMinimumAddsTheLateFee()
+        {
+            var state = State(0L, card: 100_000L);
+
+            var result = FinanceEngine.PayCreditCardMinimum(state);
+
+            Assert.AreEqual(FinanceEngine.CardLateFeeColones, result.LateFee);
+            Assert.AreEqual(100_000L + result.InterestCharged + FinanceEngine.CardLateFeeColones, state.CreditCard.Balance);
+            CollectionAssert.Contains(state.History, "missed_card_minimum");
+        }
+
+        [Test]
+        public void CardCycle_ReachingTheMinimumHasNoLateFee()
+        {
+            var state = State(50_000L, card: 100_000L);
+
+            var result = FinanceEngine.PayCreditCardMinimum(state);
+
+            Assert.AreEqual(0L, result.LateFee);
+            CollectionAssert.DoesNotContain(state.History, "missed_card_minimum");
+        }
+
         [Test]
         public void ChangeWellbeing_StaysBetweenZeroAndOneHundred()
         {

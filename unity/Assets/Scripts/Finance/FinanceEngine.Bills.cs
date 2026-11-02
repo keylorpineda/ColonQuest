@@ -37,16 +37,36 @@ namespace ColonQuest.Finance
             return paid;
         }
 
-        /// <summary>Pays a bill out of cash. Nothing changes when the cash is not enough.</summary>
-        public static bool TryPayBill(PlayerState state, long amountDue)
+        /// <summary>
+        /// Pays a bill out of cash, the account or the card. Nothing changes when that source does not reach: the card only
+        /// takes what fits under its limit.
+        /// </summary>
+        public static bool TryPayBill(PlayerState state, long amountDue, MoneySource source = MoneySource.Cash)
         {
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
             if (amountDue <= 0L || amountDue > ContractLimits.MaxColones)
                 throw new ArgumentOutOfRangeException(nameof(amountDue), "The amount must be positive and within MaxColones.");
 
-            if (!TrySpendCash(state, amountDue))
-                return false;
+            switch (source)
+            {
+                case MoneySource.Cash:
+                    if (!TrySpendCash(state, amountDue))
+                        return false;
+                    break;
+                case MoneySource.Savings:
+                    if (!TrySpendFromAccount(state, amountDue))
+                        return false;
+                    break;
+                case MoneySource.CreditCard:
+                    if (state.CreditCard.AvailableCredit < amountDue)
+                        return false;
+                    state.CreditCard.Balance += amountDue;
+                    state.RecordHistory("paid_bill_on_card");
+                    break;
+                default:
+                    return false;
+            }
 
             state.RecordHistory("paid_bill");
             return true;

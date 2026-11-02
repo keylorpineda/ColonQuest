@@ -44,13 +44,17 @@ namespace ColonQuest.Finance
         public long InterestCharged { get; }
         public long EndingBalance { get; }
 
+        /// <summary>The fee for not reaching the minimum payment. It is inside the ending balance.</summary>
+        public long LateFee { get; }
+
         public CreditCardCycleResult(
             long startingBalance,
             long minimumPaymentDue,
             long amountPaid,
             long unpaidBalanceBeforeInterest,
             long interestCharged,
-            long endingBalance)
+            long endingBalance,
+            long lateFee = 0L)
         {
             StartingBalance = startingBalance;
             MinimumPaymentDue = minimumPaymentDue;
@@ -58,6 +62,7 @@ namespace ColonQuest.Finance
             UnpaidBalanceBeforeInterest = unpaidBalanceBeforeInterest;
             InterestCharged = interestCharged;
             EndingBalance = endingBalance;
+            LateFee = lateFee;
         }
     }
 
@@ -107,6 +112,9 @@ namespace ColonQuest.Finance
         public const decimal TaxBracket4RatePct = 25m;
 
         public const long MinimumCardPaymentFloorColones = 5_000L;
+
+        /// <summary>What a month without reaching the minimum payment adds to the card. An illustrative figure, like the bills' late fee.</summary>
+        public const long CardLateFeeColones = 5_000L;
 
         /// <summary>
         /// Rounds a decimal colones amount to the nearest whole colón (half away from zero).
@@ -259,12 +267,18 @@ namespace ColonQuest.Finance
             long unpaid = startingBalance - actualPaid;
 
             long interest = CalculateCardInterest(unpaid, card.MonthlyRatePct);
-            long endingBalance = ContractLimits.ClampColones(unpaid + interest);
+            long lateFee = actualPaid < minDue ? CardLateFeeColones : 0L;
+            long endingBalance = ContractLimits.ClampColones(unpaid + interest + lateFee);
             card.Balance = endingBalance;
 
             if (startingBalance > 0L && unpaid > 0L && actualPaid <= minDue)
             {
                 state.RecordHistory("paid_minimum_only");
+            }
+
+            if (lateFee > 0L)
+            {
+                state.RecordHistory("missed_card_minimum");
             }
 
             return new CreditCardCycleResult(
@@ -273,7 +287,8 @@ namespace ColonQuest.Finance
                 actualPaid,
                 unpaid,
                 interest,
-                endingBalance);
+                endingBalance,
+                lateFee);
         }
 
         /// <summary>
