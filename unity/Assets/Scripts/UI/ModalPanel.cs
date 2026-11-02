@@ -194,7 +194,12 @@ namespace ColonQuest.UI
                 {
                     var option = options[i];
                     var press = option.OnPress;
-                    var button = UiKit.MakeButton(card, option.Label, option.Color, new Vector2(textWidth, ButtonHeight), top, new Vector2(0f, y), () => Activate(press));
+                    var button = UiKit.MakeButton(card, option.Label, option.Color, new Vector2(textWidth, ButtonHeight), top, new Vector2(0f, y), () =>
+                    {
+                        // A click means the player chose: it does not wait for the text to finish writing itself.
+                        Complete();
+                        Activate(press);
+                    });
                     button.interactable = option.Enabled;
                     y -= ButtonHeight + ButtonGap;
                 }

@@ -220,6 +220,20 @@ namespace ColonQuest.Game
             text.Append("\n\n");
         }
 
+        /// <summary>The same call in two lines, for the panel that stays on the screen during the game.</summary>
+        public static void AppendShortCall(StringBuilder text, ModelCallDto call)
+        {
+            text.Append(Tint(ModelName(call.model), "#F2A23A")).Append("  ").Append(ProviderName(call.provider)).Append('\n');
+            text.Append(JobOf(call.endpoint)).Append("  ·  ").Append(Tint((call.latencyMs / 1000f).ToString("0.0", CultureInfo.InvariantCulture) + " s", "#A8F0B8"));
+            text.Append("  ·  ").Append(Dollars(call.costUsd));
+            if (!call.ok)
+            {
+                text.Append("  ·  ").Append(Tint(Loc.T("falló"), "#FF8A8A"));
+            }
+
+            text.Append("\n\n");
+        }
+
         /// <summary>One use of a tool by an agent: what it asked and what the backend answered.</summary>
         public static void AppendStep(StringBuilder text, ToolStepDto step)
         {

@@ -510,6 +510,19 @@ namespace ColonQuest.Game
             });
         }
 
+        /// <summary>One of the questions on the buttons: it counts as asked, and goes out like a typed line.</summary>
+        public void AskKeyQuestion(KeyQuestion question, string text)
+        {
+            var negotiation = CurrentNegotiation;
+            if (negotiation == null || negotiation.IsClosed || Busy)
+            {
+                return;
+            }
+
+            negotiation.MarkAsked(question);
+            SendNegotiation(text);
+        }
+
         /// <summary>
         /// One turn spoken by the player, in two steps so the player sees their words as soon as they are understood: the
         /// clip becomes text and then goes out like a typed line. Only the backend can transcribe, so when it is missing or

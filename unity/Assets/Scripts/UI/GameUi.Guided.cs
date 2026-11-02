@@ -25,6 +25,7 @@ namespace ColonQuest.UI
         private string guidedDoor;
         private StationType? guidedVisited;
         private bool demoLabNext;
+        private bool guidedSalarySeen;
 
         /// <summary>The next time the town loads, the guided run starts there.</summary>
         public void PlayGuidedNext()
@@ -37,6 +38,7 @@ namespace ColonQuest.UI
 
             guidedObjective = null;
             guidedStation = null;
+            guidedSalarySeen = false;
             guidedPending = true;
             aiCalls.Clear();
             aiCalls.SetExpanded(true);
@@ -142,7 +144,7 @@ namespace ColonQuest.UI
             guidedDoor = SceneNames.Tienda;
             guidedStation = StationType.Store;
             guidedVisited = null;
-            guidedObjective = new Objective("Entrá a la tienda y preguntale al vendedor por el costo real", SceneNames.Tienda, "Station_Store");
+            guidedObjective = new Objective("Andá a la tienda y preguntá el costo real", SceneNames.Tienda, "Station_Store");
             while (guidedVisited != StationType.Store)
             {
                 yield return null;
@@ -173,7 +175,7 @@ namespace ColonQuest.UI
             modal.Show(
                 Loc.T("Tres meses con un salario real"),
                 Loc.T("Simulador de finanzas personales"),
-                Loc.T("Ganás el salario mínimo de Costa Rica. Las cifras las lleva el motor del juego; los personajes y la historia los escriben modelos de Meta, y a la derecha ves cada llamada real. Vos solo decidís."),
+                Loc.T("Ganás el salario mínimo. Vos solo decidís; a la derecha ves cada llamada real a los modelos de Meta."),
                 new List<ModalOption>
                 {
                     new ModalOption { Label = Loc.T("1.  Llego justo y con la tarjeta cargada"), Color = GameUiColors.Yellow, OnPress = () => choose(GuidedProfile.Tight) },
@@ -184,7 +186,7 @@ namespace ColonQuest.UI
         /// <summary>The plan of Muse Wonder arrives in the background. The player walks meanwhile; the next event has to wait for it, or the plan would be lost.</summary>
         private IEnumerator WaitForThePlan()
         {
-            guidedObjective = new Objective("Muse Wonder está escribiendo tu año. Mirá el panel de la derecha.");
+            guidedObjective = new Objective("Muse Wonder está escribiendo tu año...");
             float started = Time.unscaledTime;
             while (Time.unscaledTime - started < GuidedRoute.PlanWaitSeconds && !DemoReadout.PlannerAnswered(aiCalls.Last))
             {
@@ -208,8 +210,8 @@ namespace ColonQuest.UI
             guidedStation = station;
             guidedVisited = null;
             guidedObjective = lender
-                ? new Objective("La plata no alcanza, y Préstamos Rápidos ofrece. Andá y preguntá antes de firmar.", SceneNames.Town, "Station_Lender")
-                : new Objective("Te sobra plata, y Invierte Ya te llama. Andá y preguntá de dónde sale la ganancia.", SceneNames.Town, "Station_Pyramid");
+                ? new Objective("Andá a Préstamos Rápidos y preguntá antes de firmar", SceneNames.Town, "Station_Lender")
+                : new Objective("Andá a Invierte Ya y preguntá de dónde sale la ganancia", SceneNames.Town, "Station_Pyramid");
             while (guidedVisited != station)
             {
                 yield return null;
@@ -237,7 +239,7 @@ namespace ColonQuest.UI
                 modal.Show(
                     Loc.T("Invierte Ya dejó de contestar"),
                     string.Empty,
-                    Loc.F("Pasó un mes y el número ya no existe. Los primeros cobraron con la plata de los que entraron después, y tus {0} no vuelven.", Money.Format(DebtTalk.ExampleLoan)),
+                    Loc.F("Los primeros cobraron con la plata de los que entraron después. Tus {0} no vuelven.", Money.Format(DebtTalk.ExampleLoan)),
                     new[] { Continue(null) });
                 yield return UntilGuidedIdle();
             }
