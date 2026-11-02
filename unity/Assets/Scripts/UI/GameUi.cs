@@ -706,7 +706,7 @@ namespace ColonQuest.UI
                         return Loc.T("Está cerrado. Abrimos a las 06:00.");
                     }
 
-                    if (loop.CanDoTask(station.Type))
+                    if (loop.CanDoTask(station.Type) || (station.Type == StationType.Lender && loop.InArrears))
                     {
                         return "[E]  " + station.DisplayName;
                     }
@@ -925,10 +925,13 @@ namespace ColonQuest.UI
 
             AppendDeal(text, session.LastDeal);
 
-            text.AppendLine();
-            text.Append(session.Loop.AllTasksDone
-                ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
-                : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
+            if (!session.Guided)
+            {
+                text.AppendLine();
+                text.Append(session.Loop.AllTasksDone
+                    ? Loc.T("Hiciste todas tus tareas. Ve al banco a cobrar el salario.")
+                    : Loc.F("Tareas del mes: {0} de {1}.", session.Loop.TasksDone, GameRules.TasksPerMonth));
+            }
 
             modal.Show(Loc.T("Lo que pasó"), Loc.T(outcome.ChoiceLabel), text.ToString(), new[] { Continue(null) });
         }
@@ -1053,6 +1056,14 @@ namespace ColonQuest.UI
 
         private void ShowQuincenaNotice(long amount)
         {
+            // The guided run explains the salary once; after that it is a line, not one more window to close.
+            if (session.Guided && guidedSalarySeen)
+            {
+                Thoughts.Say(Loc.F("Cayó la quincena por SINPE: {0}", Money.Format(amount)));
+                return;
+            }
+
+            guidedSalarySeen = session.Guided;
             modal.Show(
                 Loc.T("SINPE Móvil"),
                 Loc.T("Pago de quincena"),

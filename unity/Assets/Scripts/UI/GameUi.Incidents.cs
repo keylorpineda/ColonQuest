@@ -311,22 +311,16 @@ namespace ColonQuest.UI
         {
             long demand = session.CollectionDemand;
             var text = new StringBuilder();
-            text.AppendLine(Loc.T("Un carro negro, con los vidrios polarizados y la música a todo volumen, frena frente a ti. Se bajan dos hombres."));
-            text.AppendLine();
-            text.AppendLine(Loc.F("«Mae, usted debe plata. Hoy venimos por {0}.»", Money.Format(demand)));
-            text.AppendLine();
-            text.AppendLine(Loc.T("Pagar baja la deuda. Negociar es hablarles, por texto o por voz: preguntá y pedí un arreglo. Ignorarlos cuesta una multa por atraso y mucha tensión."));
-            text.AppendLine();
-            text.Append(Loc.T("Cifras de ejemplo del juego."));
+            text.Append(Loc.F("«Mae, usted debe plata. Hoy venimos por {0}.»", Money.Format(demand)));
 
             var options = new List<ModalOption>
             {
                 new ModalOption { Label = Loc.F("1.  Pagar  ·  {0}", Money.Format(demand)), Color = GameUiColors.Green, OnPress = () => { CollectorsLeave(); session.PayCollectors(); } },
-                new ModalOption { Label = Loc.T("2.  Negociar con tus palabras"), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(TalkPartner.Collectors) },
+                new ModalOption { Label = Loc.T("2.  Hablar con ellos"), Color = GameUiColors.Yellow, OnPress = () => session.BeginTalk(TalkPartner.Collectors) },
                 new ModalOption { Label = Loc.T("3.  Ignorarlos"), Color = GameUiColors.Pink, OnPress = () => { CollectorsLeave(); session.IgnoreCollectors(); } }
             };
 
-            modal.Show(Loc.T("Los cobradores"), Loc.T("Cobro por atraso"), text.ToString(), options);
+            modal.Show(Loc.T("Los cobradores"), Loc.T(MarketAssumptions.ShortDisclaimer), text.ToString(), options);
         }
     }
 }

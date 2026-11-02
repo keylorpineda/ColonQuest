@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using ColonQuest.Api;
 using ColonQuest.Finance;
 using ColonQuest.Game;
 using ColonQuest.UI;
@@ -132,7 +133,6 @@ namespace ColonQuest.World.PlayModeTests
             yield return Shot("wonder");
             yield return Next("the report of the first month", "month1");
             Assert.AreEqual(1, session.Loop.MonthsPlayed);
-            yield return Next("the second salary", "salary2");
 
             // Month 2: the seller.
             yield return Until(() => GuidedType.HasValue, 10f, "the second objective");
@@ -145,7 +145,9 @@ namespace ColonQuest.World.PlayModeTests
             yield return Shot("in_store");
             Use(Guided());
             yield return Until(() => session.CurrentNegotiation != null, 15f, "the seller");
-            session.SendNegotiation("How much do I pay in total, with insurance and fees?");
+            yield return new WaitForSecondsRealtime(0.4f);
+            yield return Shot("seller_opens");
+            session.AskKeyQuestion(KeyQuestion.TotalCost, "How much do I pay in total?");
             yield return Until(() => !session.Busy, 30f, "the seller's answer");
             yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("seller");
@@ -153,7 +155,6 @@ namespace ColonQuest.World.PlayModeTests
             yield return Next("the outcome of the talk", "deal");
             yield return Next("the report of the second month", "month2");
             Assert.AreEqual(2, session.Loop.MonthsPlayed);
-            yield return Next("the third salary", "salary3");
 
             // Month 3: what those decisions bring.
             yield return Until(() => GuidedType.HasValue, 10f, "the third objective");
@@ -168,10 +169,9 @@ namespace ColonQuest.World.PlayModeTests
             Teleport((Vector2)place.transform.position + new Vector2(0f, -1f));
             yield return new WaitForSecondsRealtime(0.3f);
             Use(place);
-            yield return WindowOpens("the offer's first window");
+            yield return Until(() => session.CurrentTalk != null, 10f, "the talk");
+            yield return new WaitForSecondsRealtime(0.4f);
             yield return Shot("at_consequence");
-            yield return Press(0);
-            yield return Until(() => session.CurrentTalk != null, 5f, "the talk");
             session.SendTalk(lender ? "What is the interest?" : "Where does the money come from?");
             yield return Until(() => !session.Busy, 30f, "the answer");
             yield return new WaitForSecondsRealtime(0.4f);

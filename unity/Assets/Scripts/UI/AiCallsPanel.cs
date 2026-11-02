@@ -114,12 +114,22 @@ namespace ColonQuest.UI
             // The newest first: it is the one the player has just seen happen.
             for (int i = trace.calls.Count - 1; i >= 0; i--)
             {
-                DemoReadout.AppendCall(text, trace.calls[i]);
+                DemoReadout.AppendShortCall(text, trace.calls[i]);
             }
 
-            for (int i = trace.toolSteps.Count - 1; i >= 0; i--)
+            // The tools by name: what they asked and answered is in the feature demo.
+            if (trace.toolSteps.Count > 0)
             {
-                DemoReadout.AppendStep(text, trace.toolSteps[i]);
+                var tools = new List<string>();
+                foreach (var step in trace.toolSteps)
+                {
+                    if (!tools.Contains(step.tool))
+                    {
+                        tools.Add(step.tool);
+                    }
+                }
+
+                text.Append(DemoReadout.Tint(Loc.T("Herramientas usadas"), "#8FD3FF")).Append('\n').Append(string.Join(", ", tools));
             }
 
             Write(text.ToString());
@@ -133,18 +143,13 @@ namespace ColonQuest.UI
             }
 
             string who = DemoReadout.PlannedByTheModel(trace)
-                ? Loc.T("Plan del año, escrito por Muse Wonder")
-                : Loc.T(DemoReadout.PlannerAnswered(trace) ? "Plan base: Muse Wonder no llegó a tiempo" : "Plan base. Muse Wonder está escribiendo el tuyo...");
+                ? Loc.T("Tu año, por Muse Wonder")
+                : Loc.T(DemoReadout.PlannerAnswered(trace) ? "Plan base: Muse Wonder no llegó a tiempo" : "Muse Wonder está escribiendo tu año...");
             text.Append(DemoReadout.Tint(who, "#8FD3FF")).Append('\n');
             int months = Mathf.Min(MonthsShown, trace.seasonPlan.Count);
             for (int i = 0; i < months; i++)
             {
                 text.Append(trace.seasonPlan[i].month).Append(".  ").Append(trace.seasonPlan[i].theme.Replace('<', '‹').Replace('>', '›')).Append('\n');
-            }
-
-            if (trace.seasonPlan.Count > months)
-            {
-                text.Append(DemoReadout.Tint(Loc.F("Y {0} meses más, si la partida siguiera", trace.seasonPlan.Count - months), "#C9C3AE")).Append('\n');
             }
 
             text.Append('\n');
