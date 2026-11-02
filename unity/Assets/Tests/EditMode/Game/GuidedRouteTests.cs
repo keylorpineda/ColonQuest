@@ -150,6 +150,26 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void LenderOffer_LendsEachAmountOnTheSheet()
+        {
+            var offer = DebtTalk.OfferEvent(TalkPartner.Lender);
+            var request = new DebtTalk(TalkPartner.Lender).ToRequest("300 000", "en");
+
+            Assert.AreEqual(DebtTalk.LenderLoans.Length + 1, offer.Choices.Count);
+            foreach (long loan in DebtTalk.LenderLoans)
+            {
+                CollectionAssert.Contains(request.amounts, loan);
+                CollectionAssert.Contains(request.amounts, DebtTalk.LenderTotal(loan));
+            }
+
+            var state = GameRules.NewPlayer();
+            long cash = state.Cash;
+            FinanceEngine.ApplyChoice(state, offer, offer.Choices[2].Id);
+            Assert.AreEqual(cash + 300_000L, state.Cash);
+            Assert.AreEqual(300_000L, state.InformalLoans[0].Balance);
+        }
+
+        [Test]
         public void PyramidOffer_TakesTheMoneyAndSkippingChangesNothing()
         {
             var state = GameRules.NewPlayer();

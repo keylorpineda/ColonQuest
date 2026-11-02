@@ -62,6 +62,9 @@ namespace ColonQuest.Game
         /// <summary>The monthly rate of an informal loan, which every neighbor knows to fear.</summary>
         private const int NeighborLoanRatePct = LenderRatePct;
 
+        /// <summary>What the lender is willing to lend. The contract of the game allows up to the last one.</summary>
+        public static readonly long[] LenderLoans = { ExampleLoan, 200_000L, 300_000L };
+
         public const string TakeOffer = "take";
         public const string SkipOffer = "skip";
 
@@ -185,7 +188,13 @@ namespace ColonQuest.Game
         /// <summary>What the example loan costs at the end of the short term, month on month at the lender's rate.</summary>
         public static long LenderTotal()
         {
-            long total = ExampleLoan;
+            return LenderTotal(ExampleLoan);
+        }
+
+        /// <summary>What a loan costs at the end of the short term, month on month at the lender's rate.</summary>
+        public static long LenderTotal(long loan)
+        {
+            long total = loan;
             for (int month = 0; month < ExampleMonths; month++)
             {
                 total += total * LenderRatePct / 100L;
@@ -292,12 +301,16 @@ namespace ColonQuest.Game
         private static void FillLender(TalkRequestDto request)
         {
             Line(request, TalkFact.Rate, Loc.F("Cobras el {0}% al mes a {1} meses o menos, y el {2}% a más plazo.", LenderRatePct, ExampleMonths, LenderLongRatePct));
-            Line(request, TalkFact.TotalCost, Loc.F("Si prestas {0}, en {1} meses te devuelven {2}.", Money.Format(ExampleLoan), ExampleMonths, Money.Format(LenderTotal())));
+            Line(request, TalkFact.TotalCost, LenderTerms("Prestás {0}, {1} o {2}, nada más. A {3} meses te devuelven {4}, {5} o {6}."));
             Line(request, TalkFact.Arrangement, Loc.T("No hay rebajas: pasas todos los días a cobrar la cuota, gota a gota."));
             Line(request, TalkFact.WhatIfNotPaid, Loc.T("Si se atrasa, los intereses siguen corriendo y mandas a los muchachos del carro negro."));
             Line(request, TalkFact.Legal, Loc.T("Sin papeles y sin SUGEF: esto es informal, entre los dos."));
             Line(request, TalkFact.Guarantee, Loc.T("Ningún contrato: solo una firma en tu libreta."));
-            request.amounts.AddRange(new[] { ExampleLoan, LenderTotal() });
+            foreach (long loan in LenderLoans)
+            {
+                request.amounts.AddRange(new[] { loan, LenderTotal(loan) });
+            }
+
             request.percents.AddRange(new[] { LenderRatePct, LenderLongRatePct });
         }
 
@@ -334,6 +347,12 @@ namespace ColonQuest.Game
             request.percents.Add(PyramidPromisePct);
         }
 
+        private static string LenderTerms(string spanish)
+        {
+            return Loc.F(spanish, Money.Format(LenderLoans[0]), Money.Format(LenderLoans[1]), Money.Format(LenderLoans[2]), ExampleMonths,
+                Money.Format(LenderTotal(LenderLoans[0])), Money.Format(LenderTotal(LenderLoans[1])), Money.Format(LenderTotal(LenderLoans[2])));
+        }
+
         private static void Line(TalkRequestDto request, TalkFact fact, string text)
         {
             request.sheet.Add(new TalkSheetLineDto { fact = WireEnum<TalkFact>.ToWire(fact), text = text });
@@ -346,11 +365,8 @@ namespace ColonQuest.Game
         public static GameEvent OfferEvent(TalkPartner partner)
         {
             bool lender = partner == TalkPartner.Lender;
-            var take = lender
-                ? new List<Effect> { new Effect(EffectKind.NewInformalLoan, ExampleLoan, null, ExampleMonths) }
-                : new List<Effect> { new Effect(EffectKind.Expense, ExampleLoan, MoneySource.Savings) };
             string narrative = lender
-                ? Loc.F("{0} hoy mismo, sin papeles. A {1} meses, con el {2}% al mes, devolvés {3}.", Money.Format(ExampleLoan), ExampleMonths, LenderRatePct, Money.Format(LenderTotal()))
+                ? Loc.F("Hoy mismo, sin papeles. A {0} meses, con el {1}% al mes, cada {2} se vuelven {3}.", ExampleMonths, LenderRatePct, Money.Format(ExampleLoan), Money.Format(LenderTotal()))
                 : Loc.F("Ponés {0} y en un mes te prometen {1}. No hay contrato: es de confianza.", Money.Format(ExampleLoan), Money.Format(ExampleLoan * (100L + PyramidPromisePct) / 100L));
             return new GameEvent
             {
@@ -361,12 +377,29 @@ namespace ColonQuest.Game
                 Npc = lender ? new Npc("prestamista_gota_a_gota", Loc.T("Prestamista"), "lender") : new Npc("amigo_piramide", "Invierte Ya", "promoter"),
                 ImageKey = "scene_esquina_barrio",
                 TeachingConcept = lender ? TeachingConcept.InformalLending : TeachingConcept.PyramidScheme,
-                Choices = new List<Choice>
-                {
-                    new Choice(TakeOffer, lender ? Loc.F("Agarrar los {0}", Money.Format(ExampleLoan)) : Loc.F("Meter {0}", Money.Format(ExampleLoan)), take),
-                    new Choice(SkipOffer, Loc.T("Mejor no"), new List<Effect>())
-                }
+                Choices = OfferChoices(lender)
             };
+        }
+
+        private static List<Choice> OfferChoices(bool lender)
+        {
+            var choices = new List<Choice>();
+            if (lender)
+            {
+                for (int i = 0; i < LenderLoans.Length; i++)
+                {
+                    long loan = LenderLoans[i];
+                    var effects = new List<Effect> { new Effect(EffectKind.NewInformalLoan, loan, null, ExampleMonths) };
+                    choices.Add(new Choice(i == 0 ? TakeOffer : TakeOffer + "_" + loan, Loc.F("Agarrar {0} y devolver {1}", Money.Format(loan), Money.Format(LenderTotal(loan))), effects));
+                }
+            }
+            else
+            {
+                choices.Add(new Choice(TakeOffer, Loc.F("Meter {0}", Money.Format(ExampleLoan)), new List<Effect> { new Effect(EffectKind.Expense, ExampleLoan, MoneySource.Savings) }));
+            }
+
+            choices.Add(new Choice(SkipOffer, Loc.T("Mejor no"), new List<Effect>()));
+            return choices;
         }
 
         /// <summary>The history tags of the questions asked, for the metrics of the pilot.</summary>
@@ -463,7 +496,7 @@ namespace ColonQuest.Game
                 case TalkFact.Rate:
                     return Loc.F("Es el {0}% al mes a {1} meses o menos, y el {2}% a más plazo, mae. Poquito, ¿verdad?", LenderRatePct, ExampleMonths, LenderLongRatePct);
                 case TalkFact.TotalCost:
-                    return Loc.F("Si le presto {0}, en {1} meses me devuelve {2}.", Money.Format(ExampleLoan), ExampleMonths, Money.Format(LenderTotal()));
+                    return LenderTerms("Le presto {0}, {1} o {2}. A {3} meses me devuelve {4}, {5} o {6}.");
                 case TalkFact.Arrangement:
                     return "Aquí no hay rebajas. Yo paso todos los días a cobrar la cuota, gota a gota.";
                 case TalkFact.WhatIfNotPaid:

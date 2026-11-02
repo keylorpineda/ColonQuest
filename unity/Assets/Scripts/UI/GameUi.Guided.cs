@@ -223,7 +223,7 @@ namespace ColonQuest.UI
 
             // What was signed is in the history of the run, whatever the money was taken from.
             string offer = DebtTalk.OfferEvent(partner).EventId + ":" + DebtTalk.TakeOffer;
-            bool signed = session.State.History.Contains(offer);
+            bool signed = session.State.History.Exists(entry => entry.StartsWith(offer, System.StringComparison.Ordinal));
             if (signed && lender)
             {
                 yield return new WaitForSeconds(GuidedRoute.CollectorsDelaySeconds);
