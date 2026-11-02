@@ -31,7 +31,7 @@ namespace ColonQuest.Game
             new[] { "Muse Spark Open", "Los vendedores que te esconden los cargos, en Baseten", "1,9 a 2,8 s, con pesos abiertos" },
             new[] { "Muse Voice Transcribe", "Entiende lo que le decís al vendedor", "0,7 a 1,5 s, y escribir siempre sirve" },
             new[] { "Muse Wonder", "Planifica tu año y narra cómo terminó", "6 a 10 s: solo donde nadie espera" },
-            new[] { "Muse Image", "Los retratos y las escenas de los eventos", "14 a 17 s: todas se hicieron antes" }
+            new[] { "Muse Image", "Los retratos, las escenas y el final de tu partida", "14 a 17 s: todas se hicieron antes" }
         };
 
         /// <summary>The agents that decide and use tools, with what each one is after.</summary>

@@ -195,7 +195,7 @@ namespace ColonQuest.World
             { "Le presto {0}, {1} o {2}. A {3} meses me devuelve {4}, {5} o {6}.", "I can lend you {0}, {1} or {2}. In {3} months you pay me back {4}, {5} or {6}." },
             { "Hoy mismo, sin papeles. A {0} meses, con el {1}% al mes, cada {2} se vuelven {3}.", "Today, no papers. Over {0} months, at {1}% a month, every {2} becomes {3}." },
             { "Agarrar {0} y devolver {1}", "Take {0} and pay back {1}" },
-            { "Los retratos y las escenas de los eventos", "The portraits and the scenes of the events" },
+            { "Los retratos, las escenas y el final de tu partida", "The portraits, the scenes and the ending of your run" },
             { "Esperando al modelo...", "Waiting for the model..." },
             { "Terminaste debiéndole a un prestamista", "You ended up owing a loan shark" },
             { "Terminaste sin deudas", "You ended up free of debt" },
