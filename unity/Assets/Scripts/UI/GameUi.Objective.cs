@@ -178,7 +178,9 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- the panel of calls to the models
 
-        private const float TracePollSeconds = 3f;
+        private const float TracePollSeconds = 2f;
+        private bool wasBusy;
+        private bool traceIsOld;
 
         private AiCallsPanel aiCalls;
         private float nextTracePoll;
@@ -201,9 +203,15 @@ namespace ColonQuest.UI
             talkPanel.LeaveRoom(room);
             ((RectTransform)loadingCard.transform).anchoredPosition = new Vector2(-24f - room, -364f);
 
+            // A reply that just arrived is read back at once, even if a question was already on its way before it.
+            aiCalls.SetWaiting(session.Busy);
+            traceIsOld |= wasBusy && !session.Busy;
+            wasBusy = session.Busy;
+
             // The tab counts the calls too; only a run without a session asks nothing.
-            if (!tracePolling && Time.unscaledTime >= nextTracePoll)
+            if (!tracePolling && (traceIsOld || Time.unscaledTime >= nextTracePoll))
             {
+                traceIsOld = false;
                 var service = ApiClient.Instance != null ? ApiClient.Instance.Service : null;
                 if (service != null && service.HasSession)
                 {
