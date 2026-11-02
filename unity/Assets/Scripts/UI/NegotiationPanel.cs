@@ -42,6 +42,7 @@ namespace ColonQuest.UI
         private string micNotice;
         private string lastKey = string.Empty;
         private int lastKnownFeesCount;
+        private bool signing;
 
         /// <summary>The questions on the buttons, in the order of <see cref="KeyQuestion"/>.</summary>
         private static readonly string[] Questions =
@@ -90,6 +91,7 @@ namespace ColonQuest.UI
             Clear();
             lastKey = string.Empty;
             lastKnownFeesCount = 0;
+            signing = false;
             root.SetActive(false);
         }
 
@@ -107,7 +109,12 @@ namespace ColonQuest.UI
                 return;
             }
 
-            string key = negotiation.Offer.OfferId + "|" + negotiation.Offer.TermMonths + "|" + negotiation.KeyQuestionsAsked.Count + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + session.Transcribing + "|" + session.PendingLine + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
+            if (negotiation.SoundedLikeYes && !session.Busy)
+            {
+                signing = true;
+            }
+
+            string key = signing + "|" + negotiation.Offer.OfferId + "|" + negotiation.Offer.TermMonths + "|" + negotiation.KeyQuestionsAsked.Count + "|" + negotiation.Turns.Count + "|" + session.Busy + "|" + session.Transcribing + "|" + session.PendingLine + "|" + negotiation.Status + "|" + Notice + "|" + session.DealNotice;
             if (IsOpen && key == lastKey)
             {
                 return;
@@ -115,6 +122,37 @@ namespace ColonQuest.UI
 
             lastKey = key;
             Build(negotiation);
+        }
+
+        private void AskToSign()
+        {
+            signing = true;
+            Refresh();
+        }
+
+        private void NotYet()
+        {
+            signing = false;
+            session.CurrentNegotiation?.ClearYes();
+            Refresh();
+        }
+
+        /// <summary>The last step, and it has a way back: what the contract says, in figures, before signing it.</summary>
+        private void BuildContract(RectTransform card, Negotiation negotiation, float width, float y)
+        {
+            var top = new Vector2(0.5f, 1f);
+            var offer = negotiation.Offer;
+            var paper = UiKit.Fill(card, "Contract", Color.white, new Vector2(width, 120f), top, new Vector2(0f, y));
+            var title = UiKit.Label(paper.transform, "El contrato dice", 24, GameUiColors.Muted, new Vector2(width - 40f, 36f), top, new Vector2(0f, -8f), TextAnchor.MiddleCenter);
+            title.fontStyle = FontStyle.Normal;
+            string terms = Loc.F("{0} al mes por {1} meses. Total: {2}.", SellerOffer.FormatColones(offer.MonthlyCharge), offer.TermMonths, SellerOffer.FormatColones(offer.TotalCost));
+            UiKit.PlainLabel(paper.transform, "Terms", terms, 34, UiKit.Ink, new Vector2(width - 40f, 60f), top, new Vector2(0f, -46f), TextAnchor.MiddleCenter);
+            y -= 134f;
+
+            float half = (width - 16f) / 2f;
+            float left = -(half + 16f) / 2f;
+            UiKit.MakeButton(card, "Firmar", GameUiColors.Green, new Vector2(half, 72f), top, new Vector2(left, y), () => Accept());
+            UiKit.MakeButton(card, "Todavía no", GameUiColors.Yellow, new Vector2(half, 72f), top, new Vector2(-left, y), NotYet);
         }
 
         private void Accept()
@@ -270,6 +308,13 @@ namespace ColonQuest.UI
                 return;
             }
 
+            if (signing)
+            {
+                BuildContract(card, negotiation, textWidth, y);
+                root.SetActive(true);
+                return;
+            }
+
             BuildQuestions(card, negotiation, y);
             y -= 124f;
             BuildInput(card, textWidth, y);
@@ -281,7 +326,7 @@ namespace ColonQuest.UI
             string buy = Knows(negotiation, SellerFact.TotalCost)
                 ? Loc.F("Me lo llevo  ·  {0}", SellerOffer.FormatColones(negotiation.Offer.TotalCost))
                 : Loc.T("Me lo llevo");
-            UiKit.MakeButton(card, buy, GameUiColors.Green, new Vector2(half, InputHeight), top, new Vector2(left, y), () => Accept()).interactable = free;
+            UiKit.MakeButton(card, buy, GameUiColors.Green, new Vector2(half, InputHeight), top, new Vector2(left, y), () => AskToSign()).interactable = free;
             UiKit.MakeButton(card, "Mejor me voy", GameUiColors.Pink, new Vector2(half, InputHeight), top, new Vector2(-left, y), () => session.WalkAway()).interactable = free;
 
             if (!string.IsNullOrEmpty(session.DealNotice))

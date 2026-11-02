@@ -71,6 +71,15 @@ namespace ColonQuest.Game
 
         public bool IsClosed => Status != DealStatus.Open;
 
+        /// <summary>True when the player's last words sounded like buying: the window then shows the contract to sign or not.</summary>
+        public bool SoundedLikeYes { get; private set; }
+
+        /// <summary>The player said not yet, so the last words no longer count as a yes.</summary>
+        public void ClearYes()
+        {
+            SoundedLikeYes = false;
+        }
+
         public string Opening => LocalSeller.Greeting(Offer);
 
         /// <summary>Adds the seller's answer. Facts and questions accumulate over the whole conversation.</summary>
@@ -98,7 +107,8 @@ namespace ColonQuest.Game
                 Offer = Offer.AtTerm(reply.TermMonths);
             }
 
-            Status = reply.DealStatus;
+            // What the words sounded like is only a hint: the deal closes with the buttons, so nobody signs by accident.
+            SoundedLikeYes = reply.DealStatus == DealStatus.Accepted;
         }
 
         /// <summary>The player asked this one with its button: it counts whatever the answer says.</summary>
