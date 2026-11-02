@@ -13,6 +13,7 @@ namespace ColonQuest.World
         public static readonly Dictionary<string, string> English = new Dictionary<string, string>
         {
             // The town map (1 Nov)
+            { "Pulpería", "Corner store" },
             { "[M] Mapa   [H] Ocultar", "[M] Map   [H] Hide" },
             { "[H] Mostrar", "[H] Show" },
             { "Mapa", "Map" },
@@ -245,7 +246,7 @@ namespace ColonQuest.World
             { "GARANTIA 100%", "100% WARRANTY" },
             { "HOSPITAL", "HOSPITAL" },
             { "POLICÍA", "POLICE" },
-            { "PRIMA", "DOWN PAYMENT" },
+            { "PRIMA", "DOWN" },
             { "CUARTOS", "ROOMS" },
             { "MUEBLES", "FURNITURE" },
             { "CAJA 5", "TELLER 5" },

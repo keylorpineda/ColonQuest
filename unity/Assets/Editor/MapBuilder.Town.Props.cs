@@ -734,19 +734,19 @@ namespace ColonQuest.EditorTools
             Shape(root, "DealBadge_Gold", circle, new Vector2(lWx - 0.45f, 1.58f), Vector2.one * 0.66f, GamePalette.Hex("#FBBF24"), 9);
             Shape(root, "DealBadge_Red", circle, new Vector2(lWx - 0.45f, 1.58f), Vector2.one * 0.54f, GamePalette.Hex("#DC2626"), 10);
             Label(root, "0%", new Vector2(lWx - 0.45f, 1.68f), Color.white, 0.034f, TextAnchor.MiddleCenter, 11);
-            Label(root, "PRIMA", new Vector2(lWx - 0.45f, 1.48f), GamePalette.Hex("#FDE68A"), 0.024f, TextAnchor.MiddleCenter, 11);
+            Label(root, "PRIMA", new Vector2(lWx - 0.45f, 1.46f), GamePalette.Hex("#FDE68A"), 0.019f, TextAnchor.MiddleCenter, 11);
 
-            Shape(root, "ShowroomCar_Cabin", roundedSmall, new Vector2(lWx + 0.48f, 1.62f), new Vector2(0.65f, 0.38f), GamePalette.Hex("#1E293B"), 8);
-            Shape(root, "ShowroomCar_Body", roundedSmall, new Vector2(lWx + 0.48f, 1.44f), new Vector2(1.05f, 0.32f), GamePalette.Hex("#2563EB"), 8);
-            Shape(root, "ShowroomCar_WheelL", circle, new Vector2(lWx + 0.22f, 1.30f), Vector2.one * 0.20f, GamePalette.Hex("#0F172A"), 9);
-            Shape(root, "ShowroomCar_WheelR", circle, new Vector2(lWx + 0.74f, 1.30f), Vector2.one * 0.20f, GamePalette.Hex("#0F172A"), 9);
+            // A car of the town, the same drawing as the ones on the street, at a small scale behind the glass.
+            var showroomCar = new Vector2(SpriteFactory.CarWidth, SpriteFactory.CarHeight) / SpriteFactory.CarPixelsPerUnit * 0.42f;
+            Shape(root, "ShowroomCar_Body", CarSprite(SpriteFactory.CarBodyPath(CarShape.Sedan)), new Vector2(lWx + 0.5f, 1.46f), showroomCar, GamePalette.Hex("#2563EB"), 8);
+            Shape(root, "ShowroomCar_Glass", CarSprite(SpriteFactory.CarGlassPath(CarShape.Sedan)), new Vector2(lWx + 0.5f, 1.46f), showroomCar, Color.white, 9);
 
             // Right Window: Dealership Warranty Poster & Spec Sheet
             float rWx = dx + 4.5f;
             Shape(root, "SpecPoster_Out", roundedSmall, new Vector2(rWx, 1.58f), new Vector2(1.25f, 0.95f), GamePalette.Outline, 8);
             Shape(root, "SpecPoster_Card", roundedSmall, new Vector2(rWx, 1.58f), new Vector2(1.18f, 0.88f), Color.white, 9);
             Shape(root, "SpecPoster_Header", square, new Vector2(rWx, 1.88f), new Vector2(1.08f, 0.18f), GamePalette.Hex("#DC2626"), 10);
-            Label(root, "GARANTIA 100%", new Vector2(rWx, 1.88f), Color.white, 0.022f, TextAnchor.MiddleCenter, 11);
+            Label(root, "GARANTIA 100%", new Vector2(rWx, 1.88f), Color.white, 0.0145f, TextAnchor.MiddleCenter, 11);
             for (int li = 0; li < 3; li++)
             {
                 Shape(root, "SpecLine", square, new Vector2(rWx, 1.68f - li * 0.14f), new Vector2(0.96f, 0.04f), GamePalette.Hex("#64748B"), 10);
@@ -1488,6 +1488,7 @@ namespace ColonQuest.EditorTools
         /// </summary>
         /// <summary>How far below the middle of the fountain the player stands to use it: just past the stone rim.</summary>
         private const float FountainFront = 1.85f;
+        private const int FountainColliderPoints = 24;
 
         private static void Fountain(Transform parent, Transform shadows, Vector2 center)
         {
@@ -1577,9 +1578,16 @@ namespace ColonQuest.EditorTools
                 Flickering(jet, 0.50f, 2.6f + Mathf.Abs(k) * 0.3f, k * 1.7f);
             }
 
-            var collider = root.gameObject.AddComponent<CircleCollider2D>();
-            collider.radius = 1.45f;
-            collider.offset = new Vector2(0f, 0.1f);
+            // An ellipse the shape of the basin, a circle would let the player walk into its sides.
+            var collider = root.gameObject.AddComponent<PolygonCollider2D>();
+            var outline = new Vector2[FountainColliderPoints];
+            for (int i = 0; i < outline.Length; i++)
+            {
+                float turn = i * Mathf.PI * 2f / outline.Length;
+                outline[i] = new Vector2(Mathf.Cos(turn) * 2.12f, -0.04f + Mathf.Sin(turn) * 1.4f);
+            }
+
+            collider.SetPath(0, outline);
         }
 
         private static void PlazaPlanter(Transform parent, Transform shadows, Vector2 pos)
@@ -1707,7 +1715,6 @@ namespace ColonQuest.EditorTools
 
             // Swaying catenary overhead power lines connecting the poles across the upper screen
             OverheadPowerSpan(parent, poleWest, poleCasa, 4.45f);
-            OverheadPowerSpan(parent, poleCasa, new Vector2(-14.85f, 5.65f), 4.45f);
         }
 
         private static void UtilityPole(Transform parent, Transform shadows, Vector2 pos)
