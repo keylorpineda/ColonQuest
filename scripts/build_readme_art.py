@@ -339,8 +339,8 @@ COPY: dict[str, dict[str, Any]] = {
         "to the world. The full content of this card is repeated as text below it.",
         "problem": (
             "THE PROBLEM",
-            "In Costa Rica 87% of adults carry some debt and spend on average 34% of their income "
-            "paying it, and 80.88% of people surveyed never received any financial education. "
+            "In Costa Rica a third of monthly income goes to paying debts, more than half for those "
+            "who earn under $1 000, and 8 in 10 people surveyed never had any financial education. "
             "Nobody teaches you to ask the right question while a salesperson is smiling at you. "
             "That is the skill ColonQuest trains.",
         ),
@@ -437,8 +437,8 @@ COPY: dict[str, dict[str, Any]] = {
         "de ella.",
         "problem": (
             "EL PROBLEMA",
-            "En Costa Rica el 87% de los adultos tiene alguna deuda y destina en promedio el 34% de "
-            "su ingreso a pagarla, y el 80,88% de los encuestados nunca recibió educación "
+            "En Costa Rica un tercio del ingreso mensual se va en deudas, más de la mitad para quienes "
+            "ganan menos de ₡500 000, y 8 de cada 10 encuestados nunca recibieron educación "
             "financiera. Nadie te enseña a hacer la pregunta correcta mientras un vendedor te "
             "sonríe. Esa es la habilidad que entrena ColonQuest.",
         ),
@@ -530,37 +530,24 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "lang": "en",
             "kicker": "FROM COSTA RICA TO THE WORLD",
             "title": "COSTA RICA",
-            "tagline": "Why this simulator is set here.",
+            "tagline": "The problem in numbers, in plain words.",
             "desc": "The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is repeated as text below it.",
             "icons": COSTA_RICA_ICONS,
             "footer": "FROM COSTA RICA TO THE WORLD",
             "license": "Every figure, with its source, in the text below",
             "blocks": [
-                ("header", "DEBT IS ORDINARY"),
+                ("header", "THE SHORT VERSION"),
                 ("stats", [
-                    ("87%", "of adults have some kind of debt (OCF, 2025). It was 91% in 2023."),
-                    ("34%", "of monthly income goes to debts, on average. It was 38% in 2023."),
-                    ("58.3%", "for people who earn under ₡500 000 a month."),
-                    ("14.7%", "at ages 18 to 24: the moment to learn is before it grows."),
+                    ("34%", "of monthly income goes to paying debts, on average."),
+                    ("58.3%", "for those who earn under $1 000 a month."),
+                    ("80.88%", "of people surveyed never had any financial education."),
+                    ("2 930", "street-lender cases counted by investigators in 2025."),
                 ]),
-                ("header", "NOBODY TEACHES IT"),
+                ("header", "WHAT THE GAME COPIES"),
                 ("stats", [
-                    ("80.88%", "of people surveyed never received financial education (CINPE-IDESPO, UNA)."),
-                    ("73.89%", "say at least one course would be useful to them."),
-                ]),
-                ("header", "THE TRAPS ARE REAL"),
-                ("stats", [
-                    ("2 930", "gota a gota cases in 2025, and 2 050 by August 2026, says the OIJ."),
-                    ("20-100%", "interest found by the OIJ in those loans."),
-                    ("14%", "got loan offers by WhatsApp, Facebook or TikTok in a year (OCF)."),
-                    ("36.48%", "a year: the legal cap on cards in colones, late 2026 (BCCR)."),
-                ]),
-                ("header", "THE ENGINE USES REAL RULES"),
-                ("stats", [
-                    ("₡373 092", "the 2026 minimum wage for an unskilled worker: the player's salary."),
-                    ("10.83%", "worker's social charges in 2026, taken off the salary."),
-                    ("3%", "a month on the card: 36% a year, under the cap."),
-                    ("20%", "a month from the lender: the low end of what the OIJ found."),
+                    ("$750", "a month: the real 2026 minimum wage is your salary."),
+                    ("3%", "a month on the card: 36% a year, under the legal cap of 36.48%."),
+                    ("20%", "a month from the lender: the lowest rate investigators found."),
                 ]),
             ],
         },
@@ -568,37 +555,24 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "lang": "es",
             "kicker": "FROM COSTA RICA TO THE WORLD",
             "title": "COSTA RICA",
-            "tagline": "Por qué este simulador pasa aquí.",
+            "tagline": "El problema en cifras, en palabras claras.",
             "desc": "La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
             "icons": COSTA_RICA_ICONS,
             "footer": "FROM COSTA RICA TO THE WORLD",
             "license": "Cada cifra, con su fuente, en el texto de abajo",
             "blocks": [
-                ("header", "LA DEUDA ES LO NORMAL"),
+                ("header", "LA VERSIÓN CORTA"),
                 ("stats", [
-                    ("87%", "de los adultos tiene alguna deuda (OCF, 2025). En 2023 era el 91%."),
-                    ("34%", "del ingreso mensual va a deudas, en promedio. En 2023 era el 38%."),
+                    ("34%", "del ingreso mensual se va en pagar deudas, en promedio."),
                     ("58,3%", "para quienes ganan menos de ₡500 000 al mes."),
-                    ("14,7%", "de 18 a 24 años: el momento de aprender es antes de que crezca."),
+                    ("80,88%", "de los encuestados nunca recibió educación financiera."),
+                    ("2 930", "casos de gota a gota contados por el OIJ en 2025."),
                 ]),
-                ("header", "NADIE LO ENSEÑA"),
+                ("header", "LO QUE EL JUEGO COPIA"),
                 ("stats", [
-                    ("80,88%", "de los encuestados nunca recibió educación financiera (CINPE-IDESPO, UNA)."),
-                    ("73,89%", "dice que al menos un curso le sería útil."),
-                ]),
-                ("header", "LAS TRAMPAS SON REALES"),
-                ("stats", [
-                    ("2 930", "casos de gota a gota en 2025, y 2 050 a agosto de 2026, según el OIJ."),
-                    ("20-100%", "de interés encontró el OIJ en esos préstamos."),
-                    ("14%", "recibió ofertas de préstamo por WhatsApp, Facebook o TikTok en un año (OCF)."),
-                    ("36,48%", "anual: el tope legal de las tarjetas en colones, fin de 2026 (BCCR)."),
-                ]),
-                ("header", "EL MOTOR USA REGLAS REALES"),
-                ("stats", [
-                    ("₡373 092", "el salario mínimo 2026 de un trabajador no calificado: el del jugador."),
-                    ("10,83%", "de cargas sociales del trabajador en 2026, rebajadas del salario."),
-                    ("3%", "al mes en la tarjeta: 36% anual, bajo el tope."),
-                    ("20%", "al mes con el prestamista: lo más bajo de lo que halló el OIJ."),
+                    ("₡373 092", "al mes: tu salario es el mínimo real de 2026."),
+                    ("3%", "al mes en la tarjeta: 36% anual, bajo el tope legal de 36,48%."),
+                    ("20%", "al mes con el prestamista: la tasa más baja que halló el OIJ."),
                 ]),
             ],
         },
