@@ -448,15 +448,17 @@ namespace ColonQuest.EditorTools
         private static void BuildPlazaAndPark(Transform parent, Transform shadows)
         {
             Fountain(parent, shadows, new Vector2(0f, 9f));
-            PlazaBench(parent, shadows, -2.55f, 10.55f, 20f);
-            PlazaBench(parent, shadows, 2.55f, 10.55f, -20f);
-            ColonialLamp(parent, -3.45f, 9.6f);
-            ColonialLamp(parent, 3.45f, 9.6f);
+
+            // Everything stands back from the basin, so the player can walk all the way around it.
+            PlazaBench(parent, shadows, -3.0f, 11.8f, 20f);
+            PlazaBench(parent, shadows, 3.0f, 11.8f, -20f);
+            ColonialLamp(parent, -5.3f, 9.6f);
+            ColonialLamp(parent, 5.3f, 9.6f);
             PlazaPlanter(parent, shadows, new Vector2(-3.25f, 7.6f));
             PlazaPlanter(parent, shadows, new Vector2(3.25f, 7.6f));
-            PlazaPlanter(parent, shadows, new Vector2(-3.55f, 9.3f));
-            PlazaPlanter(parent, shadows, new Vector2(3.55f, 9.3f));
-            FestoonGarland(parent, new Vector2(-3.45f, 9.6f), new Vector2(3.45f, 9.6f), 2.8f);
+            PlazaPlanter(parent, shadows, new Vector2(-5.4f, 9.3f));
+            PlazaPlanter(parent, shadows, new Vector2(5.4f, 9.3f));
+            FestoonGarland(parent, new Vector2(-5.3f, 9.6f), new Vector2(5.3f, 9.6f), 2.8f);
             CasaFrontFence(parent, shadows);
             BuildOverheadPowerNetwork(parent, shadows);
 
