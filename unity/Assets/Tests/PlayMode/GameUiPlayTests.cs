@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using ColonQuest.Api;
 using ColonQuest.Game;
+using ColonQuest.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -140,6 +141,37 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(cash, Session.State.Cash);
             Assert.AreEqual(1, Session.Loop.TasksDone);
             Assert.IsFalse(NegotiationOpen);
+        }
+
+        [UnityTest]
+        public IEnumerator Map_TheTownHasAllItsPlacesOnTheMap()
+        {
+            yield return null;
+            foreach (var place in TownPlaces.All)
+            {
+                Assert.IsNotNull(GameObject.Find(place.ObjectName), place.ObjectName);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Map_TheMinimapIsThereAndTheFullMapStopsTheWorld()
+        {
+            yield return null;
+            yield return null;
+            Assert.IsTrue(Ui.Find("Minimap").gameObject.activeSelf);
+            Assert.IsFalse(Ui.Find("TownMap").gameObject.activeSelf);
+
+            var map = (TownMap)typeof(GameUi).GetField("townMap", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(Ui.GetComponent<GameUi>());
+            map.Open();
+            yield return null;
+            Assert.IsTrue(map.IsOpen);
+            Assert.IsTrue(PlayerController.Blocked);
+            Assert.IsNotNull(Ui.Find("TownMap/Area/Place_Door_Banco"), "the places get their marks");
+
+            map.Close();
+            yield return null;
+            Assert.IsFalse(map.IsOpen);
+            Assert.IsFalse(PlayerController.Blocked);
         }
 
         [UnityTest]

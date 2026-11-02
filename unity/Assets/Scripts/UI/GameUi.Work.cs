@@ -82,6 +82,7 @@ namespace ColonQuest.UI
         /// </summary>
         private void TickWorkGuide()
         {
+            townMap.GoalPosition = null;
             var clock = session.Loop.Clock;
             bool free = !modal.IsOpen && !phone.IsOpen && !pause.IsOpen && !negotiationPanel.IsOpen && !openingPlaying && !LoadingScreen.IsLoading;
             bool toWork = session.Loop.Job.ExpectedAt(clock.Minutes);
@@ -128,6 +129,7 @@ namespace ColonQuest.UI
                 return;
             }
 
+            townMap.GoalPosition = target.transform.position;
             Vector2 direction = (Vector2)target.transform.position - (Vector2)hero.transform.position;
             workArrow.gameObject.SetActive(true);
             workArrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);

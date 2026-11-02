@@ -25,8 +25,10 @@ namespace ColonQuest.UI
         {
             var topLeft = new Vector2(0f, 1f);
             var card = UiKit.Card(canvas.transform, "Tasks", new Color(0.97f, 0.96f, 0.91f, 0.82f),
-                new Vector2(470f, 58f + TaskRows * TaskRowHeight), topLeft, new Vector2(24f, -24f - HudHeight - 18f));
+                new Vector2(470f, 58f + TaskRows * TaskRowHeight), topLeft, new Vector2(24f, -24f - HudHeight * HudScale - 12f));
             tasksCard = card.parent.gameObject;
+            tasksCard.transform.localScale = new Vector3(HudScale, HudScale, 1f);
+            tasksCard.AddComponent<CanvasGroup>().alpha = HudAlpha;
             tasksBody = card;
             var title = UiKit.Label(card, "Tareas de hoy  ·  Tab", 24, UiKit.Ink, new Vector2(430f, 36f), topLeft, new Vector2(20f, -10f));
             title.font = UiKit.TitleFont;
@@ -48,7 +50,7 @@ namespace ColonQuest.UI
 
             bool free = !modal.IsOpen && !phone.IsOpen && !pause.IsOpen && !negotiationPanel.IsOpen && !openingPlaying && !LoadingScreen.IsLoading;
             var items = TaskList.For(session.Loop);
-            bool show = free && !tasksHidden && items.Count > 0;
+            bool show = free && !tasksHidden && !hudHidden && items.Count > 0;
             tasksCard.SetActive(show);
             if (!show)
             {

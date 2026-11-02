@@ -218,6 +218,7 @@ namespace ColonQuest.UI
             phoneKey.horizontalOverflow = HorizontalWrapMode.Overflow;
             tasksText = UiKit.Label(card, string.Empty, 24, GameUiColors.Muted, new Vector2(186f, 36f), new Vector2(1f, 1f), new Vector2(-22f, -HudHeight + 50f), TextAnchor.MiddleRight);
             tasksText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            BuildMapAndHud(card);
         }
 
         private const float HudHeight = 344f;
@@ -319,8 +320,8 @@ namespace ColonQuest.UI
 
         private void BuildLoading()
         {
-            // A small pill in the top right corner: the wait never covers the player or the middle of the town.
-            var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(440f, 64f), new Vector2(1f, 1f), new Vector2(-24f, -24f));
+            // A small pill under the minimap: the wait never covers the player or the middle of the town.
+            var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(440f, 64f), new Vector2(1f, 1f), new Vector2(-24f, -364f));
             loadingCard = card.parent.gameObject;
             loadingText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(410f, 50f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
             loadingCard.SetActive(false);
@@ -333,6 +334,8 @@ namespace ColonQuest.UI
             // The overlay lives across scenes, but the main menu has its own screen.
             canvas.enabled = scene.name != SceneNames.Menu;
             HideSpeech();
+            townMap.Close();
+            townMap.SceneLoaded(scene);
             usedStations.Clear();
             workStation = null;
             homeDoor = null;
@@ -491,9 +494,24 @@ namespace ColonQuest.UI
             TickCell();
             TickWorkGuide();
             TickTasks();
+            TickMapAndHud();
             effects.Tick(Time.unscaledDeltaTime);
             subtitles.Tick(Time.unscaledDeltaTime, modal.IsOpen || pause.IsOpen || phone.IsOpen || negotiationPanel.IsOpen);
             TickSpeech();
+
+            if (townMap.IsOpen)
+            {
+                // The world waits while the map is open, like it does for the phone.
+                PlayerController.Blocked = true;
+                promptCard.SetActive(false);
+                loadingCard.SetActive(false);
+                if (Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.Escape))
+                {
+                    townMap.Close();
+                }
+
+                return;
+            }
 
             if (pause.IsOpen)
             {
@@ -602,6 +620,12 @@ namespace ColonQuest.UI
             if (!session.Busy && !Interaction.Playing && Input.GetKeyDown(KeyCode.P))
             {
                 OpenPhone();
+                return;
+            }
+
+            if (!session.Busy && !Interaction.Playing && !openingPlaying && Input.GetKeyDown(KeyCode.M))
+            {
+                townMap.Open();
                 return;
             }
 
