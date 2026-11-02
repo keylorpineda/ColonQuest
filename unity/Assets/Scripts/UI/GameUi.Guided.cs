@@ -25,7 +25,6 @@ namespace ColonQuest.UI
         private string guidedDoor;
         private StationType? guidedVisited;
         private bool demoLabNext;
-        private bool guidedSalarySeen;
 
         /// <summary>The next time the town loads, the guided run starts there.</summary>
         public void PlayGuidedNext()
@@ -38,7 +37,6 @@ namespace ColonQuest.UI
 
             guidedObjective = null;
             guidedStation = null;
-            guidedSalarySeen = false;
             guidedPending = true;
             aiCalls.Clear();
             aiCalls.SetExpanded(true);
@@ -129,11 +127,18 @@ namespace ColonQuest.UI
             ShowGuidedIntro();
             yield return UntilGuidedIdle();
 
-            // Month 1: the salary, the plan of the year and an event written for this player.
+            // Month 1: the salary, a few steps so the player learns the arrow, and an event written for this player.
             session.PayGuidedQuincena();
-            yield return UntilGuidedIdle();
+            guidedStation = StationType.Garage;
+            guidedVisited = null;
+            guidedObjective = new Objective("Caminá hasta el taller: ahí empieza tu primer mes", SceneNames.Town, "Station_Garage");
+            while (guidedVisited != StationType.Garage)
+            {
+                yield return null;
+            }
+
+            guidedStation = null;
             guidedObjective = new Objective("El game master está leyendo tu situación");
-            session.BeginTask(StationType.Garage);
             yield return UntilGuidedIdle();
             yield return WaitForThePlan();
             yield return CloseGuidedMonth();
@@ -175,7 +180,7 @@ namespace ColonQuest.UI
             modal.Show(
                 Loc.T("Tres meses con un salario real"),
                 Loc.T("Simulador de finanzas personales"),
-                Loc.T("Ganás el salario mínimo. Seguí la flecha roja y apretá E al llegar: vos solo decidís. A la derecha ves cada llamada real a los modelos de Meta."),
+                Loc.T("Esta ruta resume tres meses en unos minutos, por eso todo pasa seguido. En el modo historia cada mes se vive con calma.\n\nGanás el salario mínimo. Seguí la flecha roja y apretá E al llegar. A la derecha ves cada llamada real a los modelos de Meta."),
                 new List<ModalOption>
                 {
                     new ModalOption { Label = Loc.T("1.  Llego justo y con la tarjeta cargada"), Color = GameUiColors.Yellow, OnPress = () => choose(GuidedProfile.Tight) },

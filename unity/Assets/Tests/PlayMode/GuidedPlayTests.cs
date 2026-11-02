@@ -117,9 +117,12 @@ namespace ColonQuest.World.PlayModeTests
         public IEnumerator Play(int profile)
         {
             yield return Next("the first window", "intro", profile);
-            yield return Next("the first salary", "salary");
 
-            // Month 1: the game master.
+            // Month 1: a short walk and the game master.
+            yield return Until(() => GuidedType == StationType.Garage && Guided() != null, 10f, "the first objective");
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return Shot("to_first_event");
+            Use(Guided());
             yield return Until(() => session.CurrentEvent != null && modal.IsOpen, 30f, "the first event");
             yield return Shot("event");
             for (int i = 0; i < modal.OptionCount && session.CurrentEvent != null; i++)
