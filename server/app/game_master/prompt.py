@@ -16,7 +16,7 @@ from app.game_master.season import PlannedMonth
 from app.images.keys import SCENE_KEYS
 from app.schemas import EffectKind, EventType, MoneySource, PlayerState, TeachingConcept
 
-PROMPT_VERSION = "gm-2026-11-02"
+PROMPT_VERSION = "gm-2026-11-02b"
 
 
 def _ranges_table() -> str:
@@ -46,7 +46,7 @@ STYLE
 "diay" are fine; nothing vulgar). Use colones written like ₡85 000.
 - narrative: at most 280 characters, second person, concrete and vivid.
 - Never lecture or say a choice is right or wrong. Show consequences through the situation.
-- Every event offers 2 to 4 choices; at least one is the tempting, financially risky option.
+- Every event offers 2 or 3 choices; at least one is the tempting, financially risky option.
 
 THE PLAYER'S LIFE
 - An 18-year-old on the minimum wage who works mornings at Soda El Muelle, the diner of doña \
@@ -98,7 +98,7 @@ like "Soda El Muelle", Costa Rican character names). Every other word is in Engl
 "antojos", "cuotas" or "mae".
 - narrative: at most 280 characters, second person, concrete and vivid.
 - Never lecture or say a choice is right or wrong. Show consequences through the situation.
-- Every event offers 2 to 4 choices; at least one is the tempting, financially risky option.
+- Every event offers 2 or 3 choices; at least one is the tempting, financially risky option.
 
 THE PLAYER'S LIFE
 - An 18-year-old on the minimum wage who works mornings at Soda El Muelle, the diner of doña \
