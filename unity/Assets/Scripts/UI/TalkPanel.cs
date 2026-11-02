@@ -8,18 +8,19 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The window to talk in the player's own words with the collectors, the lender or the pyramid stand: typed, or spoken
-    /// with the microphone. Under the conversation, the ways out the game window gives (pay, accept, listen, leave).
+    /// The window to talk with the collectors, the lender or the pyramid stand: questions worth asking, one click each, or the
+    /// player's own words by text or voice. Under them, the ways out the game window gives (pay, accept, listen, leave).
     /// </summary>
     public sealed class TalkPanel
     {
         private const float CardWidth = 1300f;
-        private const float CardHeight = 860f;
+        private const float CardHeight = 760f;
         private const float TextWidth = 1220f;
-        private const float LogHeight = 360f;
+        private const float LogHeight = 370f;
+        private const float InputHeight = 64f;
 
         private const string MicNotice = "No pude usar el micrófono, escribilo.";
-        private const string TypeHint = "Escribí lo que le querés decir...";
+        private const string TypeHint = "O escribí tu propia pregunta...";
         private const string Understanding = "Entendiendo lo que dijiste...";
 
         private readonly GameSession session;
@@ -171,11 +172,12 @@ namespace ColonQuest.UI
             Clear();
             var top = new Vector2(0.5f, 1f);
             var card = UiKit.Card(root.transform, "Card", UiKit.Paper, new Vector2(CardWidth, CardHeight), new Vector2(0.5f, 0.5f), Vector2.zero);
-            var title = UiKit.Label(card, talk.Name, 54, UiKit.Ink, new Vector2(TextWidth, 70f), top, new Vector2(0f, -28f), TextAnchor.MiddleCenter);
+            var title = UiKit.Label(card, talk.Name, 38, UiKit.Ink, new Vector2(TextWidth, 50f), top, new Vector2(0f, -20f), TextAnchor.MiddleCenter);
             title.font = UiKit.TitleFont;
 
             BuildConversation(card, talk);
-            BuildInput(card, -500f);
+            BuildQuestions(card, talk, -456f);
+            BuildInput(card, -522f);
 
             var actions = actionsFor != null ? actionsFor(talk) : new List<ModalOption>();
             float gap = 16f;
@@ -184,7 +186,7 @@ namespace ColonQuest.UI
             {
                 var action = actions[i];
                 float x = -TextWidth / 2f + width / 2f + i * (width + gap);
-                UiKit.MakeButton(card, action.Label, action.Color, new Vector2(width, 84f), top, new Vector2(x, -640f), () => action.OnPress?.Invoke());
+                UiKit.MakeButton(card, action.Label, action.Color, new Vector2(width, InputHeight), top, new Vector2(x, -598f), () => action.OnPress?.Invoke()).interactable = !session.Busy;
             }
 
             if (input != null && !session.Busy)
@@ -218,7 +220,30 @@ namespace ColonQuest.UI
             }
 
             waitText = wait.HasValue ? wait.Value.Text : null;
-            waitLabel = ChatView.Build(card, new Vector2(TextWidth, LogHeight), new Vector2(0.5f, 1f), new Vector2(0f, -110f), lines, wait);
+            waitLabel = ChatView.Build(card, new Vector2(TextWidth, LogHeight), new Vector2(0.5f, 1f), new Vector2(0f, -76f), lines, wait);
+        }
+
+        /// <summary>The questions worth asking, one click each. Asked, they turn green and stay as a record.</summary>
+        private void BuildQuestions(RectTransform card, DebtTalk talk, float y)
+        {
+            const float gap = 10f;
+            var questions = talk.SuggestedQuestions;
+            float width = (TextWidth - gap * (questions.Length - 1)) / questions.Length;
+            for (int i = 0; i < questions.Length; i++)
+            {
+                string spoken = Loc.T(questions[i]);
+                var fact = DebtTalk.Classify(spoken);
+                bool asked = fact.HasValue && System.Linq.Enumerable.Contains(talk.Asked, fact.Value);
+                float x = -TextWidth / 2f + width / 2f + i * (width + gap);
+                var button = UiKit.MakeButton(card, questions[i], asked ? GameUiColors.Green : Color.white, new Vector2(width, 56f), new Vector2(0.5f, 1f), new Vector2(x, y), () => session.SendTalk(spoken));
+                button.name = "Question_" + i;
+                UiKit.SetFontSize(button, 21);
+                button.interactable = !session.Busy;
+                if (asked)
+                {
+                    UiKit.MarkDone(button);
+                }
+            }
         }
 
         private void BuildInput(RectTransform card, float y)
@@ -226,22 +251,22 @@ namespace ColonQuest.UI
             var top = new Vector2(0.5f, 1f);
             bool voice = recorder.IsSupported;
             bool free = !session.Busy;
-            float sendWidth = 220f;
-            float talkWidth = voice ? 300f : 0f;
-            float gap = 16f;
+            float sendWidth = 160f;
+            float talkWidth = voice ? 190f : 0f;
+            float gap = 12f;
             float boxWidth = TextWidth - sendWidth - gap - (voice ? talkWidth + gap : 0f);
             float boxX = -(TextWidth - boxWidth) / 2f;
             float sendX = (TextWidth - sendWidth) / 2f;
             float talkX = sendX - sendWidth / 2f - gap - talkWidth / 2f;
 
-            var outline = UiKit.Fill(card, "InputBox", UiKit.Ink, new Vector2(boxWidth, 84f), top, new Vector2(boxX, y));
+            var outline = UiKit.Fill(card, "InputBox", UiKit.Ink, new Vector2(boxWidth, InputHeight), top, new Vector2(boxX, y));
             outline.raycastTarget = true;
-            var body = UiKit.Fill(outline.transform, "Body", Color.white, new Vector2(boxWidth - UiKit.Outline * 2f, 84f - UiKit.Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var body = UiKit.Fill(outline.transform, "Body", Color.white, new Vector2(boxWidth - UiKit.Outline * 2f, InputHeight - UiKit.Outline * 2f), new Vector2(0.5f, 0.5f), Vector2.zero);
 
-            var text = UiKit.PlainLabel(body.transform, "Text", string.Empty, 32, UiKit.Ink, new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var text = UiKit.PlainLabel(body.transform, "Text", string.Empty, 26, UiKit.Ink, new Vector2(boxWidth - 50f, 50f), new Vector2(0.5f, 0.5f), Vector2.zero);
             text.horizontalOverflow = HorizontalWrapMode.Overflow;
             string notice = session.VoiceNotice ?? micNotice;
-            var hint = UiKit.Label(body.transform, notice ?? TypeHint, 30, notice != null ? GameUiColors.Loss : new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 60f, 60f), new Vector2(0.5f, 0.5f), Vector2.zero);
+            var hint = UiKit.Label(body.transform, notice ?? TypeHint, 25, notice != null ? GameUiColors.Loss : new Color(0.5f, 0.52f, 0.6f, 1f), new Vector2(boxWidth - 50f, 50f), new Vector2(0.5f, 0.5f), Vector2.zero);
             hint.fontStyle = FontStyle.Italic;
 
             input = outline.gameObject.AddComponent<InputField>();
@@ -254,12 +279,12 @@ namespace ColonQuest.UI
 
             if (voice)
             {
-                var talk = UiKit.MakeButton(card, "Hablar", GameUiColors.Yellow, new Vector2(talkWidth, 84f), top, new Vector2(talkX, y), ToggleTalk);
+                var talk = UiKit.MakeButton(card, "Hablar", GameUiColors.Yellow, new Vector2(talkWidth, InputHeight), top, new Vector2(talkX, y), ToggleTalk);
                 talk.interactable = free;
                 voiceButton = new VoiceButton(talk, recorder, talkWidth);
             }
 
-            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, 84f), top, new Vector2(sendX, y), Submit).interactable = free;
+            UiKit.MakeButton(card, "Enviar", GameUiColors.Blue, new Vector2(sendWidth, InputHeight), top, new Vector2(sendX, y), Submit).interactable = free;
         }
 
         private void Clear()

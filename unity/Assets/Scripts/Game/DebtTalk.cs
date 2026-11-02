@@ -102,6 +102,23 @@ namespace ColonQuest.Game
             }
         }
 
+        /// <summary>The questions worth asking this one, in Spanish: the buttons of the talk and of the demo lab.</summary>
+        public string[] SuggestedQuestions
+        {
+            get
+            {
+                switch (Partner)
+                {
+                    case TalkPartner.Collectors:
+                        return new[] { "No tengo toda esa plata.", "¿Podemos hacer un arreglo?", "¿Qué pasa si no pago?", "¿Esto es legal?" };
+                    case TalkPartner.Lender:
+                        return new[] { "¿Cuál es el interés?", "¿Cuánto tendría que devolver en total?", "¿Qué pasa si me atraso?", "¿Firmo algún contrato?" };
+                    default:
+                        return new[] { "¿Cuánto me van a pagar?", "¿De dónde sale la plata?", "¿Hay algún contrato?", "¿Están inscritos en SUGEF?" };
+                }
+            }
+        }
+
         /// <summary>The collectors offer an arrangement only to the one who asks for it.</summary>
         public bool ArrangementOffered => asked.Contains(TalkFact.Arrangement);
 
