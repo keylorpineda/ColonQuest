@@ -12,9 +12,14 @@ namespace ColonQuest.Game
         private const int WindowSamples = SampleRate / 10;
         private const float MeterGain = 10f;
 
+        // A microphone that never starts delivering is a failure, not a long silence.
+        private const float MostSecondsToStart = 2f;
+
         private readonly float[] window = new float[WindowSamples];
         private AudioClip clip;
-        private string device;
+
+        // Null is the microphone chosen in Windows, which is not always the first one of the list.
+        private readonly string device = null;
         private float started;
         private float lastTick;
         private float loudness;
@@ -33,7 +38,7 @@ namespace ColonQuest.Game
 
         public void Start()
         {
-            if (State == VoiceRecorderState.Recording || !IsSupported)
+            if (State == VoiceRecorderState.Recording || State == VoiceRecorderState.Starting || !IsSupported)
             {
                 if (!IsSupported)
                 {
@@ -44,7 +49,6 @@ namespace ColonQuest.Game
             }
 
             wav = null;
-            device = Microphone.devices[0];
             clip = Microphone.Start(device, false, WavEncoder.MaxSeconds, SampleRate);
             if (clip == null)
             {
@@ -56,7 +60,7 @@ namespace ColonQuest.Game
             lastTick = started;
             loudness = 0f;
             gate = new SilenceGate();
-            State = VoiceRecorderState.Recording;
+            State = VoiceRecorderState.Starting;
         }
 
         public void Stop()
@@ -80,14 +84,14 @@ namespace ColonQuest.Game
 
             var samples = new float[frames * clip.channels];
             clip.GetData(samples, 0);
-            wav = WavEncoder.FromFloats(samples, clip.channels, clip.frequency);
+            wav = WavEncoder.FromFloats(clip.channels == 1 ? SpeechClip.Prepare(samples, clip.frequency) : samples, clip.channels, clip.frequency);
             Release();
             State = VoiceRecorderState.Ready;
         }
 
         public void Cancel()
         {
-            if (State == VoiceRecorderState.Recording)
+            if (State == VoiceRecorderState.Recording || State == VoiceRecorderState.Starting)
             {
                 Microphone.End(device);
             }
@@ -99,6 +103,12 @@ namespace ColonQuest.Game
 
         public void Tick()
         {
+            if (State == VoiceRecorderState.Starting)
+            {
+                TickStarting();
+                return;
+            }
+
             if (State != VoiceRecorderState.Recording)
             {
                 return;
@@ -110,6 +120,25 @@ namespace ColonQuest.Game
             if (!Microphone.IsRecording(device) || now - started >= WavEncoder.MaxSeconds || HeardTheEnd(delta))
             {
                 Stop();
+            }
+        }
+
+        /// <summary>A microphone takes a moment to wake up: "listening" and its sound wait for it, so no first word is lost.</summary>
+        private void TickStarting()
+        {
+            float now = Time.realtimeSinceStartup;
+            if (Microphone.GetPosition(device) > 0)
+            {
+                started = now;
+                lastTick = now;
+                State = VoiceRecorderState.Recording;
+                ColonQuest.World.AudioDirector.Effect(ColonQuest.World.SoundEffectKind.Chime);
+            }
+            else if (now - started > MostSecondsToStart)
+            {
+                Microphone.End(device);
+                Release();
+                State = VoiceRecorderState.Failed;
             }
         }
 
