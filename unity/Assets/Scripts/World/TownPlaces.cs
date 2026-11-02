@@ -38,7 +38,7 @@ namespace ColonQuest.World
         public static readonly IReadOnlyList<TownPlace> All = new List<TownPlace>
         {
             new TownPlace("Door_" + SceneNames.Casa, "Casa de mamá", PlaceKind.Home, true),
-            new TownPlace("Door_" + SceneNames.Cuarto, "Tu cuarto", PlaceKind.Home, true),
+            new TownPlace("Door_" + SceneNames.Cuarto, "Tu cuarto", PlaceKind.Home),
             new TownPlace("Door_" + SceneNames.Soda, "Soda El Muelle", PlaceKind.Work),
             new TownPlace("Door_" + SceneNames.Banco, "Banco", PlaceKind.Money),
             new TownPlace("Door_" + SceneNames.Cooperativa, "Cooperativa", PlaceKind.Money),
@@ -46,7 +46,7 @@ namespace ColonQuest.World
             new TownPlace("Door_" + SceneNames.Tienda, "Tienda", PlaceKind.Shop, true),
             new TownPlace("Door_" + SceneNames.Agencia, "Agencia de carros", PlaceKind.Shop),
             new TownPlace("Door_" + SceneNames.Inmobiliaria, "Inmobiliaria", PlaceKind.Shop),
-            new TownPlace("Station_Grocery", "Pulperia", PlaceKind.Shop),
+            new TownPlace("Station_Grocery", "Pulpería", PlaceKind.Shop),
             new TownPlace("Station_Garage", "Taller de Don Rafa", PlaceKind.Service),
             new TownPlace("Door_" + SceneNames.Hospital, "Hospital", PlaceKind.Service),
             new TownPlace("Station_Courses", "Cursos", PlaceKind.Service, true),

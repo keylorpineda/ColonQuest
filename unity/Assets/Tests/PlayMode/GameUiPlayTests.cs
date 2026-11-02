@@ -175,6 +175,16 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         [UnityTest]
+        public IEnumerator Fountain_StopsThePlayerAllAroundItsBasin()
+        {
+            yield return null;
+            var fountain = GameObject.Find("Fountain").GetComponent<Collider2D>();
+            Assert.IsFalse(fountain.isTrigger);
+            Assert.Greater(fountain.bounds.size.x, 4f, "as wide as the basin");
+            Assert.Greater(fountain.bounds.size.y, 2.6f, "as deep as the basin");
+        }
+
+        [UnityTest]
         public IEnumerator Hud_ShowsTheStateOfTheRun()
         {
             yield return StartOfflineRun();
