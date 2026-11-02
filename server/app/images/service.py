@@ -27,6 +27,35 @@ CARD_SUBJECTS = {
     "card_year_heavy_debt": "a young Costa Rican under a rainy sky looking at an empty wallet",
 }
 
+# The picture of the final report. The game draws the figures beside it, so it stays blank too.
+ENDING_STYLE = (
+    "16-bit pixel art in a warm Costa Rican palette, limited 32-color palette, crisp pixel "
+    "outlines, side view of a small scene, no text, no numbers, no letters, no writing on any "
+    "sign or paper"
+)
+ENDING_SUBJECTS = {
+    "end_calm_ok": "a young Costa Rican at home on a bright morning with coffee and a full piggy "
+    "bank on the table, green mountains through the window",
+    "end_calm_hard": "a young Costa Rican at a small table at night counting a few coins under "
+    "one lamp, rain on the window",
+    "end_installments_ok": "a young Costa Rican relaxing on a sunny afternoon beside one new "
+    "appliance in a tidy room",
+    "end_installments_hard": "a young Costa Rican with an empty wallet in the evening, sitting "
+    "among stacked boxes of new appliances",
+    "end_card_ok": "a young Costa Rican putting a credit card away in a drawer, calm, in a sunny "
+    "room",
+    "end_card_hard": "a credit card on a desk at night with a tall pile of blank papers growing "
+    "around it and a tired young Costa Rican behind it",
+    "end_lender_ok": "a young Costa Rican walking away free on a sunny street while a black car "
+    "drives off in the distance",
+    "end_lender_hard": "two men waiting beside a black car in front of a small house at dusk, a "
+    "young Costa Rican looking at them from behind the window",
+    "end_pyramid_ok": "a young Costa Rican walking away with money in the pocket from a golden "
+    "pyramid made of coins, sunny day",
+    "end_pyramid_hard": "a golden pyramid made of coins collapsing under a stormy sky, a young "
+    "Costa Rican with empty hands watching it fall",
+}
+
 # Muse Image ignores the requested size and returns 1600x1600 PNGs of 3 to 4 MB (Oct 29), too heavy
 # for the WebGL build, so every image is shrunk and paletted before it is cached.
 MAX_IMAGE_SIDE = 512
@@ -70,6 +99,8 @@ def shrink_image(data: bytes, media_type: str, max_side: int = MAX_IMAGE_SIDE) -
 def build_image_prompt(key: str) -> str:
     """Build a consistent pixel-art prompt from an imageKey identifier."""
     words = key.replace("_", " ").strip()
+    if key in ENDING_SUBJECTS:
+        return f"{ENDING_STYLE}. Subject: {ENDING_SUBJECTS[key]}."
     if key.startswith("card_"):
         subject = CARD_SUBJECTS.get(key, f"postcard illustration of {words}")
         return f"{STYLE_PROMPT}, {CARD_STYLE_SUFFIX}. Subject: {subject}."

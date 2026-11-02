@@ -3,8 +3,8 @@ from typing import Any
 from app.game_master.fallback import load_fallback_events
 from app.game_master.limits import clamp_event
 from app.game_master.prompt import SYSTEM_PROMPT, SYSTEM_PROMPT_EN
-from app.images.keys import CARD_KEYS, SCENE_BY_CONCEPT, SCENE_KEYS
-from app.images.service import CARD_SUBJECTS
+from app.images.keys import CARD_KEYS, ENDING_KEYS, PREGENERATED_KEYS, SCENE_BY_CONCEPT, SCENE_KEYS
+from app.images.service import CARD_SUBJECTS, ENDING_SUBJECTS, build_image_prompt
 from app.schemas import GameEvent, TeachingConcept
 
 
@@ -48,6 +48,15 @@ def test_every_fallback_event_uses_a_pregenerated_scene() -> None:
 
 def test_the_set_and_the_cards_agree() -> None:
     assert set(CARD_KEYS) == set(CARD_SUBJECTS)
+
+
+def test_every_ending_has_a_subject_without_text_and_can_be_asked_for() -> None:
+    assert set(ENDING_KEYS) == set(ENDING_SUBJECTS)
+    assert set(ENDING_KEYS) <= PREGENERATED_KEYS
+    for key in ENDING_KEYS:
+        prompt = build_image_prompt(key)
+        assert "no text, no numbers, no letters" in prompt
+        assert ENDING_SUBJECTS[key] in prompt
 
 
 def test_the_game_master_is_told_the_keys() -> None:

@@ -25,7 +25,7 @@ from app.config import get_settings
 from app.db import CachedImage
 from app.db.session import get_engine, get_sessionmaker
 from app.game_master.ledger import DbLedger
-from app.images.keys import CARD_KEYS, PORTRAIT_KEYS, SCENE_KEYS
+from app.images.keys import CARD_KEYS, ENDING_KEYS, PORTRAIT_KEYS, SCENE_KEYS
 from app.images.service import ImageService, shrink_image
 from app.providers.meta import MetaProvider
 
@@ -33,7 +33,7 @@ COST_PER_IMAGE = Decimal("0.01")
 
 
 def all_keys() -> list[str]:
-    return [*PORTRAIT_KEYS, *SCENE_KEYS, *CARD_KEYS]
+    return [*PORTRAIT_KEYS, *SCENE_KEYS, *CARD_KEYS, *ENDING_KEYS]
 
 
 async def main() -> int:

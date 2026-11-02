@@ -28,7 +28,21 @@ SCENE_KEYS = (
     "scene_tienda_electro",
 )
 CARD_KEYS = ("card_year_debt_free", "card_year_some_debt", "card_year_heavy_debt")
-PREGENERATED_KEYS = frozenset((*PORTRAIT_KEYS, *SCENE_KEYS, *CARD_KEYS))
+# The picture of the final report: what happened in the run and whether it ended in the red. The
+# game chooses it from the engine's figures (Game/EndingArt.cs); no model picks one.
+ENDING_KEYS = (
+    "end_calm_ok",
+    "end_calm_hard",
+    "end_installments_ok",
+    "end_installments_hard",
+    "end_card_ok",
+    "end_card_hard",
+    "end_lender_ok",
+    "end_lender_hard",
+    "end_pyramid_ok",
+    "end_pyramid_hard",
+)
+PREGENERATED_KEYS = frozenset((*PORTRAIT_KEYS, *SCENE_KEYS, *CARD_KEYS, *ENDING_KEYS))
 
 # The scene of an event whose model chose a key outside the list.
 SCENE_BY_CONCEPT: dict[TeachingConcept, str] = {
