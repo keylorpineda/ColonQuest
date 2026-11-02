@@ -18,7 +18,7 @@ namespace ColonQuest.UI
     /// </summary>
     public sealed partial class DemoLab : MonoBehaviour
     {
-        public const int StationCount = 6;
+        public const int StationCount = 7;
 
         private const float StageWidth = 1920f;
         private const float StageHeight = 1080f;
@@ -30,7 +30,8 @@ namespace ColonQuest.UI
         private const float EvidenceWidth = 480f;
         private const float BodyTop = -116f;
         private const float BodyHeight = 940f;
-        private const float StationButtonHeight = 146f;
+        private const float StationButtonHeight = 126f;
+        private const float StationButtonGap = 10f;
 
         /// <summary>The left edge and the width of what a station draws, inside the workspace.</summary>
         private const float Left = 28f;
@@ -53,8 +54,12 @@ namespace ColonQuest.UI
             { "Plan y cierre", "Muse Wonder" },
             { "Arte del juego", "Muse Image" },
             { "Motor y controles", "Lo que le pone reglas a la IA" },
-            { "Modo Clase", "El panel del profesor, con Muse Spark" }
+            { "Modo Clase", "El panel del profesor, con Muse Spark" },
+            { "Cobros y trampas", "Cobrador, prestamista y pirámide" }
         };
+
+        /// <summary>The order on the rail: the talks go next to the negotiation, the other conversation.</summary>
+        private static readonly int[] RailOrder = { 0, 1, 6, 2, 3, 4, 5 };
 
         /// <summary>Why each model has its job, with the times measured for docs/adr/0004-model-roles.md.</summary>
         private static readonly string[] WhyThisModel =
@@ -64,7 +69,8 @@ namespace ColonQuest.UI
             "Muse Wonder es el mejor escritor, pero suele tardar de 6 a 10 s. Por eso solo trabaja donde nadie espera: planifica en segundo plano y narra detrás de una pantalla de carga.",
             "Muse Image tarda de 14 a 17 s por imagen. Por eso todas se generan antes y se guardan: el juego nunca la espera en vivo.",
             "Esta estación no llama a ningún modelo: es lo que mantiene a la IA dentro de las reglas.",
-            "Las cifras salen de la base de datos. Muse Spark solo las explica en lenguaje claro; no inventa números."
+            "Las cifras salen de la base de datos. Muse Spark solo las explica en lenguaje claro; no inventa números.",
+            "Muse Spark Open corre con pesos abiertos en Baseten. El juego le manda la ficha con las únicas cifras que puede decir: si dice otra, se rechaza y responden las reglas locales."
         };
 
         private static DemoLab current;
@@ -117,6 +123,7 @@ namespace ColonQuest.UI
             ApiService.Language = () => Loc.Current == GameLanguage.English ? "en" : "es";
             gmService = NewService();
             negotiationService = NewService();
+            talkService = NewService();
 
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -194,17 +201,20 @@ namespace ColonQuest.UI
 
         private void BuildRail()
         {
-            for (int i = 0; i < StationCount; i++)
+            var bodies = new GameObject[StationCount];
+            for (int place = 0; place < RailOrder.Length; place++)
             {
-                int station = i;
-                var button = UiKit.MakeButton(stage, Stations[i, 0], Cream, new Vector2(RailWidth, StationButtonHeight), TopLeft, new Vector2(RailX, BodyTop - i * (StationButtonHeight + 12f)), () => Show(station));
-                button.name = "Station_" + i;
+                int station = RailOrder[place];
+                var button = UiKit.MakeButton(stage, Stations[station, 0], Cream, new Vector2(RailWidth, StationButtonHeight), TopLeft, new Vector2(RailX, BodyTop - place * (StationButtonHeight + StationButtonGap)), () => Show(station));
+                button.name = "Station_" + station;
                 var name = button.transform.Find("Body/Text").GetComponent<Text>();
-                name.rectTransform.anchoredPosition = new Vector2(0f, 26f);
-                name.rectTransform.sizeDelta = new Vector2(RailWidth - 40f, 62f);
-                UiKit.Label(button.transform.Find("Body"), Stations[i, 1], 21, GameUiColors.Muted, new Vector2(RailWidth - 40f, 62f), Center, new Vector2(0f, -30f), TextAnchor.MiddleCenter);
-                stationButtons.Add(button.transform.Find("Body").gameObject);
+                name.rectTransform.anchoredPosition = new Vector2(0f, 24f);
+                name.rectTransform.sizeDelta = new Vector2(RailWidth - 40f, 50f);
+                UiKit.Label(button.transform.Find("Body"), Stations[station, 1], 20, GameUiColors.Muted, new Vector2(RailWidth - 40f, 54f), Center, new Vector2(0f, -26f), TextAnchor.MiddleCenter);
+                bodies[station] = button.transform.Find("Body").gameObject;
             }
+
+            stationButtons.AddRange(bodies);
         }
 
         private void BuildEvidence()
@@ -235,7 +245,7 @@ namespace ColonQuest.UI
 
         public void Show(int station)
         {
-            if (station != 1)
+            if (station != 1 && station != TalksStation)
             {
                 recorder?.Cancel();
             }
@@ -275,6 +285,7 @@ namespace ColonQuest.UI
                 case 2: DrawYear(); break;
                 case 3: DrawGallery(); break;
                 case 4: DrawEngine(); break;
+                case TalksStation: DrawTalks(); break;
                 default: DrawClass(); break;
             }
         }
@@ -288,6 +299,7 @@ namespace ColonQuest.UI
                 case 1: return new[] { negotiationService };
                 case 2: return new[] { planService, yearService };
                 case 5: return classServices;
+                case TalksStation: return new[] { talkService };
                 default: return new ApiService[0];
             }
         }
