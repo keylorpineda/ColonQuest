@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=3" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=4" width="100%" alt="ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -28,6 +28,33 @@ story; the engine keeps the books.
 | **58.3%** | for people who earn under ₡500 000 (about $1 000) a month | Same survey |
 | **80.88%** | of people surveyed never had any financial education | [Universidad Nacional, 2024](https://www.elfinancierocr.com/economia-y-politica/una-cartera-muy-estrecha-menos-del-10-de-las/22FABMYC6ZE47JR73C2UYYMBJU/story) |
 | **2 930** | cases of street lenders counted by investigators in 2025 | [OIJ, 2026](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
+
+### Why financial education: the usury law and its gap
+
+1. **People owed more than they could pay.** Until 2020 Costa Rica had no legal maximum on interest, and
+   nothing stopped payroll deductions from leaving a worker below the minimum needed to live. That year,
+   households put 52% of their income into paying debts ([OCF](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion)).
+2. **The usury law answered it.** Law 9859, against credit usury, came into force in June 2020. It sets a
+   maximum yearly rate for every loan, card and microcredit, recalculated by the central bank every six
+   months (36.48% in colones for the second half of 2026). Lenders must check the person's total debt at
+   the regulator's credit bureau before lending, and payroll deductions can no longer touch the minimum
+   wage that cannot be seized ([CRHoy](https://crhoy.com/nacionales/que-es-la-ley-de-usura-y-por-que-genera-debate-en-la-campana-presidencial/),
+   [Delfino](https://delfino.cr/2020/09/tesoreria-nacional-no-admitira-deducciones-por-planilla-a-salarios-inferiores-a-199-760)).
+   By 2025 the share of income going to debts was down to 34%.
+3. **It also left people out.** With a cap, banks lend less to whoever looks risky. The OECD says the cap
+   is causing financial exclusion that pushes people to informal credit, and microlenders estimate about
+   60 000 people left out since 2020 ([El Observador](https://observador.cr/tasa-de-usura-esta-causando-exclusion-financiera-en-costa-rica-y-aumenta-los-creditos-informales-advierte-la-ocde/)).
+   The debate is open: there were more credit cards in 2024 than in 2019, and no study proves the
+   exclusion fed the street lenders ([El Financiero](https://www.elfinancierocr.com/finanzas/ley-de-usura-levanta-posiciones-encontradas/UBJQZ373BJGQDBISGMWT25SCGA/story/)).
+4. **Gota a gota filled the gap, outside the law.** Street lenders charge up to 20% a week or a month,
+   many times the legal cap, mixing usury, extortion and violence ([UN Costa Rica, 2025](https://observador.cr/onu-prestamos-gota-a-gota-combinan-usura-extorsion-y-violencia-en-costa-rica/)).
+   Extortion complaints tied to informal loans rose from 47 in 2020 to 428 in 2024. Of those who went to
+   one, 40% needed the money urgently and 32% assumed a bank would turn them down; only 14% had actually
+   been turned down ([OIJ, in El Financiero](https://www.elfinancierocr.com/finanzas/ley-de-usura-levanta-posiciones-encontradas/UBJQZ373BJGQDBISGMWT25SCGA/story/)).
+5. **A law can cap a rate; it cannot teach the question.** The legal market has a ceiling, the illegal one
+   is a message away, and 8 in 10 people never had financial education. That is why the country passed a
+   financial education law in 2025, and the gap ColonQuest trains for: knowing the total cost, spotting a
+   rate above the cap, and saying no before signing.
 
 Nobody teaches you to ask the right question while a salesperson is smiling at you. That is the skill
 ColonQuest trains, against four real traps:
@@ -84,7 +111,7 @@ It needs internet, because the models run on the backend. A whole tour costs abo
 
 | Criterion | Weight | What we built |
 | --- | --- | --- |
-| Impact | 30% | Sourced Costa Rican figures, the real minimum wage and rate cap in the engine, telemetry per decision, Class Mode for teachers |
+| Impact | 30% | Sourced Costa Rican figures, the real minimum wage and the Law 9859 rate cap in the engine, telemetry per decision, Class Mode for teachers |
 | Meta tools | 25% | Five Meta models, one clear job each, plus tool-using agents |
 | Demo | 25% | A guided three-month run and a feature demo in the game's menu; every model call has a timeout and a fallback |
 | Technical depth | 20% | Validated contracts, an exact engine, more than 1 300 tests: the engine's NUnit and the server's pytest run in CI, the Unity suites locally |

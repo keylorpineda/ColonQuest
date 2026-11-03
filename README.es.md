@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=3" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=4" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -28,6 +28,33 @@ el motor lleva las cuentas.
 | **58,3%** | para quienes ganan menos de ₡500 000 (unos $1 000) al mes | Misma encuesta |
 | **80,88%** | de los encuestados nunca recibió educación financiera | [Universidad Nacional, 2024](https://www.elfinancierocr.com/economia-y-politica/una-cartera-muy-estrecha-menos-del-10-de-las/22FABMYC6ZE47JR73C2UYYMBJU/story) |
 | **2 930** | casos de gota a gota contados por los investigadores en 2025 | [OIJ, 2026](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
+
+### Por qué educación financiera: la ley de usura y su vacío
+
+1. **La gente debía más de lo que podía pagar.** Hasta 2020 Costa Rica no tenía un máximo legal de
+   interés, y nada impedía que los rebajos por planilla dejaran a un trabajador debajo del mínimo para
+   vivir. Ese año, los hogares destinaban el 52% de su ingreso a pagar deudas ([OCF](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion)).
+2. **La ley de usura respondió.** La Ley 9859, contra la usura crediticia, rige desde junio de 2020. Fija
+   una tasa anual máxima para todo préstamo, tarjeta y microcrédito, que el Banco Central recalcula cada
+   seis meses (36,48% en colones para el segundo semestre de 2026). Quien presta debe revisar la deuda
+   total de la persona en el Centro de Información Crediticia de la SUGEF antes de prestar, y los rebajos
+   por planilla ya no pueden tocar el salario mínimo inembargable ([CRHoy](https://crhoy.com/nacionales/que-es-la-ley-de-usura-y-por-que-genera-debate-en-la-campana-presidencial/),
+   [Delfino](https://delfino.cr/2020/09/tesoreria-nacional-no-admitira-deducciones-por-planilla-a-salarios-inferiores-a-199-760)).
+   Para 2025 la parte del ingreso que se iba en deudas había bajado al 34%.
+3. **También dejó gente afuera.** Con un tope, los bancos le prestan menos a quien parece riesgoso. La
+   OCDE dice que el tope está causando exclusión financiera que empuja al crédito informal, y las
+   microfinancieras estiman unas 60 000 personas excluidas desde 2020 ([El Observador](https://observador.cr/tasa-de-usura-esta-causando-exclusion-financiera-en-costa-rica-y-aumenta-los-creditos-informales-advierte-la-ocde/)).
+   El debate sigue abierto: en 2024 había más tarjetas de crédito que en 2019, y ningún estudio prueba que
+   la exclusión alimentara a los prestamistas informales ([El Financiero](https://www.elfinancierocr.com/finanzas/ley-de-usura-levanta-posiciones-encontradas/UBJQZ373BJGQDBISGMWT25SCGA/story/)).
+4. **El gota a gota llenó el vacío, fuera de la ley.** Los prestamistas informales cobran hasta 20% por
+   semana o por mes, muchas veces el tope legal, y mezclan usura, extorsión y violencia ([ONU Costa Rica, 2025](https://observador.cr/onu-prestamos-gota-a-gota-combinan-usura-extorsion-y-violencia-en-costa-rica/)).
+   Las denuncias por extorsión ligadas a préstamos informales pasaron de 47 en 2020 a 428 en 2024. De
+   quienes acudieron a uno, el 40% necesitaba la plata con urgencia y el 32% supuso que el banco le diría
+   que no; solo al 14% se lo habían negado de verdad ([OIJ, en El Financiero](https://www.elfinancierocr.com/finanzas/ley-de-usura-levanta-posiciones-encontradas/UBJQZ373BJGQDBISGMWT25SCGA/story/)).
+5. **Una ley puede topar una tasa; no puede enseñar la pregunta.** El mercado legal tiene techo, el ilegal
+   está a un mensaje de distancia, y 8 de cada 10 personas nunca recibieron educación financiera. Por eso
+   el país aprobó una ley de educación financiera en 2025, y ese es el vacío que entrena ColonQuest: saber
+   el costo total, reconocer una tasa por encima del tope y decir que no antes de firmar.
 
 Nadie te enseña a hacer la pregunta correcta mientras un vendedor te sonríe. Esa es la habilidad que entrena
 ColonQuest, contra cuatro trampas reales:
@@ -84,7 +111,7 @@ Ocupa internet, porque los modelos corren en el backend. Un recorrido completo c
 
 | Criterio | Peso | Qué construimos |
 | --- | --- | --- |
-| Impacto | 30% | Cifras de Costa Rica con fuente, el salario mínimo y el tope de usura reales en el motor, telemetría por decisión, Modo Clase para profesores |
+| Impacto | 30% | Cifras de Costa Rica con fuente, el salario mínimo y el tope de usura de la Ley 9859 reales en el motor, telemetría por decisión, Modo Clase para profesores |
 | Herramientas de Meta | 25% | Cinco modelos de Meta con un rol claro cada uno, más agentes con herramientas |
 | Demo | 25% | Una ruta guiada de tres meses y una demo de funciones en el menú; cada llamada a un modelo tiene tiempo límite y respaldo |
 | Profundidad técnica | 20% | Contratos validados, un motor exacto y más de 1 300 pruebas: NUnit del motor y pytest del servidor corren en CI, las de Unity en local |
