@@ -1,6 +1,7 @@
 <p align="center"><b>English</b> | <a href="README.es.md">Español</a></p>
 
 <p align="center">
+  <a href="https://github.com/keylorpineda/ColonQuest/releases/latest"><img src="docs/assets/tab-download-en.svg" alt="Download the Windows build"></a>
   <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
   <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
 </p>
@@ -75,7 +76,8 @@ commission only come out if you ask.
 
 ### Play it in about three minutes
 
-Choose **Guided simulation**, the first entry of the main menu. It is the real game on a short
+[Download the Windows build](https://github.com/keylorpineda/ColonQuest/releases/latest), unzip it and open `ColonQuest.exe`. Choose **Guided simulation**,
+the first entry of the main menu. It is the real game on a short
 stretch of the town, for three months, and you only make the decisions:
 
 1. **Month 1.** You say how you get to the end of the month. Your salary lands by SINPE, Muse Wonder
