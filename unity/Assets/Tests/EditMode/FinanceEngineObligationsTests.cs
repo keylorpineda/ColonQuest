@@ -27,6 +27,23 @@ namespace ColonQuest.Finance.Tests
             Assert.That(quote.OverpaymentColones, Is.EqualTo(219_400L));
         }
 
+        // Values printed by server/app/negotiation/seller_sheet.py (Offer.at_term(...).monthly_payment).
+        [TestCase(350_000L, 6, "2.5", 63_600L)]
+        [TestCase(350_000L, 12, "2.5", 34_200L)]
+        [TestCase(350_000L, 36, "2.5", 14_900L)]
+        [TestCase(450_000L, 6, "2.7", 82_300L)]
+        [TestCase(450_000L, 12, "2.7", 44_500L)]
+        [TestCase(450_000L, 30, "2.7", 22_100L)]
+        [TestCase(450_000L, 36, "2.7", 19_700L)]
+        public void CalculateInstallmentQuote_AtEveryTerm_MatchesBackendSellerSheet(
+            long cashPrice, int termMonths, string monthlyRatePct, long expectedBase)
+        {
+            InstallmentQuote quote = FinanceEngine.CalculateInstallmentQuote(
+                cashPrice, termMonths, decimal.Parse(monthlyRatePct, System.Globalization.CultureInfo.InvariantCulture));
+
+            Assert.That(quote.BaseMonthlyPayment, Is.EqualTo(expectedBase));
+        }
+
         [Test]
         public void CalculateAguinaldo_FullAndPartialYear_ComputesExactTwelfth()
         {
