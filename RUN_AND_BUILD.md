@@ -24,7 +24,7 @@ There are three ways in, from the fastest to the most complete. Each one only ad
 
 ### 1. Just play it
 
-Unzip `ColonQuest-Windows.zip`, open `ColonQuest.exe` and choose **Guided simulation**. It talks to our
+Download `ColonQuest-Windows.zip` from the [latest release](https://github.com/keylorpineda/ColonQuest/releases/latest), unzip it, open `ColonQuest.exe` and choose **Guided simulation**. It talks to our
 hosted backend, so it only needs internet. The first answer can take up to a minute if the server was
 asleep; the game plays a scripted event if it does not arrive in time.
 

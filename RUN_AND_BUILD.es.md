@@ -24,7 +24,7 @@ Hay tres formas de entrar, de la más rápida a la más completa. Cada una solo 
 
 ### 1. Solo jugarlo
 
-Descomprimí `ColonQuest-Windows.zip`, abrí `ColonQuest.exe` y elegí **Simulación guiada**. Le habla a nuestro
+Bajá `ColonQuest-Windows.zip` del [último release](https://github.com/keylorpineda/ColonQuest/releases/latest), descomprimilo, abrí `ColonQuest.exe` y elegí **Simulación guiada**. Le habla a nuestro
 backend en línea, así que solo ocupa internet. La primera respuesta puede tardar hasta un minuto si el servidor
 estaba dormido; si no llega a tiempo, el juego usa un evento escrito a mano.
 
