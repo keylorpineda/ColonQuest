@@ -54,6 +54,15 @@ namespace ColonQuest.Game
         public const int ExampleMonths = 3;
         public const int LenderRatePct = (int)Finance.FinanceEngine.ShortInformalLoanMonthlyRatePct;
         public const int LenderLongRatePct = (int)Finance.FinanceEngine.DefaultInformalLoanMonthlyRatePct;
+
+        /// <summary>The short loan's rate over a year, without counting interest on interest.</summary>
+        public const int LenderYearlyPct = LenderRatePct * 12;
+
+        /// <summary>
+        /// The legal yearly cap of Law 9859 against usury: 36.48% in colones for the second half of 2026 (BCCR),
+        /// said as "about 36%" because the talk only allows whole percents.
+        /// </summary>
+        public const int UsuryCapYearlyPct = 36;
         public const int PyramidPromisePct = 300;
 
         /// <summary>What the stranger of the SINPE scam asks to have sent back.</summary>
@@ -304,14 +313,15 @@ namespace ColonQuest.Game
             Line(request, TalkFact.TotalCost, LenderTerms("Prestás {0}, {1} o {2}, nada más. A {3} meses te devuelven {4}, {5} o {6}."));
             Line(request, TalkFact.Arrangement, Loc.T("No hay rebajas: pasas todos los días a cobrar la cuota, gota a gota."));
             Line(request, TalkFact.WhatIfNotPaid, Loc.T("Si se atrasa, los intereses siguen corriendo y mandas a los muchachos del carro negro."));
-            Line(request, TalkFact.Legal, Loc.T("Sin papeles y sin SUGEF: esto es informal, entre los dos."));
+            Line(request, TalkFact.Legal, Loc.F("Sin papeles y sin SUGEF: esto es informal, entre los dos. Tu {0}% al mes son {1}% al año, y la ley contra la usura topa cualquier préstamo en unos {2}% al año.",
+                LenderRatePct, LenderYearlyPct, UsuryCapYearlyPct));
             Line(request, TalkFact.Guarantee, Loc.T("Ningún contrato: solo una firma en tu libreta."));
             foreach (long loan in LenderLoans)
             {
                 request.amounts.AddRange(new[] { loan, LenderTotal(loan) });
             }
 
-            request.percents.AddRange(new[] { LenderRatePct, LenderLongRatePct });
+            request.percents.AddRange(new[] { LenderRatePct, LenderLongRatePct, LenderYearlyPct, UsuryCapYearlyPct });
         }
 
         private void FillNeighbor(TalkRequestDto request)
@@ -502,7 +512,8 @@ namespace ColonQuest.Game
                 case TalkFact.WhatIfNotPaid:
                     return "Si se atrasa, los intereses siguen corriendo y le mando a los muchachos del carro negro.";
                 case TalkFact.Legal:
-                    return "¿Papeles, SUGEF? No, mae, esto es entre usted y yo. Por eso es tan rápido.";
+                    return Loc.F("¿Papeles, SUGEF? No, mae, esto es entre usted y yo. ¿La ley de usura? Topa en unos {0}% al año y lo mío son {1}%, pero por eso es tan rápido.",
+                        UsuryCapYearlyPct, LenderYearlyPct);
                 case TalkFact.Guarantee:
                     return "Ningún papel. Usted me firma aquí en la libreta y listo.";
                 default:
