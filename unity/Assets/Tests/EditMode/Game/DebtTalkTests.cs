@@ -46,6 +46,16 @@ namespace ColonQuest.Game.Tests
         }
 
         [Test]
+        public void Lender_ComparesItsRateWithTheUsuryCapWhenAskedIfItIsLegal()
+        {
+            Assert.AreEqual(240, DebtTalk.LenderYearlyPct, "20% a month over a year");
+            var talk = new DebtTalk(TalkPartner.Lender);
+            string reply = talk.Say("¿Eso es legal? ¿Están en la SUGEF?");
+            StringAssert.Contains("240%", reply);
+            StringAssert.Contains("36%", reply);
+        }
+
+        [Test]
         public void Pyramid_AdmitsWhereTheMoneyComesFromWhenAsked()
         {
             var talk = new DebtTalk(TalkPartner.Pyramid);
