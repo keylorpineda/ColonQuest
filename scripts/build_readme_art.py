@@ -568,7 +568,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ("stats", [
                     ("$750", "a month: the real 2026 minimum wage is your salary."),
                     ("3%", "a month on the card: 36% a year, under the legal cap of 36.48%."),
-                    ("20%", "a month from the lender: the lowest rate investigators found."),
+                    ("20%", "a month from the lender: 240% a year, over six times the legal cap."),
                 ]),
             ],
         },
@@ -593,7 +593,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ("stats", [
                     ("₡373 092", "al mes: tu salario es el mínimo real de 2026."),
                     ("3%", "al mes en la tarjeta: 36% anual, bajo el tope legal de 36,48%."),
-                    ("20%", "al mes con el prestamista: la tasa más baja que halló el OIJ."),
+                    ("20%", "al mes con el prestamista: 240% anual, más de seis veces el tope legal."),
                 ]),
             ],
         },
