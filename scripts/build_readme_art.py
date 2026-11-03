@@ -351,6 +351,15 @@ COPY: dict[str, dict[str, Any]] = {
             ("pyramid", "Pyramid", "Bring three friends and get rich. Promise."),
         ],
         "stamp": "TRAP",
+        "why_title": "THE USURY LAW AND ITS GAP",
+        "why_stats": [
+            ("52%", "of income went to debts in 2020, with no legal cap on interest."),
+            ("2020", "Law 9859 caps every rate, checks total debt and protects the minimum wage."),
+            ("47 > 428", "extortion complaints over informal loans, from 2020 to 2024."),
+            ("20%", "a week or a month from street lenders, far above the cap."),
+        ],
+        "why_close": "A law can cap a rate. It cannot teach anyone the right question. "
+        "That is why Costa Rica needs financial education, and why ColonQuest exists.",
         "month": (
             "HOW A MONTH PLAYS",
             "Your salary arrives with CCSS and income tax already deducted. You decide what to "
@@ -449,6 +458,15 @@ COPY: dict[str, dict[str, Any]] = {
             ("pyramid", "Pirámide", "Traé tres amigos y te hacés rico. Seguro."),
         ],
         "stamp": "TRAMPA",
+        "why_title": "LA LEY DE USURA Y SU VACÍO",
+        "why_stats": [
+            ("52%", "del ingreso se iba en deudas en 2020, sin tope legal de interés."),
+            ("2020", "La Ley 9859 topa toda tasa, revisa la deuda total y protege el salario mínimo."),
+            ("47 > 428", "denuncias por extorsión de préstamos informales, de 2020 a 2024."),
+            ("20%", "por semana o por mes con el gota a gota, muy encima del tope."),
+        ],
+        "why_close": "Una ley puede topar una tasa. No puede enseñar la pregunta correcta. "
+        "Por eso Costa Rica necesita educación financiera, y por eso existe ColonQuest.",
         "month": (
             "CÓMO SE JUEGA UN MES",
             "Te llega el salario con el rebajo de la CCSS y la renta. Decidís qué pagar, ahorrar "
@@ -938,6 +956,9 @@ def build(copy: dict[str, Any]) -> None:
     card.header(copy["problem"][0])
     card.paragraph(copy["problem"][1])
     tile_rows(card, copy["traps"], copy["stamp"])
+    card.header(copy["why_title"])
+    stats(card, copy["why_stats"])
+    card.paragraph(copy["why_close"])
     card.header(copy["month"][0])
     card.paragraph(copy["month"][1])
     card.header(copy["criteria_title"])
