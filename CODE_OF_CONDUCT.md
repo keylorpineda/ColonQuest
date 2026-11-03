@@ -1,3 +1,16 @@
+<p align="center">
+  <a href="README.md"><img src="docs/assets/tab-readme-en.svg" alt="README"></a>
+  <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
+  <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
+</p>
+
+<p align="center">
+  <img src="docs/assets/conduct-en.svg" width="100%" alt="The code of conduct of ColonQuest, based on the Contributor Covenant 2.1. The full content of this card is available as text in the section below.">
+</p>
+
+<details open>
+<summary><b>Read this page as text</b></summary>
+
 # Code of Conduct
 
 This project adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
@@ -23,3 +36,5 @@ Examples of unacceptable behavior:
 ## Enforcement
 
 Instances of abusive, harassing or otherwise unacceptable behavior may be reported to the maintainers at **keylorpineda729@gmail.com**. All complaints will be reviewed and investigated promptly and fairly, following the enforcement guidelines of the Contributor Covenant.
+
+</details>
