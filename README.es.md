@@ -146,7 +146,8 @@ inglés).
 Un cliente Unity 2D (motor financiero en C#) se comunica por JSON con un backend FastAPI (contratos
 Pydantic v2, control de costos, agentes). El backend llama a la API de modelos de Meta, guarda sesiones
 y decisiones en Postgres y corre los personajes en Muse Spark Open en Baseten, con respaldo en Meta si
-falla o se acaba su presupuesto diario.
+falla o se acaba su presupuesto diario. El diagrama, el camino de un evento, las protecciones y el costo
+de una partida (unos $0,06) están en [Arquitectura](docs/architecture.md), en inglés.
 
 - Ningún monto, tasa ni saldo sale de un modelo.
 - La plata es un número entero de colones.
