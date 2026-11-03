@@ -33,7 +33,7 @@ services:
       - key: CLASS_REPORT_MODEL
         value: "muse-spark-1.3"
       - key: DAILY_BUDGET_USD
-        value: "5.0"
+        value: "10.0"  # judging week, Nov 5 to 9: about 250 guided runs a day; Meta credits are $150 per person
       - key: ALLOWED_ORIGINS
         sync: false
       - key: CLIENT_HASH_SALT
@@ -53,7 +53,7 @@ services:
       - key: OPEN_WEIGHTS_TIMEOUT_S
         value: "5"
       - key: OPEN_WEIGHTS_DAILY_BUDGET_USD
-        value: "3"  # Baseten credits; at this spend the NPCs switch to Meta until midnight UTC
+        value: "5"  # Baseten credits ($100); at this spend the NPCs switch to Meta until midnight UTC
       - key: OPEN_WEIGHTS_BASE_URL
         value: "https://inference.baseten.co/v1"
       - key: OPEN_WEIGHTS_NPC_MODEL
