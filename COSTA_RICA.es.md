@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/costa-rica-es.svg?v=2" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/costa-rica-es.svg?v=3" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details open>
@@ -35,7 +35,8 @@ van en dólares y las palabras locales se explican abajo. Consultado el 2 de nov
 | Gota a gota | Prestamistas informales que piden poco más que la cédula y cobran a diario, muchas veces con amenazas |
 | OCF | Oficina del Consumidor Financiero, que encuesta el endeudamiento de los hogares |
 | OIJ | Organismo de Investigación Judicial, los investigadores criminales del país |
-| BCCR | Banco Central de Costa Rica, que fija el tope legal de intereses |
+| BCCR | Banco Central de Costa Rica, que recalcula cada seis meses el tope legal de intereses |
+| Ley 9859 | La ley contra la usura crediticia (2020): un tope anual para todo préstamo, tarjeta y microcrédito, revisar la deuda total antes de prestar y ningún rebajo por planilla debajo del salario mínimo inembargable |
 | CCSS | Caja Costarricense de Seguro Social, la seguridad social que se rebaja de cada salario |
 | Aguinaldo | Un mes extra de pago por ley en diciembre, un doceavo de lo ganado en el año |
 
@@ -67,7 +68,7 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | **Gota a gota** | **2 930** | Casos contados en todo el país en 2025, y 2 050 más a agosto de 2026 | [OIJ, en Semanario Universidad](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
 | | **20% a 100%** | Interés encontrado en estos préstamos, con pagos diarios de ₡5 000 a ₡15 000 ($10 a $30) | Misma fuente |
 | | **14%** | Personas que recibieron ofertas de préstamo por WhatsApp, Facebook o TikTok en un año | [OCF, en Delfino.cr](https://delfino.cr/2025/11/ocf-advierte-que-el-credito-informal-sigue-afectando-a-los-sectores-con-menos-ingresos-en-costa-rica) |
-| **Tarjeta y pago mínimo** | **36,48%** | Máximo legal anual en colones, segundo semestre de 2026. Las tarjetas entran ahí | [BCCR, en Delfino.cr](https://www.delfino.cr/2026/07/topes-de-usura-tendran-ajustes-mixtos-para-el-segundo-semestre) |
+| **Tarjeta y pago mínimo** | **36,48%** | Máximo legal anual en colones según la Ley 9859, segundo semestre de 2026. Las tarjetas entran ahí | [BCCR, en Delfino.cr](https://www.delfino.cr/2026/07/topes-de-usura-tendran-ajustes-mixtos-para-el-segundo-semestre) |
 | **Cuotas** | **22%** | Personas que mencionan deudas con tiendas de electrodomésticos, cooperativas y asociaciones solidaristas | [OCF, en Delfino.cr](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion) |
 | **Pirámides** | **50+** | Denuncias por aparentes estafas en pirámides que la Sugef trasladó a la Fiscalía en 2021 | [Teletica](https://www.teletica.com/288694_sugef-traslada-a-fiscalia-50-denuncias-por-aparentes-estafas-en-piramides) |
 | | **600+** | Inversionistas, según creen los afectados, en un esquema en tres países investigado en 2025 | [CRHoy](https://crhoy.com/fiscalia-investiga-multimillonario-fraude-con-esquema-piramidal-en-tres-paises/) |
@@ -81,7 +82,7 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | Sin renta hasta ₡918 000 | Tramos 2026: 10%, 15%, 20% y 25% de ahí para arriba | Decreto 45333-H, mismo análisis |
 | Aguinaldo de un doceavo | Libre de cargas y de renta | Ley 2412, mismo análisis |
 | Tarjeta al 3% mensual | 36% anual, bajo el tope de 36,48% | BCCR, en la tabla de arriba |
-| Prestamista al 20% mensual | La tasa más baja que halló el OIJ | OIJ, en la tabla de arriba |
+| Prestamista al 20% mensual | La tasa más baja que halló el OIJ: 240% anual, más de seis veces el tope legal. Si le preguntan si es legal, el prestamista lo dice | OIJ y BCCR, en la tabla de arriba |
 
 Simplificamos dos cosas: la renta no tiene créditos por hijos ni cónyuge, y los precios del pueblo son ejemplos,
 como dice el propio juego.

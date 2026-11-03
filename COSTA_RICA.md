@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/costa-rica-en.svg?v=2" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/costa-rica-en.svg?v=3" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
 </p>
 
 <details open>
@@ -36,7 +36,8 @@ in dollars, and local words are explained below. Consulted on 2 November 2026.
 | Gota a gota | "Drop by drop": informal lenders who ask for little more than an ID and collect daily, often with threats |
 | OCF | Oficina del Consumidor Financiero, a financial consumer office that surveys household debt |
 | OIJ | Organismo de Investigación Judicial, the country's criminal investigators |
-| BCCR | Banco Central de Costa Rica, the central bank, which sets the legal cap on interest |
+| BCCR | Banco Central de Costa Rica, the central bank, which recalculates the legal cap on interest every six months |
+| Law 9859 | The law against credit usury (2020): a yearly cap on every loan, card and microcredit, a check of total debt before lending, and no payroll deduction below the minimum wage that cannot be seized |
 | CCSS | Caja Costarricense de Seguro Social, the public social security taken off each salary |
 | Aguinaldo | A legal extra month of pay in December, one twelfth of what was earned in the year |
 
@@ -68,7 +69,7 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | **Gota a gota** | **2 930** | Cases counted nationwide in 2025, and 2 050 more by August 2026 | [OIJ, in Semanario Universidad](https://semanariouniversidad.com/pais/oij-registra-mas-de-2-000-casos-vinculados-a-prestamos-gota-a-gota-en-lo-que-va-de-2026/) |
 | | **20% to 100%** | Interest found in these loans, with daily payments of ₡5 000 to ₡15 000 ($10 to $30) | Same source |
 | | **14%** | People who got loan offers by WhatsApp, Facebook or TikTok in a year | [OCF, in Delfino.cr](https://delfino.cr/2025/11/ocf-advierte-que-el-credito-informal-sigue-afectando-a-los-sectores-con-menos-ingresos-en-costa-rica) |
-| **Card and minimum payment** | **36.48%** | Legal maximum a year in colones, second half of 2026. Cards fall under it | [BCCR, in Delfino.cr](https://www.delfino.cr/2026/07/topes-de-usura-tendran-ajustes-mixtos-para-el-segundo-semestre) |
+| **Card and minimum payment** | **36.48%** | Legal maximum a year in colones under Law 9859, second half of 2026. Cards fall under it | [BCCR, in Delfino.cr](https://www.delfino.cr/2026/07/topes-de-usura-tendran-ajustes-mixtos-para-el-segundo-semestre) |
 | **Installments** | **22%** | People who mention debts with appliance stores, cooperatives and solidarity associations | [OCF, in Delfino.cr](https://delfino.cr/2025/10/aunque-los-costarricenses-comprometen-en-promedio-menos-dinero-para-el-pago-de-deudas-el-nivel-de-endeudamiento-es-alto-para-buena-parte-de-la-poblacion) |
 | **Pyramids** | **50+** | Complaints about apparent pyramid scams that the financial regulator sent to prosecutors in 2021 | [Teletica](https://www.teletica.com/288694_sugef-traslada-a-fiscalia-50-denuncias-por-aparentes-estafas-en-piramides) |
 | | **600+** | Investors, as those affected believe, in a scheme across three countries under investigation in 2025 | [CRHoy](https://crhoy.com/fiscalia-investiga-multimillonario-fraude-con-esquema-piramidal-en-tres-paises/) |
@@ -82,7 +83,7 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | No income tax up to ₡918 000 | 2026 brackets: 10%, 15%, 20% and 25% above that | Decree 45333-H, same review |
 | Aguinaldo of one twelfth | Free of charges and of income tax | Law 2412, same review |
 | Card at 3% a month | 36% a year, under the cap of 36.48% | BCCR, in the table above |
-| Lender at 20% a month | The lowest rate the OIJ found | OIJ, in the table above |
+| Lender at 20% a month | The lowest rate the OIJ found: 240% a year, more than six times the legal cap. Asked if it is legal, the lender says so | OIJ and BCCR, in the table above |
 
 We simplified two things: income tax has no credits for children or a spouse, and the prices of the town
 are examples, as the game itself says.
