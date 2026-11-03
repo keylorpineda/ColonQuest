@@ -1070,6 +1070,7 @@ TABS = {
     "readme": {"en": "README", "es": "README"},
     "costa-rica": {"en": "COSTA RICA", "es": "COSTA RICA"},
     "run": {"en": "RUN AND BUILD", "es": "CORRER Y ARMAR"},
+    "download": {"en": "DOWNLOAD", "es": "DESCARGAR"},
 }
 
 
