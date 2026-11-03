@@ -22,6 +22,21 @@
         "title": "Body_negotiate_voice_api_sessions__session_id__negotiation_voice_post",
         "type": "object"
       },
+      "Body_transcribe_api_sessions__session_id__transcribe_post": {
+        "properties": {
+          "audio": {
+            "contentMediaType": "application/octet-stream",
+            "description": "WAV clip, 16-bit PCM, up to 15 s",
+            "title": "Audio",
+            "type": "string"
+          }
+        },
+        "required": [
+          "audio"
+        ],
+        "title": "Body_transcribe_api_sessions__session_id__transcribe_post",
+        "type": "object"
+      },
       "BudgetInfo": {
         "additionalProperties": false,
         "properties": {
@@ -250,6 +265,10 @@
               }
             ],
             "title": "Classcode"
+          },
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
           }
         },
         "title": "CreateSessionRequest",
@@ -499,6 +518,14 @@
         "title": "GameEvent",
         "type": "object"
       },
+      "GameLanguage": {
+        "enum": [
+          "es",
+          "en"
+        ],
+        "title": "GameLanguage",
+        "type": "string"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -533,6 +560,16 @@
             ],
             "title": "Database",
             "type": "string"
+          },
+          "openWeightsBudget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BudgetInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "const": "ok",
@@ -625,6 +662,55 @@
         "title": "KeyQuestion",
         "type": "string"
       },
+      "ModelCallInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "costUsd": {
+            "title": "Costusd",
+            "type": "number"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "inputTokens": {
+            "title": "Inputtokens",
+            "type": "integer"
+          },
+          "latencyMs": {
+            "title": "Latencyms",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "outputTokens": {
+            "title": "Outputtokens",
+            "type": "integer"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint",
+          "provider",
+          "model",
+          "inputTokens",
+          "outputTokens",
+          "costUsd",
+          "latencyMs",
+          "ok"
+        ],
+        "title": "ModelCallInfo",
+        "type": "object"
+      },
       "MoneySource": {
         "enum": [
           "cash",
@@ -663,6 +749,13 @@
             "title": "Revealedfacts",
             "type": "array"
           },
+          "termMonths": {
+            "default": 0,
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Termmonths",
+            "type": "integer"
+          },
           "transcript": {
             "maxLength": 1000,
             "title": "Transcript",
@@ -680,10 +773,21 @@
       "NegotiationRequest": {
         "additionalProperties": false,
         "properties": {
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
+          },
           "offerId": {
             "pattern": "^[a-z0-9_]{1,40}$",
             "title": "Offerid",
             "type": "string"
+          },
+          "termMonths": {
+            "default": 0,
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Termmonths",
+            "type": "integer"
           },
           "text": {
             "maxLength": 500,
@@ -730,14 +834,78 @@
         "title": "Npc",
         "type": "object"
       },
+      "PingResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "PingResponse",
+        "type": "object"
+      },
+      "PlanMonthInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "eventType": {
+            "title": "Eventtype",
+            "type": "string"
+          },
+          "month": {
+            "title": "Month",
+            "type": "integer"
+          },
+          "teachingConcept": {
+            "title": "Teachingconcept",
+            "type": "string"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "teachingConcept",
+          "eventType",
+          "theme"
+        ],
+        "title": "PlanMonthInfo",
+        "type": "object"
+      },
       "PlayerState": {
         "additionalProperties": false,
         "properties": {
+          "assetsValue": {
+            "default": 0,
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Assetsvalue",
+            "type": "integer"
+          },
           "cash": {
             "maximum": 100000000.0,
             "minimum": 0.0,
             "title": "Cash",
             "type": "integer"
+          },
+          "characterName": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charactername"
           },
           "creditCard": {
             "$ref": "#/components/schemas/CreditCard"
@@ -774,10 +942,40 @@
             "title": "Installments",
             "type": "array"
           },
+          "jobPosition": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jobposition"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GameLanguage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "month": {
             "maximum": 12.0,
             "minimum": 1.0,
             "title": "Month",
+            "type": "integer"
+          },
+          "monthsPlayed": {
+            "default": 0,
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Monthsplayed",
             "type": "integer"
           },
           "salaryNet": {
@@ -791,6 +989,19 @@
             "minimum": 0.0,
             "title": "Savings",
             "type": "integer"
+          },
+          "week": {
+            "anyOf": [
+              {
+                "maximum": 4.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week"
           },
           "wellbeing": {
             "maximum": 100.0,
@@ -843,6 +1054,15 @@
       "SessionSummary": {
         "additionalProperties": false,
         "properties": {
+          "cardImageKey": {
+            "enum": [
+              "card_year_debt_free",
+              "card_year_some_debt",
+              "card_year_heavy_debt"
+            ],
+            "title": "Cardimagekey",
+            "type": "string"
+          },
           "conceptsTaught": {
             "items": {
               "$ref": "#/components/schemas/TeachingConcept"
@@ -904,9 +1124,207 @@
           "totalDebt",
           "netWorth",
           "narrative",
-          "source"
+          "source",
+          "cardImageKey"
         ],
         "title": "SessionSummary",
+        "type": "object"
+      },
+      "SessionTrace": {
+        "additionalProperties": false,
+        "description": "What the models and agents did in a session, for the judges' demo. Newest calls last.",
+        "properties": {
+          "calls": {
+            "items": {
+              "$ref": "#/components/schemas/ModelCallInfo"
+            },
+            "title": "Calls",
+            "type": "array"
+          },
+          "seasonPlan": {
+            "items": {
+              "$ref": "#/components/schemas/PlanMonthInfo"
+            },
+            "title": "Seasonplan",
+            "type": "array"
+          },
+          "toolSteps": {
+            "items": {
+              "$ref": "#/components/schemas/ToolStepInfo"
+            },
+            "title": "Toolsteps",
+            "type": "array"
+          },
+          "totalCostUsd": {
+            "title": "Totalcostusd",
+            "type": "number"
+          }
+        },
+        "required": [
+          "calls",
+          "toolSteps",
+          "seasonPlan",
+          "totalCostUsd"
+        ],
+        "title": "SessionTrace",
+        "type": "object"
+      },
+      "TalkExchange": {
+        "additionalProperties": false,
+        "properties": {
+          "player": {
+            "maxLength": 500,
+            "title": "Player",
+            "type": "string"
+          },
+          "reply": {
+            "maxLength": 500,
+            "title": "Reply",
+            "type": "string"
+          }
+        },
+        "required": [
+          "player",
+          "reply"
+        ],
+        "title": "TalkExchange",
+        "type": "object"
+      },
+      "TalkFact": {
+        "enum": [
+          "total_cost",
+          "rate",
+          "arrangement",
+          "what_if_not_paid",
+          "where_money_comes",
+          "guarantee",
+          "legal"
+        ],
+        "title": "TalkFact",
+        "type": "string"
+      },
+      "TalkPartner": {
+        "enum": [
+          "collectors",
+          "lender",
+          "pyramid",
+          "neighbor",
+          "stranger"
+        ],
+        "title": "TalkPartner",
+        "type": "string"
+      },
+      "TalkReply": {
+        "additionalProperties": false,
+        "properties": {
+          "askedFacts": {
+            "items": {
+              "$ref": "#/components/schemas/TalkFact"
+            },
+            "title": "Askedfacts",
+            "type": "array"
+          },
+          "npcReply": {
+            "title": "Npcreply",
+            "type": "string"
+          },
+          "source": {
+            "const": "model",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "npcReply",
+          "askedFacts",
+          "source"
+        ],
+        "title": "TalkReply",
+        "type": "object"
+      },
+      "TalkRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "amounts": {
+            "items": {
+              "maximum": 100000000.0,
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 20,
+            "title": "Amounts",
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/TalkExchange"
+            },
+            "maxItems": 20,
+            "title": "History",
+            "type": "array"
+          },
+          "language": {
+            "$ref": "#/components/schemas/GameLanguage",
+            "default": "es"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/TalkPartner"
+          },
+          "percents": {
+            "items": {
+              "maximum": 1000.0,
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 10,
+            "title": "Percents",
+            "type": "array"
+          },
+          "sheet": {
+            "items": {
+              "$ref": "#/components/schemas/TalkSheetLine"
+            },
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Sheet",
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "partner",
+          "text",
+          "sheet",
+          "amounts",
+          "percents"
+        ],
+        "title": "TalkRequest",
+        "type": "object"
+      },
+      "TalkSheetLine": {
+        "additionalProperties": false,
+        "description": "One true thing about the deal, from the game's engine, worded for the character.",
+        "properties": {
+          "fact": {
+            "$ref": "#/components/schemas/TalkFact"
+          },
+          "text": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact",
+          "text"
+        ],
+        "title": "TalkSheetLine",
         "type": "object"
       },
       "TeachingConcept": {
@@ -920,10 +1338,60 @@
           "pyramid_scheme",
           "inflation",
           "exchange_rate",
-          "payroll_deductions"
+          "payroll_deductions",
+          "invest_in_yourself"
         ],
         "title": "TeachingConcept",
         "type": "string"
+      },
+      "ToolStepInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "arguments": {
+            "title": "Arguments",
+            "type": "string"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "result": {
+            "title": "Result",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint",
+          "step",
+          "tool",
+          "arguments",
+          "result"
+        ],
+        "title": "ToolStepInfo",
+        "type": "object"
+      },
+      "TranscriptResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "transcript": {
+            "minLength": 1,
+            "title": "Transcript",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript"
+        ],
+        "title": "TranscriptResponse",
+        "type": "object"
       },
       "ValidationError": {
         "properties": {
@@ -968,8 +1436,8 @@
     }
   },
   "info": {
-    "description": "Backend for the Colón Quest financial-literacy game.",
-    "title": "Colón Quest API",
+    "description": "Backend for the ColonQuest financial-literacy game.",
+    "title": "ColonQuest API",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",
@@ -1028,6 +1496,15 @@
               "pattern": "^[A-Z0-9]{4,8}$",
               "title": "Code",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/GameLanguage",
+              "default": "es"
             }
           }
         ],
@@ -1120,6 +1597,28 @@
         "summary": "Get Image",
         "tags": [
           "images"
+        ]
+      }
+    },
+    "/api/ping": {
+      "get": {
+        "description": "Keep-alive for UptimeRobot: wakes Render without touching Neon or any model.",
+        "operationId": "ping_api_ping_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ping",
+        "tags": [
+          "health"
         ]
       }
     },
@@ -1329,7 +1828,7 @@
     },
     "/api/sessions/{session_id}/negotiation/voice": {
       "post": {
-        "description": "One negotiation turn spoken by the player.\n\nValidation happens before paying for transcription. If voice fails the response is 503 and\nthe client switches to the text endpoint, so the negotiation never blocks.",
+        "description": "One negotiation turn spoken by the player, for builds older than /transcribe.\n\nIf voice fails the response is 503 and the client switches to the text endpoint, so the\nnegotiation never blocks.",
         "operationId": "negotiate_voice_api_sessions__session_id__negotiation_voice_post",
         "parameters": [
           {
@@ -1432,6 +1931,158 @@
         "summary": "Finish Session",
         "tags": [
           "summary"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/talk": {
+      "post": {
+        "description": "The character's words, from the true sheet the game sends. 503 means: use the local rules.",
+        "operationId": "talk_api_sessions__session_id__talk_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TalkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TalkReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Talk",
+        "tags": [
+          "talk"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/trace": {
+      "get": {
+        "description": "The session's model calls, tool steps and season plan. Finished sessions still answer.",
+        "operationId": "session_trace_api_sessions__session_id__trace_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTrace"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Session Trace",
+        "tags": [
+          "trace"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/transcribe": {
+      "post": {
+        "description": "Only the player's words, so the game can show them at once and then ask the seller.",
+        "operationId": "transcribe_api_sessions__session_id__transcribe_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_api_sessions__session_id__transcribe_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transcribe",
+        "tags": [
+          "negotiation"
         ]
       }
     }

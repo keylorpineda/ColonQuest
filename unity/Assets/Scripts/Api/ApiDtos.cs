@@ -1,0 +1,299 @@
+using System;
+using System.Collections.Generic;
+
+namespace ColonQuest.Api
+{
+    // Wire shapes of the backend contract (shared/schemas). Field names are the camelCase
+    // names on the wire so that JsonUtility reads and writes them directly. Enums travel as
+    // snake_case strings and optional values as an empty string or zero; ApiMapper turns all
+    // of this into the finance engine types and back.
+
+    [Serializable]
+    public sealed class CreditCardDto
+    {
+        public long balance;
+        public long limit;
+        public float monthlyRatePct;
+        public float minPaymentPct;
+    }
+
+    [Serializable]
+    public sealed class InstallmentDto
+    {
+        public string item = string.Empty;
+        public long monthly;
+        public int monthsLeft;
+    }
+
+    [Serializable]
+    public sealed class InformalLoanDto
+    {
+        public string lender = string.Empty;
+        public long balance;
+        public float monthlyRatePct;
+    }
+
+    [Serializable]
+    public sealed class PlayerStateDto
+    {
+        public string characterName = string.Empty;
+        public int week = 1;
+        public string jobPosition = string.Empty;
+        public long assetsValue;
+        public int monthsPlayed;
+        public int month;
+        public long salaryNet;
+        public long cash;
+        public long savings;
+        public long emergencyFund;
+        public CreditCardDto creditCard = new CreditCardDto();
+        public List<InstallmentDto> installments = new List<InstallmentDto>();
+        public List<InformalLoanDto> informalLoans = new List<InformalLoanDto>();
+        public List<string> history = new List<string>();
+        public int wellbeing;
+        public string language = "es";
+    }
+
+    [Serializable]
+    public sealed class NpcDto
+    {
+        public string id = string.Empty;
+        public string name = string.Empty;
+        public string role = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class EffectDto
+    {
+        public string kind = string.Empty;
+        public long amount;
+        public string source = string.Empty;
+        public int months;
+    }
+
+    [Serializable]
+    public sealed class ChoiceDto
+    {
+        public string id = string.Empty;
+        public string label = string.Empty;
+        public List<EffectDto> effects = new List<EffectDto>();
+    }
+
+    [Serializable]
+    public sealed class GameEventDto
+    {
+        public string eventId = string.Empty;
+        public string type = string.Empty;
+        public string title = string.Empty;
+        public string narrative = string.Empty;
+        public NpcDto npc = new NpcDto();
+        public string imageKey = string.Empty;
+        public List<ChoiceDto> choices = new List<ChoiceDto>();
+        public string teachingConcept = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class FallbackCatalogDto
+    {
+        public List<GameEventDto> events = new List<GameEventDto>();
+    }
+
+    [Serializable]
+    public sealed class CreateSessionRequestDto
+    {
+        public string classCode;
+        public string language = "es";
+    }
+
+    [Serializable]
+    public sealed class SessionCreatedDto
+    {
+        public string sessionId = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class DecisionRequestDto
+    {
+        public int month;
+        public string eventId = string.Empty;
+        public string teachingConcept = string.Empty;
+        public string choiceId = string.Empty;
+        public PlayerStateDto stateAfter = new PlayerStateDto();
+    }
+
+    [Serializable]
+    public sealed class NegotiationRequestDto
+    {
+        public string offerId = string.Empty;
+        public string text = string.Empty;
+        public string language = "es";
+        public int termMonths;
+    }
+
+    [Serializable]
+    public sealed class NegotiationReplyDto
+    {
+        public string transcript = string.Empty;
+        public string npcReply = string.Empty;
+        public List<string> revealedFacts = new List<string>();
+        public List<string> keyQuestionsAsked = new List<string>();
+        public string dealStatus = string.Empty;
+        public int termMonths;
+    }
+
+    [Serializable]
+    public sealed class TranscriptDto
+    {
+        public string transcript = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class SessionSummaryDto
+    {
+        public int monthsPlayed;
+        public int decisions;
+        public List<string> conceptsTaught = new List<string>();
+        public int negotiations;
+        public int dealsAccepted;
+        public List<string> keyQuestionsAsked = new List<string>();
+        public long totalDebt;
+        public long netWorth;
+        public string narrative = string.Empty;
+        public string source = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class BudgetDto
+    {
+        public float spentUsd;
+        public float budgetUsd;
+        public float remainingUsd;
+        public string mode = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class HealthDto
+    {
+        public string status = string.Empty;
+        public string version = string.Empty;
+        public string database = string.Empty;
+        public BudgetDto budget = new BudgetDto();
+        public BudgetDto openWeightsBudget = new BudgetDto();
+    }
+
+    [Serializable]
+    public sealed class TalkSheetLineDto
+    {
+        public string fact = string.Empty;
+        public string text = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class TalkExchangeDto
+    {
+        public string player = string.Empty;
+        public string reply = string.Empty;
+    }
+
+    /// <summary>One turn of a talk: the true sheet and the only figures the character may say, all from the game's engine.</summary>
+    [Serializable]
+    public sealed class TalkRequestDto
+    {
+        public string partner = string.Empty;
+        public string text = string.Empty;
+        public string language = "es";
+        public List<TalkSheetLineDto> sheet = new List<TalkSheetLineDto>();
+        public List<long> amounts = new List<long>();
+        public List<int> percents = new List<int>();
+        public List<TalkExchangeDto> history = new List<TalkExchangeDto>();
+    }
+
+    [Serializable]
+    public sealed class TalkReplyDto
+    {
+        public string npcReply = string.Empty;
+        public List<string> askedFacts = new List<string>();
+        public string source = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class ModelCallDto
+    {
+        public string endpoint = string.Empty;
+        public string provider = string.Empty;
+        public string model = string.Empty;
+        public int inputTokens;
+        public int outputTokens;
+        public float costUsd;
+        public int latencyMs;
+        public bool ok;
+    }
+
+    [Serializable]
+    public sealed class ToolStepDto
+    {
+        public string endpoint = string.Empty;
+        public int step;
+        public string tool = string.Empty;
+        public string arguments = string.Empty;
+        public string result = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class PlanMonthDto
+    {
+        public int month;
+        public string teachingConcept = string.Empty;
+        public string eventType = string.Empty;
+        public string theme = string.Empty;
+    }
+
+    /// <summary>What the models and agents did in a session, as the demo lab shows it.</summary>
+    [Serializable]
+    public sealed class SessionTraceDto
+    {
+        public List<ModelCallDto> calls = new List<ModelCallDto>();
+        public List<ToolStepDto> toolSteps = new List<ToolStepDto>();
+        public List<PlanMonthDto> seasonPlan = new List<PlanMonthDto>();
+        public float totalCostUsd;
+    }
+
+    [Serializable]
+    public sealed class CreateClassRequestDto
+    {
+        public string name = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class ClassCreatedDto
+    {
+        public string code = string.Empty;
+        public string name = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class ConceptStatDto
+    {
+        public string concept = string.Empty;
+        public int decisions;
+        public int riskyChoicePct;
+    }
+
+    [Serializable]
+    public sealed class ClassDashboardDto
+    {
+        /// <summary>What a figure holds when the backend has nothing to compute it from.</summary>
+        public const int NoData = -1;
+
+        public string code = string.Empty;
+        public string name = string.Empty;
+        public int students;
+        public int finishedGames;
+        public int negotiations;
+        public int trapDetectionPct;
+        public long averageFinalDebt;
+        public List<ConceptStatDto> concepts = new List<ConceptStatDto>();
+        public string explanation = string.Empty;
+        public string source = string.Empty;
+    }
+}

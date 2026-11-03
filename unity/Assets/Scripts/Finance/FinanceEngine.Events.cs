@@ -7,6 +7,11 @@ namespace ColonQuest.Finance
     {
         public const decimal DefaultInformalLoanMonthlyRatePct = 15.0m;
 
+        /// <summary>A short "gota a gota" loan, of up to <see cref="ShortInformalLoanMonths"/> months, costs more per month.</summary>
+        public const decimal ShortInformalLoanMonthlyRatePct = 20.0m;
+
+        public const int ShortInformalLoanMonths = 3;
+
         /// <summary>
         /// Validates and applies a player's chosen <see cref="Choice"/> from a <see cref="GameEvent"/>.
         /// Every effect in the choice is validated before any state is mutated; if any effect is out of
@@ -197,7 +202,7 @@ namespace ColonQuest.Finance
                 throw new InvalidGameEventEffectException("Maximum number of informal loans reached.");
 
             // Shorter-term "gota a gota" loans carry steeper monthly rates (15% to 20%).
-            decimal monthlyRatePct = months <= 3 ? 20.0m : DefaultInformalLoanMonthlyRatePct;
+            decimal monthlyRatePct = months <= ShortInformalLoanMonths ? ShortInformalLoanMonthlyRatePct : DefaultInformalLoanMonthlyRatePct;
             state.Cash = ContractLimits.ClampColones(state.Cash + principalColones);
             state.InformalLoans.Add(new InformalLoan(normalizedLender, principalColones, monthlyRatePct));
             state.RecordHistory("took_informal_loan");

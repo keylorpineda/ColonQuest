@@ -1,0 +1,188 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+
+namespace ColonQuest.World.Tests
+{
+    public sealed class LocTests
+    {
+        private static IEnumerable<string> Holes(string text)
+        {
+            return Regex.Matches(text, @"\{\d+\}").Cast<Match>().Select(m => m.Value).OrderBy(v => v);
+        }
+
+        [Test]
+        public void Spanish_ReturnsTheTextAsItIs()
+        {
+            Assert.AreEqual("Ajustes", Loc.Translate("Ajustes", GameLanguage.Spanish));
+            Assert.AreEqual("texto que no existe", Loc.Translate("texto que no existe", GameLanguage.Spanish));
+        }
+
+        [Test]
+        public void English_TranslatesAKnownTextAndLeavesAnUnknownOneInSpanish()
+        {
+            Assert.AreEqual("Settings", Loc.Translate("Ajustes", GameLanguage.English));
+            Assert.AreEqual("texto que no existe", Loc.Translate("texto que no existe", GameLanguage.English), "a missing entry never breaks the game");
+            Assert.IsNull(Loc.Translate(null, GameLanguage.English));
+            Assert.AreEqual(string.Empty, Loc.Translate(string.Empty, GameLanguage.English));
+        }
+
+        [Test]
+        public void EveryEntry_HasAnEnglishTextThatIsNotEmptyAndKeepsItsHoles()
+        {
+            foreach (var pair in Translations.English)
+            {
+                Assert.IsFalse(string.IsNullOrWhiteSpace(pair.Value), "empty English for: " + pair.Key);
+                CollectionAssert.AreEqual(Holes(pair.Key).ToList(), Holes(pair.Value).ToList(), "the {n} holes differ in: " + pair.Key);
+            }
+        }
+
+        [Test]
+        public void EveryEntry_HasNoDashesOrEmojis()
+        {
+            foreach (var pair in Translations.English)
+            {
+                Assert.IsFalse(pair.Value.Contains("—") || pair.Value.Contains("–"), "dash in: " + pair.Value);
+                Assert.IsFalse(pair.Value.Any(c => char.IsSurrogate(c)), "emoji in: " + pair.Value);
+            }
+        }
+
+        [Test]
+        public void English_TheTextsThatAreNotNamesAreNotLeftInSpanish()
+        {
+            // These read the same in both languages, and the signs still need an entry to be known.
+            var sameInBoth = new HashSet<string> { "Cifras de ejemplo del juego.", "HOSPITAL", "SEDAN 2022", "SUV 2024" };
+            var sameAsKey = Translations.English.Where(p => p.Key == p.Value).Select(p => p.Key).ToList();
+            CollectionAssert.IsEmpty(sameAsKey.Where(k => !sameInBoth.Contains(k)), "an entry that did not change was never translated");
+        }
+
+        [Test]
+        public void F_FillsTheHolesAfterTranslating()
+        {
+            // The language is read from the saved settings; this checks the pure part with the translation table.
+            string english = Loc.Translate("Mes {0} de {1}", GameLanguage.English);
+            Assert.AreEqual("Month 2 of 3", string.Format(english, 2, 3));
+        }
+
+        // ---------------------------------------------------------------- the Costa Rican words
+
+        [TestCase("Pulperia", "orner store")]
+        [TestCase("Soda El Muelle", "diner")]
+        [TestCase("Cuotas al mes", "Installments")]
+        [TestCase("Ánimo", "Mood")]
+        [TestCase("Deuda con prestamista", "Loan-shark")]
+        [TestCase("Los cobradores", "collectors")]
+        public void Glossary_CostaRicanWordsBecomeColloquialEnglish(string spanish, string expectedPart)
+        {
+            StringAssert.Contains(expectedPart, Loc.Translate(spanish, GameLanguage.English));
+        }
+
+        [Test]
+        public void Glossary_MaeBecomesDudeAndPlataBecomesMoney()
+        {
+            string collectors = Loc.Translate("«Mae, usted debe plata. Hoy venimos por {0}.»", GameLanguage.English);
+            StringAssert.Contains("Dude", collectors);
+            StringAssert.Contains("money", collectors);
+            StringAssert.DoesNotContain("plata", collectors);
+            StringAssert.DoesNotContain("Mae", collectors);
+        }
+
+        [Test]
+        public void Glossary_TheWordsWithoutAnEnglishTwinKeepTheirNameWithAnExplanation()
+        {
+            StringAssert.Contains("pulpería", Loc.Translate("Pulperia", GameLanguage.English));
+            StringAssert.Contains("soda", Loc.Translate("Soda El Muelle", GameLanguage.English));
+        }
+
+        // ---------------------------------------------------------------- the saved language
+
+        [Test]
+        public void Settings_TheLanguageIsKeptInTheTextForm()
+        {
+            var settings = new GameSettings { SoundOn = false, Volume = 0.4f, Language = GameLanguage.Spanish };
+
+            var again = GameSettings.Parse(settings.Serialize());
+
+            Assert.AreEqual(GameLanguage.Spanish, again.Language);
+            Assert.IsFalse(again.SoundOn);
+            Assert.AreEqual("0;0.40;es", settings.Serialize());
+        }
+
+        [Test]
+        public void Settings_EnglishIsTheDefaultAndAddsNothingToTheText()
+        {
+            Assert.AreEqual(GameLanguage.English, new GameSettings().Language);
+            Assert.AreEqual("1;1.00", new GameSettings().Serialize());
+        }
+
+        [Test]
+        public void Settings_SpanishIsRemembered()
+        {
+            var again = GameSettings.Parse(new GameSettings { Language = GameLanguage.Spanish }.Serialize());
+
+            Assert.AreEqual(GameLanguage.Spanish, again.Language);
+        }
+
+        [TestCase("1;1.00;fr")]
+        [TestCase("1;1.00;")]
+        [TestCase("1;1.00;ES")]
+        [TestCase("1;1.00;en")]
+        public void Settings_AnythingButEsIsEnglish(string text)
+        {
+            Assert.AreEqual(GameLanguage.English, GameSettings.Parse(text).Language);
+        }
+
+        [Test]
+        public void Settings_OldSavedTextWithoutALanguageStillLoads()
+        {
+            var old = GameSettings.Parse("0;0.50");
+
+            Assert.IsFalse(old.SoundOn);
+            Assert.AreEqual(0.5f, old.Volume, 0.0001f);
+            Assert.AreEqual(GameLanguage.English, old.Language);
+            Assert.AreEqual(TimeSpeed.Normal, old.Speed);
+            Assert.AreEqual(30f, old.SecondsPerGameHour);
+        }
+
+        [Test]
+        public void Settings_SpeedFastIsSerializedAndParsed()
+        {
+            var settings = new GameSettings { Speed = TimeSpeed.Fast };
+            Assert.AreEqual("1;1.00;fast", settings.Serialize());
+            Assert.AreEqual(10f, settings.SecondsPerGameHour);
+
+            var parsed = GameSettings.Parse(settings.Serialize());
+            Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
+            Assert.AreEqual(10f, parsed.SecondsPerGameHour);
+        }
+
+        [Test]
+        public void Settings_SpeedFastWithEnglish()
+        {
+            var settings = new GameSettings { Language = GameLanguage.English, Speed = TimeSpeed.Fast };
+            Assert.AreEqual("1;1.00;fast", settings.Serialize());
+
+            var parsed = GameSettings.Parse(settings.Serialize());
+            Assert.AreEqual(GameLanguage.English, parsed.Language);
+            Assert.AreEqual(TimeSpeed.Fast, parsed.Speed);
+        }
+    
+
+        [Test]
+        public void LocalizedMesh_ShrinksALongerTranslationToTheOriginalWidth()
+        {
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(100f, 80f), 0.0001f, "a shorter text keeps its size");
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(100f, 100f), 0.0001f);
+            Assert.AreEqual(0.5f, LocalizedMesh.FitScale(100f, 200f), 0.0001f, "twice as long, half the size");
+            Assert.AreEqual(1f, LocalizedMesh.FitScale(0f, 200f), 0.0001f, "an unknown width never shrinks to nothing");
+        }
+
+        [Test]
+        public void Translations_HaveNoRepeatedKeys()
+        {
+            // A repeated key makes the dictionary throw the moment it loads, which would stop the game at the menu.
+            Assert.DoesNotThrow(() => Assert.Greater(Loc.KnownTexts.Count, 1000));
+        }
+    }
+}

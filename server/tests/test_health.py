@@ -15,7 +15,22 @@ def test_health_without_database() -> None:
         "version": "0.1.0",
         "database": "not_configured",
         "budget": None,
+        "openWeightsBudget": None,
     }
+
+
+def test_uptime_checks_with_head_are_accepted() -> None:
+    # UptimeRobot sends HEAD by default; 405 here took the monitor down on Oct 29.
+    client = TestClient(app)
+    assert client.head("/api/ping").status_code == 200
+    assert client.head("/api/health").status_code == 200
+
+
+def test_ping_needs_no_database_or_model() -> None:
+    response = TestClient(app).get("/api/ping")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
 
 
 @requires_db
@@ -26,3 +41,4 @@ async def test_health_reports_budget(api) -> None:  # type: ignore[no-untyped-de
     assert body["database"] == "ok"
     assert body["budget"]["mode"] == "normal"
     assert body["budget"]["remainingUsd"] == body["budget"]["budgetUsd"]
+    assert body["openWeightsBudget"]["budgetUsd"] == 3.0

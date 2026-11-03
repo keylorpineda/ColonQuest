@@ -157,7 +157,8 @@
         "pyramid_scheme",
         "inflation",
         "exchange_rate",
-        "payroll_deductions"
+        "payroll_deductions",
+        "invest_in_yourself"
       ],
       "title": "TeachingConcept",
       "type": "string"

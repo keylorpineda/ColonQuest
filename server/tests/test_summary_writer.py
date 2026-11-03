@@ -72,3 +72,48 @@ def test_fallback_only_quotes_real_amounts() -> None:
 
 def test_payload_formats_negative_net_worth() -> None:
     assert '"netWorth": "-₡136 000"' in stats_payload(STATS)
+
+
+def slow_writer(
+    delay_s: float, narrative: str = "Cerraste el año debiendo ₡386 000."
+) -> SummaryWriter:
+    # Same shape as production (8 s live, 25 s summary), scaled down so the test stays fast.
+    settings = Settings(_env_file=None, model_timeout_s=0.08, summary_timeout_s=0.25)  # type: ignore[call-arg]
+    return SummaryWriter(FakeProvider(text(narrative), delay_s=delay_s), settings)
+
+
+async def test_slow_model_beyond_live_timeout_still_writes_the_summary() -> None:
+    written = await slow_writer(delay_s=0.12).write(FakeLedger(), uuid.uuid4(), STATS)
+
+    assert written.source == "model"
+
+
+async def test_model_slower_than_summary_timeout_uses_fallback() -> None:
+    ledger = FakeLedger()
+    written = await slow_writer(delay_s=0.4).write(ledger, uuid.uuid4(), STATS)
+
+    assert written.source == "fallback"
+    assert ledger.records[0]["ok"] is False
+
+
+async def test_summary_timeout_reaches_the_provider() -> None:
+    provider = FakeProvider(text("Bien."))
+    await make_writer(provider).write(FakeLedger(), uuid.uuid4(), STATS)
+
+    assert provider.calls[0]["timeout_s"] == 25.0
+    assert provider.calls[0]["reasoning_effort"] == "minimal"
+    assert provider.calls[0]["max_tokens"] == 2000
+
+
+def test_fallback_narrative_english() -> None:
+    narrative = fallback_narrative(STATS, language="en")
+    assert "You closed the year owing ₡386 000" in narrative
+    assert "asking about the total cost" in narrative
+
+
+async def test_summary_writer_english() -> None:
+    provider = FakeProvider(text("You finished owing ₡386 000, good questions."))
+    written = await make_writer(provider).write(FakeLedger(), uuid.uuid4(), STATS, language="en")
+    assert written.source == "model"
+    assert "Natural English" in provider.calls[0]["system"]
+    assert '"language": "en"' in provider.calls[0]["user"]

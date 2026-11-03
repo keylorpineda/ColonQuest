@@ -16,8 +16,13 @@ FastAPI backend (`server/`) from `main` only after GitHub Actions CI passes (`au
 | `DATABASE_URL` | Neon PostgreSQL connection string (plain `postgresql://...` works) | `postgresql://user:pass@ep-...neon.tech/neondb?sslmode=require` |
 | `ALLOWED_ORIGINS` | Comma-separated origins allowed by CORS (WebGL domain + local dev) | `https://colon-quest.pages.dev,http://localhost:8000` |
 | `GAME_MASTER_MODEL` | Primary model for monthly events and negotiation (`muse-wonder-1.0` in prod) | `muse-wonder-1.0` |
-| `SUMMARY_MODEL` | Model for end-of-game summaries and teacher explanations | `muse-spark-1.3` |
-| `DAILY_BUDGET_USD` | Daily spend ceiling before automatic Spark downgrade (80%) and fallback (100%) | `5.0` |
+| `SUMMARY_MODEL` | Model for the year-end summary, behind a loading screen | `muse-wonder-1.0` |
+| `PLANNER_MODEL` | Model of the season planner, which runs in the background after the first event | `muse-wonder-1.0` |
+| `PLANNER_TIMEOUT_S` | Timeout of the background season planner | `30` |
+| `SUMMARY_TIMEOUT_S` | Timeout of the year-end summary; Unity waits up to 30 s there | `25` |
+| `CLASS_REPORT_MODEL` | Model for the teacher dashboard explanation (a live call, keep it on Spark) | `muse-spark-1.3` |
+| `DAILY_BUDGET_USD` | Daily Meta spend ceiling before automatic Spark downgrade (80%) and fallback (100%) | `10.0` during judging, `5.0` before |
+| `OPEN_WEIGHTS_DAILY_BUDGET_USD` | Daily Baseten spend; once reached, the NPCs use Meta until midnight UTC | `5` during judging, `3` before |
 
 ### 2. Health check and migrations
 

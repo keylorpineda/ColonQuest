@@ -121,7 +121,8 @@ namespace ColonQuest.Finance.Tests
             Assert.That(state.Cash, Is.EqualTo(0L));
             Assert.That(result.UnpaidBalanceBeforeInterest, Is.EqualTo(93_000L));
             Assert.That(result.InterestCharged, Is.EqualTo(3_720L));
-            Assert.That(state.CreditCard.Balance, Is.EqualTo(96_720L));
+            Assert.That(result.LateFee, Is.EqualTo(FinanceEngine.CardLateFeeColones), "7 000 does not reach the minimum of 10 000");
+            Assert.That(state.CreditCard.Balance, Is.EqualTo(96_720L + FinanceEngine.CardLateFeeColones));
         }
 
         [Test]

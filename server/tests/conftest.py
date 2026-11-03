@@ -1,5 +1,6 @@
 import asyncio
 import os
+import socket
 import sys
 from collections.abc import AsyncIterator
 from pathlib import Path
@@ -14,6 +15,7 @@ import httpx2
 import pytest
 from alembic import command
 from alembic.config import Config
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from app.db.session import normalize_url
@@ -32,12 +34,24 @@ def anyio_backend() -> str | tuple[str, dict[str, Any]]:
     return "asyncio"
 
 
+def _stop_unless_reachable(url: str) -> None:
+    """Without this each database test waits for its own timeout: nine minutes to learn nothing."""
+    parsed = make_url(url)
+    try:
+        with socket.create_connection((parsed.host or "localhost", parsed.port or 5432), timeout=3):
+            return
+    except OSError:
+        where = f"{parsed.host}:{parsed.port}"
+        pytest.exit(f"TEST_DATABASE_URL is not reachable at {where}", returncode=2)
+
+
 @pytest.fixture(scope="session")
 def migrated_database() -> str:
     """Apply migrations once to the disposable test database."""
     if not TEST_DATABASE_URL:
         pytest.skip("TEST_DATABASE_URL not set")
     url = normalize_url(TEST_DATABASE_URL)
+    _stop_unless_reachable(url)
     config = Config(str(SERVER_DIR / "alembic.ini"))
     config.set_main_option("script_location", str(SERVER_DIR / "migrations"))
     config.set_main_option("sqlalchemy.url", url.replace("%", "%%"))

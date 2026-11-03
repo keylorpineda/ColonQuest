@@ -1,6 +1,7 @@
-# Colón Quest — Guía de implementación para Claude Code
+# ColonQuest — Guía de implementación para Claude Code
 
-Juego 2D de educación financiera para estudiantes de Costa Rica, construido para el
+Simulador de finanzas personales que se juega como un juego, para Costa Rica, con el lema
+**From Costa Rica to the World**, construido para el
 **Meta Global AI Developer Hackathon** (track Indie). Un game master con IA convierte cada
 decisión de plata en una historia con consecuencias; el jugador negocia por voz con
 personajes que intentan engañarlo (cuotas con cargos escondidos, préstamos "gota a gota",
@@ -31,8 +32,8 @@ negociación funcionando.** Nada de esta tabla se hace a costa de eso.
 | Best Creative Build | $5K | **Entra seguro.** Ya lo cubre el diseño | Proyecto original con Muse Image o Muse Wonder |
 | Most Viral Project | $20K | **Entra seguro.** Es campaña, no código | Post del demo en X con más interacción hasta el 8 nov, 11:59 p. m. ET |
 | Community Vote | $10K | **Entra seguro.** Es campaña, no código | Más votos en la galería pública (ganador el 16 nov) |
-| Best Build on Meta Open Weights | $10K | **Condicional.** Solo si aprueban créditos de Baseten o Modal antes del 28 oct | Parte central del proyecto corriendo en Muse Glimmer o Muse Spark Open |
-| Best Agentic Use-Case | $5K | **Solo si da tiempo.** Únicamente si el mes jugable está listo el 29 oct | Agentes que deciden y ejecutan tareas de varios pasos |
+| Best Build on Meta Open Weights | $10K | **Entra (decidido el 28 oct).** Créditos de Baseten y Modal aprobados; los vendedores corren en Muse Spark Open en Baseten | Parte central del proyecto corriendo en Muse Glimmer o Muse Spark Open |
+| Best Agentic Use-Case | $5K | **Entra (decidido el 29 oct).** Game master con herramientas y planificador de temporada encendidos en Render | Agentes que deciden y ejecutan tareas de varios pasos |
 
 Pendiente de confirmar en Discord: si un proyecto puede ganar un premio de track y uno extra,
 y si para Open Weights basta con que una parte central use el modelo abierto.
@@ -49,7 +50,8 @@ y si para Open Weights basta con que una parte central use el modelo abierto.
    El juego nunca se rompe por una respuesta mala del modelo.
 4. **Cada llamada a un modelo pasa por el control de costos** (ver más abajo).
 5. **El dinero se maneja en enteros** (colones, sin decimales). Nada de `float` para montos.
-6. **Código en inglés** (nombres, comentarios). Textos del juego en español de Costa Rica.
+6. **Código en inglés** (nombres, comentarios). Textos del juego en español de Costa Rica, traducidos en
+   `Translations.cs`. El juego arranca en inglés porque los jueces solo leen inglés; el español queda en Ajustes.
 
 ## Arquitectura
 
@@ -79,8 +81,11 @@ https://api.meta.ai/v1      sesiones, decisiones, clases
   es compatible con el SDK de OpenAI. Envolverlo en `app/providers/meta.py` para que el resto
   del código no dependa del SDK.
 - **Base de datos:** Neon (PostgreSQL) con SQLAlchemy 2 o psycopg 3 y migraciones con Alembic.
-- **Despliegue:** backend en Render; build WebGL de Unity como sitio estático (itch.io,
-  Cloudflare Pages o Vercel). Configurar CORS para el dominio del build.
+- **Despliegue:** backend en Render (servicio `colon-quest-api`, región Ohio junto a Neon,
+  https://colon-quest-api.onrender.com). Despliega `develop` mientras se desarrolla; antes de la
+  evaluación se saca una versión a `main` y Render pasa a `main`. Build WebGL de Unity como sitio
+  estático, publicado con `pnpm` (ver `docs/prompts/model-roles-session.md`, punto 8). Configurar
+  CORS para el dominio del build.
 
 ### Antes de escribir código contra la API: verificar en la documentación
 
@@ -93,28 +98,41 @@ La documentación oficial está en `https://dev.meta.ai/docs`. Confirmar ahí, n
 
 ## Modelos y responsabilidades
 
-| Modelo | ID | Uso en el juego | Notas de costo |
-| --- | --- | --- | --- |
-| Muse Wonder | `muse-wonder-1.0` | Game master: genera el evento del mes y da voz a los NPCs en la negociación | $4 entrada / $20 salida por millón de tokens. `reasoning.effort` bajo |
-| Muse Spark | `muse-spark-1.3` | Resumen anual, análisis del Modo Clase, y modelo de desarrollo para todo | $1.25 / $4.25. Usar `muse-spark-1.3-contributor` en desarrollo |
-| Muse Voice Transcribe | `muse-voice-transcribe-1.0` | Transcribe lo que el jugador dice al negociar | $0.18 por hora de audio |
-| Muse Image | `muse-image-1.0` | Retratos y escenas en pixel art | $0.01 por imagen. Pre-generar y cachear |
+Decidido el 29 de octubre con latencias medidas. Las métricas y el porqué de cada decisión están en
+[`docs/adr/0004-model-roles.md`](docs/adr/0004-model-roles.md). Lo marcado *pendiente* está descrito
+en [`docs/prompts/model-roles-session.md`](docs/prompts/model-roles-session.md).
 
-Variable de entorno `GAME_MASTER_MODEL` para cambiar entre Wonder y Spark sin tocar código.
+| Modelo | ID | Rol en el juego | Por qué | Costo |
+| --- | --- | --- | --- | --- |
+| Muse Spark | `muse-spark-1.3` | Game master en vivo (evento del mes y game master con herramientas), informe del Modo Clase, respaldo de los vendedores | Único modelo de Meta que responde siempre dentro de los 8 s de Unity: 3,0 a 4,4 s con `minimal` | $1.25 / $4.25 por millón |
+| Muse Wonder | `muse-wonder-1.0` | Planifica el año del jugador en segundo plano y narra el resumen final; escribe el banco de eventos (*pendiente*) | El mejor escritor, pero tarda 5,8 a 10,5 s aun con `minimal`: solo donde el jugador no espera | $4 / $20 por millón |
+| Muse Spark Open | `meta-models/muse-spark-open-1026` (Baseten) | Los vendedores: esconden el seguro y la comisión hasta que les preguntan. Tácticas con herramientas y memoria de la partida *pendientes* | 1,9 a 2,8 s, pagado con los $100 de Baseten, pieza del premio Open Weights | $1.25 / $4.25 por millón (créditos de Baseten) |
+| Muse Image | `muse-image-1.0` | Retratos de los NPC, escenas de los eventos y la imagen del resumen final, elegida por las cifras de la partida (`Game/EndingArt.cs`), **sin texto** | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
+| Muse Voice Transcribe | `muse-voice-transcribe-1.0` | La voz del jugador al negociar | 0,7 a 1,5 s; escribir siempre sirve de respaldo | $0.18 por hora de audio |
 
-### Modelos open-weight (CONDICIONAL: solo si aprueban créditos de Baseten o Modal)
+Reglas que salen de las mediciones:
 
-**Puerta de decisión: miércoles 28 de octubre.** Si para entonces no hay créditos aprobados en
-Baseten o Modal, esta sección se descarta y todo sigue en la API de Meta.
+- **Todos los modelos razonan antes de responder**, y esos tokens cuentan contra `max_tokens`. Con
+  poco margen la respuesta llega vacía y el juego cae al respaldo sin avisar. Toda llamada deja
+  margen: 2000 tokens o más en texto, y 3072 extra en Baseten.
+- Las llamadas que el jugador espera usan `LIVE_REASONING_EFFORT=minimal` (`none` no existe).
+- Un modelo lento nunca va en el camino de una llamada en vivo: corre en segundo plano, fuera de
+  línea o detrás de una pantalla de carga con su propio tiempo de espera.
+- Unity se rinde a los 8 s en el evento y a los 10 s en las demás llamadas.
+- Variables: `GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S` (30 s).
 
-Si hay créditos:
+### Modelos open-weight (decidido el 28 de octubre: Baseten)
 
-| Parte del juego | Modelo | Dónde corre |
-| --- | --- | --- |
-| Personajes en la negociación (vendedor, prestamista, amigo del "negocio") | Muse Spark Open | Baseten o Modal |
-| Diálogos secundarios y resumen del Modo Clase | Muse Glimmer | Baseten o Modal |
-| Game master | Muse Wonder | API de Meta |
-| Voz e imágenes | Voice Transcribe e Image | API de Meta |
+Hay créditos de Baseten ($100 y hasta 2M tokens por minuto) y de Modal. Se usa **Baseten**: ya
+publica Muse Spark Open como API compatible con OpenAI, mientras que Modal obliga a desplegar y
+mantener el modelo, con arranques en frío. **Modal queda de reserva y no se usa.** Fireworks sigue
+pendiente y no hace falta.
+
+- Base URL `https://inference.baseten.co/v1`. La llave de la hackatón **solo** acepta el modelo
+  `meta-models/muse-spark-open-1026` (no el `muse-spark-open` de su documentación).
+- Acepta salida con esquema JSON estricto. Siempre razona: se le manda `reasoning_effort: low` y
+  3072 tokens de margen, o devuelve respuestas vacías.
+- `NPC_PROVIDER=open_weights` y `OPEN_WEIGHTS_TIMEOUT_S=5` en Render.
 
 - Implementar un **segundo proveedor** en `app/providers/open_weights.py` con la misma interfaz
   que `app/providers/meta.py`. Si el endpoint del socio es compatible con OpenAI, reutilizar
@@ -137,9 +155,11 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 | `POST /api/sessions/{id}/event` | Recibe el estado financiero del mes y devuelve un `GameEvent` |
 | `POST /api/sessions/{id}/decisions` | Registra la decisión tomada y el estado resultante (telemetría) |
 | `POST /api/sessions/{id}/negotiation` | Recibe audio (o texto de respaldo) y devuelve un `NegotiationReply` |
+| `POST /api/sessions/{id}/talk` | Cobradores, prestamista y pirámide en palabras del modelo. Unity manda la ficha y las únicas cifras permitidas; 503 significa usar las reglas locales de `DebtTalk` |
 | `GET /api/images/{key}` | Devuelve un retrato o escena cacheada; la genera solo si no existe |
 | `POST /api/sessions/{id}/summary` | Genera el resumen final con Muse Spark |
 | `GET /api/classes/{code}/dashboard` | Métricas agregadas del grupo para el panel del profesor |
+| `GET /api/sessions/{id}/trace` | Lo que hicieron los modelos y agentes en la sesión; lo muestra la demo de funciones del menú |
 | `GET /api/health` | Estado y presupuesto restante |
 
 ### `PlayerState` (lo envía Unity, lo calcula el motor C#)
@@ -151,7 +171,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
   "cash": 120000,
   "savings": 50000,
   "emergencyFund": 0,
-  "creditCard": { "balance": 180000, "limit": 300000, "monthlyRatePct": 3.5, "minPaymentPct": 10 },
+  "creditCard": { "balance": 180000, "limit": 300000, "monthlyRatePct": 3, "minPaymentPct": 10 },
   "installments": [{ "item": "Celular", "monthly": 25000, "monthsLeft": 33 }],
   "informalLoans": [],
   "history": ["paid_minimum_only", "skipped_savings"],
@@ -209,6 +229,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 - El vendedor tiene una **ficha oculta con la verdad** (precio de contado, cuota, plazo,
   seguros, comisiones) generada y calculada por el motor, no por el modelo. El modelo solo
   decide cómo revelarla según las preguntas del jugador.
+- `termMonths` va y vuelve en cada turno: el plazo que el vendedor cotizó de último es el que se firma. El precio de contado nunca cambia.
 - `keyQuestionsAsked` alimenta la métrica de impacto: ¿el jugador hizo las preguntas correctas?
 - Siempre ofrecer **entrada de texto como respaldo** si el micrófono falla.
 
@@ -224,10 +245,12 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 - **Eventos de respaldo:** un archivo `fallback_events.json` con 15 a 20 eventos escritos a
   mano. Si el modelo falla, tarda más de 8 segundos o se acaba el presupuesto, se usa uno.
 
-## Game master agéntico (SOLO SI DA TIEMPO, para Best Agentic Use-Case)
+## Game master agéntico (para Best Agentic Use-Case)
 
-**Puerta de decisión: jueves 29 de octubre.** Solo se empieza si ese día ya hay un mes
-jugable de punta a punta con la negociación por texto funcionando. Si no, se descarta.
+**Decidido el 29 de octubre: va.** El mes jugable funciona de punta a punta. En Render están
+encendidos `AGENTIC_GAME_MASTER` (1,4 a 4,2 s, usa sus herramientas) y `SEASON_PLANNER` (3,6 s).
+`SELLER_AGENT` también está encendido: el vendedor agente corre en Baseten (visto en vivo el 1 de
+noviembre). Detalle en `docs/adr/0003-agentic-game-master.md`.
 
 La versión base del game master hace una llamada por mes. La versión agéntica:
 
@@ -246,6 +269,20 @@ Reglas: máximo de pasos por llamada (5), timeout total de 10 s, y si algo falla
 versión base de una sola llamada. Las herramientas nunca escriben el estado del jugador;
 solo lo leen o calculan.
 
+## Simulación guiada (lo primero del menú)
+
+Decidido el 1 de noviembre: una lista de funciones no demuestra que esto sea un simulador. La simulación
+guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador solo decide. Está en
+`unity/Assets/Scripts/UI/GameUi.Guided.cs` y sus reglas puras en `Game/GuidedRoute.cs`.
+
+- **Mes 1:** elige su situación, cae la quincena y el game master trae un evento. Antes de pedir el mes 2 espera
+  a Muse Wonder (`GuidedRoute.PlanWaitSeconds`): si el siguiente evento llega antes, el servidor descarta su plan.
+- **Mes 2:** la flecha lleva a la tienda y al vendedor.
+- **Mes 3:** con poca plata, el prestamista y luego los cobradores; con plata de sobra, la pirámide.
+- Mientras dura: el reloj no corre, sin atropellos ni policía, solo abren las puertas de la ruta y no toca las partidas guardadas.
+- El panel de llamadas (`UI/AiCallsPanel.cs`, tecla L) lee `/trace`. Nunca muestra llaves.
+- Los objetivos (`Game/Objectives.cs`, `UI/GameUi.Objective.cs`) son los mismos en el modo historia.
+
 ## Voz en Unity
 
 - **El `Microphone` de Unity no funciona en builds WebGL.** En WebGL, grabar con un plugin
@@ -257,15 +294,16 @@ solo lo leen o calculan.
 
 ## Imágenes
 
-- **Pre-generar** un set base (retratos de los NPCs fijos y escenas comunes) con un script
-  `scripts/pregenerate_images.py` y guardarlas como assets. Muse Image en tiempo real solo
-  para eventos especiales, con caché por `imageKey`.
+- **Pre-generar** un set base (retratos de los NPCs fijos, escenas de los eventos y los diez finales) con `server/scripts/pregenerate_images.py` y guardarlas en la tabla
+  `images`. Muse Image en tiempo real solo para claves nuevas, con caché por `imageKey` y
+  `IMAGE_TIMEOUT_S=30`.
+- **Ninguna imagen lleva texto ni números.** Los créditos y la demo de funciones no muestran el arte (decidido el 2 de noviembre).
 - Prompt de estilo fijo para mantener consistencia: pixel art, paleta limitada, mismo encuadre.
 
 ## Control de costos (obligatorio)
 
-Créditos: $150 en la API de Meta por persona. Una partida completa con Wonder cuesta
-alrededor de $0.75; con Spark, alrededor de $0.15.
+Créditos: $150 en la API de Meta por persona y $100 en Baseten. Medido el 28 de octubre: una
+partida de 3 meses cuesta unos $0.04 de Meta; un turno de negociación en Baseten, unos $0.0025.
 
 - `app/cost_guard.py`: estima el costo de cada llamada con los precios oficiales y acumula el
   gasto diario en la base de datos.
@@ -274,6 +312,11 @@ alrededor de $0.75; con Spark, alrededor de $0.15.
 - Límite por sesión: máximo de llamadas por partida y por IP.
 - Caché de respuestas idénticas.
 - En desarrollo, `GAME_MASTER_MODEL=muse-spark-1.3-contributor`.
+- El gasto de Baseten tiene tope propio: `OPEN_WEIGHTS_DAILY_BUDGET_USD` (3 por defecto). Al llegar,
+  los personajes pasan a la API de Meta hasta la medianoche UTC. `/api/health` muestra ambos presupuestos.
+- `GET /api/ping` responde sin tocar Neon ni los modelos: es el que usa UptimeRobot para mantener
+  despierto Render.
+- `MAX_CALLS_PER_CLIENT_PER_DAY` es 200 por IP; el día del piloto subirlo (todo el colegio sale por una IP).
 
 ## Base de datos (Neon)
 
@@ -386,5 +429,23 @@ uv run pytest
 uv run ruff check . && uv run mypy app
 ```
 
+```bash
+# Solo las suites que el cambio puede afectar (--fast sin PlayMode, --failed lo que falló, --full todo)
+python scripts/run_tests.py
+```
+
+```bash
+# Prueba en vivo de cada modelo de Meta (cobra unos centavos)
+uv run python scripts/smoke_models.py --audio pregunta.wav
+# Prueba de punta a punta contra un backend corriendo (usar la base de QA, no producción)
+python ../scripts/smoke_test.py
+```
+
+El ejecutable para los jueces se arma con `python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué
+backend habla el juego; se puede cambiar al lado del exe sin volver a armar. Guía en `RUN_AND_BUILD.md`.
+
 Variables de entorno (`server/.env`, nunca en el repo): `MODEL_API_KEY`, `DATABASE_URL`,
-`GAME_MASTER_MODEL`, `DAILY_BUDGET_USD`, `ALLOWED_ORIGINS`.
+`GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S`,
+`DAILY_BUDGET_USD`, `ALLOWED_ORIGINS`, `NPC_PROVIDER`, `OPEN_WEIGHTS_BASE_URL`,
+`OPEN_WEIGHTS_API_KEY`, `OPEN_WEIGHTS_NPC_MODEL`, `AGENTIC_GAME_MASTER`, `SEASON_PLANNER`,
+`SELLER_AGENT`.

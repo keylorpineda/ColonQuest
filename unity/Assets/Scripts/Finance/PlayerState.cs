@@ -33,6 +33,9 @@ namespace ColonQuest.Finance
     [Serializable]
     public sealed class CreditCard
     {
+        /// <summary>36% a year: a typical card in colones, under the usury cap of 36.48% of the second half of 2026 (BCCR).</summary>
+        public const decimal TypicalMonthlyRatePct = 3m;
+
         public long Balance { get; set; }
         public long Limit { get; set; }
         public decimal MonthlyRatePct { get; set; }
@@ -132,12 +135,21 @@ namespace ColonQuest.Finance
     [Serializable]
     public sealed class PlayerState
     {
+        public string CharacterName { get; set; } = string.Empty;
+        public int Week { get; set; } = 1;
+        public string JobPosition { get; set; } = string.Empty;
+
+        /// <summary>What the holdings are worth, sent so the backend's summary counts them. The engine does not use it.</summary>
+        public long AssetsValue { get; set; }
+
+        /// <summary>The months of the run already closed, for the summary: <see cref="Month"/> has moved on to the next one by then.</summary>
+        public int MonthsPlayed { get; set; }
         public int Month { get; set; } = 1;
         public long SalaryNet { get; set; }
         public long Cash { get; set; }
         public long Savings { get; set; }
         public long EmergencyFund { get; set; }
-        public CreditCard CreditCard { get; set; } = new CreditCard(0L, 300_000L, 3.5m, 10m);
+        public CreditCard CreditCard { get; set; } = new CreditCard(0L, 300_000L, CreditCard.TypicalMonthlyRatePct, 10m);
         public List<Installment> Installments { get; set; } = new List<Installment>();
         public List<InformalLoan> InformalLoans { get; set; } = new List<InformalLoan>();
         public List<string> History { get; set; } = new List<string>();
@@ -147,6 +159,11 @@ namespace ColonQuest.Finance
         {
             return new PlayerState
             {
+                CharacterName = CharacterName,
+                Week = Week,
+                JobPosition = JobPosition,
+                AssetsValue = AssetsValue,
+                MonthsPlayed = MonthsPlayed,
                 Month = Month,
                 SalaryNet = SalaryNet,
                 Cash = Cash,

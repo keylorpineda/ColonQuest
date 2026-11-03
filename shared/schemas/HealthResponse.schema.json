@@ -57,6 +57,17 @@
       "title": "Database",
       "type": "string"
     },
+    "openWeightsBudget": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BudgetInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "status": {
       "const": "ok",
       "title": "Status",

@@ -54,7 +54,7 @@ async def test_model_event_is_returned_and_recorded() -> None:
     assert outcome.source == EventSource.MODEL
     assert outcome.event.event_id == "evt_llanta_ponchada"
     assert provider.calls[0]["system"] is SYSTEM_PROMPT
-    assert provider.calls[0]["reasoning_effort"] == "low"
+    assert provider.calls[0]["reasoning_effort"] == "minimal"  # the player waits on this call
     assert [r["ok"] for r in ledger.records] == [True]
 
 

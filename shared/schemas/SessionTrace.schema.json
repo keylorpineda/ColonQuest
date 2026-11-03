@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "ModelCallInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "costUsd": {
+          "title": "Costusd",
+          "type": "number"
+        },
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "inputTokens": {
+          "title": "Inputtokens",
+          "type": "integer"
+        },
+        "latencyMs": {
+          "title": "Latencyms",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "ok": {
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "outputTokens": {
+          "title": "Outputtokens",
+          "type": "integer"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint",
+        "provider",
+        "model",
+        "inputTokens",
+        "outputTokens",
+        "costUsd",
+        "latencyMs",
+        "ok"
+      ],
+      "title": "ModelCallInfo",
+      "type": "object"
+    },
+    "PlanMonthInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "eventType": {
+          "title": "Eventtype",
+          "type": "string"
+        },
+        "month": {
+          "title": "Month",
+          "type": "integer"
+        },
+        "teachingConcept": {
+          "title": "Teachingconcept",
+          "type": "string"
+        },
+        "theme": {
+          "title": "Theme",
+          "type": "string"
+        }
+      },
+      "required": [
+        "month",
+        "teachingConcept",
+        "eventType",
+        "theme"
+      ],
+      "title": "PlanMonthInfo",
+      "type": "object"
+    },
+    "ToolStepInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "title": "Arguments",
+          "type": "string"
+        },
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "result": {
+          "title": "Result",
+          "type": "string"
+        },
+        "step": {
+          "title": "Step",
+          "type": "integer"
+        },
+        "tool": {
+          "title": "Tool",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint",
+        "step",
+        "tool",
+        "arguments",
+        "result"
+      ],
+      "title": "ToolStepInfo",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What the models and agents did in a session, for the judges' demo. Newest calls last.",
+  "properties": {
+    "calls": {
+      "items": {
+        "$ref": "#/$defs/ModelCallInfo"
+      },
+      "title": "Calls",
+      "type": "array"
+    },
+    "seasonPlan": {
+      "items": {
+        "$ref": "#/$defs/PlanMonthInfo"
+      },
+      "title": "Seasonplan",
+      "type": "array"
+    },
+    "toolSteps": {
+      "items": {
+        "$ref": "#/$defs/ToolStepInfo"
+      },
+      "title": "Toolsteps",
+      "type": "array"
+    },
+    "totalCostUsd": {
+      "title": "Totalcostusd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "calls",
+    "toolSteps",
+    "seasonPlan",
+    "totalCostUsd"
+  ],
+  "title": "SessionTrace",
+  "type": "object"
+}

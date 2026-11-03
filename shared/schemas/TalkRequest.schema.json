@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "GameLanguage": {
+      "enum": [
+        "es",
+        "en"
+      ],
+      "title": "GameLanguage",
+      "type": "string"
+    },
+    "TalkExchange": {
+      "additionalProperties": false,
+      "properties": {
+        "player": {
+          "maxLength": 500,
+          "title": "Player",
+          "type": "string"
+        },
+        "reply": {
+          "maxLength": 500,
+          "title": "Reply",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player",
+        "reply"
+      ],
+      "title": "TalkExchange",
+      "type": "object"
+    },
+    "TalkFact": {
+      "enum": [
+        "total_cost",
+        "rate",
+        "arrangement",
+        "what_if_not_paid",
+        "where_money_comes",
+        "guarantee",
+        "legal"
+      ],
+      "title": "TalkFact",
+      "type": "string"
+    },
+    "TalkPartner": {
+      "enum": [
+        "collectors",
+        "lender",
+        "pyramid",
+        "neighbor",
+        "stranger"
+      ],
+      "title": "TalkPartner",
+      "type": "string"
+    },
+    "TalkSheetLine": {
+      "additionalProperties": false,
+      "description": "One true thing about the deal, from the game's engine, worded for the character.",
+      "properties": {
+        "fact": {
+          "$ref": "#/$defs/TalkFact"
+        },
+        "text": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact",
+        "text"
+      ],
+      "title": "TalkSheetLine",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "amounts": {
+      "items": {
+        "maximum": 100000000,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "maxItems": 20,
+      "title": "Amounts",
+      "type": "array"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/TalkExchange"
+      },
+      "maxItems": 20,
+      "title": "History",
+      "type": "array"
+    },
+    "language": {
+      "$ref": "#/$defs/GameLanguage",
+      "default": "es"
+    },
+    "partner": {
+      "$ref": "#/$defs/TalkPartner"
+    },
+    "percents": {
+      "items": {
+        "maximum": 1000,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "maxItems": 10,
+      "title": "Percents",
+      "type": "array"
+    },
+    "sheet": {
+      "items": {
+        "$ref": "#/$defs/TalkSheetLine"
+      },
+      "maxItems": 7,
+      "minItems": 1,
+      "title": "Sheet",
+      "type": "array"
+    },
+    "text": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "partner",
+    "text",
+    "sheet",
+    "amounts",
+    "percents"
+  ],
+  "title": "TalkRequest",
+  "type": "object"
+}

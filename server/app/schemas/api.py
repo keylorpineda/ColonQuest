@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from app.schemas.base import ContractModel
-from app.schemas.enums import KeyQuestion, TeachingConcept
+from app.schemas.enums import GameLanguage, KeyQuestion, TeachingConcept
 from app.schemas.game_event import Identifier
 from app.schemas.player_state import PlayerState
 
@@ -43,6 +43,7 @@ class ClassDashboard(ContractModel):
 
 class CreateSessionRequest(ContractModel):
     class_code: ClassCode | None = None
+    language: GameLanguage = GameLanguage.SPANISH
 
 
 class SessionCreated(ContractModel):
@@ -64,6 +65,48 @@ class DecisionRecorded(ContractModel):
 class NegotiationRequest(ContractModel):
     offer_id: Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
     text: Annotated[str, Field(min_length=1, max_length=500)]
+    language: GameLanguage = GameLanguage.SPANISH
+    # The term the conversation reached, as the last reply gave it. 0 or absent is the offer's own.
+    term_months: Annotated[int, Field(ge=0, le=120)] = 0
+
+
+class TranscriptResponse(ContractModel):
+    transcript: Annotated[str, Field(min_length=1)]
+
+
+class ModelCallInfo(ContractModel):
+    endpoint: str
+    provider: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+    latency_ms: int
+    ok: bool
+
+
+class ToolStepInfo(ContractModel):
+    endpoint: str
+    step: int
+    tool: str
+    arguments: str
+    result: str
+
+
+class PlanMonthInfo(ContractModel):
+    month: int
+    teaching_concept: str
+    event_type: str
+    theme: str
+
+
+class SessionTrace(ContractModel):
+    """What the models and agents did in a session, for the judges' demo. Newest calls last."""
+
+    calls: list[ModelCallInfo]
+    tool_steps: list[ToolStepInfo]
+    season_plan: list[PlanMonthInfo]
+    total_cost_usd: float
 
 
 class SessionSummary(ContractModel):
@@ -77,6 +120,8 @@ class SessionSummary(ContractModel):
     net_worth: int
     narrative: str
     source: Literal["model", "fallback"]
+    # Pre-generated illustration without text; Unity draws the figures above on top of it.
+    card_image_key: Literal["card_year_debt_free", "card_year_some_debt", "card_year_heavy_debt"]
 
 
 class BudgetInfo(ContractModel):
@@ -91,3 +136,8 @@ class HealthResponse(ContractModel):
     version: str
     database: Literal["ok", "unavailable", "not_configured"]
     budget: BudgetInfo | None = None
+    open_weights_budget: BudgetInfo | None = None  # Baseten NPCs, separate daily budget
+
+
+class PingResponse(ContractModel):
+    status: Literal["ok"]

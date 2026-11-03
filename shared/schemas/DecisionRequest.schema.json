@@ -37,6 +37,14 @@
       "title": "CreditCard",
       "type": "object"
     },
+    "GameLanguage": {
+      "enum": [
+        "es",
+        "en"
+      ],
+      "title": "GameLanguage",
+      "type": "string"
+    },
     "InformalLoan": {
       "additionalProperties": false,
       "properties": {
@@ -100,11 +108,32 @@
     "PlayerState": {
       "additionalProperties": false,
       "properties": {
+        "assetsValue": {
+          "default": 0,
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Assetsvalue",
+          "type": "integer"
+        },
         "cash": {
           "maximum": 100000000,
           "minimum": 0,
           "title": "Cash",
           "type": "integer"
+        },
+        "characterName": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Charactername"
         },
         "creditCard": {
           "$ref": "#/$defs/CreditCard"
@@ -141,10 +170,42 @@
           "title": "Installments",
           "type": "array"
         },
+        "jobPosition": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Jobposition"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GameLanguage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "month": {
           "maximum": 12,
           "minimum": 1,
           "title": "Month",
+          "type": "integer"
+        },
+        "monthsPlayed": {
+          "default": 0,
+          "maximum": 120,
+          "minimum": 0,
+          "title": "Monthsplayed",
           "type": "integer"
         },
         "salaryNet": {
@@ -158,6 +219,20 @@
           "minimum": 0,
           "title": "Savings",
           "type": "integer"
+        },
+        "week": {
+          "anyOf": [
+            {
+              "maximum": 4,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Week"
         },
         "wellbeing": {
           "maximum": 100,
@@ -189,7 +264,8 @@
         "pyramid_scheme",
         "inflation",
         "exchange_rate",
-        "payroll_deductions"
+        "payroll_deductions",
+        "invest_in_yourself"
       ],
       "title": "TeachingConcept",
       "type": "string"

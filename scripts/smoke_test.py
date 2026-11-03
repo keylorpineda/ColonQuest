@@ -123,7 +123,7 @@ def main() -> int:
     status, headers, event = request("POST", f"{base}/event", STATE)
     source = headers.get("X-Event-Source") or headers.get("x-event-source")
     check("first event", status == 200 and 2 <= len(event.get("choices", [])) <= 4, event)
-    check("event source header", source in {"model", "cache", "fallback"}, source)
+    check("event source header", source in {"model", "cache", "fallback", "agent"}, source)
     choice = event["choices"][0] if status == 200 else {"id": "x"}
 
     decision = {

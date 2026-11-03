@@ -1,0 +1,20 @@
+{
+  "name": "ColonQuest.UI",
+  "rootNamespace": "ColonQuest.UI",
+  "references": [
+    "ColonQuest.Finance",
+    "ColonQuest.Api",
+    "ColonQuest.World",
+    "ColonQuest.Game",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

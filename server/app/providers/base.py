@@ -1,7 +1,7 @@
 """Provider-agnostic types so callers never depend on a vendor SDK."""
 
-from dataclasses import dataclass
-from typing import Literal, Protocol
+from dataclasses import dataclass, field
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel
 
@@ -32,6 +32,7 @@ class Usage:
     cached_input_tokens: int = 0
     audio_seconds: float = 0.0
     images: int = 0
+    provider: str = "meta_api"  # recorded in model_calls; "open_weights" for Baseten/Modal
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,6 +58,39 @@ class GeneratedImage:
     latency_ms: int
 
 
+@dataclass(frozen=True, slots=True)
+class ToolCall:
+    """A function call requested by the model; ``arguments`` is the raw JSON string."""
+
+    id: str
+    name: str
+    arguments: str
+
+
+@dataclass(frozen=True, slots=True)
+class ChatTurn:
+    """One assistant turn: either final content or tool calls to execute."""
+
+    content: str | None
+    tool_calls: list[ToolCall]
+    usage: Usage
+    latency_ms: int
+    message: dict[str, Any] = field(default_factory=dict)  # assistant message to send back
+
+
+class ToolCallingProvider(Protocol):
+    async def chat(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        output: type[BaseModel],
+        reasoning_effort: ReasoningEffort | None = None,
+        max_tokens: int = 2048,
+    ) -> ChatTurn: ...
+
+
 class Transcriber(Protocol):
     async def transcribe(
         self, wav: bytes, *, language_bias: list[str] | None = None
@@ -79,4 +113,9 @@ class ModelProvider(Protocol):
         output: type[T],
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
+        timeout_s: float | None = None,  # overrides the HTTP timeout for slow background calls
     ) -> StructuredResult[T]: ...
+
+
+class ChatModelProvider(ModelProvider, ToolCallingProvider, Protocol):
+    """Structured answers and tool-calling steps: what the NPCs need from a provider."""

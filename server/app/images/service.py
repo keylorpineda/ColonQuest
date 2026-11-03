@@ -2,8 +2,11 @@
 
 import asyncio
 import base64
+import io
 import time
 from dataclasses import dataclass
+
+from PIL import Image, UnidentifiedImageError
 
 from app.config import Settings
 from app.cost_guard import BudgetMode
@@ -16,6 +19,46 @@ STYLE_PROMPT = (
     "16-bit pixel art in a warm Costa Rican palette, limited 32-color palette, "
     "crisp pixel outlines, no text or watermarks, consistent top-down RPG framing"
 )
+# Unity draws the year's figures on top of the card, so the illustration must stay blank.
+CARD_STYLE_SUFFIX = "no text, no numbers, no letters, leave the upper third empty for an overlay"
+CARD_SUBJECTS = {
+    "card_year_debt_free": "a young Costa Rican celebrating at a sunny viewpoint over the valley",
+    "card_year_some_debt": "a young Costa Rican walking home at dusk, calm but thoughtful",
+    "card_year_heavy_debt": "a young Costa Rican under a rainy sky looking at an empty wallet",
+}
+
+# The picture of the final report. The game draws the figures beside it, so it stays blank too.
+ENDING_STYLE = (
+    "16-bit pixel art in a warm Costa Rican palette, limited 32-color palette, crisp pixel "
+    "outlines, side view of a small scene, no text, no numbers, no letters, no writing on any "
+    "sign or paper"
+)
+ENDING_SUBJECTS = {
+    "end_calm_ok": "a young Costa Rican at home on a bright morning with coffee and a full piggy "
+    "bank on the table, green mountains through the window",
+    "end_calm_hard": "a young Costa Rican at a small table at night counting a few coins under "
+    "one lamp, rain on the window",
+    "end_installments_ok": "a young Costa Rican relaxing on a sunny afternoon beside one new "
+    "appliance in a tidy room",
+    "end_installments_hard": "a young Costa Rican with an empty wallet in the evening, sitting "
+    "among stacked boxes of new appliances",
+    "end_card_ok": "a young Costa Rican putting a credit card away in a drawer, calm, in a sunny "
+    "room",
+    "end_card_hard": "a credit card on a desk at night with a tall pile of blank papers growing "
+    "around it and a tired young Costa Rican behind it",
+    "end_lender_ok": "a young Costa Rican walking away free on a sunny street while a black car "
+    "drives off in the distance",
+    "end_lender_hard": "two men waiting beside a black car in front of a small house at dusk, a "
+    "young Costa Rican looking at them from behind the window",
+    "end_pyramid_ok": "a young Costa Rican walking away with money in the pocket from a golden "
+    "pyramid made of coins, sunny day",
+    "end_pyramid_hard": "a golden pyramid made of coins collapsing under a stormy sky, a young "
+    "Costa Rican with empty hands watching it fall",
+}
+
+# Muse Image ignores the requested size and returns 1600x1600 PNGs of 3 to 4 MB (Oct 29), too heavy
+# for the WebGL build, so every image is shrunk and paletted before it is cached.
+MAX_IMAGE_SIDE = 512
 
 # 1x1 transparent PNG so Unity's texture loader never fails when budget or credentials are absent.
 FALLBACK_PNG: bytes = base64.b64decode(
@@ -29,11 +72,38 @@ class ImageOutcome:
     media_type: str
     source: str
     cacheable: bool
+    latency_ms: int = 0
+
+
+def shrink_image(data: bytes, media_type: str, max_side: int = MAX_IMAGE_SIDE) -> tuple[bytes, str]:
+    """Downscale an image to fit ``max_side`` and re-encode it as a 256-color PNG.
+
+    Pixel art survives the palette untouched and the file drops to about 130 KB. Returns the
+    input unchanged when it is already small and paletted, or is not a readable image.
+    """
+    try:
+        with Image.open(io.BytesIO(data)) as image:
+            if max(image.size) <= max_side and image.mode == "P":
+                return data, media_type
+            image.thumbnail((max_side, max_side), Image.Resampling.BOX)
+            paletted = image.convert("RGB").quantize(
+                256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE
+            )
+            output = io.BytesIO()
+            paletted.save(output, format="PNG", optimize=True)
+    except (UnidentifiedImageError, OSError):
+        return data, media_type
+    return output.getvalue(), "image/png"
 
 
 def build_image_prompt(key: str) -> str:
     """Build a consistent pixel-art prompt from an imageKey identifier."""
     words = key.replace("_", " ").strip()
+    if key in ENDING_SUBJECTS:
+        return f"{ENDING_STYLE}. Subject: {ENDING_SUBJECTS[key]}."
+    if key.startswith("card_"):
+        subject = CARD_SUBJECTS.get(key, f"postcard illustration of {words}")
+        return f"{STYLE_PROMPT}, {CARD_STYLE_SUFFIX}. Subject: {subject}."
     if key.startswith(("npc_", "portrait_")):
         subject = f"character bust portrait of {words} in a Costa Rican neighborhood"
     elif key.startswith("scene_"):
@@ -55,7 +125,7 @@ class ImageService:
 
         started = time.perf_counter()
         try:
-            async with asyncio.timeout(self._settings.model_timeout_s):
+            async with asyncio.timeout(self._settings.image_timeout_s):
                 image = await self._generator.generate_image(
                     build_image_prompt(key), size="512x512"
                 )
@@ -76,4 +146,11 @@ class ImageService:
             ok=True,
             session_id=None,
         )
-        return ImageOutcome(image.data, image.media_type, "model", cacheable=True)
+        data, media_type = shrink_image(image.data, image.media_type)
+        return ImageOutcome(
+            data,
+            media_type,
+            "model",
+            cacheable=True,
+            latency_ms=image.latency_ms,
+        )

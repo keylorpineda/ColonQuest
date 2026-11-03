@@ -1,4 +1,17 @@
-# Contributing to Colón Quest
+<p align="center">
+  <a href="README.md"><img src="docs/assets/tab-readme-en.svg" alt="README"></a>
+  <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
+  <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
+</p>
+
+<p align="center">
+  <img src="docs/assets/contributing-en.svg" width="100%" alt="How to contribute to ColonQuest: branches, commits, pull requests and code rules. The full content of this card is available as text in the section below.">
+</p>
+
+<details open>
+<summary><b>Read this page as text</b></summary>
+
+# Contributing to ColonQuest
 
 Thanks for helping! This guide keeps the repository tidy and every change traceable to a Jira ticket.
 
@@ -108,3 +121,5 @@ SCRUM-7 #done
 
 - C# naming follows the [.NET conventions](https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions).
 - The finance engine is a pure C# class with EditMode tests.
+
+</details>

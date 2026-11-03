@@ -68,12 +68,19 @@ async def test_summary_closes_the_session(client: httpx2.AsyncClient, db: AsyncS
     assert body["netWorth"] == 100000
     assert body["keyQuestionsAsked"] == ["total_cost"]
     assert body["source"] == "fallback"
+    assert body["cardImageKey"] == "card_year_some_debt"
     game_session = await db.get(GameSession, uuid.UUID(session_id))
     assert game_session is not None and game_session.finished_at is not None
     assert game_session.final_state == FINAL_STATE | {
+        "assetsValue": 0,
+        "monthsPlayed": 0,
         "installments": [],
         "informalLoans": [],
         "history": [],
+        "characterName": None,
+        "week": None,
+        "jobPosition": None,
+        "language": None,
     }
 
     again = await client.post(f"/api/sessions/{session_id}/summary", json=FINAL_STATE)

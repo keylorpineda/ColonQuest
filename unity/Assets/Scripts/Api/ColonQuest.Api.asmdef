@@ -1,0 +1,16 @@
+{
+  "name": "ColonQuest.Api",
+  "rootNamespace": "ColonQuest.Api",
+  "references": [
+    "ColonQuest.Finance"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

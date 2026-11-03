@@ -15,6 +15,7 @@ from app.classes.metrics import DecisionRow, average_final_debt, concept_metrics
 from app.db import Decision, GameSession, Negotiation, SchoolClass
 from app.game_master.ledger import DbLedger
 from app.schemas.api import ClassCode, ClassDashboard, ConceptStat
+from app.schemas.enums import GameLanguage
 
 router = APIRouter(prefix="/classes", tags=["classes"])
 
@@ -29,7 +30,11 @@ ClassExplainerDep = Annotated[ClassExplainer, Depends(get_class_explainer)]
 
 @router.get("/{code}/dashboard", response_model=ClassDashboard)
 async def class_dashboard(
-    code: ClassCode, db: DbSession, settings: AppSettings, explainer: ClassExplainerDep
+    code: ClassCode,
+    db: DbSession,
+    settings: AppSettings,
+    explainer: ClassExplainerDep,
+    language: GameLanguage = GameLanguage.SPANISH,
 ) -> ClassDashboard:
     school_class = await db.get(SchoolClass, code)
     if school_class is None:
@@ -66,7 +71,9 @@ async def class_dashboard(
         average_final_debt=average_final_debt(state for state in final_states if state),
         concepts=concept_metrics(DecisionRow(*row) for row in decision_rows),
     )
-    explanation = await explainer.explain(DbLedger(db, settings, None), figures)
+    explanation = await explainer.explain(
+        DbLedger(db, settings, None), figures, language=language.value
+    )
     await db.commit()
 
     return ClassDashboard(

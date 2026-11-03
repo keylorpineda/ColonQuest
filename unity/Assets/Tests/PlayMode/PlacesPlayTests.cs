@@ -1,0 +1,495 @@
+using System.Collections;
+using System.Linq;
+using ColonQuest.Api;
+using ColonQuest.Finance;
+using ColonQuest.Game;
+using ColonQuest.UI;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+
+namespace ColonQuest.World.PlayModeTests
+{
+    /// <summary>Makes sure the session and the overlay exist, offline, whatever scene a test starts in.</summary>
+    internal static class PlaceTestSetup
+    {
+        public static GameSession StartOfflineRun()
+        {
+            ApiClient.Instance.Configure(new OfflineTransport(), new ApiConfig());
+            AudioDirector.EnsureCreated();
+            var session = GameSession.Create();
+            if (GameObject.Find("GameUi") == null)
+            {
+                GameUi.Create(session);
+            }
+
+            session.StartNewGame();
+            PlayerController.Blocked = false;
+            Time.timeScale = 1f;
+            return session;
+        }
+
+        public static Station[] Stations(StationType type)
+        {
+            return Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Where(s => s.Type == type).ToArray();
+        }
+    }
+
+    /// <summary>The car agency: three cars on show, Don Chepe at his desk, a glass office, a waiting room and a workshop.</summary>
+    public sealed class AgenciaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Agencia;
+
+        [UnityTest]
+        public IEnumerator Agency_HasTheShowroomTheOfficeTheWaitingRoomAndTheWorkshop()
+        {
+            yield return null;
+
+            var cars = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Count(s => s.name == "Thing_Car" || s.name.StartsWith("Thing_Car"));
+            Assert.GreaterOrEqual(cars, 4, "three cars on show and one on the lift");
+            Assert.IsNotNull(GameObject.Find("DonChepe"), "he welcomes the player inside");
+            Assert.AreEqual(1, PlaceTestSetup.Stations(StationType.CarDealer).Length, "the negotiation opens here");
+            Assert.IsNotNull(GameObject.Find("FinancingOffice"));
+            Assert.IsNotNull(GameObject.Find("WaitingRoom"));
+            Assert.IsNotNull(GameObject.Find("Lift"));
+            Assert.IsNotNull(GameObject.Find("Mecanico"));
+            Assert.IsNotNull(GameObject.Find("PriceTag0"));
+        }
+
+        [UnityTest]
+        public IEnumerator Agency_TheSalesmenTalkAndTheFinancingDeskNegotiates()
+        {
+            yield return null;
+
+            foreach (var name in new[] { "Thing_Salesman1", "Thing_Salesman2", "Thing_DonChepe" })
+            {
+                Assert.IsNotNull(GameObject.Find(name), name);
+            }
+
+            var desk = PlaceTestSetup.Stations(StationType.CarDealer)[0].transform.position;
+            Assert.Greater(desk.x, 4.4f, "the car negotiation opens in the financing office, behind the glass");
+            Assert.Less(Vector2.Distance(desk, GameObject.Find("Financiera").transform.position), 3.5f, "in front of the financing officer");
+        }
+
+        [UnityTest]
+        public IEnumerator Agency_TheDeskOpensTheCarCatalogWithDonChepe()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            yield return null;
+            var desk = PlaceTestSetup.Stations(StationType.CarDealer)[0];
+            Station entered = null;
+            desk.PlayerEntered += s => entered = s;
+
+            Teleport(desk.transform.position);
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+
+            Assert.AreSame(desk, entered);
+            session.BeginCarNegotiation(MarketAssumptions.FindCar("compacto"));
+            Assert.AreEqual("Agencia de carros", session.CurrentNegotiation.Venue);
+        }
+
+        [UnityTest]
+        public IEnumerator Agency_TheDoormatLeadsBackToTheAvenue()
+        {
+            Teleport(MapLayout.AgenciaMat);
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(9f, Body.position.x, 0.8f);
+            Assert.AreEqual(31.6f, Body.position.y, 0.8f);
+        }
+    }
+
+    /// <summary>The police station: cells, the officer's counter and the judge.</summary>
+    public sealed class CarcelPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Carcel;
+
+        [UnityTest]
+        public IEnumerator Jail_HasFourCellsACounterAndAJudge()
+        {
+            yield return null;
+
+            Assert.IsNotNull(GameObject.Find("Cells"));
+            Assert.IsNotNull(GameObject.Find("CellBed3"));
+            Assert.IsNotNull(GameObject.Find("Oficial"));
+            Assert.IsNotNull(GameObject.Find("Juez"));
+            Assert.IsNotNull(GameObject.Find("Thing_Judge"));
+        }
+
+        [UnityTest]
+        public IEnumerator Jail_AnArrestedPlayerWakesUpInTheCell()
+        {
+            SceneTransition.Go(SceneNames.Carcel, SpawnIds.JailCell);
+            yield return new WaitForSeconds(2.5f);
+            yield return null;
+            FindPlayer();
+
+            Assert.AreEqual(-7.6f, Body.position.x, 0.6f);
+            Assert.AreEqual(3.0f, Body.position.y, 0.6f);
+        }
+
+        [UnityTest]
+        public IEnumerator Jail_TheDoormatLeadsToTheStationDoor()
+        {
+            Teleport(MapLayout.CarcelMat);
+            yield return WaitForScene(SceneNames.Town, 3f);
+            FindPlayer();
+
+            Assert.AreEqual(56f, Body.position.x, 0.8f);
+            Assert.AreEqual(31.6f, Body.position.y, 0.8f);
+        }
+    }
+
+    /// <summary>The hospital: reception with the insurance desk, the emergency ward and the stairs up.</summary>
+    public sealed class HospitalPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Hospital;
+
+        [UnityTest]
+        public IEnumerator Hospital_HasTheInsuranceDeskTheWardAndTheElevator()
+        {
+            yield return null;
+
+            Assert.AreEqual(1, PlaceTestSetup.Stations(StationType.HealthDesk).Length);
+            Assert.IsNotNull(GameObject.Find("EmergencyWard"));
+            var elevators = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Where(d => d.TargetScene == SceneNames.HospitalArriba).ToArray();
+            Assert.AreEqual(1, elevators.Length);
+            Assert.IsNotNull(elevators[0].GetComponent<Elevator>(), "the way up is an elevator, not stairs");
+        }
+
+        [UnityTest]
+        public IEnumerator Hospital_TheInsuranceDeskIsNotATaskAndTheNurseIsThere()
+        {
+            yield return null;
+
+            Assert.IsFalse(GameLoop.IsTaskStation(StationType.HealthDesk));
+            Assert.IsNotNull(GameObject.Find("Enfermera"));
+        }
+
+        [UnityTest]
+        public IEnumerator Hospital_AHurtPlayerWakesUpInABed()
+        {
+            SceneTransition.Go(SceneNames.Hospital, SpawnIds.HospitalBed);
+            yield return new WaitForSeconds(2.5f);
+            yield return null;
+            FindPlayer();
+
+            Assert.AreEqual(6.4f, Body.position.x, 0.6f);
+            Assert.AreEqual(-2.6f, Body.position.y, 0.6f);
+        }
+
+        [UnityTest]
+        public IEnumerator Hospital_TheElevatorGoesUpAndComesBackDown()
+        {
+            // The ride (button, doors, step in) plays before the floor changes, so the waits are longer than a plain door.
+            var elevator = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).First(d => d.TargetScene == SceneNames.HospitalArriba);
+            Body.linearVelocity = Vector2.zero;
+            Teleport((Vector2)elevator.transform.position + new Vector2(0f, -0.3f));
+            Body.linearVelocity = Vector2.up * 3f;
+            yield return WaitForScene(SceneNames.HospitalArriba, 10f);
+            Assert.AreEqual(SceneNames.HospitalArriba, SceneManager.GetActiveScene().name);
+            FindPlayer();
+            Body.GetComponent<PlayerController>().enabled = false;
+
+            // Upstairs the elevator is in the front wall: the player starts in the cabin and walks up, into the corridor.
+            float firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Less(firstY, Body.position.y - 1f, "out of the cabin and up into the corridor");
+            Assert.Greater(Body.position.y, MapLayout.HospitalArribaMat.y + 0.8f, "in the room, not in the wall");
+
+            Teleport(MapLayout.HospitalArribaMat + new Vector2(0f, 0.3f));
+            Body.linearVelocity = Vector2.down * 3f;
+            yield return WaitForScene(SceneNames.Hospital, 10f);
+            FindPlayer();
+
+            // Downstairs it is in the back wall: the player starts in the cabin and walks down, the way they went in.
+            firstY = Body.position.y;
+            yield return WaitForArrival();
+            Assert.Greater(firstY, Body.position.y + 1f, "out of the cabin and down into the hall");
+            Assert.AreEqual(-8.4f, Body.position.x, 0.8f);
+            Assert.AreEqual(4.0f, Body.position.y, 0.8f);
+        }
+
+        /// <summary>The screen clears and the doors of the elevator open and close behind the player.</summary>
+        private static IEnumerator WaitForArrival()
+        {
+            yield return new WaitForSeconds(0.5f);
+            for (float waited = 0f; waited < 6f && (SceneTransition.IsBusy || Interaction.Playing); waited += Time.deltaTime)
+            {
+                yield return null;
+            }
+        }
+    }
+
+    /// <summary>The upper floor: the consulting rooms and the lab.</summary>
+    public sealed class HospitalArribaPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.HospitalArriba;
+
+        [UnityTest]
+        public IEnumerator Upstairs_HasThreeConsultingRoomsAndALab()
+        {
+            yield return null;
+
+            Assert.IsNotNull(GameObject.Find("ConsultingRooms"));
+            Assert.IsNotNull(GameObject.Find("Doctor1"));
+            Assert.IsNotNull(GameObject.Find("Doctor3"));
+            Assert.IsNotNull(GameObject.Find("Laboratorista"));
+        }
+    }
+
+    /// <summary>The neighbor's house: the owner shouts, and a player who stays is arrested.</summary>
+    public sealed class VecinoPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Vecino;
+
+        [UnityTest]
+        public IEnumerator Neighbor_HasNoMotherAndOnlySomeHousesHaveADog()
+        {
+            yield return null;
+            Assert.IsNull(GameObject.Find("Mama"), "the mother lives in her own house");
+            Assert.IsNull(GameObject.Find("Thing_Mama"));
+
+            string remembered = Door.RememberedReturn;
+            try
+            {
+                Door.SetRememberedReturn("Town_From_Casa_Almendros_3");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNull(GameObject.Find("Thing_Pet"), "no dog in this house");
+
+                Door.SetRememberedReturn("Town_From_Casa_Vecina_A");
+                yield return SceneManager.LoadSceneAsync(SceneNames.Vecino);
+                yield return null;
+                Assert.IsNotNull(GameObject.Find("Thing_Pet"), "this neighbor keeps a dog");
+            }
+            finally
+            {
+                Door.SetRememberedReturn(remembered);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Neighbor_TheOwnerCountsDownAndThePlayersOwnDeskIsNotThere()
+        {
+            yield return null;
+
+            var watch = TrespassWatch.Active;
+            Assert.IsNotNull(watch);
+            Assert.AreEqual(MarketAssumptions.TrespassGraceSeconds, watch.Remaining, 1.5f);
+            Assert.IsNotNull(GameObject.Find("DonMario"));
+            Assert.AreEqual(0, PlaceTestSetup.Stations(StationType.Home).Length, "the statement desk is in the player's house only");
+        }
+
+        [UnityTest]
+        public IEnumerator Neighbor_NoOfficerComesWhileTheOwnerHasNotCalled()
+        {
+            PlaceTestSetup.StartOfflineRun();
+            yield return null;
+
+            var officer = Object.FindObjectsByType<PoliceOfficer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Single();
+            Assert.IsFalse(officer.gameObject.activeSelf, "he is not in the house until the owner calls");
+            Assert.AreEqual(OffenseKind.None, Offenses.Current, "no offense, so no fine");
+        }
+
+        [UnityTest]
+        public IEnumerator Neighbor_LeavingInTimeCostsNothing()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            yield return null;
+            long cash = session.State.Cash;
+
+            Teleport(MapLayout.VecinoMat);
+            yield return WaitForScene(SceneNames.Town, 3f);
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsNull(TrespassWatch.Active);
+            Assert.AreEqual(cash, session.State.Cash);
+            Assert.AreEqual(0, session.Loop.TasksDone);
+        }
+
+        [UnityTest]
+        public IEnumerator Neighbor_StayingTooLongMeansTheFineTheLostDaysAndTheJail()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            session.State.Cash = 500_000L;
+            yield return null;
+            TrespassWatch.Active.Configure("Don Mario", 0.3f);
+            yield return new WaitForSeconds(0.6f);
+
+            // The owner called, but nothing is charged until the officer reaches the player.
+            Assert.IsTrue(TrespassWatch.Active.PoliceCalled);
+            Assert.AreEqual(OffenseKind.Trespass, Offenses.Current);
+
+            var window = GameObject.Find("GameUi").transform.Find("Modal");
+            for (float waited = 0f; waited < 6f && !window.gameObject.activeSelf; waited += Time.deltaTime)
+            {
+                Assert.AreEqual(500_000L, session.State.Cash, "no fine before the officer stops the player");
+                yield return null;
+            }
+
+            Assert.IsTrue(window.gameObject.activeSelf, "the officer reached the player and the window opened");
+            Assert.AreEqual(500_000L, session.State.Cash, "the fine is charged when the window is closed, not before");
+            window.GetComponentInChildren<UnityEngine.UI.Button>().onClick.Invoke();
+            yield return WaitForScene(SceneNames.Carcel, 4f);
+
+            Assert.AreEqual(SceneNames.Carcel, SceneManager.GetActiveScene().name);
+            Assert.AreEqual(500_000L - MarketAssumptions.TrespassFine, session.State.Cash);
+            Assert.AreEqual(GameRules.TasksPerDay, session.Loop.TasksDone, "a day in the cell is a day of tasks lost");
+            Assert.AreEqual(1, session.Loop.JailDaysRemaining);
+        }
+    }
+
+    /// <summary>The street: the new doors, see-through glass, the car that runs the player over and the collectors.</summary>
+    public sealed class StreetIncidentsPlayTests : PlayTestBase
+    {
+        protected override string SceneToLoad => SceneNames.Town;
+
+        private static Transform Ui => GameObject.Find("GameUi").transform;
+
+        [UnityTest]
+        public IEnumerator Town_HasTheDoorsOfTheNewBuildings()
+        {
+            yield return null;
+
+            var doors = Object.FindObjectsByType<Door>(FindObjectsSortMode.None).Select(d => d.TargetScene).ToList();
+            foreach (string scene in new[] { SceneNames.Agencia, SceneNames.Carcel, SceneNames.Hospital, SceneNames.Vecino })
+            {
+                CollectionAssert.Contains(doors, scene);
+            }
+
+            foreach (var buildingName in new[] { "Comisaria", "Hospital" })
+            {
+                Assert.AreEqual(1, Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).Count(t => t.name == buildingName), buildingName);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator NewBuildings_StandOnClearGroundAwayFromEveryOtherBuilding()
+        {
+            yield return null;
+
+            var all = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            var buildings = Object.FindObjectsByType<BoxCollider2D>(FindObjectsSortMode.None)
+                .Where(c => !c.isTrigger && c.transform.Find("Roof") != null)
+                .ToArray();
+
+            foreach (var name in new[] { "Comisaria", "Hospital" })
+            {
+                var building = buildings.First(c => c.name == name);
+                foreach (var other in buildings.Where(c => c != building))
+                {
+                    Assert.IsFalse(building.bounds.Intersects(other.bounds), name + " overlaps " + other.name);
+                }
+
+                var area = building.bounds;
+                foreach (var item in all.Where(t => t.name == "Rock" || t.name == "Tree" || t.name == "Bush"))
+                {
+                    Assert.IsFalse(area.Contains(item.position), name + " has a " + item.name + " inside it at " + item.position);
+                }
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Cars_MovingOnesShowADriverAndParkedOnesAreEmpty()
+        {
+            yield return null;
+
+            var all = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            var driving = all.Where(t => t.name == "Car" && t.GetComponent<TrafficCar>() != null).ToArray();
+            var parked = all.Where(t => t.name == "Car" && t.GetComponent<TrafficCar>() == null).ToArray();
+
+            Assert.IsNotEmpty(driving);
+            Assert.IsNotEmpty(parked);
+            foreach (var car in driving)
+            {
+                Assert.IsNotNull(car.Find("DriverHead"), "somebody is driving");
+                Assert.AreEqual(2, car.GetComponentsInChildren<WheelSpin>().Length, "both wheels roll");
+            }
+
+            foreach (var car in parked)
+            {
+                Assert.IsNull(car.Find("DriverHead"), "nobody in a parked car");
+                Assert.IsNotNull(car.Find("Seat"), "the empty seat shows through the glass");
+            }
+
+            var collector = GameObject.Find("CollectorCar");
+            Assert.IsNotNull(collector);
+            Assert.IsNull(collector.transform.Find("DriverHead"), "tinted glass: nobody can see in");
+        }
+
+        [UnityTest]
+        public IEnumerator Cars_ARunOverPlayerGoesToTheHospitalOnceAMonth()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            session.State.Cash = 600_000L;
+            yield return null;
+
+            var car = Object.FindObjectsByType<TrafficCar>(FindObjectsSortMode.None).First(c => c.name == "Car");
+            Teleport(car.transform.position);
+
+            yield return WaitForScene(SceneNames.Hospital, 4f);
+
+            Assert.AreEqual(SceneNames.Hospital, SceneManager.GetActiveScene().name);
+            Assert.IsTrue(session.Loop.HurtThisMonth);
+            Assert.AreEqual(600_000L - MarketAssumptions.HospitalBill, session.State.Cash);
+            Assert.AreEqual(MarketAssumptions.HospitalDaysLost * GameRules.TasksPerDay, session.Loop.TasksDone);
+        }
+
+        [UnityTest]
+        public IEnumerator Collectors_StopInFrontOfAPlayerWhoOwesAndAskForMoney()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            session.State.InformalLoans.Add(new InformalLoan("Prestamista", 100_000L, 15m));
+            session.State.Cash = 300_000L;
+            yield return null;
+            Assert.IsTrue(session.InArrears);
+
+            var car = CollectorCar.Instance;
+            Assert.IsNotNull(car);
+            Teleport((Vector2)car.transform.position + new Vector2(1.5f, 2.0f));
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsTrue(car.IsStopped);
+            Assert.IsTrue(Interaction.Playing, "first the two men get out and walk up to the player");
+            Assert.IsTrue(CollectorCar.Held, "the car waits for them");
+            Interaction.SkipCurrent();
+            for (float waited = 0f; waited < 5f && Interaction.Playing; waited += Time.unscaledDeltaTime)
+            {
+                yield return null;
+            }
+
+            var man = GameObject.Find(CollectorCar.MenNames[0]);
+            Assert.IsNotNull(man);
+            Assert.IsTrue(man.GetComponentInChildren<SpriteRenderer>().enabled, "the men stand next to the player");
+            Assert.Less(Vector2.Distance(man.transform.position, GameObject.FindWithTag(Station.PlayerTag).transform.position), 1.5f);
+
+            var modal = Ui.Find("Modal");
+            Assert.IsTrue(modal.gameObject.activeSelf, "the collectors' window is open");
+            Assert.IsTrue(car.IsStopped, "the car stays while the window is open");
+
+            long debt = FinanceEngine.DebtOwed(session.State);
+            session.PayCollectors();
+            Assert.Less(FinanceEngine.DebtOwed(session.State), debt);
+        }
+
+        [UnityTest]
+        public IEnumerator Collectors_LeaveAPlayerWhoOwesNothingAlone()
+        {
+            var session = PlaceTestSetup.StartOfflineRun();
+            session.State.InformalLoans.Clear();
+            session.State.CreditCard.Balance = session.State.CreditCard.Limit;
+            yield return null;
+            Assert.IsFalse(session.InArrears, "a full card alone does not bring them");
+
+            var car = CollectorCar.Instance;
+            Teleport((Vector2)car.transform.position + new Vector2(1.5f, 2.0f));
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(car.IsStopped);
+        }
+    }
+}

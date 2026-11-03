@@ -10,13 +10,20 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Protocol
 
 from app.config import Settings
 from app.cost_guard import BudgetMode, select_text_model
+from app.game_master.facts import assumes_missing_thing, is_dishonest
 from app.game_master.fallback import pick_fallback_event
 from app.game_master.ledger import Ledger
 from app.game_master.limits import clamp_event
-from app.game_master.prompt import PROMPT_VERSION, SYSTEM_PROMPT, PromptContext, build_user_prompt
+from app.game_master.prompt import (
+    PROMPT_VERSION,
+    PromptContext,
+    build_user_prompt,
+    get_system_prompt,
+)
 from app.providers.base import (
     ModelProvider,
     ProviderError,
@@ -35,6 +42,7 @@ MAX_ATTEMPTS = 2  # first try plus one retry when the response is invalid
 
 class EventSource(StrEnum):
     MODEL = "model"
+    AGENT = "agent"
     CACHE = "cache"
     FALLBACK = "fallback"
 
@@ -55,6 +63,14 @@ class EventOutcome:
     model: str | None = None
     fallback_reason: FallbackReason | None = None
     adjustments: list[str] = field(default_factory=list)
+
+
+class EventGenerator(Protocol):
+    """Anything that produces the month's event: GameMaster or AgenticGameMaster."""
+
+    async def next_event(
+        self, ledger: Ledger, session_id: uuid.UUID, context: PromptContext
+    ) -> EventOutcome: ...
 
 
 class GameMaster:
@@ -86,14 +102,16 @@ class GameMaster:
             return self._fallback(context, reason)
 
         user_prompt = build_user_prompt(context)
-        key = cache_key(PROMPT_VERSION, model, user_prompt)
+        key = cache_key(PROMPT_VERSION, model, context.language, user_prompt)
         cached = self._cache.get(key)
         if cached is not None:
             return EventOutcome(event=cached, source=EventSource.CACHE, model=model)
 
         try:
             async with asyncio.timeout(self._settings.model_timeout_s):
-                event, adjustments = await self._ask_model(ledger, session_id, model, user_prompt)
+                event, adjustments = await self._ask_model(
+                    ledger, session_id, model, user_prompt, context
+                )
         except TimeoutError:
             await self._record_failure(ledger, session_id, model, started=None)
             return self._fallback(context, FallbackReason.TIMEOUT)
@@ -110,17 +128,22 @@ class GameMaster:
         )
 
     async def _ask_model(
-        self, ledger: Ledger, session_id: uuid.UUID, model: str, user_prompt: str
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        model: str,
+        user_prompt: str,
+        context: PromptContext,
     ) -> tuple[GameEvent, list[str]]:
         for attempt in range(1, MAX_ATTEMPTS + 1):
             started = time.perf_counter()
             try:
                 result = await self._provider.structured(
                     model=model,
-                    system=SYSTEM_PROMPT,
+                    system=get_system_prompt(context.language),
                     user=user_prompt,
                     output=GameEvent,
-                    reasoning_effort="low",
+                    reasoning_effort=self._settings.live_reasoning_effort,
                 )
             except ProviderResponseError:
                 await self._record_failure(ledger, session_id, model, started)
@@ -140,6 +163,11 @@ class GameMaster:
                 session_id=session_id,
             )
             event, adjustments = clamp_event(result.value)
+            if assumes_missing_thing(event, context.state) or is_dishonest(event):
+                if attempt == MAX_ATTEMPTS:
+                    raise ProviderResponseError("the event assumes something the player lacks")
+                logger.warning("game master assumed something the player lacks, retrying")
+                continue
             if adjustments:
                 logger.info("clamped game master event: %s", adjustments)
             return event, adjustments
@@ -156,6 +184,10 @@ class GameMaster:
             ok=False,
             session_id=session_id,
         )
+
+    def fallback_event(self, context: PromptContext, reason: FallbackReason) -> EventOutcome:
+        """Hand-written event without calling any model."""
+        return self._fallback(context, reason)
 
     def _fallback(self, context: PromptContext, reason: FallbackReason) -> EventOutcome:
         logger.info("serving fallback event: %s", reason)

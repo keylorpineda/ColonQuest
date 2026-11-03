@@ -1,7 +1,7 @@
 """Application settings loaded from environment variables."""
 
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -15,9 +15,18 @@ class Settings(BaseSettings):
     model_api_key: SecretStr = SecretStr("")
     meta_base_url: str = "https://api.meta.ai/v1"
     model_timeout_s: float = Field(default=8.0, gt=0)
+    # Calls the player waits on (monthly event, negotiation). Measured on Oct 28: with "low",
+    # Muse Wonder took 14-18 s and Spark 5-8 s; with "minimal", Spark answers in 3-4.5 s.
+    live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
+    # Muse Image took about 14 s per 512x512 image on Oct 28; images are cached after the first one.
+    image_timeout_s: float = Field(default=30.0, gt=0)
+    # Year-end summary with Muse Wonder (5.8 to 10.5 s at "minimal"); Unity waits up to 30 s there.
+    summary_timeout_s: float = Field(default=25.0, gt=0)
     database_url: str = ""
     game_master_model: str = "muse-spark-1.3-contributor"
     summary_model: str = "muse-spark-1.3-contributor"
+    # The teacher dashboard is a live call (8 s): it stays on Spark when the summary uses Wonder.
+    class_report_model: str = "muse-spark-1.3-contributor"
     image_model: str = "muse-image-1.0"
     transcribe_model: str = "muse-voice-transcribe-1.0"
     daily_budget_usd: float = Field(default=5.0, ge=0)
@@ -29,6 +38,25 @@ class Settings(BaseSettings):
     client_hash_salt: SecretStr = SecretStr("")
     allowed_origins: Annotated[list[str], NoDecode] = ["http://localhost:8000"]
     log_level: str = "INFO"
+
+    # Open-weights NPCs (SCRUM-68): conditional on Baseten or Modal credits.
+    npc_provider: Literal["meta_api", "open_weights"] = "meta_api"
+    open_weights_base_url: str = ""
+    open_weights_api_key: SecretStr = SecretStr("")
+    open_weights_npc_model: str = "meta-models/muse-spark-open-1026"
+    open_weights_timeout_s: float = Field(default=5.0, gt=0)
+    # Baseten credits ($100): at this daily spend the NPCs switch to Meta until midnight UTC.
+    open_weights_daily_budget_usd: float = Field(default=3.0, ge=0)
+
+    # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
+    agentic_game_master: bool = False
+    season_planner: bool = False
+    # The planner runs in the background after the first event, so it can use the slow Wonder.
+    planner_model: str = "muse-wonder-1.0"
+    planner_timeout_s: float = Field(default=30.0, gt=0)
+    seller_agent: bool = False
+    agent_max_steps: int = Field(default=5, ge=1, le=10)
+    agent_timeout_s: float = Field(default=10.0, gt=0)
 
     @field_validator("allowed_origins", mode="before")
     @classmethod

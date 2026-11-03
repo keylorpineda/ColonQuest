@@ -57,7 +57,8 @@ async def finish_session(
         negotiations=[NegotiationRecord(row[0], row[1]) for row in negotiations],
     )
     ledger = DbLedger(db, settings, game_session.client_hash)
-    written = await writer.write(ledger, session_id, stats)
+    language = (state.language.value if state.language else None) or game_session.language or "es"
+    written = await writer.write(ledger, session_id, stats, language=language)
 
     game_session.finished_at = datetime.now(UTC)
     game_session.final_state = state.model_dump(mode="json")
@@ -73,4 +74,5 @@ async def finish_session(
         net_worth=stats.net_worth,
         narrative=written.narrative,
         source="model" if written.source == "model" else "fallback",
+        card_image_key=stats.card_image_key,
     )

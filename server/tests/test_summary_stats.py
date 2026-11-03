@@ -1,5 +1,13 @@
 from app.schemas import KeyQuestion, PlayerState, TeachingConcept
-from app.summary.stats import NegotiationRecord, build_stats, net_worth, total_debt
+from app.schemas.player_state import Installment
+from app.summary.stats import (
+    HEAVY_DEBT_FROM,
+    NegotiationRecord,
+    build_stats,
+    net_worth,
+    total_debt,
+    year_card_key,
+)
 
 STATE = PlayerState.model_validate(
     {
@@ -50,3 +58,32 @@ def test_empty_game() -> None:
     assert stats.decisions == 0
     assert stats.concepts_taught == []
     assert stats.key_questions_asked == []
+
+
+def test_year_card_follows_final_debt() -> None:
+    assert year_card_key(0) == "card_year_debt_free"
+    assert year_card_key(1) == "card_year_some_debt"
+    assert year_card_key(HEAVY_DEBT_FROM - 1) == "card_year_some_debt"
+    assert year_card_key(HEAVY_DEBT_FROM) == "card_year_heavy_debt"
+    assert build_stats(STATE, [], []).card_image_key == "card_year_some_debt"
+
+
+def test_rent_is_not_a_debt_and_what_was_bought_counts() -> None:
+    state = STATE.model_copy(
+        update={
+            "installments": [
+                *STATE.installments,
+                Installment(item="Alquiler: Casa Vecina D", monthly=260000, months_left=12),
+            ],
+            "assets_value": 2720000,
+        }
+    )
+
+    assert total_debt(state) == total_debt(STATE), "the lease adds nothing to what is owed"
+    assert net_worth(state) == net_worth(STATE) + 2720000
+
+
+def test_the_months_played_come_from_the_run_when_it_says_them() -> None:
+    assert build_stats(STATE, [], []).months_played == 12
+    closed = STATE.model_copy(update={"month": 4, "months_played": 3})
+    assert build_stats(closed, [], []).months_played == 3

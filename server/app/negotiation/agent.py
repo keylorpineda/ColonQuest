@@ -1,0 +1,169 @@
+"""Seller agent: a salesperson that pushes the term that earns it the most commission.
+
+It wraps the single-call Negotiator. The agent may re-price the offer at other terms with the
+``quote_term`` tool and steer the player toward longer terms (lower monthly payment, higher total
+cost), but it can never lie: every amount it says must be on the hidden sheet or come out of a
+tool call, and it answers honestly when asked. When the flag is off, the budget or limits forbid
+model calls, or the agent fails, the base negotiator answers exactly as before.
+"""
+
+import logging
+import uuid
+from collections.abc import Sequence
+from typing import Any
+
+from app.agents.loop import AgentRequest, run_tool_loop
+from app.agents.tools import ToolContext, quotable_amounts
+from app.config import Settings
+from app.cost_guard import select_text_model
+from app.game_master.ledger import Ledger
+from app.negotiation.questions import classify_questions, invalid_amounts, wrong_cash_prices
+from app.negotiation.seller_sheet import Offer, offer_on_the_table
+from app.negotiation.service import (
+    SYSTEM_PROMPT,
+    SYSTEM_PROMPT_EN,
+    NegotiationOutcome,
+    Negotiator,
+    PreviousTurn,
+    SellerTurn,
+    build_user_prompt,
+    ordered,
+)
+from app.providers.base import ProviderError, ToolCallingProvider
+from app.schemas import KeyQuestion, NegotiationReply
+
+logger = logging.getLogger(__name__)
+
+ENDPOINT = "negotiation_agent"
+# Only quote_term, which re-prices this offer: a tool taking any price lets the seller invent one.
+SELLER_TOOLS = ("quote_term",)
+
+AGENT_SYSTEM_PROMPT = (
+    SYSTEM_PROMPT
+    + """
+
+YOUR GOAL AND TOOLS
+- You want to maximize your earnings: the longer the term, the more you earn.
+- quote_term(months) re-prices this exact offer at another term and tells you your private \
+earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
+quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+the cash price stays the same.
+- Push a longer term by highlighting the lower monthly payment. Never tell the player your \
+earnings. If the player asks for a lower payment or a longer term, call quote_term now and give \
+its figures in this reply: never promise to check it later.
+- You may omit figures until asked, but never lie: if the player asks for the total cost, the \
+interest or the insurance, give the exact figure for the term you are offering.
+- Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
+{"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \
+"dealStatus": "open" | "accepted" | "walked_away"}"""
+)
+
+AGENT_SYSTEM_PROMPT_EN = (
+    SYSTEM_PROMPT_EN
+    + """
+
+YOUR GOAL AND TOOLS
+- You want to maximize your earnings: the longer the term, the more you earn.
+- quote_term(months) re-prices this exact offer at another term and tells you your private \
+earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
+quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+the cash price stays the same.
+- Push a longer term by highlighting the lower monthly payment. Never tell the player your \
+earnings. If the player asks for a lower payment or a longer term, call quote_term now and give \
+its figures in this reply: never promise to check it later.
+- You may omit figures until asked, but never lie: if the player asks for the total cost, the \
+interest or the insurance, give the exact figure for the term you are offering.
+- Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
+{"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \
+"dealStatus": "open" | "accepted" | "walked_away"}"""
+)
+
+
+def get_agent_system_prompt(language: str = "es") -> str:
+    if language and language.lower().startswith("en"):
+        return AGENT_SYSTEM_PROMPT_EN
+    return AGENT_SYSTEM_PROMPT
+
+
+def term_offer(offer: Offer, tool_results: Sequence[dict[str, Any]]) -> Offer:
+    """The offer at the last term the seller quoted this turn: that term is now on the table."""
+    for result in reversed(tool_results):
+        months = result.get("months")
+        if isinstance(months, int):
+            return (
+                offer_on_the_table(offer, months)
+                if months >= offer.term_months
+                else offer.at_term(months)
+            )
+    return offer
+
+
+class SellerAgent:
+    def __init__(self, base: Negotiator, provider: ToolCallingProvider, settings: Settings) -> None:
+        self._base = base
+        self._provider = provider
+        self._settings = settings
+
+    async def reply(
+        self,
+        ledger: Ledger,
+        session_id: uuid.UUID,
+        offer: Offer,
+        player_text: str,
+        history: Sequence[PreviousTurn] = (),
+        habits: Sequence[KeyQuestion] = (),
+        language: str = "es",
+    ) -> NegotiationOutcome:
+        if not self._settings.seller_agent:
+            return await self._base.reply(
+                ledger, session_id, offer, player_text, history, habits, language=language
+            )
+        model = select_text_model(
+            self._settings.game_master_model, await ledger.budget_mode(), self._settings
+        )
+        if model is None or await ledger.limit_exceeded(session_id) is not None:
+            return self._base.fallback(offer, player_text, language=language)
+
+        request = AgentRequest(
+            session_id=session_id,
+            endpoint=ENDPOINT,
+            model=model,
+            system=get_agent_system_prompt(language),
+            user=build_user_prompt(offer, history, player_text, habits, language=language),
+            output=SellerTurn,
+            tools=SELLER_TOOLS,
+            context=ToolContext(offer=offer),
+            max_steps=self._settings.agent_max_steps,
+            timeout_s=self._settings.agent_timeout_s,
+            reasoning_effort=self._settings.live_reasoning_effort,
+            max_tokens=2400,  # reasoning tokens count against this
+        )
+        try:
+            result = await run_tool_loop(self._provider, ledger, request)
+        except TimeoutError:
+            logger.warning("seller agent timed out; serving a scripted reply")
+            return self._base.fallback(offer, player_text, language=language)
+        except ProviderError as error:
+            logger.warning("seller agent failed (%s); using the base negotiator", error)
+            return await self._base.reply(
+                ledger, session_id, offer, player_text, history, habits, language=language
+            )
+
+        turn = result.value
+        bad = invalid_amounts(turn.npc_reply, offer, quotable_amounts(result.tool_results))
+        bad += wrong_cash_prices(turn.npc_reply, term_offer(offer, result.tool_results))
+        if bad:
+            logger.warning("seller agent quoted amounts no tool computed: %s", bad)
+            return self._base.fallback(offer, player_text, language=language)
+        logger.info(
+            "seller agent answered after %s steps, tools=%s", result.steps, result.tools_used
+        )
+        reply = NegotiationReply(
+            transcript=player_text,
+            npc_reply=turn.npc_reply,
+            revealed_facts=turn.revealed_facts,
+            key_questions_asked=ordered(classify_questions(player_text)),
+            deal_status=turn.deal_status,
+            term_months=term_offer(offer, result.tool_results).term_months,
+        )
+        return NegotiationOutcome(reply=reply, source="agent")
