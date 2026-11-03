@@ -71,10 +71,15 @@ namespace ColonQuest.Finance
             }
             else
             {
-                double r = (double) (monthlyRatePct / 100m);
-                double denom = 1.0 - Math.Pow(1.0 + r, -termMonths);
-                decimal factor = (decimal) (r / denom);
-                baseRaw = cashPriceColones * factor;
+                // Decimal all the way, like the backend's Decimal: no double rounding noise near a 100-colón step.
+                decimal rate = monthlyRatePct / 100m;
+                decimal growth = 1m;
+                for (int i = 0; i < termMonths; i++)
+                {
+                    growth *= 1m + rate;
+                }
+
+                baseRaw = cashPriceColones * rate * growth / (growth - 1m);
             }
 
             long roundedBase = (long) (decimal.Ceiling(baseRaw / InstallmentRoundingStepColones) * InstallmentRoundingStepColones);
