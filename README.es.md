@@ -1,6 +1,7 @@
 <p align="center"><a href="README.md">English</a> | <b>Español</b></p>
 
 <p align="center">
+  <a href="https://github.com/keylorpineda/ColonQuest/releases/latest"><img src="docs/assets/tab-download-es.svg" alt="Descargar el juego para Windows"></a>
   <a href="COSTA_RICA.es.md"><img src="docs/assets/tab-costa-rica-es.svg" alt="La situación en Costa Rica, con fuentes"></a>
   <a href="RUN_AND_BUILD.es.md"><img src="docs/assets/tab-run-es.svg" alt="Correr y armar, para los jueces"></a>
 </p>
@@ -75,7 +76,8 @@ la comisión reales solo salen si preguntás.
 
 ### Jugalo en unos tres minutos
 
-Elegí **Simulación guiada**, lo primero del menú. Es el juego real en un tramo corto del pueblo,
+[Bajá el juego para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest), descomprimilo y abrí `ColonQuest.exe`. Elegí **Simulación guiada**,
+lo primero del menú. Es el juego real en un tramo corto del pueblo,
 durante tres meses, y vos solo tomás las decisiones:
 
 1. **Mes 1.** Decís cómo llegás a fin de mes. Te cae el salario por SINPE, Muse Wonder escribe tu año
