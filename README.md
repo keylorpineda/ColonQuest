@@ -146,7 +146,8 @@ Behind feature flags, see [ADR 0003](docs/adr/0003-agentic-game-master.md).
 A Unity 2D client (C# finance engine) talks JSON with a FastAPI backend (Pydantic v2 contracts, cost
 guard, agents). The backend calls the Meta Model API, stores sessions and decisions in Postgres, and
 runs the characters on Muse Spark Open in Baseten, falling back to Meta if it fails or runs out of its
-own daily budget.
+own daily budget. The diagram, the path of one event, the guardrails and the cost of a run (about $0.06)
+are in [Architecture](docs/architecture.md).
 
 - No amount, rate or balance ever comes from a model.
 - Money is an integer number of colones.
