@@ -542,6 +542,9 @@ COPY: dict[str, dict[str, Any]] = {
 # The other pages of the docs, per language: what each one says, block by block.
 COSTA_RICA_ICONS = ["coin", "person", "warning", "chart", "spark"]
 RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
+CONTRIBUTING_ICONS = ["folder", "terminal", "team", "warning"]
+SECURITY_ICONS = ["warning", "stack"]
+CONDUCT_ICONS = ["team", "person", "warning", "spark"]
 PAGES: dict[str, dict[str, dict[str, Any]]] = {
     "costa-rica": {
         "en": {
@@ -640,6 +643,88 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ("terminal", ["cd server", "cp .env.example .env", "uv sync", "uv run alembic upgrade head", "uv run python -m app.dev"]),
                 ("header", "ARMAR EL EJECUTABLE"),
                 ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
+            ],
+        },
+    },
+    # The community pages are written in English only, like the files GitHub links them from.
+    "contributing": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR CONTRIBUTORS",
+            "title": "CONTRIBUTING",
+            "tagline": "One ticket, one branch, small commits.",
+            "desc": "How to contribute to ColonQuest: branches, commits, pull requests and code rules. The full content of this card is repeated as text below it.",
+            "icons": CONTRIBUTING_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Every change traceable to a Jira ticket",
+            "blocks": [
+                ("header", "BRANCHES"),
+                ("tiles", [
+                    ("stack", "main", "Stable releases only, each one tagged."),
+                    ("folder", "develop", "Integration branch: every PR lands here."),
+                    ("bolt", "type/SCRUM-n-...", "One branch per Jira ticket, from develop."),
+                ]),
+                ("header", "COMMITS"),
+                ("terminal", ["feat(server): add health endpoint [SCRUM-7]"]),
+                ("header", "PULL REQUESTS"),
+                ("paragraph", "Small and focused on one ticket, split into commits that each build and pass the tests. Feature PRs go to develop; only releases and hotfixes go to main."),
+                ("header", "RULES THAT DO NOT BREAK"),
+                ("tiles", [
+                    ("coin", "Integer colones", "Money is never a float."),
+                    ("warning", "Keys in the backend", "Never in Unity, never in the repo."),
+                    ("spark", "Validated answers", "Every model reply has a schema and a fallback."),
+                ]),
+            ],
+        },
+    },
+    "security": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR RESEARCHERS",
+            "title": "SECURITY",
+            "tagline": "Report privately. Keys stay in the backend.",
+            "desc": "How to report a vulnerability in ColonQuest and how its secrets are handled. The full content of this card is repeated as text below it.",
+            "icons": SECURITY_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Please never open a public issue for a vulnerability",
+            "blocks": [
+                ("header", "REPORT A VULNERABILITY"),
+                ("paragraph", "Use GitHub private vulnerability reporting or write to keylorpineda729@gmail.com. We aim to answer within 48 hours during the hackathon."),
+                ("header", "SECRETS"),
+                ("tiles", [
+                    ("stack", "Backend only", "Keys come from environment variables."),
+                    ("folder", ".env is ignored", "server/.env.example is the reference."),
+                    ("warning", "Leaked a key?", "Rotate it at once; history is not enough."),
+                ]),
+            ],
+        },
+    },
+    "conduct": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR EVERYONE",
+            "title": "CODE OF CONDUCT",
+            "tagline": "A harassment-free space for everyone.",
+            "desc": "The code of conduct of ColonQuest, based on the Contributor Covenant 2.1. The full content of this card is repeated as text below it.",
+            "icons": CONDUCT_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Based on the Contributor Covenant 2.1",
+            "blocks": [
+                ("header", "OUR PLEDGE"),
+                ("paragraph", "Everyone takes part free of harassment, whatever their age, body, disability, origin, gender, experience, education, income, nationality, looks, religion or orientation."),
+                ("header", "WE DO"),
+                ("tiles", [
+                    ("person", "Respect", "Different opinions and experiences."),
+                    ("chart", "Feedback", "Given and taken with grace."),
+                    ("team", "Community first", "What is best for everyone."),
+                ]),
+                ("header", "WE DO NOT"),
+                ("tiles", [
+                    ("warning", "Harass", "No insults or derogatory comments."),
+                    ("folder", "Expose", "No private information without consent."),
+                ]),
+                ("header", "REPORT IT"),
+                ("paragraph", "Write to keylorpineda729@gmail.com. Every report is reviewed promptly and fairly."),
             ],
         },
     },
