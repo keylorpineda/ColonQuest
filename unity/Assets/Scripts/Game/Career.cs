@@ -113,7 +113,7 @@ namespace ColonQuest.Game
     {
         private readonly int[] attended = new int[Career.Courses.Count];
 
-        /// <summary>True once the player went to a class today: one a day.</summary>
+        /// <summary>True once the user went to a class today: one a day.</summary>
         public bool AttendedToday { get; set; }
 
         public int Attended(CourseKind kind)

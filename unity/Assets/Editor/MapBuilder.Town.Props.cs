@@ -1486,7 +1486,7 @@ namespace ColonQuest.EditorTools
         /// 3-Tier Carved Stone Colonial Fountain with ornamental relief panels, turquoise water,
         /// animated white foam rings, floating pink petals, and cascading water streams.
         /// </summary>
-        /// <summary>How far below the middle of the fountain the player stands to use it: just past the stone rim.</summary>
+        /// <summary>How far below the middle of the fountain the user stands to use it: just past the stone rim.</summary>
         private const float FountainFront = 1.85f;
         private const int FountainColliderPoints = 24;
 
@@ -1578,7 +1578,7 @@ namespace ColonQuest.EditorTools
                 Flickering(jet, 0.50f, 2.6f + Mathf.Abs(k) * 0.3f, k * 1.7f);
             }
 
-            // An ellipse the shape of the basin, a circle would let the player walk into its sides.
+            // An ellipse the shape of the basin, a circle would let the user walk into its sides.
             var collider = root.gameObject.AddComponent<PolygonCollider2D>();
             var outline = new Vector2[FountainColliderPoints];
             for (int i = 0; i < outline.Length; i++)
@@ -1831,7 +1831,7 @@ namespace ColonQuest.EditorTools
             Shape(crates, "Crate_Plank", square, new Vector2(0f, 0.4f), new Vector2(0.06f, 1.0f), GamePalette.Hex("#7A4F2A"), 2);
             crates.gameObject.AddComponent<BoxCollider2D>().size = new Vector2(1.0f, 0.9f);
 
-            // Neon sign over the alley mouth. It hangs high, so the player always walks under it.
+            // Neon sign over the alley mouth. It hangs high, so the user always walks under it.
             var sign = Root(parent, "AlleySign", new Vector2(-14f, -2.55f), -9f);
             Shape(sign, "Outline", roundedSmall, Vector2.zero, new Vector2(3.5f, 0.74f), GamePalette.Outline, 0);
             var neon = Shape(sign, "Neon", roundedSmall, Vector2.zero, new Vector2(3.36f, 0.6f), GamePalette.Hex("#8E1F2B"), 1);

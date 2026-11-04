@@ -92,7 +92,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>The boss shakes the player's hand, the new salary is set and a window says what changed.</summary>
+        /// <summary>The boss shakes the user's hand, the new salary is set and a window says what changed.</summary>
         private Interaction AddPromotion(Interaction scene)
         {
             var next = session.Loop.Job.Position + 1;

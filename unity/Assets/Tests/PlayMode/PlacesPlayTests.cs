@@ -48,7 +48,7 @@ namespace ColonQuest.World.PlayModeTests
 
             var cars = Object.FindObjectsByType<Station>(FindObjectsSortMode.None).Count(s => s.name == "Thing_Car" || s.name.StartsWith("Thing_Car"));
             Assert.GreaterOrEqual(cars, 4, "three cars on show and one on the lift");
-            Assert.IsNotNull(GameObject.Find("DonChepe"), "he welcomes the player inside");
+            Assert.IsNotNull(GameObject.Find("DonChepe"), "he welcomes the user inside");
             Assert.AreEqual(1, PlaceTestSetup.Stations(StationType.CarDealer).Length, "the negotiation opens here");
             Assert.IsNotNull(GameObject.Find("FinancingOffice"));
             Assert.IsNotNull(GameObject.Find("WaitingRoom"));
@@ -194,7 +194,7 @@ namespace ColonQuest.World.PlayModeTests
             FindPlayer();
             Body.GetComponent<PlayerController>().enabled = false;
 
-            // Upstairs the elevator is in the front wall: the player starts in the cabin and walks up, into the corridor.
+            // Upstairs the elevator is in the front wall: the user starts in the cabin and walks up, into the corridor.
             float firstY = Body.position.y;
             yield return WaitForArrival();
             Assert.Less(firstY, Body.position.y - 1f, "out of the cabin and up into the corridor");
@@ -205,7 +205,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return WaitForScene(SceneNames.Hospital, 10f);
             FindPlayer();
 
-            // Downstairs it is in the back wall: the player starts in the cabin and walks down, the way they went in.
+            // Downstairs it is in the back wall: the user starts in the cabin and walks down, the way they went in.
             firstY = Body.position.y;
             yield return WaitForArrival();
             Assert.Greater(firstY, Body.position.y + 1f, "out of the cabin and down into the hall");
@@ -213,7 +213,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(4.0f, Body.position.y, 0.8f);
         }
 
-        /// <summary>The screen clears and the doors of the elevator open and close behind the player.</summary>
+        /// <summary>The screen clears and the doors of the elevator open and close behind the user.</summary>
         private static IEnumerator WaitForArrival()
         {
             yield return new WaitForSeconds(0.5f);
@@ -241,7 +241,7 @@ namespace ColonQuest.World.PlayModeTests
         }
     }
 
-    /// <summary>The neighbor's house: the owner shouts, and a player who stays is arrested.</summary>
+    /// <summary>The neighbor's house: the owner shouts, and a user who stays is arrested.</summary>
     public sealed class VecinoPlayTests : PlayTestBase
     {
         protected override string SceneToLoad => SceneNames.Vecino;
@@ -281,7 +281,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsNotNull(watch);
             Assert.AreEqual(MarketAssumptions.TrespassGraceSeconds, watch.Remaining, 1.5f);
             Assert.IsNotNull(GameObject.Find("DonMario"));
-            Assert.AreEqual(0, PlaceTestSetup.Stations(StationType.Home).Length, "the statement desk is in the player's house only");
+            Assert.AreEqual(0, PlaceTestSetup.Stations(StationType.Home).Length, "the statement desk is in the user's house only");
         }
 
         [UnityTest]
@@ -320,18 +320,18 @@ namespace ColonQuest.World.PlayModeTests
             TrespassWatch.Active.Configure("Don Mario", 0.3f);
             yield return new WaitForSeconds(0.6f);
 
-            // The owner called, but nothing is charged until the officer reaches the player.
+            // The owner called, but nothing is charged until the officer reaches the user.
             Assert.IsTrue(TrespassWatch.Active.PoliceCalled);
             Assert.AreEqual(OffenseKind.Trespass, Offenses.Current);
 
             var window = GameObject.Find("GameUi").transform.Find("Modal");
             for (float waited = 0f; waited < 6f && !window.gameObject.activeSelf; waited += Time.deltaTime)
             {
-                Assert.AreEqual(500_000L, session.State.Cash, "no fine before the officer stops the player");
+                Assert.AreEqual(500_000L, session.State.Cash, "no fine before the officer stops the user");
                 yield return null;
             }
 
-            Assert.IsTrue(window.gameObject.activeSelf, "the officer reached the player and the window opened");
+            Assert.IsTrue(window.gameObject.activeSelf, "the officer reached the user and the window opened");
             Assert.AreEqual(500_000L, session.State.Cash, "the fine is charged when the window is closed, not before");
             window.GetComponentInChildren<UnityEngine.UI.Button>().onClick.Invoke();
             yield return WaitForScene(SceneNames.Carcel, 4f);
@@ -343,7 +343,7 @@ namespace ColonQuest.World.PlayModeTests
         }
     }
 
-    /// <summary>The street: the new doors, see-through glass, the car that runs the player over and the collectors.</summary>
+    /// <summary>The street: the new doors, see-through glass, the car that runs the user over and the collectors.</summary>
     public sealed class StreetIncidentsPlayTests : PlayTestBase
     {
         protected override string SceneToLoad => SceneNames.Town;
@@ -454,7 +454,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return new WaitForSeconds(0.5f);
 
             Assert.IsTrue(car.IsStopped);
-            Assert.IsTrue(Interaction.Playing, "first the two men get out and walk up to the player");
+            Assert.IsTrue(Interaction.Playing, "first the two men get out and walk up to the user");
             Assert.IsTrue(CollectorCar.Held, "the car waits for them");
             Interaction.SkipCurrent();
             for (float waited = 0f; waited < 5f && Interaction.Playing; waited += Time.unscaledDeltaTime)
@@ -464,7 +464,7 @@ namespace ColonQuest.World.PlayModeTests
 
             var man = GameObject.Find(CollectorCar.MenNames[0]);
             Assert.IsNotNull(man);
-            Assert.IsTrue(man.GetComponentInChildren<SpriteRenderer>().enabled, "the men stand next to the player");
+            Assert.IsTrue(man.GetComponentInChildren<SpriteRenderer>().enabled, "the men stand next to the user");
             Assert.Less(Vector2.Distance(man.transform.position, GameObject.FindWithTag(Station.PlayerTag).transform.position), 1.5f);
 
             var modal = Ui.Find("Modal");

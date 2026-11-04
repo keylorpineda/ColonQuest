@@ -21,7 +21,7 @@ namespace ColonQuest.UI
 
         private static readonly Color MarkColor = GamePalette.Hex("#FF4D6D");
 
-        // The arrow beside the player of the guided run: far from the place, it says which way to walk without looking up.
+        // The arrow beside the user of the guided run: far from the place, it says which way to walk without looking up.
         private const float GuideArrowDistance = 1.35f;
         private const float GuideArrowHidesWithin = 2.6f;
 

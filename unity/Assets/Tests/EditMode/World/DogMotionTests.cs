@@ -10,7 +10,7 @@ namespace ColonQuest.World.Tests
         public void ExcitementFor_GrowsAsThePlayerComesCloser()
         {
             Assert.AreEqual(0f, DogMotion.ExcitementFor(DogMotion.NoticeRadius + 0.1f));
-            Assert.AreEqual(0f, DogMotion.ExcitementFor(float.MaxValue), "no player in the scene");
+            Assert.AreEqual(0f, DogMotion.ExcitementFor(float.MaxValue), "no user in the scene");
             float near = DogMotion.ExcitementFor(0.5f);
             float far = DogMotion.ExcitementFor(DogMotion.NoticeRadius - 0.1f);
             Assert.Greater(near, far);

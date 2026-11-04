@@ -39,7 +39,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
             Assert.AreEqual(Seagull.SeagullState.Idle, seagull.State);
 
-            // Move player close to seagull (within 2.5 units)
+            // Move user close to seagull (within 2.5 units)
             playerObj.transform.position = seagullObj.transform.position + new Vector3(1.5f, 0f, 0f);
             yield return null;
             yield return null;
@@ -50,7 +50,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return new WaitForSeconds(0.25f);
             Assert.AreEqual(Seagull.SeagullState.Away, seagull.State);
 
-            // Move player far away
+            // Move user far away
             playerObj.transform.position = new Vector3(800f, 800f, 0f);
 
             // Wait for away timer to finish and return

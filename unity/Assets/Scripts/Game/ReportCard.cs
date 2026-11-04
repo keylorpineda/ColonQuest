@@ -17,7 +17,7 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// The grades of a run, from A to D, worked out from the player's numbers. Never from a model. The thresholds are compared
+    /// The grades of a run, from A to D, worked out from the user's numbers. Never from a model. The thresholds are compared
     /// against the salary, so they mean the same at any pay.
     /// </summary>
     public static class ReportCard

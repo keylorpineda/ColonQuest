@@ -7,7 +7,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// Plays the soundscape: the tune of the place, voices in the bank, cars on the street, the sea on
-    /// the beach, birds, and the babble of whoever the player talks to. It lives across scenes. What
+    /// the beach, birds, and the babble of whoever the user talks to. It lives across scenes. What
     /// should be heard comes from <see cref="SoundMix"/>; the sounds themselves from <see cref="ProceduralSound"/>.
     /// </summary>
     public sealed class AudioDirector : MonoBehaviour
@@ -224,7 +224,7 @@ namespace ColonQuest.World
             return source;
         }
 
-        /// <summary>Makes the clips one per frame so the game never stalls, the tune of the town first.</summary>
+        /// <summary>Makes the clips one per frame so the simulator never stalls, the tune of the town first.</summary>
         private IEnumerator Prepare()
         {
             Play(music[MusicTrack.Menu], ProceduralSound.Music(MusicTrack.Menu));
@@ -293,7 +293,7 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>The music of the collectors' car, louder as it comes close to the player. Silent when it is out of sight.</summary>
+        /// <summary>The music of the collectors' car, louder as it comes close to the user. Silent when it is out of sight.</summary>
         private float CollectorLevel()
         {
             var car = CollectorCar.Instance;
@@ -326,7 +326,7 @@ namespace ColonQuest.World
 
         private readonly HashSet<TrafficCar> carsHeard = new HashSet<TrafficCar>();
 
-        /// <summary>A car sounds once, as it comes within hearing range of the player. No car near, no sound.</summary>
+        /// <summary>A car sounds once, as it comes within hearing range of the user. No car near, no sound.</summary>
         private void Traffic(float level, float dt)
         {
             nextCar -= dt;

@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 
 namespace ColonQuest.World.PlayModeTests
 {
-    /// <summary>Loads one scene, finds the player and offers helpers to teleport and walk it.</summary>
+    /// <summary>Loads one scene, finds the user and offers helpers to teleport and walk it.</summary>
     public abstract class PlayTestBase
     {
         protected Rigidbody2D Body;

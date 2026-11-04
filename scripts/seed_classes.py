@@ -2,7 +2,7 @@
 
 Usage:
     python scripts/seed_classes.py "Finanzas 10-1" "Finanzas 10-2"
-    API_URL=https://colon-quest-api.onrender.com python scripts/seed_classes.py "Piloto UNA"
+    API_URL=http://localhost:8000 python scripts/seed_classes.py "Piloto UNA"
 
 Prints one "code<TAB>name" line per class so the codes can be handed to teachers.
 """

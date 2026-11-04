@@ -92,7 +92,7 @@ namespace ColonQuest.World.PlayModeTests
             Teleport(new Vector2((signal.ZoneMinX + signal.ZoneMaxX) * 0.5f, 2f));
             yield return new WaitForSeconds(2f);
 
-            Assert.IsFalse(signal.WalkLight, "the player is still crossing on red");
+            Assert.IsFalse(signal.WalkLight, "the user is still crossing on red");
             Assert.AreEqual(OffenseKind.None, Offenses.Current);
             for (int i = 0; i < officers.Length; i++)
             {
@@ -192,7 +192,7 @@ namespace ColonQuest.World.PlayModeTests
         public IEnumerator Player_LegsSwingWhileWalking()
         {
             var animator = Body.GetComponentInChildren<PlayerAnimator>();
-            Assert.IsTrue(animator.HasRig, "the player is a person with moving parts");
+            Assert.IsTrue(animator.HasRig, "the user is a person with moving parts");
             var leg = animator.transform.Find("Visual/LegL");
 
             // Open ground on the avenue, so nothing stops the walk.
@@ -306,7 +306,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name);
             Assert.AreEqual(0f, Body.position.x, 0.6f);
 
-            // The player appears at the doormat and takes a few steps in, the same way it walked through the door.
+            // The user appears at the doormat and takes a few steps in, the same way it walked through the door.
             float steps = SceneTransition.WalkOutSeconds * 4.5f;
             Assert.GreaterOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f - 0.6f);
             Assert.LessOrEqual(Body.position.y, MapLayout.CasaMat.y + 1.3f + steps + 0.6f);
@@ -315,7 +315,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Camera_FollowsThePlayer()
         {
-            // Open ground on the avenue, so the player is not pushed by a collider.
+            // Open ground on the avenue, so the user is not pushed by a collider.
             Teleport(new Vector2(0f, -6f));
             yield return new WaitForSeconds(1.5f);
 

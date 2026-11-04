@@ -1,7 +1,7 @@
 # Plan de implementación visual: cambio drástico
 
 Instrucciones paso a paso para implementar, en la rama `feat/SCRUM-94-lighting-water-characters`, el salto
-visual del juego: árboles que reaccionan, agua viva, personajes y animaciones que se notan, y edificios con
+visual del simulador: árboles que reaccionan, agua viva, personajes y animaciones que se notan, y edificios con
 texturas e interiores distintos. Está escrito para un agente de código (Gemini) que **no** vio la
 conversación donde se diseñó. Seguí las fases en orden. Cada fase termina con un commit.
 
@@ -22,7 +22,7 @@ tiene esta rama cambiaron ese código, pero **las escenas nunca se regeneraron**
   que antes.
 
 **Regla de oro:** después de cada fase hay que correr **Build All Scenes** en Unity y hacer commit de las
-escenas regeneradas. Sin ese paso ningún cambio de `MapBuilder` se ve en el juego.
+escenas regeneradas. Sin ese paso ningún cambio de `MapBuilder` se ve en el simulador.
 
 Además, varios valores de la primera pasada quedaron demasiado sutiles. La fase 1 y la fase 2 los suben.
 
@@ -34,7 +34,7 @@ Estas reglas existen porque en este proyecto ya se arreglaron muchos bugs causad
 
 ### Código
 
-1. **Código en inglés** (nombres, comentarios). Textos visibles del juego en español de Costa Rica.
+1. **Código en inglés** (nombres, comentarios). Textos visibles del simulador en español de Costa Rica.
 2. **Un `MonoBehaviour` por archivo**, con el archivo llamado **exactamente** como la clase
    (`ShoreLap` va en `ShoreLap.cs`). Si no, Unity no puede guardar el componente en la escena. Las clases
    `static` de lógica pura pueden ir en cualquier archivo.
@@ -87,7 +87,7 @@ Estas reglas existen porque en este proyecto ya se arreglaron muchos bugs causad
 15. Antes de cada commit, en Unity:
     1. **ColonQuest > Build All Scenes**, sin errores en la consola.
     2. **Window > General > Test Runner**: correr EditMode y PlayMode. Todo en verde.
-    3. Jugar el pueblo: caminar entre árboles, ir a la playa y al río, entrar a la casa y a 3 locales.
+    3. Simular el pueblo: caminar entre árboles, ir a la playa y al río, entrar a la casa y a 3 locales.
 16. **Commits a nombre de Keylor**, sin líneas `Co-Authored-By` ni menciones a una IA:
     ```bash
     git config user.name "keylorpineda"
@@ -102,14 +102,14 @@ Estas reglas existen porque en este proyecto ya se arreglaron muchos bugs causad
 
 ---
 
-## Fase 1. Árboles, arbustos y pasto que reaccionan al jugador
+## Fase 1. Árboles, arbustos y pasto que reaccionan al usuario
 
 **Objetivo visible:** al pasar junto a un árbol, la copa se sacude claramente y se recupera; caen 2 o 3 hojas.
-Los arbustos y el pasto alto se apartan al paso del jugador. Con viento, se ve la ráfaga cruzar el pueblo.
+Los arbustos y el pasto alto se apartan al paso del usuario. Con viento, se ve la ráfaga cruzar el pueblo.
 
 ### 1.1 Rebote más fuerte y que se dispare siempre (`unity/Assets/Scripts/World/FoliagePhysics.cs`)
 
-Hoy el rebote solo se dispara si el jugador **entra** al radio viniendo de lejos
+Hoy el rebote solo se dispara si el usuario **entra** al radio viniendo de lejos
 (`lastRustleDistance >= reactRadius * 0.85f`). Si camina pegado a una fila de árboles, casi nunca se dispara.
 
 1. Cambiar las constantes:
@@ -118,7 +118,7 @@ Hoy el rebote solo se dispara si el jugador **entra** al radio viniendo de lejos
 2. Agregar campos privados: `private float nextRustleTime;` y `private Vector2 lastPlayerPos;`.
 3. Reescribir `UpdatePlayerRustle()` así:
    - Calcular `dist` como hoy.
-   - Calcular cuánto se movió el jugador desde el frame anterior: `float moved = Vector2.Distance(playerPos, lastPlayerPos); lastPlayerPos = playerPos;`.
+   - Calcular cuánto se movió el usuario desde el frame anterior: `float moved = Vector2.Distance(playerPos, lastPlayerPos); lastPlayerPos = playerPos;`.
    - Disparar si `dist < reactRadius && moved > 0.01f && Time.time >= nextRustleTime`.
    - Al disparar: `springVelocity += dir * reactImpulseDegrees * (3.5f + strength * 3.5f);`, poner
      `nextRustleTime = Time.time + 0.45f`, y avisar a `LeafBurst` si existe (ver 1.3).
@@ -166,13 +166,13 @@ Crear `unity/Assets/Scripts/World/LeafBurst.cs` (+ `.meta`):
 ### 1.4 Pasto alto y flores que se apartan (`GrassBend.cs`, nuevo)
 
 `GrassClump` y `FlowerClump` (en `MapBuilder.Depth.cs`) hoy son estáticos.
-- Crear `unity/Assets/Scripts/World/GrassBend.cs`: un `MonoBehaviour` que, si el jugador está a menos de
-  **0,9** unidades, inclina su `transform` hasta **±18°** alejándose del jugador (signo según
+- Crear `unity/Assets/Scripts/World/GrassBend.cs`: un `MonoBehaviour` que, si el usuario está a menos de
+  **0,9** unidades, inclina su `transform` hasta **±18°** alejándose del usuario (signo según
   `player.x > x`), con un resorte (`FoliagePhysics.StepSpringToward`, rigidez 60, amortiguación 8).
-  Lejos del jugador, se mece con la brisa global con amplitud 3°
+  Lejos del usuario, se mece con la brisa global con amplitud 3°
   (`FoliagePhysics.WindLean(FoliagePhysics.GlobalWindStrength(...), 3f)`).
-- Buscar al jugador con `GameObject.FindWithTag("Player")` como máximo cada 0,5 s, y guardarlo.
-- **Rendimiento:** hay unos 330 objetos de cobertura. Si el jugador está a más de 8 unidades, no hacer nada
+- Buscar al usuario con `GameObject.FindWithTag("Player")` como máximo cada 0,5 s, y guardarlo.
+- **Rendimiento:** hay unos 330 objetos de cobertura. Si el usuario está a más de 8 unidades, no hacer nada
   (`return` antes de cualquier cálculo).
 - En `GrassClump` y `FlowerClump`: crear un hijo `"BendRig"` en `(0, 0)`, dibujar las hojas y flores dentro de
   él y agregarle `GrassBend`. La raíz con `SortingGroup` no se toca.
@@ -189,7 +189,7 @@ Crear `unity/Assets/Scripts/World/LeafBurst.cs` (+ `.meta`):
 
 ## Fase 2. Agua que se nota
 
-**Objetivo visible:** el mar se mueve todo el tiempo, la orilla tiene olas claras, el río corre, el jugador
+**Objetivo visible:** el mar se mueve todo el tiempo, la orilla tiene olas claras, el río corre, el usuario
 salpica y deja huellas en la arena mojada, y la cascada echa espuma.
 
 ### 2.1 Subir los valores (`unity/Assets/Editor/MapBuilder.World.cs`)
@@ -280,10 +280,10 @@ valor absoluto de entre 10 y 35 al caminar.
 
 ### 3.4 Giro con transición
 
-En `PlayerController.Update` (jugador) y en `Patrol`/`BankCustomer` (NPC), hoy
+En `PlayerController.Update` (usuario) y en `Patrol`/`BankCustomer` (NPC), hoy
 `visual.localScale = new Vector3(facing, 1f, 1f)` cambia de golpe. Crear `FacingTurn.cs` (`MonoBehaviour`
 en `Visual`) con `public void TurnTo(int sign)`: durante 0,12 s la escala x pasa de `±1` a `0.15` y luego
-a `∓1`, con la forma `1 - |cos(t·π)|`, conservando el signo final. El jugador y los NPC llaman `TurnTo` en
+a `∓1`, con la forma `1 - |cos(t·π)|`, conservando el signo final. El usuario y los NPC llaman `TurnTo` en
 lugar de escribir la escala. **Cuidado:** `PlayerController.Face(int)` y `Interaction` también voltean;
 deben seguir siendo instantáneos (las escenas animadas cuentan con eso). Usar el giro animado **solo** en el
 caminar normal.
@@ -293,13 +293,13 @@ caminar normal.
 En `PlayerAnimator.Update`: cuando `target > 0.2f` y `moving < 0.05f` (arranque), aplicar un impulso de
 `settleVelocity += 0.8f` (se estira) y una inclinación hacia atrás de +4° durante 0,1 s sobre `torsoLean`.
 
-### 3.6 Esperas variadas (solo el jugador)
+### 3.6 Esperas variadas (solo el usuario)
 
 1. Agregar a `PersonPose` las poses `Stretch`, `ScratchHead`, `LookAround`, `CheckPhone` y `ShiftWeight`,
    con sus ángulos en `PersonPoses.Evaluate` (usar como referencia las poses existentes `Wave`, `Read` y
    `Pocket`). Por ejemplo, `ScratchHead`: `ArmR = 150f + sin(t*14)*8f`, `ElbowR = 70f`, `Lean = 3f`.
-2. Crear `IdleActions.cs` (`MonoBehaviour` en el `Bob` del jugador, agregado por `BuildPlayer` solo en el
-   pueblo): si el jugador está quieto, sin `PlayerController.Blocked`/`Frozen` y sin pose, después de
+2. Crear `IdleActions.cs` (`MonoBehaviour` en el `Bob` del usuario, agregado por `BuildPlayer` solo en el
+   pueblo): si el usuario está quieto, sin `PlayerController.Blocked`/`Frozen` y sin pose, después de
    **6 a 9 s** elige una pose al azar (sin repetir la anterior) y la mantiene de 1,5 a 2,5 s con
    `PlayerAnimator.SetPose(pose, seconds)`. Cualquier movimiento la cancela con `SetPose(PersonPose.None)`.
 3. Lógica pura: `public static PersonPose IdleActions.Pick(float random01, PersonPose last)`, con test que
@@ -307,10 +307,10 @@ En `PlayerAnimator.Update`: cuando `target > 0.2f` y `moving < 0.05f` (arranque)
 
 ### 3.7 Ojos y cara vivos
 
-- **Mirada que se mueve sola:** en `AnimateFace`, si no hay jugador cerca, cada 1,5 a 3,5 s mover
+- **Mirada que se mueve sola:** en `AnimateFace`, si no hay usuario cerca, cada 1,5 a 3,5 s mover
   `pupilGoal` a un punto al azar de ±0,012 en x y ±0,006 en y.
 - **Doble parpadeo:** con probabilidad 0,2, programar un segundo parpadeo 0,18 s después del primero.
-- **Cara según el ánimo** (solo el jugador): agregar `public void SetMood(float wellbeing01)` a
+- **Cara según el ánimo** (solo el usuario): agregar `public void SetMood(float wellbeing01)` a
   `PlayerAnimator`. Con menos de 0,35, cejas 10° hacia adentro y boca recta (`MouthRest` 0,25); con más de
   0,75, sonrisa. `GameUi` (o `GameSession.Update`) llama `SetMood(state.Wellbeing / 100f)` como máximo una
   vez por segundo. `Wellbeing` es un entero de 0 a 100 en `PlayerState`.
@@ -323,12 +323,12 @@ y escalarla en `Update` con `1f - step * 0.15f * moving`.
 
 ### 3.9 Globos de reacción
 
-Crear `ReactionBubble.cs` en World: muestra sobre la cabeza del jugador un círculo blanco con contorno y un
+Crear `ReactionBubble.cs` en World: muestra sobre la cabeza del usuario un círculo blanco con contorno y un
 símbolo dibujado con formas (no texto): `!` (dos rectángulos), `$` (círculo amarillo con barra), corazón
 (dos círculos y un rombo), enojo (dos rayas rojas cruzadas). Aparece con un rebote de escala 0 → 1,15 → 1
 en 0,25 s, dura 1,6 s y se desvanece.
 - API: `public static void Show(ReactionKind kind)`, con
-  `enum ReactionKind { Alert, Money, Love, Angry }`. Busca al jugador por la etiqueta `Player`.
+  `enum ReactionKind { Alert, Money, Love, Angry }`. Busca al usuario por la etiqueta `Player`.
 - Engancharlo **sin tocar la lógica de dinero**, solo suscribiéndose a eventos existentes:
   - `TrafficCar.PlayerHit` → `Angry`.
   - `PoliceOfficer.StoppedPlayer` → `Alert`.
@@ -336,7 +336,7 @@ en 0,25 s, dura 1,6 s y se desvanece.
   - En la negociación, cuando `revealedFacts` trae un cargo nuevo (`insurance_fee` o `hidden_fees`) →
     `Alert`. Hacerlo en `NegotiationPanel`, solo visual.
 - Suscribirse en `OnEnable` y desuscribirse en `OnDisable`. Si no, se duplica al cambiar de escena (ya pasó
-  con otros eventos del juego).
+  con otros eventos del simulador).
 
 ### 3.10 NPC con oficio
 
@@ -355,7 +355,7 @@ trabajo y `None`:
 
 - [ ] Caminar de lado: el cuerpo se inclina, los codos se doblan, el pelo largo y la corbata se quedan atrás.
 - [ ] Cambiar de dirección: el giro se ve (no salta).
-- [ ] Quedarse quieto 10 s: el jugador hace una acción de espera.
+- [ ] Quedarse quieto 10 s: el usuario hace una acción de espera.
 - [ ] Con bienestar bajo, la cara se ve triste.
 - [ ] Atropello, multa, perro y cargo escondido muestran su globo.
 - [ ] Los tests de PlayMode de interacción y de escenas (`InteractionTests`, `PlacesPlayTests`) siguen en
@@ -405,7 +405,7 @@ Crear la función `private static (Sprite wall, Sprite roof) MaterialsFor(Buildi
 
 | Edificio (`b.Name`) | Pared | Techo |
 | --- | --- | --- |
-| `Casa` (la del jugador) | `stuccoTex` | `clayRoofTex` |
+| `Casa` (la del usuario) | `stuccoTex` | `clayRoofTex` |
 | `Casa_*` (vecinos) | por semilla del nombre: `stucco`, `concreteBlock`, `woodSiding` | por semilla: `zincRoof` (60 %), `clayRoof` (40 %) |
 | `Banco` | sin textura de pared (mármol liso actual) + franja de `tileWhite` en el zócalo | `concreteRoofTex` |
 | `Tienda`, `Pulperia`, `SodaElMuelle` | `woodSidingTex` | `zincRoofTex` |
@@ -442,7 +442,7 @@ y = 2,2.
 7. **Antena** de TV en el techo de 50 % de las casas: un poste y 3 barras.
 8. **Rótulo pintado a mano** en negocios sin rótulo propio: rectángulo de color con 2 franjas, sin texto.
 9. **Variación de casas**: por semilla, el color de pared se elige de una paleta tica: `#F2D7B6`, `#BFE3D0`,
-   `#F7C6C7`, `#FFE8A3`, `#C9D8F0`, `#E8D5F2`, `#F4F1E8`. Solo para `Casa_*`, **no** para la casa del jugador
+   `#F7C6C7`, `#FFE8A3`, `#C9D8F0`, `#E8D5F2`, `#F4F1E8`. Solo para `Casa_*`, **no** para la casa del usuario
    ni para los negocios (su color es parte de su identidad).
 
 ### 4.5 Criterios de aceptación
@@ -505,7 +505,7 @@ Todo con `Deco`, que nunca bloquea. Respetar la regla 11 (zonas libres).
 | Tienda | Estantes llenos de cajas de colores distintos, cajas registradoras, etiquetas de precio (sin texto) |
 | Cárcel | Barrotes con sombra en el piso, banca de concreto, manchas |
 | Finca | Sacos de café, herramientas colgadas, gallinas (círculos) que caminan con `Patrol` corto |
-| Casa del jugador | Más objetos personales: libros, ropa en una silla, cargador del celular, plantas |
+| Casa del usuario | Más objetos personales: libros, ropa en una silla, cargador del celular, plantas |
 
 ### 5.4 Casas del vecino distintas (la parte más delicada)
 
@@ -554,7 +554,7 @@ En interiores, hoy los sprites no tienen luz y se ven planos. Para agregar luz:
 ## Fase 6. Cierre
 
 1. Actualizar `docs/graficos-luces-animacion.md` con lo que se hizo en cada fase.
-2. Build All Scenes, todos los tests en verde y una partida completa de 3 meses sin errores en la consola.
+2. Build All Scenes, todos los tests en verde y una simulación completa de 3 meses sin errores en la consola.
 3. Build WebGL (menú `ColonQuest > Build > WebGL`) y probarla en el navegador:
    debe cargar y mantener al menos 30 fps al caminar por el pueblo de noche.
 4. Commit final: `chore(unity): regenerate scenes with the visual overhaul [SCRUM-94]`.
@@ -574,7 +574,7 @@ En interiores, hoy los sprites no tienen luz y se ven planos. Para agregar luz:
 | Mar, río, palmeras, cascada | `unity/Assets/Editor/MapBuilder.World.cs` |
 | Pasto, flores y rocas de cobertura | `unity/Assets/Editor/MapBuilder.Depth.cs` |
 | Personas (cuerpo, cabeza, pelo, ropa, vista de espaldas) | `unity/Assets/Editor/MapBuilder.People.cs` |
-| Jugador y NPC (`BuildPlayer`, `BuildNpc`) | `unity/Assets/Editor/MapBuilder.Characters.cs` |
+| Usuario y NPC (`BuildPlayer`, `BuildNpc`) | `unity/Assets/Editor/MapBuilder.Characters.cs` |
 | Interiores | `unity/Assets/Editor/MapBuilder.Interiors*.cs` |
 | Texturas generadas por código | `unity/Assets/Editor/SpriteFactory.cs` |
 | Animación de personas | `unity/Assets/Scripts/World/PlayerAnimator.cs`, `PersonMotion.cs`, `PersonPose.cs` |
@@ -583,14 +583,14 @@ En interiores, hoy los sprites no tienen luz y se ven planos. Para agregar luz:
 | Perro | `unity/Assets/Scripts/World/DogAnimator.cs`, `unity/Assets/Editor/MapBuilder.Dog.cs` |
 | Hora del día y luz | `DayCycle.cs`, `DayTint.cs`, `unity/Assets/Scripts/Lighting/` |
 | Tests de lógica | `unity/Assets/Tests/EditMode/World/` |
-| Tests jugando escenas | `unity/Assets/Tests/PlayMode/` |
+| Tests simulando escenas | `unity/Assets/Tests/PlayMode/` |
 
 ## Apéndice B. Errores que ya pasaron en este proyecto (no repetirlos)
 
 - Objetos que tapan puertas o desplazan estaciones al cambiar el orden de los números aleatorios (regla 9).
-- Colisiones en adornos que dejan al jugador atascado (regla 10).
+- Colisiones en adornos que dejan al usuario atascado (regla 10).
 - Componentes en un archivo con otro nombre que desaparecen de la escena (regla 2).
 - Eventos `static` sin desuscribir que se duplican al cambiar de escena (fase 3.9).
 - `SetActive` llamado dentro de `OnDisable` mientras el objeto se destruye: da error. Ver el comentario en
   `PlayerAnimator.OnDisable`.
-- Escenas sin regenerar: el código cambia pero el juego no (sección 0).
+- Escenas sin regenerar: el código cambia pero el simulador no (sección 0).

@@ -96,7 +96,7 @@ async def test_the_model_only_gets_its_character_and_the_true_sheet() -> None:
 
 async def test_the_characters_stay_in_the_town() -> None:
     for partner in TalkPartner:
-        assert "never mention a game, buttons or a sheet" in system_prompt(partner, "en")
+        assert "never mention a simulation, buttons or a sheet" in system_prompt(partner, "en")
 
 
 async def test_a_valid_reply_comes_back_with_what_was_asked() -> None:

@@ -76,7 +76,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>A heavier font for the name of the game and the big titles.</summary>
+        /// <summary>A heavier font for the name of the simulator and the big titles.</summary>
         public static Font TitleFont
         {
             get

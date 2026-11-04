@@ -23,7 +23,7 @@ namespace ColonQuest.World.Tests
         public void English_TranslatesAKnownTextAndLeavesAnUnknownOneInSpanish()
         {
             Assert.AreEqual("Settings", Loc.Translate("Ajustes", GameLanguage.English));
-            Assert.AreEqual("texto que no existe", Loc.Translate("texto que no existe", GameLanguage.English), "a missing entry never breaks the game");
+            Assert.AreEqual("texto que no existe", Loc.Translate("texto que no existe", GameLanguage.English), "a missing entry never breaks the simulator");
             Assert.IsNull(Loc.Translate(null, GameLanguage.English));
             Assert.AreEqual(string.Empty, Loc.Translate(string.Empty, GameLanguage.English));
         }
@@ -52,7 +52,7 @@ namespace ColonQuest.World.Tests
         public void English_TheTextsThatAreNotNamesAreNotLeftInSpanish()
         {
             // These read the same in both languages, and the signs still need an entry to be known.
-            var sameInBoth = new HashSet<string> { "Cifras de ejemplo del juego.", "HOSPITAL", "SEDAN 2022", "SUV 2024" };
+            var sameInBoth = new HashSet<string> { "Cifras de ejemplo del simulador.", "HOSPITAL", "SEDAN 2022", "SUV 2024" };
             var sameAsKey = Translations.English.Where(p => p.Key == p.Value).Select(p => p.Key).ToList();
             CollectionAssert.IsEmpty(sameAsKey.Where(k => !sameInBoth.Contains(k)), "an entry that did not change was never translated");
         }
@@ -181,7 +181,7 @@ namespace ColonQuest.World.Tests
         [Test]
         public void Translations_HaveNoRepeatedKeys()
         {
-            // A repeated key makes the dictionary throw the moment it loads, which would stop the game at the menu.
+            // A repeated key makes the dictionary throw the moment it loads, which would stop the simulator at the menu.
             Assert.DoesNotThrow(() => Assert.Greater(Loc.KnownTexts.Count, 1000));
         }
     }

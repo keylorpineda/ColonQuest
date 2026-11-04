@@ -4,17 +4,14 @@ using System.IO;
 namespace ColonQuest.Api
 {
     /// <summary>
-    /// Where the backend lives and how long the game waits for it. There are no keys here: the
+    /// Where the backend lives and how long the simulator waits for it. There are no keys here: the
     /// model keys only exist on the server. A build asks for its backend in <see cref="EnvVariable"/> and then
     /// in <see cref="EnvFile"/> beside the exe, so it can change without building again; see RUN_AND_BUILD.md.
     /// </summary>
     public sealed class ApiConfig
     {
-        /// <summary>Local backend started with <c>uv run uvicorn app.main:app --reload</c>.</summary>
+        /// <summary>The backend on this computer, started by <c>start_colonquest.bat</c> (<c>scripts/run_local.py</c>). There is no hosted one.</summary>
         public const string LocalUrl = "http://localhost:8000/api";
-
-        /// <summary>The deployed backend. The editor and the tests keep the local one; every build uses this one.</summary>
-        public const string ProductionUrl = "https://colon-quest-api.onrender.com/api";
 
         /// <summary>The environment variable that says where the backend is.</summary>
         public const string EnvVariable = "COLONQUEST_API_URL";
@@ -22,13 +19,13 @@ namespace ColonQuest.Api
         /// <summary>The file beside the exe that says it too, with lines like <c>COLONQUEST_API_URL=http://...</c>.</summary>
         public const string EnvFile = "colonquest.env";
 
-        /// <summary>The year summary is written by a bigger model, so it gets longer; after this the game writes its own.</summary>
+        /// <summary>The year summary is written by a bigger model, so it gets longer; after this the simulator writes its own.</summary>
         public const float SummaryTimeoutSeconds = 25f;
 
         /// <summary>A picture is generated once, the first time it is asked for, and then served from the cache.</summary>
         public const float ImageTimeoutSeconds = 30f;
 
-        /// <summary>The game master has this long before the game plays a local event instead.</summary>
+        /// <summary>The simulation director has this long before the simulator runs a local event instead.</summary>
         public const float EventTimeoutSeconds = 8f;
 
         public const float DefaultTimeoutSeconds = 10f;
@@ -54,8 +51,8 @@ namespace ColonQuest.Api
         public static ApiConfig Current { get; private set; } = new ApiConfig();
 
         /// <summary>
-        /// The same backend for the demo lab, which waits longer: a judge is there to watch the real model answer, and a
-        /// server that was asleep needs most of a minute for its first reply. Nothing here falls back in silence.
+        /// The same backend for the demo lab, which waits longer: a judge is there to watch the real model answer, and the
+        /// first reply of a server that just started can take a while. Nothing here falls back in silence.
         /// </summary>
         public ApiConfig ForDemo()
         {
@@ -102,7 +99,7 @@ namespace ColonQuest.Api
         private static string buildUrl;
 
         // Read on first use: Current, a static field above, already needs it while the class starts.
-        private static string BuildUrl => buildUrl ?? (buildUrl = Resolve(Environment.GetEnvironmentVariable(EnvVariable), ReadEnvFile(), ProductionUrl));
+        private static string BuildUrl => buildUrl ?? (buildUrl = Resolve(Environment.GetEnvironmentVariable(EnvVariable), ReadEnvFile(), LocalUrl));
 
         private static string ReadEnvFile()
         {

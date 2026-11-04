@@ -101,7 +101,7 @@ namespace ColonQuest.World.Tests
         [Test]
         public void SidewalksAlongTheRiverAndThePond_AreNotWater()
         {
-            // A player walking next to the river, a step from its wall, and on the path around the pond.
+            // A user walking next to the river, a step from its wall, and on the path around the pond.
             Assert.AreEqual(HintKind.None, WorldHints.Check(SceneNames.Town, new Vector2(MapLayout.RiverXMin - 0.8f, 15f)).Kind);
             Assert.AreEqual(HintKind.None, WorldHints.Check(SceneNames.Town, new Vector2(MapLayout.RiverXMax + 0.8f, 15f)).Kind);
             Assert.AreEqual(HintKind.None, WorldHints.Check(SceneNames.Town, new Vector2(19.5f, -5.9f + 1.2f + 0.8f)).Kind);

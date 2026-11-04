@@ -11,7 +11,7 @@
       "type": "string"
     },
     "KeyQuestion": {
-      "description": "Questions a financially literate player should ask (impact metric).",
+      "description": "Questions a financially literate user should ask (impact metric).",
       "enum": [
         "total_cost",
         "hidden_fees",

@@ -12,7 +12,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The overlay of the game: the status card, the "press E" prompt, the loading card and the
+    /// The overlay of the simulator: the status card, the "press E" prompt, the loading card and the
     /// modal windows for events, results, the statement and the end of the run. It is the only
     /// place that turns what happens in <see cref="GameSession"/> into screens.
     /// </summary>
@@ -51,7 +51,7 @@ namespace ColonQuest.UI
 
         private readonly List<Station> inside = new List<Station>();
 
-        /// <summary>Places used since the player walked into them; they come back once the player leaves.</summary>
+        /// <summary>Places used since the user walked into them; they come back once the user leaves.</summary>
         private readonly HashSet<Station> usedStations = new HashSet<Station>();
 
         /// <summary>The place whose person is speaking in the subtitle, or null for a thought or nobody.</summary>
@@ -104,7 +104,7 @@ namespace ColonQuest.UI
             BuildIncidents();
             BuildCell();
 
-            // A new game can create the overlay from the menu, which has its own screen.
+            // A new simulation can create the overlay from the menu, which has its own screen.
             canvas.enabled = SceneManager.GetActiveScene().name != SceneNames.Menu;
 
             session.Changed += Refresh;
@@ -325,7 +325,7 @@ namespace ColonQuest.UI
 
         private void BuildLoading()
         {
-            // A small pill under the minimap: the wait never covers the player or the middle of the town.
+            // A small pill under the minimap: the wait never covers the user or the middle of the town.
             var card = UiKit.Card(canvas.transform, "Loading", UiKit.Paper, new Vector2(440f, 64f), new Vector2(1f, 1f), new Vector2(-24f, -364f));
             loadingCard = card.parent.gameObject;
             loadingText = UiKit.Label(card, string.Empty, 26, UiKit.Ink, new Vector2(410f, 50f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
@@ -367,7 +367,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>True inside a house for sale or rent that the player has not rented or bought.</summary>
+        /// <summary>True inside a house for sale or rent that the user has not rented or bought.</summary>
         private bool InHouseNotMine()
         {
             if (!HouseVisit.InListing || SceneManager.GetActiveScene().name != SceneNames.Casa)
@@ -421,7 +421,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>Remembers who is talking, so the line goes away when the player leaves them. Thoughts follow the player.</summary>
+        /// <summary>Remembers who is talking, so the line goes away when the user leaves them. Thoughts follow the user.</summary>
         private void ShowSpeech(Station station, string speaker, string text)
         {
             speakingStation = string.IsNullOrEmpty(speaker) ? null : station;
@@ -434,7 +434,7 @@ namespace ColonQuest.UI
             subtitles.Hide();
         }
 
-        /// <summary>Backup for a speaker the trigger misses (the player walked through it fast): too far means the talk is over.</summary>
+        /// <summary>Backup for a speaker the trigger misses (the user walked through it fast): too far means the talk is over.</summary>
         private void TickSpeech()
         {
             if (speakingStation == null || !subtitles.IsVisible)
@@ -582,7 +582,7 @@ namespace ColonQuest.UI
             if (loadingCard.activeSelf)
             {
                 // The wait for the summary of the year says what is being made, with dots that come and go.
-                string wait = Loc.T(session.Finishing ? "Armando tu año" : "El game master está pensando");
+                string wait = Loc.T(session.Finishing ? "Armando tu año" : "El director de la simulación está pensando");
                 loadingText.text = wait + new string('.', 1 + (int)(Time.unscaledTime * 2.5f) % 3);
             }
 
@@ -615,7 +615,7 @@ namespace ColonQuest.UI
                 session.Loop.TickShift(Time.deltaTime);
             }
 
-            // Otherwise the clock runs only while the player is free: no window, no scene, no wait for the server.
+            // Otherwise the clock runs only while the user is free: no window, no scene, no wait for the server.
             if (!session.Busy && !Interaction.Playing && !SceneTransition.IsBusy && session.TickClock(Time.deltaTime))
             {
                 FallAsleepScene();
@@ -662,7 +662,7 @@ namespace ColonQuest.UI
             var station = Nearby;
             string text = station != null && !session.Busy && !Interaction.Playing && !usedStations.Contains(station) && GuidedAllows(station) ? PromptFor(station) : null;
 
-            // Nothing else to do here: the person next to the player can be talked to.
+            // Nothing else to do here: the person next to the user can be talked to.
             Transform person = text == null && station == null && !session.Busy && !Interaction.Playing && Time.unscaledTime - usedAt > UsedPause ? NearbyPerson() : null;
             if (person != null)
             {
@@ -692,7 +692,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>The prompt in the player's language: the key "[E]  " stays, the rest is translated.</summary>
+        /// <summary>The prompt in the user's language: the key "[E]  " stays, the rest is translated.</summary>
         private static string PromptText(string text)
         {
             const string key = "[E]  ";
@@ -1130,7 +1130,7 @@ namespace ColonQuest.UI
                 walker.Greet(player.transform.position, 8f);
             }
 
-            // People speak as a subtitle with their name; an object only gives the player a thought. Neither stops the walk.
+            // People speak as a subtitle with their name; an object only gives the user a thought. Neither stops the walk.
             bool person = station.name == "Thing_Talk";
             ShowSpeech(station, person ? Loc.T(PersonName(station)) : string.Empty, Loc.T(line));
         }
@@ -1214,8 +1214,8 @@ namespace ColonQuest.UI
                 options.Add(new ModalOption { Label = Loc.T("Ver lo que compraste"), Color = GameUiColors.Yellow, OnPress = () => ShowAssetsReport(assets) });
             }
 
-            options.Add(new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart });
-            endScreen.Show(Loc.T("Fin de la partida"), summary, session.Loop, aiCalls.Last, options);
+            options.Add(new ModalOption { Label = Loc.T("Simular de nuevo"), Color = GameUiColors.Green, OnPress = Restart });
+            endScreen.Show(Loc.T("Fin de la simulación"), summary, session.Loop, aiCalls.Last, options);
         }
 
         /// <summary>True while the pause window or its settings are up.</summary>
@@ -1223,7 +1223,7 @@ namespace ColonQuest.UI
 
         /// <summary>
         /// Opens the pause window. Time stops while it is up; the audio and the window run on unscaled time.
-        /// Nothing happens while the game master is answering.
+        /// Nothing happens while the simulation director is answering.
         /// </summary>
         public void OpenPause()
         {

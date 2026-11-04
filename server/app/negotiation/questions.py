@@ -1,6 +1,6 @@
 """Deterministic analysis of a negotiation turn.
 
-- classify_questions: which key questions the player asked (impact metric, free and repeatable).
+- classify_questions: which key questions the user asked (impact metric, free and repeatable).
 - quoted_amounts / invalid_amounts: the seller may hide figures but never lie about them, so any
   colón amount in a reply that is not on the hidden sheet makes the reply invalid.
 - fallback_reply: a scripted answer used when the model is unavailable.
@@ -156,7 +156,7 @@ def facts_answering(questions: set[KeyQuestion]) -> list[SellerFact]:
 def fallback_reply(
     offer: Offer, questions: set[KeyQuestion], language: str = "es"
 ) -> tuple[str, list[SellerFact]]:
-    """Scripted seller answer that only reveals what the player asked about."""
+    """Scripted seller answer that only reveals what the user asked about."""
     facts = facts_answering(questions)
     if language and language.lower().startswith("en"):
         if not facts:

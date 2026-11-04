@@ -1,4 +1,4 @@
-"""Bounded tool-calling loop shared by the agentic game master and the seller agent.
+"""Bounded tool-calling loop shared by the agentic simulation director and the seller agent.
 
 At most ``max_steps`` model calls inside ``timeout_s``; every call is recorded through the
 ledger. Callers catch ProviderError and TimeoutError and fall back to their single-call version.

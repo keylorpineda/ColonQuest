@@ -33,10 +33,10 @@ def pick_fallback_event(
 ) -> GameEvent:
     """Pick a fallback that fits the month and avoids repeating recent events.
 
-    December prefers aguinaldo and marchamo; otherwise events teaching concepts the player has
-    not seen yet come first. Events about a vehicle or a fridge are only for a player who has one.
+    December prefers aguinaldo and marchamo; otherwise events teaching concepts the user has
+    not seen yet come first. Events about a vehicle or a fridge are only for a user who has one.
     """
-    rng = rng or random.Random()  # noqa: S311 - gameplay variety, not security
+    rng = rng or random.Random()  # noqa: S311 - simulation variety, not security
     events = load_fallback_events()
     if not owns_vehicle(state):
         events = tuple(event for event in events if event.event_id not in VEHICLE_EVENT_IDS)

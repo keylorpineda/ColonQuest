@@ -10,10 +10,10 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The demo for whoever will not play a whole year: each thing the game does, one click away and against the real
+    /// The demo for whoever will not play a whole year: each thing the simulator does, one click away and against the real
     /// backend. On the left the stations, in the middle the one being tried, and on the right what the models really did,
     /// read back from the server: which model, which provider, how long, how many tokens, what it cost and which tools it
-    /// used. It has its own sessions, so it never touches a saved game, and it says so when an answer did not come from a
+    /// used. It has its own sessions, so it never touches a saved simulation, and it says so when an answer did not come from a
     /// model. Each station lives in its own file.
     /// </summary>
     public sealed partial class DemoLab : MonoBehaviour
@@ -37,7 +37,7 @@ namespace ColonQuest.UI
         private const float Left = 28f;
         private const float Width = 972f;
 
-        private const string NoServer = "No hubo respuesta del servidor. Revisá el internet y probá otra vez.";
+        private const string NoServer = "No hubo respuesta del servidor local. Abrí start_colonquest.bat y probá otra vez.";
 
         private static readonly Vector2 TopLeft = new Vector2(0f, 1f);
         private static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
@@ -52,7 +52,7 @@ namespace ColonQuest.UI
 
         private static readonly string[,] Stations =
         {
-            { "Game master", "Muse Spark con herramientas" },
+            { "Director de la simulación", "Muse Spark con herramientas" },
             { "Negociación", "Muse Spark Open y Voice Transcribe" },
             { "Plan y cierre", "Muse Wonder" },
             { "Motor y controles", "Lo que le pone reglas a la IA" },
@@ -66,12 +66,12 @@ namespace ColonQuest.UI
         /// <summary>Why each model has its job, with the times measured for docs/adr/0004-model-roles.md.</summary>
         private static readonly string[] WhyThisModel =
         {
-            "Muse Spark es el único que responde siempre dentro de los 8 s del juego (3 a 4,4 s). Sus herramientas leen el historial y calculan deudas, pero nunca escriben el estado del jugador.",
-            "Muse Spark Open corre con pesos abiertos en Baseten (1,9 a 2,8 s). Voice Transcribe pasa tu voz a texto (0,7 a 1,5 s). Si Baseten falla, contesta la API de Meta y el juego ni se entera.",
+            "Muse Spark es el único que responde siempre dentro de los 8 s del simulador (3 a 4,4 s). Sus herramientas leen el historial y calculan deudas, pero nunca escriben el estado del usuario.",
+            "Muse Spark Open corre con pesos abiertos en Baseten (1,9 a 2,8 s). Voice Transcribe pasa tu voz a texto (0,7 a 1,5 s). Si Baseten falla, contesta la API de Meta y el simulador ni se entera.",
             "Muse Wonder es el mejor escritor, pero suele tardar de 6 a 10 s. Por eso solo trabaja donde nadie espera: planifica en segundo plano y narra detrás de una pantalla de carga.",
             "Esta estación no llama a ningún modelo: es lo que mantiene a la IA dentro de las reglas.",
             "Las cifras salen de la base de datos. Muse Spark solo las explica en lenguaje claro; no inventa números.",
-            "Muse Spark Open corre con pesos abiertos en Baseten. El juego le manda la ficha con las únicas cifras que puede decir: si dice otra, se rechaza y responden las reglas locales."
+            "Muse Spark Open corre con pesos abiertos en Baseten. El simulador le manda la ficha con las únicas cifras que puede decir: si dice otra, se rechaza y responden las reglas locales."
         };
 
         private static DemoLab current;
@@ -118,7 +118,7 @@ namespace ColonQuest.UI
 
         private void Awake()
         {
-            // The game sets these when a run starts; the lab can open before any run.
+            // The simulator sets these when a run starts; the lab can open before any run.
             LocalSeller.Translate = Loc.T;
             ApiService.LocalTextsOnly = () => false;
             ApiService.Language = () => Loc.Current == GameLanguage.English ? "en" : "es";
@@ -165,7 +165,7 @@ namespace ColonQuest.UI
             if (waitLabel != null)
             {
                 int seconds = Mathf.FloorToInt(Time.unscaledTime - waitStarted);
-                string slow = seconds >= 12 ? "\n" + Loc.T("Si el servidor estaba dormido, despertarlo toma hasta un minuto.") : string.Empty;
+                string slow = seconds >= 12 ? "\n" + Loc.T("Si el modelo tarda, la primera respuesta puede tomar hasta un minuto.") : string.Empty;
                 waitLabel.text = Loc.T(waitText) + new string('.', 1 + (int)(Time.unscaledTime * 3f) % 3) + "  " + seconds + " s" + slow;
             }
 
@@ -195,7 +195,7 @@ namespace ColonQuest.UI
             outline.effectColor = Night;
             outline.effectDistance = new Vector2(3f, -3f);
 
-            UiKit.Label(stage, "Cada función del juego, con la IA real y sus datos a la vista", 26, Soft, new Vector2(860f, 40f), TopLeft, new Vector2(WorkX + 6f, -36f));
+            UiKit.Label(stage, "Cada función del simulador, con la IA real y sus datos a la vista", 26, Soft, new Vector2(860f, 40f), TopLeft, new Vector2(WorkX + 6f, -36f));
             serverStatus = UiKit.PlainLabel(stage, "ServerStatus", Loc.T("Conectando con el servidor..."), 24, Soft, new Vector2(330f, 60f), TopLeft, new Vector2(1250f, -26f), TextAnchor.MiddleRight);
             UiKit.MakeButton(stage, "Volver al menú", GameUiColors.Yellow, new Vector2(290f, 72f), TopLeft, new Vector2(1606f, -22f), Close);
         }
@@ -546,7 +546,7 @@ namespace ColonQuest.UI
             text.Append(Tint(Loc.T("Presupuesto de hoy, en vivo"), "#F2A23A")).Append('\n');
             text.Append(Loc.F("API de Meta: {0} de {1}", DemoReadout.Dollars(health.MetaSpentUsd), DemoReadout.Dollars(health.MetaBudgetUsd))).Append('\n');
             text.Append(Loc.F("Baseten: {0} de {1}", DemoReadout.Dollars(health.OpenWeightsSpentUsd), DemoReadout.Dollars(health.OpenWeightsBudgetUsd))).Append("\n\n");
-            text.Append(Loc.T("Al 80% del presupuesto el game master baja a Muse Spark. Al 100% solo salen eventos de respaldo. El juego nunca se cae por eso.")).Append("\n\n");
+            text.Append(Loc.T("Al 80% del presupuesto el director de la simulación baja a Muse Spark. Al 100% solo salen eventos de respaldo. El simulador nunca se cae por eso.")).Append("\n\n");
         }
 
         private static string Tint(string value, string hex)

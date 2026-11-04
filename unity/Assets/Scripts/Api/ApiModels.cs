@@ -23,7 +23,7 @@ namespace ColonQuest.Api
         TotalCost
     }
 
-    /// <summary>Questions a financially literate player should ask. They feed the impact metric.</summary>
+    /// <summary>Questions a financially literate user should ask. They feed the impact metric.</summary>
     public enum KeyQuestion
     {
         TotalCost,
@@ -42,7 +42,7 @@ namespace ColonQuest.Api
         public List<KeyQuestion> KeyQuestionsAsked = new List<KeyQuestion>();
         public DealStatus DealStatus;
 
-        /// <summary>The term on the table after this turn, which is the one the player signs. 0 when the backend does not say.</summary>
+        /// <summary>The term on the table after this turn, which is the one the user signs. 0 when the backend does not say.</summary>
         public int TermMonths;
     }
 
@@ -85,7 +85,7 @@ namespace ColonQuest.Api
         Fallback
     }
 
-    /// <summary>The outcome of one API call. Errors are values, never exceptions, so a bad response cannot break the game.</summary>
+    /// <summary>The outcome of one API call. Errors are values, never exceptions, so a bad response cannot break the simulator.</summary>
     public sealed class ApiResult<T>
     {
         public bool Ok;

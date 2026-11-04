@@ -12,7 +12,7 @@ namespace ColonQuest.World
         private static readonly System.Collections.Generic.HashSet<Patrol> All = new System.Collections.Generic.HashSet<Patrol>();
         private static bool passThrough;
 
-        /// <summary>While true the player walks through the people: nobody blocks the way of the guided run.</summary>
+        /// <summary>While true the user walks through the people: nobody blocks the way of the guided run.</summary>
         public static bool PassThrough
         {
             get => passThrough;
@@ -92,7 +92,7 @@ namespace ColonQuest.World
             homePoint = home;
         }
 
-        /// <summary>The player talks to this walker: it stops where it is and turns to face them for a while.</summary>
+        /// <summary>The user talks to this walker: it stops where it is and turns to face them for a while.</summary>
         public void Greet(Vector2 playerPosition, float seconds)
         {
             chatUntil = Time.time + seconds;

@@ -24,7 +24,7 @@ van en dólares y las palabras locales se explican abajo. Consultado el 2 de nov
 - **Casi a nadie le enseñaron a manejarla.** Ocho de cada diez encuestados nunca recibieron educación financiera.
 - **Las trampas no son teoría.** Los investigadores contaron 2 930 casos de gota a gota en 2025, con intereses
   del 20% al 100%, y las ofertas llegan por WhatsApp, Facebook y TikTok.
-- **Por eso el juego usa las reglas reales.** Vivís con el salario mínimo real, los rebajos reales y una tarjeta
+- **Por eso el simulador usa las reglas reales.** Vivís con el salario mínimo real, los rebajos reales y una tarjeta
   bajo el tope legal real, y practicás antes de que te cueste algo.
 
 ### Palabras que quizá necesités
@@ -61,7 +61,7 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | **73,89%** | Quienes dicen que al menos un curso les ayudaría | Misma encuesta |
 | **2025** | Entró a regir la Ley 10627 de educación financiera, reglamentada en 2026 | [Columna en La Nación](https://www.nacion.com/opinion/foros/entre-la-tarjeta-y-la-loteria-tenemos-cultura/LRYCPI4W65HN3IG2EQ256KSCPU/story/) |
 
-### 3. Las trampas del juego son reales
+### 3. Las trampas del simulador son reales
 
 | Trampa | Cifra | Qué significa | Fuente |
 | --- | --- | --- | --- |
@@ -73,9 +73,9 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | **Pirámides** | **50+** | Denuncias por aparentes estafas en pirámides que la Sugef trasladó a la Fiscalía en 2021 | [Teletica](https://www.teletica.com/288694_sugef-traslada-a-fiscalia-50-denuncias-por-aparentes-estafas-en-piramides) |
 | | **600+** | Inversionistas, según creen los afectados, en un esquema en tres países investigado en 2025 | [CRHoy](https://crhoy.com/fiscalia-investiga-multimillonario-fraude-con-esquema-piramidal-en-tres-paises/) |
 
-### 4. Lo que el juego copia de la realidad
+### 4. Lo que el simulador copia de la realidad
 
-| En el juego | La regla real | Fuente |
+| En el simulador | La regla real | Fuente |
 | --- | --- | --- |
 | Salario bruto de ₡373 092 (unos $750) | Salario mínimo 2026 de un trabajador no calificado | Decreto 45303-MTSS, en [Bloomberg Línea](https://www.bloomberglinea.com/latinoamerica/costa-rica/salario-minimo-2026-en-costa-rica-nuevos-montos-para-el-sector-privado/) |
 | 10,83% rebajado del salario | Cargas del trabajador en 2026: 5,50 + 4,33 + 1,00 | [Nuestro análisis del motor](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
@@ -85,11 +85,11 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | Prestamista al 20% mensual | La tasa más baja que halló el OIJ: 240% anual, más de seis veces el tope legal. Si le preguntan si es legal, el prestamista lo dice | OIJ y BCCR, en la tabla de arriba |
 
 Simplificamos dos cosas: la renta no tiene créditos por hijos ni cónyuge, y los precios del pueblo son ejemplos,
-como dice el propio juego.
+como dice el propio simulador.
 
-### 5. Lo que practica el jugador
+### 5. Lo que practica el usuario
 
-| Lo que pasa en Costa Rica | Lo que hace el jugador |
+| Lo que pasa en Costa Rica | Lo que hace el usuario |
 | --- | --- |
 | Un tercio del ingreso se va en deudas | Vive mes a mes con el salario real |
 | Cuotas con costos que nadie menciona | Le pregunta al vendedor el total, el seguro y la comisión, en voz alta |
@@ -107,7 +107,7 @@ como dice el propio juego.
 - **La encuesta y la policía apuntan a lados distintos.** En la encuesta, quienes tomaron un gota a gota bajaron de
   12% a 3% (unas 92 000 personas en tres años), mientras los investigadores reportan más casos. Una pregunta a la
   gente y la otra cuenta denuncias, así que no las sumamos.
-- **Todavía no podemos afirmar que el juego funciona.** No hay resultados de un piloto para publicar, así que esta
+- **Todavía no podemos afirmar que el simulador funciona.** No hay resultados de un piloto para publicar, así que esta
   página describe el problema y el diseño, no un efecto. El Modo Clase y la telemetría están para medirlo, y los
   resultados irán en `docs/pilot/`.
 

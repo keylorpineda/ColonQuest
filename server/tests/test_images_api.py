@@ -12,6 +12,8 @@ from app.config import Settings
 from app.cost_guard import BudgetMode
 from app.db import CachedImage, ModelCall
 from app.db.session import get_session
+from app.images.bundled import bundled_image
+from app.images.keys import PREGENERATED_KEYS
 from app.images.service import (
     FALLBACK_PNG,
     MAX_IMAGE_SIDE,
@@ -102,8 +104,10 @@ def generator() -> FakeImageGenerator:
 
 @pytest.fixture
 async def client(
-    db: AsyncSession, generator: FakeImageGenerator
+    db: AsyncSession, generator: FakeImageGenerator, monkeypatch: pytest.MonkeyPatch
 ) -> AsyncIterator[httpx2.AsyncClient]:
+    # These tests are about the cache and the model; the shipped copies have their own test.
+    monkeypatch.setattr("app.api.images.bundled_image", lambda key: None)
     settings = Settings(_env_file=None)  # type: ignore[call-arg]
     app = create_app()
 
@@ -179,6 +183,32 @@ async def test_get_image_still_serves_a_cached_key_outside_the_set(
 
     assert response.headers["x-image-source"] == "cache"
     assert generator.prompts == []
+
+
+async def test_get_image_serves_the_shipped_copy_without_paying(
+    client: httpx2.AsyncClient,
+    generator: FakeImageGenerator,
+    db: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("app.api.images.bundled_image", bundled_image)
+
+    response = await client.get("/api/images/npc_kevin_vendedor")
+
+    assert response.status_code == 200
+    assert response.headers["x-image-source"] == "bundled"
+    assert response.content[:8] == bytes.fromhex("89504e470d0a1a0a")
+    assert generator.prompts == []
+    assert (await db.scalars(select(ModelCall))).all() == []
+
+
+def test_every_pre_generated_key_ships_with_the_repository() -> None:
+    assert [key for key in sorted(PREGENERATED_KEYS) if bundled_image(key) is None] == []
+
+
+def test_a_key_outside_the_set_is_never_read_from_disk() -> None:
+    assert bundled_image("soda_elmolle") is None
+    assert bundled_image("__init__") is None
 
 
 async def test_get_image_rejects_invalid_key(client: httpx2.AsyncClient) -> None:

@@ -49,7 +49,7 @@ namespace ColonQuest.Api
             return value;
         }
 
-        /// <summary>Parses a list, skipping values this client does not know so that a newer backend never breaks the game.</summary>
+        /// <summary>Parses a list, skipping values this client does not know so that a newer backend never breaks the simulator.</summary>
         public static List<T> ParseKnown(IEnumerable<string> wires)
         {
             var list = new List<T>();

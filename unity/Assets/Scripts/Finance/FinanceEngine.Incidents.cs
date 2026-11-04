@@ -16,7 +16,7 @@ namespace ColonQuest.Finance
     }
 
     /// <summary>
-    /// Money that leaves in a moment the player did not choose: a fine, a hospital bill, the collectors at the
+    /// Money that leaves in a moment the user did not choose: a fine, a hospital bill, the collectors at the
     /// door. Every figure arrives as a parameter (the illustrative ones live in <c>MarketAssumptions</c>); this
     /// file only moves it, in whole colones, and never lets cash go below zero without a debt behind it.
     /// </summary>
@@ -51,7 +51,7 @@ namespace ColonQuest.Finance
             return onCard;
         }
 
-        /// <summary>The share of a bill the player pays when a policy covers part of it, rounded up to the colon.</summary>
+        /// <summary>The share of a bill the user pays when a policy covers part of it, rounded up to the colon.</summary>
         public static long PatientShare(long bill, int patientSharePct)
         {
             if (bill < 0L)
@@ -110,7 +110,7 @@ namespace ColonQuest.Finance
             return paid;
         }
 
-        /// <summary>The player pays the lender by choice, out of cash: all of the informal debt or what the cash reaches. Returns what was paid.</summary>
+        /// <summary>The user pays the lender by choice, out of cash: all of the informal debt or what the cash reaches. Returns what was paid.</summary>
         public static long PayInformalDebt(PlayerState state)
         {
             if (state == null)

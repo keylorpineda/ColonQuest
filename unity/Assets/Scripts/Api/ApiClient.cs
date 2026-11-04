@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ColonQuest.Api
 {
     /// <summary>
-    /// The component the game uses to talk to the backend. It runs the <see cref="ApiService"/>
+    /// The component the simulator uses to talk to the backend. It runs the <see cref="ApiService"/>
     /// coroutines and survives scene changes, so the session id is kept between the town and the
     /// interiors. Results arrive in the callback on the main thread.
     /// </summary>
@@ -36,7 +36,7 @@ namespace ColonQuest.Api
         }
 
         /// <summary>Replaces the transport and config, for tests and for pointing at another backend.</summary>
-        /// <summary>The log of the player says which backend this build reads, so a wrong env file is easy to spot.</summary>
+        /// <summary>The log of the user says which backend this build reads, so a wrong env file is easy to spot.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void SayWhichBackend()
         {
@@ -50,7 +50,7 @@ namespace ColonQuest.Api
             Service = new ApiService(transport, config);
         }
 
-        /// <summary>A service of its own for the demo lab: its sessions and longer waits never touch the player's game.</summary>
+        /// <summary>A service of its own for the demo lab: its sessions and longer waits never touch the user's simulator.</summary>
         public ApiService NewDemoService()
         {
             return new ApiService(transport, config.ForDemo());

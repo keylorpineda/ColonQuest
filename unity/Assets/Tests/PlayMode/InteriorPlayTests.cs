@@ -309,7 +309,7 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return Walk(new Vector2(-2.9f, -0.3f), Vector2.up, 1.5f);
 
-            Assert.Greater(Body.position.y, 1.3f, "the doorway lets the player through");
+            Assert.Greater(Body.position.y, 1.3f, "the doorway lets the user through");
         }
 
         [UnityTest]
@@ -363,7 +363,7 @@ namespace ColonQuest.World.PlayModeTests
         }
 
         /// <summary>
-        /// Plays the scene of a piece of furniture from where the player would press E, and measures the longest move of a
+        /// Plays the scene of a piece of furniture from where the user would press E, and measures the longest move of a
         /// single frame: walking is a few hundredths, a jump to the seat is far more.
         /// </summary>
         [UnityTest]
@@ -391,7 +391,7 @@ namespace ColonQuest.World.PlayModeTests
                 last = Body.position;
             }
 
-            Assert.Less(longest, 0.5f, thing + " moves the player in one jump");
+            Assert.Less(longest, 0.5f, thing + " moves the user in one jump");
         }
 
         [UnityTest]
@@ -411,7 +411,7 @@ namespace ColonQuest.World.PlayModeTests
                 Assert.IsNull(GameObject.Find("Mama"), "the mother lives in her own house");
                 InteriorUi.Interact(GameObject.Find("Thing_Shower").GetComponent<Station>());
                 yield return null;
-                Assert.IsFalse(Interaction.Playing, "no shower in a house that is not the player's");
+                Assert.IsFalse(Interaction.Playing, "no shower in a house that is not the user's");
                 Assert.AreEqual(HouseVisit.NotMineThought, heard);
             }
             finally
@@ -498,7 +498,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.Greater(GameObject.Find("AsesoraCoop").transform.position.y, station.transform.position.y, "the advisor is behind the counter");
             Assert.IsNotNull(GameObject.Find("Thing_TermSavings"));
             Assert.AreEqual(0f, Body.position.x, 0.5f);
-            Assert.AreEqual(MapLayout.CooperativaMat.y + 1.3f, Body.position.y, 0.5f, "the player comes in on the mat");
+            Assert.AreEqual(MapLayout.CooperativaMat.y + 1.3f, Body.position.y, 0.5f, "the user comes in on the mat");
         }
 
         [UnityTest]

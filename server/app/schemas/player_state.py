@@ -1,4 +1,4 @@
-"""Player financial state, computed by the Unity finance engine and sent to the backend."""
+"""User financial state, computed by the Unity finance engine and sent to the backend."""
 
 from typing import Annotated
 
@@ -43,7 +43,7 @@ class PlayerState(ContractModel):
     character_name: Annotated[ShortText | None, Field(default=None)] = None
     week: Annotated[int | None, Field(default=None, ge=1, le=4)] = None
     job_position: Annotated[ShortText | None, Field(default=None)] = None
-    # What the player's home, car and farm are worth, for the summary. The engine computes it.
+    # What the user's home, car and farm are worth, for the summary. The engine computes it.
     assets_value: Colones = 0
     # The months already closed, for the summary: "month" has moved on to the next one by then.
     months_played: Annotated[int, Field(ge=0, le=120)] = 0

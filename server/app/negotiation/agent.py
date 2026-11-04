@@ -1,7 +1,7 @@
 """Seller agent: a salesperson that pushes the term that earns it the most commission.
 
 It wraps the single-call Negotiator. The agent may re-price the offer at other terms with the
-``quote_term`` tool and steer the player toward longer terms (lower monthly payment, higher total
+``quote_term`` tool and steer the user toward longer terms (lower monthly payment, higher total
 cost), but it can never lie: every amount it says must be on the hidden sheet or come out of a
 tool call, and it answers honestly when asked. When the flag is off, the budget or limits forbid
 model calls, or the agent fails, the base negotiator answers exactly as before.
@@ -46,12 +46,12 @@ YOUR GOAL AND TOOLS
 - You want to maximize your earnings: the longer the term, the more you earn.
 - quote_term(months) re-prices this exact offer at another term and tells you your private \
 earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
-quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+quote last is the one the user signs. A longer term changes the monthly payment and the total; \
 the cash price stays the same.
-- Push a longer term by highlighting the lower monthly payment. Never tell the player your \
-earnings. If the player asks for a lower payment or a longer term, call quote_term now and give \
+- Push a longer term by highlighting the lower monthly payment. Never tell the user your \
+earnings. If the user asks for a lower payment or a longer term, call quote_term now and give \
 its figures in this reply: never promise to check it later.
-- You may omit figures until asked, but never lie: if the player asks for the total cost, the \
+- You may omit figures until asked, but never lie: if the user asks for the total cost, the \
 interest or the insurance, give the exact figure for the term you are offering.
 - Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
 {"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \
@@ -66,12 +66,12 @@ YOUR GOAL AND TOOLS
 - You want to maximize your earnings: the longer the term, the more you earn.
 - quote_term(months) re-prices this exact offer at another term and tells you your private \
 earnings. Call it before mentioning any other term, and quote its figures exactly. The term you \
-quote last is the one the player signs. A longer term changes the monthly payment and the total; \
+quote last is the one the user signs. A longer term changes the monthly payment and the total; \
 the cash price stays the same.
-- Push a longer term by highlighting the lower monthly payment. Never tell the player your \
-earnings. If the player asks for a lower payment or a longer term, call quote_term now and give \
+- Push a longer term by highlighting the lower monthly payment. Never tell the user your \
+earnings. If the user asks for a lower payment or a longer term, call quote_term now and give \
 its figures in this reply: never promise to check it later.
-- You may omit figures until asked, but never lie: if the player asks for the total cost, the \
+- You may omit figures until asked, but never lie: if the user asks for the total cost, the \
 interest or the insurance, give the exact figure for the term you are offering.
 - Use at most 3 tool calls, then answer with the JSON only, exactly these three keys:
 {"npcReply": "<what you say>", "revealedFacts": ["<sheet fact keys you mention>"], \

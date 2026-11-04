@@ -21,12 +21,12 @@ Convención: título del PR `tipo(alcance): resumen [SCRUM-n]`, rama con el núm
 ### 3. Créditos de Meta frente al juicio (Keylor)
 - Confirmar cuándo vencen los $150 (ventana de 10 días) frente al juicio del 4 al 8 de nov.
 - Si vencen antes: llave secundaria en el backend y respaldo a contenido local verificado.
-- Hecho cuando: el juego completa un mes sin llamadas a Meta y sin pantallas de error.
+- Hecho cuando: el simulador completa un mes sin llamadas a Meta y sin pantallas de error.
 
 ### 4. Indicador Live / Offline y respaldo a 8 s (Jefferson)
 - Chip discreto que muestra si la respuesta viene del modelo o del respaldo local.
 - Si el servidor tarda más de 8 s, entra el respaldo sin congelar ni mostrar error.
-- Hecho cuando: con el backend apagado, el mes completo se juega y el chip dice Offline.
+- Hecho cuando: con el backend apagado, el mes completo se simula y el chip dice Offline.
 
 ## Prioridad 2: Judge Run y el momento wow
 
@@ -46,7 +46,7 @@ Convención: título del PR `tipo(alcance): resumen [SCRUM-n]`, rama con el núm
 - Hecho cuando: el momento se entiende en menos de 10 s sin explicación, y se graba un clip de prueba.
 
 ### 8. Tarjeta de cierre del mes (Jefferson)
-- Muestra el concepto aprendido y qué preguntas clave hizo bien el jugador.
+- Muestra el concepto aprendido y qué preguntas clave hizo bien el usuario.
 - Dos botones: "How teachers see this" (Modo Clase) y "Under the hood" (Demo Lab).
 - Hecho cuando: ambos botones llevan a su pantalla y se puede volver.
 
@@ -58,7 +58,7 @@ Convención: título del PR `tipo(alcance): resumen [SCRUM-n]`, rama con el núm
 
 ### 10. Chips de evidencia dentro de la escena (Jefferson)
 - Chip sobre el personaje: "Muse Spark Open, 2,1 s, $0,002", que se despliega al rastro de herramientas.
-- Hecho cuando: se ve en el evento del game master y en el vendedor sin salir de la escena.
+- Hecho cuando: se ve en el evento del director de la simulación y en el vendedor sin salir de la escena.
 
 ### 11. Tarjeta del piloto y Modo Clase con datos reales (Keylor)
 - N y porcentajes agregados, sin nombres ni rostros; si no hay datos, mostrar la clase simulada rotulada como tal.

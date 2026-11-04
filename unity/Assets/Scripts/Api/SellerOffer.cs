@@ -80,12 +80,12 @@ namespace ColonQuest.Api
             }
         }
 
-        /// <summary>What leaves the player's pocket every month: the payment plus the insurance.</summary>
+        /// <summary>What leaves the user's pocket every month: the payment plus the insurance.</summary>
         public long MonthlyCharge => MonthlyPayment + InsuranceMonthly;
 
         public long TotalCost => MonthlyCharge * TermMonths + Commission + DownPayment;
 
-        /// <summary>What the player pays on top of the cash price by buying in installments.</summary>
+        /// <summary>What the user pays on top of the cash price by buying in installments.</summary>
         public long ExtraOverCash => TotalCost - CashPrice;
 
         public string Describe(SellerFact fact)

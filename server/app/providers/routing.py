@@ -1,6 +1,6 @@
 """Provider routing: try the open-weights endpoint first and fall back to the Meta API.
 
-The game never breaks because the partner endpoint is down or slow: any error or a timeout
+The simulator never breaks because the partner endpoint is down or slow: any error or a timeout
 shorter than the caller's own deadline sends the same request to Meta.
 """
 

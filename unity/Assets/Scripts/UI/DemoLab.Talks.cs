@@ -8,15 +8,15 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The talks with the collector, the lender and the pyramid stand, without waiting for them to come up in a game. Next to
-    /// the chat is what each one knows, written by the engine, and a line opens when the player asks about it. The same
-    /// <see cref="DebtTalk"/> as in the game, so what is tried here is what is played.
+    /// The talks with the collector, the lender and the pyramid stand, without waiting for them to come up in a simulation. Next to
+    /// the chat is what each one knows, written by the engine, and a line opens when the user asks about it. The same
+    /// <see cref="DebtTalk"/> as in the simulator, so what is tried here is what is played.
     /// </summary>
     public sealed partial class DemoLab
     {
         private const int TalksStation = 5;
 
-        /// <summary>What the collector comes for in the demo. In a game it depends on the player's debts.</summary>
+        /// <summary>What the collector comes for in the demo. In a simulation it depends on the user's debts.</summary>
         private const long SampleDemand = 80_000L;
 
         private static readonly TalkPartner[] Partners = { TalkPartner.Collectors, TalkPartner.Lender, TalkPartner.Pyramid };
@@ -37,7 +37,7 @@ namespace ColonQuest.UI
         private int talkPartner;
         private string pendingTalk;
 
-        /// <summary>One turn in the player's words. Public so a test can talk without a keyboard.</summary>
+        /// <summary>One turn in the user's words. Public so a test can talk without a keyboard.</summary>
         public void TryTalk(string line)
         {
             if (!Busy && !string.IsNullOrWhiteSpace(line))
@@ -54,7 +54,7 @@ namespace ColonQuest.UI
             }
 
             recorder = recorder ?? VoiceRecorders.Create();
-            DrawHeading("Cobros y trampas", "Muse Spark Open  +  Muse Voice Transcribe", "Hablales con voz o por escrito. Cada uno tiene su personalidad y solo dice lo incómodo si le preguntás. Las cifras no las inventa el modelo: las pone el motor del juego.");
+            DrawHeading("Cobros y trampas", "Muse Spark Open  +  Muse Voice Transcribe", "Hablales con voz o por escrito. Cada uno tiene su personalidad y solo dice lo incómodo si le preguntás. Las cifras no las inventa el modelo: las pone el motor del simulador.");
 
             float y = -170f;
             float buttonWidth = (610f - 20f) / Partners.Length;
@@ -97,11 +97,11 @@ namespace ColonQuest.UI
             DrawTalkSheet();
         }
 
-        /// <summary>What the character knows, from the same sheet the model gets. A line opens when the player asks about it.</summary>
+        /// <summary>What the character knows, from the same sheet the model gets. A line opens when the user asks about it.</summary>
         private void DrawTalkSheet()
         {
             float y = -170f;
-            Note("La ficha que le dio el juego", 25, UiKit.Ink, new Vector2(SideWidth, 34f), new Vector2(SideX, y));
+            Note("La ficha que le dio el simulador", 25, UiKit.Ink, new Vector2(SideWidth, 34f), new Vector2(SideX, y));
             y -= 38f;
             foreach (var line in talk.ToRequest(string.Empty, ApiService.Language()).sheet)
             {
@@ -169,7 +169,7 @@ namespace ColonQuest.UI
             }
             else
             {
-                // The same rules that answer in a game without a backend, and the panel says they did.
+                // The same rules that answer in a simulator without a backend, and the panel says they did.
                 current.Say(line);
                 lastOriginNote = Tint(DemoReadout.OriginOf("rules"), "#FF8A8A");
             }

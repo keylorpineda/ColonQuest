@@ -9,6 +9,7 @@ from app.api.deps import AppSettings, ClientHash, DbSession
 from app.cost_guard import calls_for_client_today
 from app.db import CachedImage
 from app.game_master.ledger import DbLedger
+from app.images.bundled import bundled_image
 from app.images.keys import PREGENERATED_KEYS
 from app.images.service import FALLBACK_PNG, ImageService
 
@@ -54,6 +55,15 @@ async def get_image(
                 "X-Image-Source": "cache",
                 "Cache-Control": "public, max-age=86400",
             },
+        )
+
+    # A local run starts with an empty database: the shipped copy comes before a paid one.
+    shipped = bundled_image(key)
+    if shipped is not None:
+        return Response(
+            content=shipped,
+            media_type="image/png",
+            headers={"X-Image-Source": "bundled", "Cache-Control": "public, max-age=86400"},
         )
 
     # Only the pre-generated set may be paid for; a key the model made up is not worth 17 s.

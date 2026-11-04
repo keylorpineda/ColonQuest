@@ -2,7 +2,7 @@ using ColonQuest.Finance;
 
 namespace ColonQuest.Game
 {
-    /// <summary>How the player says they get to the end of the month, at the start of the guided run.</summary>
+    /// <summary>How the user says they get to the end of the month, at the start of the guided run.</summary>
     public enum GuidedProfile
     {
         Tight,
@@ -10,8 +10,8 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// The rules of the guided run: three real months of the game on a short stretch of the map, where only the decisions are
-    /// left to the player. Pure, so it can be tested. The money moves in the finance engine, as in any other run.
+    /// The rules of the guided run: three real months of the simulator on a short stretch of the map, where only the decisions are
+    /// left to the user. Pure, so it can be tested. The money moves in the finance engine, as in any other run.
     /// </summary>
     public static class GuidedRoute
     {

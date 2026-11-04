@@ -5,7 +5,7 @@ namespace ColonQuest.Finance
     public static partial class FinanceEngine
     {
         /// <summary>
-        /// Takes money out of the player's cash for something that cannot be put on credit, such as a casino bet.
+        /// Takes money out of the user's cash for something that cannot be put on credit, such as a casino bet.
         /// Returns false and changes nothing when the cash is not enough.
         /// </summary>
         public static bool TrySpendCash(PlayerState state, long amountColones)
@@ -59,7 +59,7 @@ namespace ColonQuest.Finance
         }
 
         /// <summary>
-        /// True when the player can take this choice: what goes on the card has to fit. An event where nothing fits leaves all
+        /// True when the user can take this choice: what goes on the card has to fit. An event where nothing fits leaves all
         /// its choices open, because the event still has to end somehow.
         /// </summary>
         public static bool ChoiceIsOpen(PlayerState state, GameEvent gameEvent, Choice choice)
@@ -70,7 +70,7 @@ namespace ColonQuest.Finance
             return CardCovers(state, choice) || !gameEvent.Choices.Exists(other => CardCovers(state, other));
         }
 
-        /// <summary>Adds money to the player's cash, never past the contract limit.</summary>
+        /// <summary>Adds money to the user's cash, never past the contract limit.</summary>
         public static void CreditCash(PlayerState state, long amountColones)
         {
             if (state == null)
@@ -127,7 +127,7 @@ namespace ColonQuest.Finance
     {
         public CasinoOutcome Outcome { get; }
 
-        /// <summary>What the player gains (positive) or loses (negative) on top of the stake.</summary>
+        /// <summary>What the user gains (positive) or loses (negative) on top of the stake.</summary>
         public long Net { get; }
 
         public CasinoResult(CasinoOutcome outcome, long net)
@@ -146,7 +146,7 @@ namespace ColonQuest.Finance
         public const long MinStake = 1_000L;
         public const long MaxStake = 50_000L;
 
-        // Rolls 0-3 pay double, 4-37 pay half, the other 62 lose the stake: the player gets back 63 colones
+        // Rolls 0-3 pay double, 4-37 pay half, the other 62 lose the stake: the user gets back 63 colones
         // on average for every 100 bet.
         private const int JackpotBelow = 4;
         private const int SmallWinBelow = 38;

@@ -13,7 +13,7 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Displays a temporary reaction bubble over the player's head (Alert, Money, Love, Angry)
+    /// Displays a temporary reaction bubble over the user's head (Alert, Money, Love, Angry)
     /// popping in with a bounce (0 -> 1.15 -> 1 in 0.25s), staying 1.6s and fading out.
     /// </summary>
     public sealed class ReactionBubble : MonoBehaviour

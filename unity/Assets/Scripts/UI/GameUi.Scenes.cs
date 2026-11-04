@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The little scenes of the everyday places, like the actions of The Sims. Every interaction walks the player to the spot,
+    /// The little scenes of the everyday places, like the actions of The Sims. Every interaction walks the user to the spot,
     /// takes a pose, makes an object or another person react and plays a sound; only at the end it runs the original action
     /// (the window of options, the task, the swim), so a window never opens in place of the gesture. Space skips a scene.
     /// What an action costs or pays is always decided by the finance engine inside that action.
@@ -83,7 +83,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// Closing a deal at the store: the seller slides the contract over, the player signs it, the seller stamps it, they shake
+        /// Closing a deal at the store: the seller slides the contract over, the user signs it, the seller stamps it, they shake
         /// hands and the box changes owner. The purchase itself is made by the finance engine in <paramref name="accept"/>.
         /// </summary>
         private void PlayContract(Action accept)
@@ -159,7 +159,7 @@ namespace ColonQuest.UI
                     return ThingScene(station, then);
                 case StationType.Lender:
                 case StationType.Pyramid:
-                    // Their offers come from the game, so there is nothing to ask ahead.
+                    // Their offers come from the simulator, so there is nothing to ask ahead.
                     return session.Loop.CanDoTask(station.Type) ? TalkScene(station, then) : null;
                 case StationType.Garage:
                 case StationType.Grocery:
@@ -170,7 +170,7 @@ namespace ColonQuest.UI
                         return null;
                     }
 
-                    // The game master starts writing now, so the greeting hides most of the wait.
+                    // The simulation director starts writing now, so the greeting hides most of the wait.
                     session.PrefetchTask(station.Type);
                     return TalkScene(station, then);
                 default:
@@ -200,7 +200,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// When a customer is at the window, the player waits behind them: the teller asks for a moment and the scene goes
+        /// When a customer is at the window, the user waits behind them: the teller asks for a moment and the scene goes
         /// on once the window is free, or after a few seconds at most.
         /// </summary>
         private static Interaction WaitTurn(Interaction scene, Vector2 window, string teller, string speaker)
@@ -215,7 +215,7 @@ namespace ColonQuest.UI
                 .WaitUntil(() => !BankCustomer.IsBeingServed(window) || Time.time > until).Wait(0.4f);
         }
 
-        /// <summary>The longest the player waits in line before the teller turns to them.</summary>
+        /// <summary>The longest the user waits in line before the teller turns to them.</summary>
         private const float BankWaitSeconds = 8f;
 
         /// <summary>The cash machine: the card goes in, the keys are tapped, the bills come out and the receipt prints.</summary>
@@ -234,7 +234,7 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- the house
 
-        /// <summary>The desk with the bills: the player sits with the papers, writes on them and reads the statement.</summary>
+        /// <summary>The desk with the bills: the user sits with the papers, writes on them and reads the statement.</summary>
         private Interaction DeskScene(Station station, Action then)
         {
             Vector2 me = Here(station);
@@ -280,7 +280,7 @@ namespace ColonQuest.UI
                 }
 
                 case "Thing_Toilet":
-                    // The screen dims while the player uses the toilet, the flush sounds and the light comes back.
+                    // The screen dims while the user uses the toilet, the flush sounds and the light comes back.
                     return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Fade(new Color(0.02f, 0.03f, 0.1f, 0.85f), 0.5f)
                         .Wait(1.2f).Sound(SoundEffectKind.Water).Wait(0.8f).Fade(Dawn, 0.5f).Apply(then);
 
@@ -312,7 +312,7 @@ namespace ColonQuest.UI
 
                 case "Thing_DiningTable":
                 {
-                    // The chair on the near side of the table, so the player sits facing the screen with the table behind.
+                    // The chair on the near side of the table, so the user sits facing the screen with the table behind.
                     Vector2 chair = Here(station, -0.6f, -0.95f);
                     return new Interaction().SitOn(chair, 0.1f).Pose(PersonPose.SitEat, 2.4f)
                         .Fly("plate", Here(station, 0.6f, 0.2f), chair + new Vector2(0f, 0.15f), 0.6f).Sound(SoundEffectKind.Munch)
@@ -349,12 +349,12 @@ namespace ColonQuest.UI
                         .Sound(SoundEffectKind.Knock).Wobble("Juez", 0.5f).Wait(0.8f).Apply(then);
 
                 case "Thing_EmergencyWard":
-                    // The player only looks at the beds; there is no seat in the middle of the ward.
+                    // The user only looks at the beds; there is no seat in the middle of the ward.
                     return new Interaction().WalkTo(me).Face(Here(station, 1f, 0f))
                         .Sound(SoundEffectKind.Beep).Wait(0.8f).Sound(SoundEffectKind.Beep).Wait(0.8f).Apply(then);
 
                 case "Thing_Fountain":
-                    // The station is the strip in front of the rim: the player stays there and the coin lands in the water.
+                    // The station is the strip in front of the rim: the user stays there and the coin lands in the water.
                     return new Interaction().WalkTo(me).Face(Here(station, 0f, 1f)).Pose(PersonPose.Handover, 0.7f)
                         .Fly("coin", me + new Vector2(0f, 0.5f), Here(station, 0f, 1.6f), 0.7f)
                         .Wait(0.7f).Sound(SoundEffectKind.Coin).Sound(SoundEffectKind.Splash)
@@ -362,7 +362,7 @@ namespace ColonQuest.UI
 
                 case "Thing_Talk":
                 {
-                    // A passer-by: the player waves and the other person waves back.
+                    // A passer-by: the user waves and the other person waves back.
                     string person = station.transform.parent != null ? station.transform.parent.name : string.Empty;
                     return new Interaction().Face(Here(station)).Pose(PersonPose.Wave, 1.4f).NpcPose(person, PersonPose.Wave, 1.6f)
                         .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
@@ -380,7 +380,7 @@ namespace ColonQuest.UI
 
                 case "Thing_Mama":
                 {
-                    // The mother turns to the player and waves while she gives her advice.
+                    // The mother turns to the user and waves while she gives her advice.
                     Vector2 mother = PersonAt(Mother, Here(station, 0f, 0.5f));
                     return new Interaction().Face(mother).Pose(PersonPose.Wave, 0.8f).NpcPose(Mother, PersonPose.Wave, 1.4f)
                         .Sound(SoundEffectKind.Chime).Wait(0.3f).Apply(then);
@@ -400,7 +400,7 @@ namespace ColonQuest.UI
                 case "Thing_Manager":
                 case "Thing_CreditAdvisor":
                 {
-                    // The player stands on the guest side of the desk while the other person talks.
+                    // The user stands on the guest side of the desk while the other person talks.
                     string person = station.name == "Thing_Manager" ? "Gerente" : "Asesora";
                     Vector2 desk = PersonAt(person, Here(station, 0f, 1.3f));
                     return new Interaction().WalkTo(me).Face(desk).Pose(PersonPose.Wave, 0.9f).NpcPose(person, PersonPose.Wave, 1.2f)
@@ -409,7 +409,7 @@ namespace ColonQuest.UI
                 }
 
                 case "Thing_Pet":
-                    // The player bends to pet the dog and the dog wiggles with joy (the shake is its cue to wag, jump and show a heart).
+                    // The user bends to pet the dog and the dog wiggles with joy (the shake is its cue to wag, jump and show a heart).
                     return new Interaction().Face(me).Pose(PersonPose.Reach, 1.6f).Wobble("Dog", 1.4f)
                         .Sound(SoundEffectKind.Swish).Wait(0.6f).Sound(SoundEffectKind.Chime).Wait(0.8f).Apply(then);
 
@@ -467,7 +467,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// Sleeping: the player walks to the bed and lies down, the Z letters rise, the screen goes dark, the alarm rings and the
+        /// Sleeping: the user walks to the bed and lies down, the Z letters rise, the screen goes dark, the alarm rings and the
         /// morning comes back: the clock skips to the next week. Before the evening it is only a short nap.
         /// </summary>
         private Interaction BedScene(Station station, Action then)
@@ -513,7 +513,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// Sleeping for the night: the player lies down, the Z letters rise, the screen goes dark, the alarm rings and the
+        /// Sleeping for the night: the user lies down, the Z letters rise, the screen goes dark, the alarm rings and the
         /// morning comes back.
         /// </summary>
         private Interaction NightSleepScene(Vector2 bed)
@@ -558,7 +558,7 @@ namespace ColonQuest.UI
         public const string MissedWorkThought = "Ayer no fui a trabajar. Eso me lo van a rebajar del salario.";
 
         /// <summary>
-        /// The day ended away from the bed: the player nods off where they stand, the screen goes dark and the next morning
+        /// The day ended away from the bed: the user nods off where they stand, the screen goes dark and the next morning
         /// comes with less mood. The finance engine applies the loss.
         /// </summary>
         private void FallAsleepScene()
@@ -578,8 +578,8 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// The wardrobe: the player stands at its doors, they swing open and, once bought, the swimsuit hangs inside. The
-        /// window to buy it opens after the gesture, and the doors close again before the player is free. The wardrobe
+        /// The wardrobe: the user stands at its doors, they swing open and, once bought, the swimsuit hangs inside. The
+        /// window to buy it opens after the gesture, and the doors close again before the user is free. The wardrobe
         /// stands against the wall of the living room, so its doors face the bedroom on the right, not down the screen.
         /// </summary>
         private Interaction WardrobeScene(Station station, Action then)
@@ -592,7 +592,7 @@ namespace ColonQuest.UI
                 .Wait(0.3f).Swing(WardrobeDoors, 1f, 0.35f).Sound(SoundEffectKind.Knock).Wait(0.4f);
         }
 
-        /// <summary>Where the player stands to open the wardrobe, relative to its station: beside the doors, mid height.</summary>
+        /// <summary>Where the user stands to open the wardrobe, relative to its station: beside the doors, mid height.</summary>
         private static readonly Vector2 WardrobeFront = new Vector2(1.0f, 1.3f);
 
         private const string WardrobeDoors = "Wardrobe_Doors";
@@ -638,7 +638,7 @@ namespace ColonQuest.UI
                 .Apply(then);
         }
 
-        /// <summary>The swim: the player wades in, swims with the arms going and the water splashes. Without the swimsuit the thought plays instead.</summary>
+        /// <summary>The swim: the user wades in, swims with the arms going and the water splashes. Without the swimsuit the thought plays instead.</summary>
         private Interaction BeachScene(Station station, Action then)
         {
             if (!session.Loop.HasSwimsuit || session.Loop.SwamThisMonth)
@@ -658,7 +658,7 @@ namespace ColonQuest.UI
             return scene.Sound(SoundEffectKind.Splash).Pose(PersonPose.None, 0.3f).Apply(then);
         }
 
-        /// <summary>The desk of an agency: the other person greets, the papers come and the player signs before the options open.</summary>
+        /// <summary>The desk of an agency: the other person greets, the papers come and the user signs before the options open.</summary>
         private Interaction SignScene(Station station, Action then, string who, string speaker, string line, bool keys)
         {
             Vector2 me = Here(station);

@@ -69,7 +69,7 @@ class SellerFact(StrEnum):
 
 
 class KeyQuestion(StrEnum):
-    """Questions a financially literate player should ask (impact metric)."""
+    """Questions a financially literate user should ask (impact metric)."""
 
     TOTAL_COST = "total_cost"
     HIDDEN_FEES = "hidden_fees"

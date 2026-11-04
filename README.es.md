@@ -1,13 +1,13 @@
 <p align="center"><a href="README.md">English</a> | <b>Español</b></p>
 
 <p align="center">
-  <a href="https://github.com/keylorpineda/ColonQuest/releases/latest"><img src="docs/assets/tab-download-es.svg" alt="Descargar el juego para Windows"></a>
+  <a href="https://github.com/keylorpineda/ColonQuest/releases/latest"><img src="docs/assets/tab-download-es.svg" alt="Descargar el simulador para Windows"></a>
   <a href="COSTA_RICA.es.md"><img src="docs/assets/tab-costa-rica-es.svg" alt="La situación en Costa Rica, con fuentes"></a>
   <a href="RUN_AND_BUILD.es.md"><img src="docs/assets/tab-run-es.svg" alt="Correr y armar, para los jueces"></a>
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=4" width="100%" alt="ColonQuest, un simulador de finanzas personales que se juega como un juego, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=4" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -15,7 +15,7 @@
 
 ## ColonQuest
 
-**From Costa Rica to the World.** Un simulador de finanzas personales que se juega como un juego:
+**From Costa Rica to the World.** Un simulador de finanzas personales:
 vivís tres meses con un salario mínimo de Costa Rica, mientras te tratan de vender cosas. Hecho por
 DoWhile Team para el Meta Global AI Developer Hackathon 2026 (track Indie). Vos decidís, Muse Spark
 narra, el motor en C# calcula los colones exactos y negociás con la voz. La IA cuenta la historia;
@@ -67,29 +67,31 @@ ColonQuest, contra cuatro trampas reales:
 
 Explicaciones claras, palabras locales y hasta dónde confiar en cada cifra: [La situación en Costa Rica](COSTA_RICA.es.md).
 
-### Cómo se juega un mes
+### Cómo se simula un mes
 
 Te llega el salario con el rebajo de la CCSS y la renta. Decidís qué pagar, ahorrar o pedir
 prestado. Muse Spark escribe un evento hecho para tu situación y el motor en C# lo aplica en
 colones enteros. Cuando aparece un vendedor, negociás en voz alta: el precio, la tasa, el seguro y
 la comisión reales solo salen si preguntás.
 
-### Jugalo en unos tres minutos
+### Probalo en unos tres minutos
 
-[Bajá el juego para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest), descomprimilo y abrí `ColonQuest.exe`. Elegí **Simulación guiada**,
-lo primero del menú. Es el juego real en un tramo corto del pueblo,
+Corre en tu propia computadora con tu propia llave de Meta; no hay ningún servicio en línea. [Bajá el simulador para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest),
+descomprimilo, hacé doble clic en `start_colonquest.bat` y pegá tu llave cuando te la pida. Instala lo que necesita,
+levanta el backend local y abre el simulador ([detalles](RUN_AND_BUILD.es.md#1-evaluarlo-con-tu-propia-llave)). Elegí **Simulación guiada**,
+lo primero del menú. Es el simulador real en un tramo corto del pueblo,
 durante tres meses, y vos solo tomás las decisiones:
 
 1. **Mes 1.** Decís cómo llegás a fin de mes. Te cae el salario por SINPE, Muse Wonder escribe tu año
-   en segundo plano y el game master trae un evento hecho para tu situación.
+   en segundo plano y el director de la simulación trae un evento hecho para tu situación.
 2. **Mes 2.** Una flecha te lleva a la tienda, donde el vendedor se calla lo que no le preguntás.
    Hablá o escribí.
 3. **Mes 3.** Lo que sigue depende de tu plata: si te falta, el prestamista y luego los cobradores; si
    te sobra, una pirámide. Podés preguntarles antes de firmar.
 
 El panel de la derecha muestra cada llamada real mientras pasa, leída del servidor: modelo, proveedor,
-tiempo y costo. Se oculta con **L**. La partida termina con un informe hecho con los números del motor:
-lo que tenés, lo que debés, tu plata mes a mes, tus notas y una imagen elegida por lo que pasó en tu partida. Los objetivos, la flecha y las marcas del
+tiempo y costo. Se oculta con **L**. La simulación termina con un informe hecho con los números del motor:
+lo que tenés, lo que debés, tu plata mes a mes, tus notas y una imagen elegida por lo que pasó en tu simulación. Los objetivos, la flecha y las marcas del
 mapa funcionan igual en el **Modo historia** completo, donde la gente de la calle también te habla con
 Muse Spark Open.
 
@@ -100,14 +102,14 @@ llamadas reales.
 
 | Estación | Qué probar | Modelos |
 | --- | --- | --- |
-| Game master | Elegí la situación de un jugador, luego una opción, y mirá cómo la aplica el motor | Muse Spark con herramientas |
+| Director de la simulación | Elegí la situación de un usuario, luego una opción, y mirá cómo la aplica el motor | Muse Spark con herramientas |
 | Negociación | Hablale o escribile a un vendedor y abrí la ficha oculta línea por línea | Muse Spark Open, Muse Voice Transcribe |
 | Cobros y trampas | Hablá con el cobrador, el prestamista y el de la pirámide, y abrí lo que esconden | Muse Spark Open, Muse Voice Transcribe |
 | Plan y cierre | Compará los planes de dos perfiles y leé cómo terminó un año | Muse Wonder |
 | Motor y controles | Tratá de meter un monto fuera de rango y mirá los presupuestos en vivo | Ninguno, a propósito |
 | Modo Clase | Corré una clase de prueba real con tres estudiantes simulados, marcados como tales | Muse Spark |
 
-Ocupa internet, porque los modelos corren en el backend. Un recorrido completo cuesta unos $0,10.
+Necesita el backend local con tu llave de Meta, porque los modelos corren ahí. Un recorrido completo cuesta unos $0,10.
 
 ### Criterios del jurado
 
@@ -122,13 +124,13 @@ Ocupa internet, porque los modelos corren en el backend. Un recorrido completo c
 
 | Modelo | Rol |
 | --- | --- |
-| Muse Spark | Game master en vivo: el evento de cada mes, con herramientas; reportes del Modo Clase |
+| Muse Spark | Director de la simulación en vivo: el evento de cada mes, con herramientas; reportes del Modo Clase |
 | Muse Wonder | Planifica tu año en segundo plano y escribe el resumen final |
 | Muse Spark Open (Baseten) | Los vendedores, con tácticas de comisión y memoria de lo que preguntaste; los cobradores, el prestamista, el de la pirámide y la gente del pueblo |
 | Muse Voice Transcribe | Negociás en voz alta; escribir siempre sirve |
-| Muse Image | Retratos, escenas de los eventos y la imagen de tu final, elegida por lo que pasó en tu partida; pre-generados y sin texto |
+| Muse Image | Retratos, escenas de los eventos y la imagen de tu final, elegida por lo que pasó en tu simulación; pre-generados y sin texto |
 
-Cada rol sale de latencias medidas: solo Spark responde siempre dentro de los 8 s del juego, así
+Cada rol sale de latencias medidas: solo Spark responde siempre dentro de los 8 s del simulador, así
 que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver
 [ADR 0004](docs/adr/0004-model-roles.md).
 
@@ -137,9 +139,9 @@ que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver
 Detrás de banderas de configuración, ver [ADR 0003](docs/adr/0003-agentic-game-master.md) (en
 inglés).
 
-- **Game master:** usa herramientas de solo lectura como `simulate_purchase` y `project_debt`, así
+- **Director de la simulación:** usa herramientas de solo lectura como `simulate_purchase` y `project_debt`, así
   las consecuencias que narra usan números reales.
-- **Planificador:** arma el recorrido del año y repasa los conceptos en los que el jugador falló.
+- **Planificador:** arma el recorrido del año y repasa los conceptos en los que el usuario falló.
 - **Vendedor:** empuja plazos más largos para ganar más comisión, pero solo puede decir cifras de
   su ficha oculta o de sus herramientas.
 
@@ -147,9 +149,9 @@ inglés).
 
 Un cliente Unity 2D (motor financiero en C#) se comunica por JSON con un backend FastAPI (contratos
 Pydantic v2, control de costos, agentes). El backend llama a la API de modelos de Meta, guarda sesiones
-y decisiones en Postgres y corre los personajes en Muse Spark Open en Baseten, con respaldo en Meta si
+y decisiones en SQLite o Postgres y corre los personajes en Muse Spark Open en Baseten, con respaldo en Meta si
 falla o se acaba su presupuesto diario. El diagrama, el camino de un evento, las protecciones y el costo
-de una partida (unos $0,06) están en [Arquitectura](docs/architecture.md), en inglés.
+de una simulación (unos $0,06) están en [Arquitectura](docs/architecture.md), en inglés.
 
 - Ningún monto, tasa ni saldo sale de un modelo.
 - La plata es un número entero de colones.
@@ -172,16 +174,13 @@ de una partida (unos $0,06) están en [Arquitectura](docs/architecture.md), en i
 
 ### Correrlo y armarlo
 
-El juego lee a qué backend hablarle de `colonquest.env`, y el backend lee sus llaves de `server/.env`.
-Cambiálos y armá desde ahí; las llaves nunca van dentro del ejecutable. La guía completa:
-[Correr y armar](RUN_AND_BUILD.es.md).
+Todo corre en tu computadora con tus propias llaves. `start_colonquest.bat` instala uv si falta, te pide la llave
+de Meta, levanta el backend local (SQLite, sin base de datos que instalar) y abre el simulador. Las llaves se quedan
+en `server/.env` y nunca van dentro del ejecutable. En otros sistemas, `python scripts/run_local.py` hace lo mismo.
+La guía completa: [Correr y armar](RUN_AND_BUILD.es.md).
 
 ```bash
-cd server
-cp .env.example .env
-uv sync
-uv run alembic upgrade head
-uv run python -m app.dev
+start_colonquest.bat
 ```
 
 ```bash

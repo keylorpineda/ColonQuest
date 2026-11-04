@@ -9,9 +9,9 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The window to haggle with the store seller. On the left the conversation, on the right what the player knows so far;
-    /// under them the questions worth asking, one click each, or the player's own words by text or voice; and at the foot the
-    /// decision. It is rebuilt whenever the conversation changes, so it holds no state of its own. What the player says shows
+    /// The window to haggle with the store seller. On the left the conversation, on the right what the user knows so far;
+    /// under them the questions worth asking, one click each, or the user's own words by text or voice; and at the foot the
+    /// decision. It is rebuilt whenever the conversation changes, so it holds no state of its own. What the user says shows
     /// at once, before the seller answers.
     /// </summary>
     public sealed class NegotiationPanel
@@ -73,7 +73,7 @@ namespace ColonQuest.UI
         public bool IsOpen => root.activeSelf;
 
         /// <summary>
-        /// Set by the game window: it plays the signing of the contract and then runs the action it is given, which closes the deal.
+        /// Set by the simulator window: it plays the signing of the contract and then runs the action it is given, which closes the deal.
         /// Without it the deal closes at once.
         /// </summary>
         public System.Action<System.Action> SignContract;
@@ -213,7 +213,7 @@ namespace ColonQuest.UI
             UpdateVoice();
         }
 
-        /// <summary>Tap to start talking, tap again to send; the recorder also stops by itself when the player goes quiet.</summary>
+        /// <summary>Tap to start talking, tap again to send; the recorder also stops by itself when the user goes quiet.</summary>
         private void ToggleTalk()
         {
             if (session.Busy)
@@ -341,7 +341,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>True once the seller said it, or the player asked the question that makes the seller say it.</summary>
+        /// <summary>True once the seller said it, or the user asked the question that makes the seller say it.</summary>
         private static bool Knows(Negotiation negotiation, SellerFact fact)
         {
             if (negotiation.RevealedFacts.Contains(fact))
@@ -362,7 +362,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>What the player knows so far, in figures that do not have to be fished out of the conversation.</summary>
+        /// <summary>What the user knows so far, in figures that do not have to be fished out of the conversation.</summary>
         private static void BuildSheet(RectTransform card, Negotiation negotiation, float y)
         {
             var top = new Vector2(0.5f, 1f);

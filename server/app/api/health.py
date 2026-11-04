@@ -23,13 +23,13 @@ def budget_info(status: BudgetStatus) -> BudgetInfo:
 
 @router.get("/ping", response_model=PingResponse)
 async def ping() -> PingResponse:
-    """Keep-alive for UptimeRobot: wakes Render without touching Neon or any model."""
+    """Liveness check that touches neither the database nor any model."""
     return PingResponse(status="ok")
 
 
 # UptimeRobot checks with HEAD by default and a GET-only route answers 405 Method Not Allowed.
 # Separate HEAD routes stay out of the OpenAPI contract (one operation per path) and never touch
-# Neon or the models, so a monitor can keep Render awake for free.
+# the database or the models, so a monitor can poll it for free.
 @router.head("/ping", include_in_schema=False)
 @router.head("/health", include_in_schema=False)
 async def head_check() -> Response:

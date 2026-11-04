@@ -48,7 +48,7 @@ namespace ColonQuest.World.Tests
                         foreach (var station in root.GetComponentsInChildren<Station>(true))
                         {
                             Check(station.DisplayName, name + " / " + station.name + " (prompt)", known, missing);
-                            // A real estate station keeps a listing id in its lines; the player never reads it.
+                            // A real estate station keeps a listing id in its lines; the user never reads it.
                             if (station.Type == StationType.RealEstate)
                             {
                                 continue;

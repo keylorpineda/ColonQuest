@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The talks in the player's own words: with the collectors when they come, and with the lender and the pyramid stand
+    /// The talks in the user's own words: with the collectors when they come, and with the lender and the pyramid stand
     /// before hearing their offer. The money moves only through the finance engine, after the talk, with the buttons.
     /// </summary>
     public sealed partial class GameUi
@@ -37,7 +37,7 @@ namespace ColonQuest.UI
             session.BeginTalk(type == StationType.Lender ? TalkPartner.Lender : TalkPartner.Pyramid);
         }
 
-        /// <summary>The ways out under the conversation. The arrangement of the collectors shows only once the player asked for it.</summary>
+        /// <summary>The ways out under the conversation. The arrangement of the collectors shows only once the user asked for it.</summary>
         private IList<ModalOption> TalkActions(DebtTalk talk)
         {
             var options = new List<ModalOption>();

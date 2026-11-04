@@ -4,8 +4,9 @@ Usage (from server/, with MODEL_API_KEY in .env):
     uv run python scripts/generate_event_bank.py              # 3 events per teaching concept
     uv run python scripts/generate_event_bank.py --per-concept 1 --dry-run
 
-Makes real, billed calls (about $0.02 per event, well under $1 in total). Each event uses the game
-master's SYSTEM_PROMPT and is kept only if it validates as a GameEvent, survives clamp_event
+Makes real, billed calls (about $0.02 per event, well under $1 in total). Each event uses the
+simulation director's SYSTEM_PROMPT and is kept only if it validates as a GameEvent, survives
+clamp_event
 unchanged, has a new id, quotes no amount that is not in its effects and is not a December event
 (the fallback picker would show it in any month). Accepted events are appended to
 app/game_master/fallback_events.json; the hand-written events are never removed.

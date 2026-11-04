@@ -90,7 +90,7 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(swimsuit, loop.Outfit);
 
             loop.NewGame();
-            Assert.AreEqual(0, loop.Outfit, "a new game starts in everyday clothes");
+            Assert.AreEqual(0, loop.Outfit, "a new simulation starts in everyday clothes");
         }
 
         [Test]

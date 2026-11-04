@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace ColonQuest.Game.Tests
 {
-    /// <summary>Every text the game writes from data (events, offers, houses, cars, the farm, the glossary) has an English entry.</summary>
+    /// <summary>Every text the simulator writes from data (events, offers, houses, cars, the farm, the glossary) has an English entry.</summary>
     [TestFixture]
     public sealed class TranslationCoverageTests
     {

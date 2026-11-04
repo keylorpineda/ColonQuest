@@ -335,7 +335,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negotiate", "by voice"),
         ],
         "rule": ("The AI tells the story.", "The engine keeps the books."),
-        "desc": "ColonQuest, a personal-finance simulator that plays like a game, from Costa Rica "
+        "desc": "ColonQuest, a personal-finance simulator that feels like real life, from Costa Rica "
         "to the world. The full content of this card is repeated as text below it.",
         "problem": (
             "THE PROBLEM",
@@ -376,7 +376,7 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "models_title": "META MODELS",
         "models": [
-            ("bolt", "Muse Spark", "Live game master with tools; Class Mode reports."),
+            ("bolt", "Muse Spark", "Live simulation director with tools; Class Mode reports."),
             ("spark", "Muse Wonder", "Plans your year, writes the summary and event bank."),
             ("person", "Muse Spark Open", "The sellers on Baseten: tactics and memory."),
             ("mic", "Voice Transcribe", "You negotiate out loud; typing always works too."),
@@ -385,12 +385,12 @@ COPY: dict[str, dict[str, Any]] = {
         "agents_title": "AGENTS",
         "agents": [
             (
-                "Game master",
+                "Simulation director",
                 "Calls read-only tools such as simulate_purchase and project_debt, so the consequences it narrates use real numbers.",
             ),
             (
                 "Season planner",
-                "Sets the teaching arc of the year and brings back the concepts a player struggled with.",
+                "Sets the teaching arc of the year and brings back the concepts a user struggled with.",
             ),
             (
                 "Seller",
@@ -402,7 +402,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Unity 2D client", ["WebGL and desktop", "C# finance engine"]),
             ("FastAPI backend", ["Pydantic v2 contracts", "cost guard, agents"]),
             ("Meta Model API", ["Wonder, Spark,", "Voice, Image"]),
-            ("Neon Postgres", ["sessions,", "decisions, calls"]),
+            ("SQLite or Postgres", ["sessions,", "decisions, calls"]),
             ("Open weights", ["sellers on Baseten", "Muse Spark Open"]),
         ],
         "rules": [
@@ -419,7 +419,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("done", "Plain language", "Short texts in everyday Costa Rican Spanish."),
             ("done", "No dead ends", "If a model fails, scripted content takes over."),
             ("done", "Readable page", "A text version below, motion stops on request."),
-            ("progress", "Keyboard play", "Movement and every panel without a mouse."),
+            ("progress", "Keyboard use", "Movement and every panel without a mouse."),
             ("progress", "Not by color alone", "Every color also has a label or an icon."),
             ("planned", "Adjustable text", "A larger font for panels and dialogue."),
         ],
@@ -441,7 +441,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Negociar", "con la voz"),
         ],
         "rule": ("La IA cuenta la historia.", "El motor lleva las cuentas."),
-        "desc": "ColonQuest, un simulador de finanzas personales que se juega como un juego, de "
+        "desc": "ColonQuest, un simulador de finanzas personales, de "
         "Costa Rica para el mundo. Todo el contenido de esta tarjeta se repite como texto debajo "
         "de ella.",
         "problem": (
@@ -483,7 +483,7 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "models_title": "MODELOS DE META",
         "models": [
-            ("bolt", "Muse Spark", "Game master en vivo con herramientas; Modo Clase."),
+            ("bolt", "Muse Spark", "Director de la simulación en vivo con herramientas; Modo Clase."),
             ("spark", "Muse Wonder", "Planifica tu año, escribe el resumen y los eventos."),
             ("person", "Muse Spark Open", "Los vendedores en Baseten: tácticas y memoria."),
             ("mic", "Voice Transcribe", "Negociás en voz alta; escribir siempre sirve."),
@@ -492,12 +492,12 @@ COPY: dict[str, dict[str, Any]] = {
         "agents_title": "AGENTES",
         "agents": [
             (
-                "Game master",
+                "Simulation director",
                 "Usa herramientas de solo lectura como simulate_purchase y project_debt, así las consecuencias que narra usan números reales.",
             ),
             (
                 "Planificador",
-                "Arma el recorrido del año y repasa los conceptos en los que el jugador falló.",
+                "Arma el recorrido del año y repasa los conceptos en los que el usuario falló.",
             ),
             (
                 "Vendedor",
@@ -509,7 +509,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Cliente Unity 2D", ["WebGL y escritorio", "motor financiero C#"]),
             ("Backend FastAPI", ["contratos Pydantic v2", "costos, agentes"]),
             ("API de Meta", ["Wonder, Spark,", "Voice, Image"]),
-            ("Neon Postgres", ["sesiones,", "decisiones"]),
+            ("SQLite o Postgres", ["sesiones,", "decisiones"]),
             ("Modelos abiertos", ["vendedores en Baseten", "Muse Spark Open"]),
         ],
         "rules": [
@@ -564,7 +564,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                     ("80.88%", "of people surveyed never had any financial education."),
                     ("2 930", "street-lender cases counted by investigators in 2025."),
                 ]),
-                ("header", "WHAT THE GAME COPIES"),
+                ("header", "WHAT THE SIMULATOR COPIES"),
                 ("stats", [
                     ("$750", "a month: the real 2026 minimum wage is your salary."),
                     ("3%", "a month on the card: 36% a year, under the legal cap of 36.48%."),
@@ -589,7 +589,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                     ("80,88%", "de los encuestados nunca recibió educación financiera."),
                     ("2 930", "casos de gota a gota contados por el OIJ en 2025."),
                 ]),
-                ("header", "LO QUE EL JUEGO COPIA"),
+                ("header", "LO QUE EL SIMULADOR COPIA"),
                 ("stats", [
                     ("₡373 092", "al mes: tu salario es el mínimo real de 2026."),
                     ("3%", "al mes en la tarjeta: 36% anual, bajo el tope legal de 36,48%."),
@@ -603,21 +603,21 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "lang": "en",
             "kicker": "FOR THE JUDGES",
             "title": "RUN AND BUILD",
-            "tagline": "Change the env files, build from there.",
-            "desc": "How to run ColonQuest, point it to another backend and build the executable from the env files. The full content of this card is repeated as text below it.",
+            "tagline": "Unzip, paste your key, simulate.",
+            "desc": "How to run ColonQuest on your computer with your own Meta key, with one launcher that starts the local backend, and how to build the executable. The full content of this card is repeated as text below it.",
             "icons": RUN_ICONS,
             "footer": "FROM COSTA RICA TO THE WORLD",
-            "license": "The keys never go inside the executable",
+            "license": "Your keys stay on your computer",
             "blocks": [
-                ("header", "JUST PLAY IT"),
-                ("paragraph", "Unzip the Windows build and open ColonQuest.exe. It uses our hosted backend, so it only needs internet. Choose Guided simulation."),
-                ("header", "TWO ENV FILES"),
+                ("header", "EVALUATE IT IN THREE STEPS"),
+                ("paragraph", "Unzip the latest release. Double-click start_colonquest.bat and paste your Meta key. It installs what it needs, starts the local backend and opens the simulator. Choose Guided simulation."),
+                ("header", "YOUR KEYS, YOUR COMPUTER"),
                 ("tiles", [
-                    ("stack", "server/.env", "API keys, models, budgets, database. Backend only."),
-                    ("folder", "colonquest.env", "Which backend the game talks to. No secrets."),
+                    ("stack", "server/.env", "Your Meta and Baseten keys. Only the local backend reads them."),
+                    ("folder", "colonquest.env", "Which backend the simulator talks to. No secrets."),
                 ]),
-                ("header", "YOUR OWN BACKEND"),
-                ("terminal", ["cd server", "cp .env.example .env", "uv sync", "uv run alembic upgrade head", "uv run python -m app.dev"]),
+                ("header", "THE LAUNCHER"),
+                ("terminal", ["start_colonquest.bat"]),
                 ("header", "BUILD THE EXECUTABLE"),
                 ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
             ],
@@ -626,21 +626,21 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "lang": "es",
             "kicker": "PARA LOS JUECES",
             "title": "CORRER Y ARMAR",
-            "tagline": "Cambiá los env y armá desde ahí.",
-            "desc": "Cómo correr ColonQuest, apuntarlo a otro backend y armar el ejecutable a partir de los archivos env. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
+            "tagline": "Descomprimí, pegá tu llave, simulá.",
+            "desc": "Cómo correr ColonQuest en tu computadora con tu propia llave de Meta, con un lanzador que levanta el backend local, y cómo armar el ejecutable. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
             "icons": RUN_ICONS,
             "footer": "FROM COSTA RICA TO THE WORLD",
-            "license": "Las llaves nunca van dentro del ejecutable",
+            "license": "Tus llaves se quedan en tu computadora",
             "blocks": [
-                ("header", "SOLO JUGARLO"),
-                ("paragraph", "Descomprimí el build de Windows y abrí ColonQuest.exe. Usa nuestro backend en línea, así que solo ocupa internet. Elegí Simulación guiada."),
-                ("header", "DOS ARCHIVOS ENV"),
+                ("header", "EVALUALO EN TRES PASOS"),
+                ("paragraph", "Descomprimí el último release. Hacé doble clic en start_colonquest.bat y pegá tu llave de Meta. Instala lo que necesita, levanta el backend local y abre el simulador. Elegí Simulación guiada."),
+                ("header", "TUS LLAVES, TU COMPUTADORA"),
                 ("tiles", [
-                    ("stack", "server/.env", "Llaves, modelos, presupuestos y base. Solo el backend."),
-                    ("folder", "colonquest.env", "A qué backend habla el juego. Sin secretos."),
+                    ("stack", "server/.env", "Tus llaves de Meta y Baseten. Solo las lee el backend local."),
+                    ("folder", "colonquest.env", "A qué backend habla el simulador. Sin secretos."),
                 ]),
-                ("header", "TU PROPIO BACKEND"),
-                ("terminal", ["cd server", "cp .env.example .env", "uv sync", "uv run alembic upgrade head", "uv run python -m app.dev"]),
+                ("header", "EL LANZADOR"),
+                ("terminal", ["start_colonquest.bat"]),
                 ("header", "ARMAR EL EJECUTABLE"),
                 ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
             ],
@@ -732,12 +732,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
 
 
 COMMANDS = [
-    "cd server",
-    "cp .env.example .env",
-    "uv sync",
-    "uv run alembic upgrade head",
-    "uv run python -m app.dev",
-    "cd ..",
+    "start_colonquest.bat",
     "cp colonquest.env.example colonquest.env",
     "python scripts/build_game.py",
 ]

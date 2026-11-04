@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Flat colors shared by the map and the UI so the whole game reads as one
+    /// Flat colors shared by the map and the UI so the whole simulation reads as one
     /// Among Us style cartoon: chunky dark outlines, solid fills, no gradients.
     /// </summary>
     public static class GamePalette

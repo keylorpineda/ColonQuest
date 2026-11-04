@@ -306,8 +306,8 @@ namespace ColonQuest.EditorTools
             ripple.a = 0.4f;
             Flickering(Shape(parent, "Pond_Ripple", ring, new Vector2(18.5f, -5.9f), new Vector2(1.6f, 0.9f), ripple, TownPark + 2), 0.6f, 1.4f, 5f);
             Flickering(Shape(parent, "Pond_Ripple", ring, new Vector2(21f, -6.2f), new Vector2(1.2f, 0.7f), ripple, TownPark + 2), 0.6f, 1.8f, 12f);
-            // The pond is alive: rings now and then, lily pads that drift and move away from the player, and a fish
-            // that jumps out once in a while. All of it stays inside the water (the pond's wall keeps the player out).
+            // The pond is alive: rings now and then, lily pads that drift and move away from the user, and a fish
+            // that jumps out once in a while. All of it stays inside the water (the pond's wall keeps the user out).
             var pond = new Rect(19.5f - 2.8f, -5.9f - 1.3f, 5.6f, 2.6f);
             var rings = new GameObject("Pond_Rings").transform;
             rings.SetParent(parent, false);
@@ -449,7 +449,7 @@ namespace ColonQuest.EditorTools
         {
             Fountain(parent, shadows, new Vector2(0f, 9f));
 
-            // Everything stands back from the basin, so the player can walk all the way around it.
+            // Everything stands back from the basin, so the user can walk all the way around it.
             PlazaBench(parent, shadows, -3.0f, 11.8f, 20f);
             PlazaBench(parent, shadows, 3.0f, 11.8f, -20f);
             ColonialLamp(parent, -5.3f, 9.6f);

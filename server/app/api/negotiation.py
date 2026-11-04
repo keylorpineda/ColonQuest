@@ -53,7 +53,7 @@ TranscriberDep = Annotated[Transcriber, Depends(get_transcriber)]
 async def player_habits(
     db: AsyncSession, session_id: uuid.UUID, offer_id: str
 ) -> list[KeyQuestion]:
-    """Key questions the player asked other sellers in this session: the seller's memory."""
+    """Key questions the user asked other sellers in this session: the seller's memory."""
     rows = await db.scalars(
         select(Negotiation.key_questions_asked).where(
             Negotiation.session_id == session_id, Negotiation.offer_id != offer_id
@@ -144,7 +144,7 @@ async def transcribe_clip(
     game_session: GameSession,
     audio: UploadFile,
 ) -> str:
-    """The player's words from a clip, or an HTTP error the client answers by asking for text.
+    """The user's words from a clip, or an HTTP error the client answers by asking for text.
 
     Validation happens before paying for transcription.
     """
@@ -160,7 +160,7 @@ async def transcribe_clip(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, VOICE_UNAVAILABLE)
 
     started = time.perf_counter()
-    # Whatever the language of the game, the player may well speak the other one.
+    # Whatever the language of the simulator, the user may well speak the other one.
     bias = ["English", "Spanish"] if game_session.language == "en" else ["Spanish", "English"]
     try:
         transcription = await transcriber.transcribe(wav, language_bias=bias)
@@ -195,7 +195,7 @@ async def transcribe(
     transcriber: TranscriberDep,
     audio: Annotated[UploadFile, File(description="WAV clip, 16-bit PCM, up to 15 s")],
 ) -> TranscriptResponse:
-    """Only the player's words, so the game can show them at once and then ask the seller."""
+    """Only the user's words, so the simulator can show them at once and then ask the seller."""
     game_session = await get_active_session(db, session_id)
     text = await transcribe_clip(db, settings, transcriber, game_session, audio)
     await db.commit()
@@ -213,7 +213,7 @@ async def negotiate_voice(
     offer_id: Annotated[str, Form(alias="offerId", pattern=r"^[a-z0-9_]{1,40}$")],
     audio: Annotated[UploadFile, File(description="WAV clip, 16-bit PCM, up to 15 s")],
 ) -> NegotiationReply:
-    """One negotiation turn spoken by the player, for builds older than /transcribe.
+    """One negotiation turn spoken by the user, for builds older than /transcribe.
 
     If voice fails the response is 503 and the client switches to the text endpoint, so the
     negotiation never blocks.

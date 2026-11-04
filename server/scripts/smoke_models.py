@@ -1,4 +1,4 @@
-"""Live smoke test of every Meta model the game uses (SCRUM-20).
+"""Live smoke test of every Meta model the simulator uses (SCRUM-20).
 
 Usage (from server/, with MODEL_API_KEY in .env):
     uv run python scripts/smoke_models.py --audio path/to/question.wav --image-out muse.png

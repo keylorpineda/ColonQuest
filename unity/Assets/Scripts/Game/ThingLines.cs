@@ -4,8 +4,8 @@ using ColonQuest.World;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// Picks what an everyday object says when the player uses it. Lines rotate with each use and may
-    /// mention the player's money with {cash}, {savings}, {card} or {salary}; the amounts come from the
+    /// Picks what an everyday object says when the user uses it. Lines rotate with each use and may
+    /// mention the user's money with {cash}, {savings}, {card} or {salary}; the amounts come from the
     /// state, never from the text. Pure C#, tested in EditMode.
     /// </summary>
     public static class ThingLines

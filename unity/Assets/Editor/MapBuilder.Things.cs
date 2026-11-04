@@ -4,9 +4,9 @@ using UnityEngine;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// Everyday objects and people the player can use by walking up and pressing E. They only talk:
+    /// Everyday objects and people the user can use by walking up and pressing E. They only talk:
     /// money moves through the finance engine, never through these lines. Amounts in the lines come
-    /// from the player's state through the {cash}, {savings}, {card} and {salary} tokens.
+    /// from the user's state through the {cash}, {savings}, {card} and {salary} tokens.
     /// </summary>
     public static partial class MapBuilder
     {

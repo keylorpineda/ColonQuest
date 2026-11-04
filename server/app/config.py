@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     model_api_key: SecretStr = SecretStr("")
     meta_base_url: str = "https://api.meta.ai/v1"
     model_timeout_s: float = Field(default=8.0, gt=0)
-    # Calls the player waits on (monthly event, negotiation). Measured on Oct 28: with "low",
+    # Calls the user waits on (monthly event, negotiation). Measured on Oct 28: with "low",
     # Muse Wonder took 14-18 s and Spark 5-8 s; with "minimal", Spark answers in 3-4.5 s.
     live_reasoning_effort: Literal["minimal", "low", "medium"] = "minimal"
     # Muse Image took about 14 s per 512x512 image on Oct 28; images are cached after the first one.
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     # Baseten credits ($100): at this daily spend the NPCs switch to Meta until midnight UTC.
     open_weights_daily_budget_usd: float = Field(default=3.0, ge=0)
 
-    # Agentic game master and seller (SCRUM-69..71): only if the playable month is ready.
+    # Agentic simulation director and seller (SCRUM-69..71): only if the working month is ready.
     agentic_game_master: bool = False
     season_planner: bool = False
     # The planner runs in the background after the first event, so it can use the slow Wonder.

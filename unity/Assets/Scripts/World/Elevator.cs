@@ -5,8 +5,8 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// The hospital elevator, on both floors. Its <see cref="Door"/> hands it the trip instead of changing scene at once:
-    /// the player presses the button, the chime sounds, the two leaves slide apart, the player steps in and the leaves
-    /// close before the scene changes. On the other floor the elevator rings and opens for the player who arrives.
+    /// the user presses the button, the chime sounds, the two leaves slide apart, the user steps in and the leaves
+    /// close before the scene changes. On the other floor the elevator rings and opens for the user who arrives.
     /// The door logic (target scene and spawn) stays the same.
     /// </summary>
     public sealed class Elevator : MonoBehaviour
@@ -19,7 +19,7 @@ namespace ColonQuest.World
         [SerializeField] private Vector2 button;
         [SerializeField] private Vector2 inside;
 
-        /// <summary>Set before the scene changes, so the elevator of the next floor opens for the player.</summary>
+        /// <summary>Set before the scene changes, so the elevator of the next floor opens for the user.</summary>
         public static bool Arriving { get; private set; }
 
         public void Configure(string leftLeafName, string rightLeafName, Vector2 buttonAt, Vector2 insideAt)
@@ -38,7 +38,7 @@ namespace ColonQuest.World
                 return;
             }
 
-            // The cabin is in the wall: the feet stop colliding so the player really steps inside before the doors close.
+            // The cabin is in the wall: the feet stop colliding so the user really steps inside before the doors close.
             var scene = new Interaction()
                 .Face(button).Pose(PersonPose.Reach, 0.5f).Sound(SoundEffectKind.Beep)
                 .Wait(0.3f).Sound(SoundEffectKind.Chime)
@@ -69,7 +69,7 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// The player just came up or down: they wait inside the cabin, the chime rings, the leaves open and the player walks
+        /// The user just came up or down: they wait inside the cabin, the chime rings, the leaves open and the user walks
         /// out the front of the elevator to the spot the floor gave them, facing the corridor; the leaves close behind.
         /// </summary>
         private IEnumerator Arrive()
@@ -104,7 +104,7 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>Turns the collision of the player's feet off while they are inside the cabin, which sits in the wall.</summary>
+        /// <summary>Turns the collision of the user's feet off while they are inside the cabin, which sits in the wall.</summary>
         private static void SetFeet(bool on)
         {
             var hero = GameObject.FindWithTag(Station.PlayerTag);

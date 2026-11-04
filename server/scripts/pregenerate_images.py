@@ -7,8 +7,8 @@ Usage (from server/, with MODEL_API_KEY and DATABASE_URL in .env):
 
 Images cached at full size by an earlier run are shrunk in place without a new call.
 Makes real, billed calls: each image takes 14 to 17 s and costs $0.01. Images are stored in the
-`images` table exactly like GET /api/images/{key}, so the game reads them from the cache and never
-waits on Muse Image. Run it against the QA database first. Exits 1 if any image fails.
+`images` table exactly like GET /api/images/{key}, so the simulator reads them from the cache and
+never waits on Muse Image. Run it against the QA database first. Exits 1 if any image fails.
 """
 
 import argparse

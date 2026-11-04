@@ -23,7 +23,7 @@ namespace ColonQuest.EditorTools
             return x > 15.5f && x < 25.5f && y > PoolY - 3f;
         }
 
-        // Where the player talks to the agencies and the farm: one step in front of each door.
+        // Where the user talks to the agencies and the farm: one step in front of each door.
         private static readonly Vector2 RealEstateSpot = new Vector2(-12f, 31f);
         private static readonly Vector2 CarDealerSpot = new Vector2(9f, 31f);
         private static readonly Vector2 FarmSpot = new Vector2(54.5f, 4.9f);
@@ -75,7 +75,7 @@ namespace ColonQuest.EditorTools
             });
             Banner(hospital, "URGENCIAS", 0f, 5.6f + 1.4f, "#E8505B");
 
-            // Two cars on show in front of the agency, on either side of the place where the player talks.
+            // Two cars on show in front of the agency, on either side of the place where the user talks.
             Car(parent, shadows, 4f, 32f, "#E8505B");
             Car(parent, shadows, 13.5f, 32f, "#4DA3FF");
 
@@ -197,7 +197,7 @@ namespace ColonQuest.EditorTools
             }
         }
 
-        /// <summary>Trees along the foot of the east cliff and past the north wall, where the player cannot go but can see.</summary>
+        /// <summary>Trees along the foot of the east cliff and past the north wall, where the user cannot go but can see.</summary>
         private static void BuildDistrictEdges(Transform parent, Transform shadows, System.Random random)
         {
             for (float x = -44f; x < MapLayout.EastCliffX; x += 3.4f)
@@ -273,7 +273,7 @@ namespace ColonQuest.EditorTools
             Doorway(parent, new Vector2(HospitalX, HospitalY + 0.2f), SceneNames.Hospital);
 
             // Every house that is not on the market can be entered: they all lead to the same neighbor's interior, and the
-            // door the player came in by is the one they come out of. The four houses with a sign are only for sale or rent.
+            // door the user came in by is the one they come out of. The four houses with a sign are only for sale or rent.
             BuildHouseDoor(parent, "Casa_Vecina_A", -40.25f, 5.5f);
             BuildHouseDoor(parent, "Casa_Almendros_3", -23f, 31.8f);
             BuildHouseDoor(parent, "Casa_Almendros_4", 38f, 31.8f);
@@ -283,7 +283,7 @@ namespace ColonQuest.EditorTools
             BuildSpawnPoint(parent, SpawnIds.TownFromHospital, new Vector2(HospitalX, 31.6f));
             BuildSpawnPoint(parent, SpawnIds.TownFromVecino, new Vector2(-32.5f, -9.2f));
 
-            // The yellow house on the south row rents out rooms: the player's own door.
+            // The yellow house on the south row rents out rooms: the user's own door.
             Doorway(parent, new Vector2(-32.5f, -8.9f), SceneNames.Cuarto);
             BuildSpawnPoint(parent, SpawnIds.TownFromCuarto, new Vector2(-32.5f, -9.2f));
             string layer = currentLayer;

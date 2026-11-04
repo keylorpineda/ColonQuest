@@ -14,7 +14,7 @@ MAX_CODE_ATTEMPTS = 5
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=ClassCreated)
 async def create_class(body: CreateClassRequest, db: DbSession) -> ClassCreated:
-    """Create a class and return the short code students type when they start a game."""
+    """Create a class and return the short code students type when they start a simulation."""
     for _ in range(MAX_CODE_ATTEMPTS):
         code = generate_code()
         if await db.get(SchoolClass, code) is None:

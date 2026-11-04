@@ -27,7 +27,7 @@ CARD_SUBJECTS = {
     "card_year_heavy_debt": "a young Costa Rican under a rainy sky looking at an empty wallet",
 }
 
-# The picture of the final report. The game draws the figures beside it, so it stays blank too.
+# The picture of the final report. The simulator draws the figures beside it, so it stays blank too.
 ENDING_STYLE = (
     "16-bit pixel art in a warm Costa Rican palette, limited 32-color palette, crisp pixel "
     "outlines, side view of a small scene, no text, no numbers, no letters, no writing on any "

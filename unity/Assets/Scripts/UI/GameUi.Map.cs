@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The map, and a HUD that does not get in the way: smaller and translucent, it fades further when the player walks under
+    /// The map, and a HUD that does not get in the way: smaller and translucent, it fades further when the user walks under
     /// it, and H hides it all for a clean view of the town.
     /// </summary>
     public sealed partial class GameUi
@@ -23,7 +23,7 @@ namespace ColonQuest.UI
         private float hudAlpha = HudAlpha;
         private float mapAlpha = HudAlpha;
 
-        /// <summary>True when the player has hidden the HUD with H.</summary>
+        /// <summary>True when the user has hidden the HUD with H.</summary>
         public bool HudHidden => hudHidden;
 
         private void BuildMapAndHud(RectTransform hudCard)
@@ -62,7 +62,7 @@ namespace ColonQuest.UI
             townMap.Tick(!hudHidden && !openingPlaying && !LoadingScreen.IsLoading, mapAlpha);
         }
 
-        /// <summary>True when the player is drawn under this piece of the screen.</summary>
+        /// <summary>True when the user is drawn under this piece of the screen.</summary>
         private static bool IsOver(GameObject hero, RectTransform piece)
         {
             var camera = Camera.main;

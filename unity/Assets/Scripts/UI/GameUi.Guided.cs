@@ -9,7 +9,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The guided run: the same game, with the same money and the same models, on a short stretch of the town and for three
+    /// The guided run: the same simulator, with the same money and the same models, on a short stretch of the town and for three
     /// months. It only says what to do next and keeps out what would get in the way (the clock, the traffic, the police, the
     /// other doors). Everything else, from the seller to the report at the end, is what a normal run shows.
     /// </summary>
@@ -92,7 +92,7 @@ namespace ColonQuest.UI
             return door.TargetScene == SceneNames.Town || door.TargetScene == guidedDoor;
         }
 
-        /// <summary>True when nothing is on the screen waiting for the player or for the server.</summary>
+        /// <summary>True when nothing is on the screen waiting for the user or for the server.</summary>
         private bool GuidedIdle => !modal.IsOpen && !talkPanel.IsOpen && !negotiationPanel.IsOpen && !session.Busy && !Interaction.Playing
             && !SceneTransition.IsBusy && !LoadingScreen.IsLoading && session.CurrentEvent == null && session.CurrentNegotiation == null && session.CurrentTalk == null;
 
@@ -127,7 +127,7 @@ namespace ColonQuest.UI
             ShowGuidedIntro();
             yield return UntilGuidedIdle();
 
-            // Month 1: the salary, a few steps so the player learns the arrow, and an event written for this player.
+            // Month 1: the salary, a few steps so the user learns the arrow, and an event written for this user.
             session.PayGuidedQuincena();
             guidedStation = StationType.Garage;
             guidedVisited = null;
@@ -138,7 +138,7 @@ namespace ColonQuest.UI
             }
 
             guidedStation = null;
-            guidedObjective = new Objective("El game master está leyendo tu situación");
+            guidedObjective = new Objective("El director de la simulación está leyendo tu situación");
             yield return UntilGuidedIdle();
             yield return WaitForThePlan();
             yield return CloseGuidedMonth();
@@ -188,7 +188,7 @@ namespace ColonQuest.UI
                 });
         }
 
-        /// <summary>The plan of Muse Wonder arrives in the background. The player walks meanwhile; the next event has to wait for it, or the plan would be lost.</summary>
+        /// <summary>The plan of Muse Wonder arrives in the background. The user walks meanwhile; the next event has to wait for it, or the plan would be lost.</summary>
         private IEnumerator WaitForThePlan()
         {
             guidedObjective = new Objective("Un momento: Muse Wonder está escribiendo tu año...");
@@ -265,7 +265,7 @@ namespace ColonQuest.UI
         {
             return new List<ModalOption>
             {
-                new ModalOption { Label = Loc.T("Jugar libre en el pueblo"), Color = GameUiColors.Green, OnPress = Restart },
+                new ModalOption { Label = Loc.T("Recorrer libre el pueblo"), Color = GameUiColors.Green, OnPress = Restart },
                 new ModalOption
                 {
                     Label = Loc.T("Ver cómo funciona por dentro"),

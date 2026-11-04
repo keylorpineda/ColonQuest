@@ -5,8 +5,8 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// What the player goes through when a car runs them over, in a second and a half: the world slows for an instant at the
-    /// hit, the player is thrown away from the car, spins and ends lying on the road with a ring of stars over the head. Then
+    /// What the user goes through when a car runs them over, in a second and a half: the world slows for an instant at the
+    /// hit, the user is thrown away from the car, spins and ends lying on the road with a ring of stars over the head. Then
     /// the hospital takes over. Pure effect: what the hit costs is decided by the finance engine, never here.
     /// </summary>
     public sealed class HitAnimation : MonoBehaviour
@@ -19,7 +19,7 @@ namespace ColonQuest.World
 
         public static bool Playing { get; private set; }
 
-        /// <summary>Plays the hit on this player. <paramref name="finished"/> runs when the stars fade out.</summary>
+        /// <summary>Plays the hit on this user. <paramref name="finished"/> runs when the stars fade out.</summary>
         public static void Play(Transform player, Vector2 carPosition, Action finished)
         {
             if (Playing || player == null)

@@ -1,4 +1,4 @@
-"""Game sessions and decision telemetry."""
+"""Simulator sessions and decision telemetry."""
 
 import uuid
 
@@ -24,7 +24,7 @@ async def get_active_session(db: DbSession, session_id: uuid.UUID) -> GameSessio
 async def create_session(
     body: CreateSessionRequest, db: DbSession, hashed_client: ClientHash
 ) -> SessionCreated:
-    """Start a game. A classCode joins the session to a Class Mode class."""
+    """Start a simulation. A classCode joins the session to a Class Mode class."""
     if body.class_code is not None and await db.get(SchoolClass, body.class_code) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "class not found")
     game_session = GameSession(
@@ -45,7 +45,7 @@ async def create_session(
 async def record_decision(
     session_id: uuid.UUID, body: DecisionRequest, db: DbSession
 ) -> DecisionRecorded:
-    """Store the choice the player made and the resulting state (impact telemetry)."""
+    """Store the choice the user made and the resulting state (impact telemetry)."""
     await get_active_session(db, session_id)
     if body.state_after.month != body.month:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "stateAfter.month must match")

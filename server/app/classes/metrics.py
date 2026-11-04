@@ -1,6 +1,6 @@
 """Teacher dashboard figures. All numbers come from stored telemetry, never from a model.
 
-A decision counts as "risky" when the player's total debt went up compared with the state after
+A decision counts as "risky" when the user's total debt went up compared with the state after
 their previous decision. That works for any event, model-written or hand-written.
 """
 
@@ -63,7 +63,7 @@ def concept_metrics(rows: Iterable[DecisionRow]) -> list[ConceptMetric]:
 
 
 def trap_detection_pct(key_questions_per_negotiation: Sequence[Sequence[str]]) -> int | None:
-    """Share of negotiation turns where the player asked about total cost or hidden charges."""
+    """Share of negotiation turns where the user asked about total cost or hidden charges."""
     if not key_questions_per_negotiation:
         return None
     detected = sum(

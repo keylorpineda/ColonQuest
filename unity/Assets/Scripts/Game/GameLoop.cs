@@ -6,7 +6,7 @@ using ColonQuest.World;
 
 namespace ColonQuest.Game
 {
-    /// <summary>What one decision did to the player's numbers, to show right after choosing.</summary>
+    /// <summary>What one decision did to the user's numbers, to show right after choosing.</summary>
     public sealed class ChoiceOutcome
     {
         public string ChoiceLabel = string.Empty;
@@ -40,7 +40,7 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// The rules of a run without any Unity or network code: the player's state, which tasks were
+    /// The rules of a run without any Unity or network code: the user's state, which tasks were
     /// done this month, applying a decision and closing the month. All money math is the finance
     /// engine's; this only decides when it runs.
     /// </summary>
@@ -65,7 +65,7 @@ namespace ColonQuest.Game
         /// <summary>The week of the month and the hour of the day.</summary>
         public GameClock Clock { get; private set; } = new GameClock();
 
-        /// <summary>The home, the car and the farm stakes the player bought in this run.</summary>
+        /// <summary>The home, the car and the farm stakes the user bought in this run.</summary>
         public Holdings Holdings { get; private set; } = new Holdings();
 
         /// <summary>The attendance at the first job.</summary>
@@ -127,7 +127,7 @@ namespace ColonQuest.Game
             doneStations.Clear();
         }
 
-        /// <summary>The run as a saved game writes it (see <see cref="SaveSlots"/>).</summary>
+        /// <summary>The run as a saved simulation writes it (see <see cref="SaveSlots"/>).</summary>
         public RunSnapshot Snapshot()
         {
             var snapshot = new RunSnapshot
@@ -280,15 +280,15 @@ namespace ColonQuest.Game
 
         public bool AllTasksDone => TasksDone >= GameRules.TasksPerMonth;
 
-        /// <summary>True once the player has been run over this month; it happens once a month at most.</summary>
+        /// <summary>True once the user has been run over this month; it happens once a month at most.</summary>
         public bool HurtThisMonth { get; private set; }
 
-        /// <summary>How many times the police took the player away in this run. Each one is a longer stay in the cell.</summary>
+        /// <summary>How many times the police took the user away in this run. Each one is a longer stay in the cell.</summary>
         public int Arrests { get; private set; }
 
         public bool HasSwimsuit { get; private set; }
 
-        /// <summary>The clothes the player wears, by number (see PlayerOutfit): 0 is the everyday clothes, 3 the swimsuit.</summary>
+        /// <summary>The clothes the user wears, by number (see PlayerOutfit): 0 is the everyday clothes, 3 the swimsuit.</summary>
         public int Outfit { get; private set; }
 
         /// <summary>Changes the clothes. The swimsuit can only be worn once it was bought.</summary>
@@ -305,7 +305,7 @@ namespace ColonQuest.Game
 
         public bool SwamThisMonth { get; private set; }
 
-        /// <summary>True once the player slept in the bed this month. Skipping it costs a little mood when the month closes.</summary>
+        /// <summary>True once the user slept in the bed this month. Skipping it costs a little mood when the month closes.</summary>
         public bool SleptThisMonth { get; private set; }
 
         public bool CookedThisMonth { get; private set; }
@@ -316,7 +316,7 @@ namespace ColonQuest.Game
             TasksDone = Math.Min(GameRules.TasksPerMonth, TasksDone + Math.Max(0, days) * GameRules.TasksPerDay);
         }
 
-        // ---------------------------------------------------------------- things that happen to the player
+        // ---------------------------------------------------------------- things that happen to the user
 
         public ChoiceOutcome ArrestPlayer()
         {
@@ -415,7 +415,7 @@ namespace ColonQuest.Game
             return outcome;
         }
 
-        /// <summary>The day ended away from the bed: the player falls asleep where they are and wakes up tired.</summary>
+        /// <summary>The day ended away from the bed: the user falls asleep where they are and wakes up tired.</summary>
         public ChoiceOutcome FallAsleep()
         {
             var before = State.Clone();
@@ -426,7 +426,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// The player may go to bed for the night before the evening once the morning of work is over: they worked today, or
+        /// The user may go to bed for the night before the evening once the morning of work is over: they worked today, or
         /// the shift is already past. Never in the middle of a shift.
         /// </summary>
         public bool CanSleepEarly => !Job.OnShift && (Job.WorkedToday || Clock.Hour >= GameRules.WorkEndHour);
@@ -439,7 +439,7 @@ namespace ColonQuest.Game
 
         private float shiftStartMinutes;
 
-        /// <summary>The player has been in their rented room at least once. The first shift waits for it.</summary>
+        /// <summary>The user has been in their rented room at least once. The first shift waits for it.</summary>
         public bool VisitedRoom { get; private set; }
 
         public void MarkRoomVisited()
@@ -448,7 +448,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// True in a new story until the first shift: the day of arrival, when the player first sees their room and takes out
+        /// True in a new story until the first shift: the day of arrival, when the user first sees their room and takes out
         /// the health insurance. A run made any other way (a test, an old save) starts without it.
         /// </summary>
         public bool ArrivalDay { get; private set; }
@@ -462,7 +462,7 @@ namespace ColonQuest.Game
         /// <summary>Before the first shift of a new story the room is seen and the insurance taken out. After it nothing more is asked.</summary>
         public bool ReadyForFirstShift => !ArrivalDay || Job.DaysWorked > 0 || (VisitedRoom && Holdings.HasHealthInsurance);
 
-        /// <summary>The player clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>
+        /// <summary>The user clocks in now. The time of the morning goes by while the shift plays (see <see cref="TickShift"/>).</summary>
         public ClockInResult ClockIn()
         {
             if (!Job.WorkedToday && !ReadyForFirstShift)
@@ -483,7 +483,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// While the player works, the clock moves through the morning little by little: from clocking in to the end of the
+        /// While the user works, the clock moves through the morning little by little: from clocking in to the end of the
         /// shift over <see cref="GameRules.ShiftRealSeconds"/>. It never passes the end of the shift.
         /// </summary>
         public void TickShift(float realSeconds)
@@ -726,7 +726,7 @@ namespace ColonQuest.Game
             return outcome;
         }
 
-        /// <summary>The player was run over: the bill depends on having health insurance and on the emergency fund.</summary>
+        /// <summary>The user was run over: the bill depends on having health insurance and on the emergency fund.</summary>
         public ChoiceOutcome HospitalizePlayer()
         {
             var before = State.Clone();
@@ -759,7 +759,7 @@ namespace ColonQuest.Game
         /// <summary>True once the collectors had their say this month: they come once a month at most.</summary>
         public bool CollectorsCameThisMonth { get; private set; }
 
-        /// <summary>True when the car stops for this player if they meet it.</summary>
+        /// <summary>True when the car stops for this user if they meet it.</summary>
         public bool CollectorsDue => InArrears && !CollectorsCameThisMonth;
 
         public long CollectionDemand => CollectionRules.Demand(State);
@@ -791,7 +791,7 @@ namespace ColonQuest.Game
             return OutcomeFrom(before, Loc.T("Ignorar a los cobradores"));
         }
 
-        /// <summary>The player pays the lender by choice, out of cash. Null when nothing is owed or there is no cash.</summary>
+        /// <summary>The user pays the lender by choice, out of cash. Null when nothing is owed or there is no cash.</summary>
         public ChoiceOutcome PayLender()
         {
             var before = State.Clone();
@@ -842,7 +842,7 @@ namespace ColonQuest.Game
 
         // ---------------------------------------------------------------- homes, cars and the farm
 
-        // None of these is a task of the month: the player may visit the agencies whenever there is cash.
+        // None of these is a task of the month: the user may visit the agencies whenever there is cash.
 
         public AssetPurchase RentHome(HomeListing home)
         {

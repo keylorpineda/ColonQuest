@@ -1,7 +1,7 @@
 """Local development server that also works on Windows.
 
 Async psycopg cannot run on Windows' default ProactorEventLoop, so this entry point starts
-uvicorn on a SelectorEventLoop. Production (Linux on Render) runs plain uvicorn.
+uvicorn on a SelectorEventLoop. Linux can run plain uvicorn.
 
     uv run python -m app.dev
 """

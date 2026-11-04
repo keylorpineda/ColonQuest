@@ -8,7 +8,7 @@ namespace ColonQuest.UI
     /// <summary>
     /// The pictures the backend serves (portraits of the characters, scenes of the events, the end postcard). Each one is
     /// asked for once, kept as a sprite, and used the next time a window opens. A picture that never arrives is simply not
-    /// drawn: the game keeps its colored faces and plain windows, and never waits for the network to draw anything.
+    /// drawn: the simulator keeps its colored faces and plain windows, and never waits for the network to draw anything.
     /// </summary>
     public static class RemoteImages
     {
@@ -50,7 +50,7 @@ namespace ColonQuest.UI
             return null;
         }
 
-        /// <summary>Like <see cref="Get"/>, without waiting for a game to be running: the demo lab shows pictures from the menu.</summary>
+        /// <summary>Like <see cref="Get"/>, without waiting for a simulation to be running: the demo lab shows pictures from the menu.</summary>
         public static Sprite Fetch(string key)
         {
             if (string.IsNullOrEmpty(key))

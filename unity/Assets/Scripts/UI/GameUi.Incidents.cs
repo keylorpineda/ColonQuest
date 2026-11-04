@@ -9,9 +9,9 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The windows of what happens to the player without asking: the owner who shouts from his house, the arrest,
-    /// the car that runs the player over, the health insurance desk and the collectors at the curb. What each one
-    /// costs is the finance engine's; this only shows it and moves the player to the next place.
+    /// The windows of what happens to the user without asking: the owner who shouts from his house, the arrest,
+    /// the car that runs the user over, the health insurance desk and the collectors at the curb. What each one
+    /// costs is the finance engine's; this only shows it and moves the user to the next place.
     /// </summary>
     public sealed partial class GameUi
     {
@@ -38,7 +38,7 @@ namespace ColonQuest.UI
             CollectorCar.Armed = false;
         }
 
-        /// <summary>Runs every frame: shows the owner's countdown and tells the collectors whether the player owes enough.</summary>
+        /// <summary>Runs every frame: shows the owner's countdown and tells the collectors whether the user owes enough.</summary>
         private void TickIncidents()
         {
             var watch = TrespassWatch.Active;
@@ -55,7 +55,7 @@ namespace ColonQuest.UI
         // ---------------------------------------------------------------- the law
 
         /// <summary>
-        /// A fine never comes by itself: an officer has to reach the player first. Only then the window opens, and the
+        /// A fine never comes by itself: an officer has to reach the user first. Only then the window opens, and the
         /// fine, the lost days and the trip to the station are charged when it is closed.
         /// </summary>
         private void OnStoppedByOfficer(OffenseKind offense)
@@ -121,7 +121,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// The arrest, as a scene: siren and lights, the officer steps up beside the player, the player raises the hands,
+        /// The arrest, as a scene: siren and lights, the officer steps up beside the user, the user raises the hands,
         /// the handcuffs click on and they walk a few steps together. Then the station, where the cell gate slams shut.
         /// Space skips the scene; the sentence itself was already applied by the finance engine.
         /// </summary>
@@ -160,7 +160,7 @@ namespace ColonQuest.UI
 
         private const float ArrestSirenSeconds = 2.2f;
 
-        /// <summary>The arrest with the officer who stopped the player, or null when no officer is close enough to act it.</summary>
+        /// <summary>The arrest with the officer who stopped the user, or null when no officer is close enough to act it.</summary>
         private Interaction ArrestScene()
         {
             var officer = NearestOfficer(HeroAt(), 6f);
@@ -225,7 +225,7 @@ namespace ColonQuest.UI
                 text.AppendLine();
                 text.AppendLine(Loc.T("El fondo de emergencia también sirve para esto: es la plata que ya está lista cuando llega el golpe."));
                 text.AppendLine();
-                text.Append(Loc.T("Cifras de ejemplo del juego. Es un seguro de salud genérico; no es el de ninguna institución."));
+                text.Append(Loc.T("Cifras de ejemplo del simulador. Es un seguro de salud genérico; no es el de ninguna institución."));
                 options.Add(new ModalOption
                 {
                     Label = Loc.F("1.  Contratar el seguro  ·  {0} al mes", Money.Format(premium)),
@@ -241,7 +241,7 @@ namespace ColonQuest.UI
         // ---------------------------------------------------------------- the collectors
 
         /// <summary>
-        /// As the prologue tells it: the black car brakes in front of the player, two men get out and walk up to them, and only
+        /// As the prologue tells it: the black car brakes in front of the user, two men get out and walk up to them, and only
         /// then the window with the choices opens. When the choice is made they walk back to the car and it drives off.
         /// </summary>
         private void OnCollectorsArrived(CollectorCar car)

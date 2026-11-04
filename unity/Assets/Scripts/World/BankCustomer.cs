@@ -6,8 +6,8 @@ namespace ColonQuest.World
     /// <summary>
     /// A person who comes into the bank, runs an errand and leaves: the cash machine, a window, the information desk or a
     /// wait on the chairs first. Every visit picks another errand and other times, so the lobby never repeats the same
-    /// loop. Customers have no collider; they never block the player. The teller scenes ask <see cref="IsBeingServed"/>
-    /// to make the player wait their turn.
+    /// loop. Customers have no collider; they never block the user. The teller scenes ask <see cref="IsBeingServed"/>
+    /// to make the user wait their turn.
     /// </summary>
     public sealed class BankCustomer : MonoBehaviour
     {

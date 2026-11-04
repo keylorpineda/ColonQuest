@@ -3,7 +3,7 @@ using System;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// The rules of the phone's block game, with no Unity code: a board, falling pieces that move and turn,
+    /// The rules of the phone's block puzzle, with no Unity code: a board, falling pieces that move and turn,
     /// full lines that clear and a score. The screen only draws <see cref="Cells"/> and <see cref="PieceCells"/>.
     /// </summary>
     public sealed class TetrisBoard

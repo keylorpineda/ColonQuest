@@ -13,7 +13,7 @@ namespace ColonQuest.Finance
         public const int ShortInformalLoanMonths = 3;
 
         /// <summary>
-        /// Validates and applies a player's chosen <see cref="Choice"/> from a <see cref="GameEvent"/>.
+        /// Validates and applies a user's chosen <see cref="Choice"/> from a <see cref="GameEvent"/>.
         /// Every effect in the choice is validated before any state is mutated; if any effect is out of
         /// range, <see cref="InvalidGameEventEffectException"/> is thrown and <paramref name="state"/>
         /// remains untouched.

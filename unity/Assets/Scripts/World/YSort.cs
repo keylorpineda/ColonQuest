@@ -5,7 +5,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// Draws a character or prop in front of things that are further up the screen and
-    /// behind things that are further down, so the player can walk behind a tree.
+    /// behind things that are further down, so the user can walk behind a tree.
     /// Attach it to the root of the object, next to its SortingGroup.
     /// </summary>
     [RequireComponent(typeof(SortingGroup))]

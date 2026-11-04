@@ -1,4 +1,4 @@
-"""Monthly event endpoint backed by the AI game master."""
+"""Monthly event endpoint backed by the AI simulation director."""
 
 import logging
 import uuid
@@ -64,7 +64,7 @@ SessionFactoryDep = Annotated[SessionFactory, Depends(get_session_factory)]
 
 
 async def risky_concepts(db: AsyncSession, session_id: uuid.UUID) -> list[TeachingConcept]:
-    """The last decision's concept when that decision left the player with more debt."""
+    """The last decision's concept when that decision left the user with more debt."""
     rows = (
         await db.execute(
             select(Decision.teaching_concept, Decision.state_after)
@@ -93,7 +93,7 @@ def dump_plan(plan: SeasonPlan) -> dict[str, Any]:
 async def plan_month(
     db: AsyncSession, game_session: GameSession, state: PlayerState
 ) -> tuple[PlannedMonth, SeasonPlan | None]:
-    """Store the default plan on the first event, then adjust it to the player's decisions.
+    """Store the default plan on the first event, then adjust it to the user's decisions.
 
     Returns this month's focus and, on the first event, the default plan that the model's plan
     replaces once it arrives in the background.
@@ -132,7 +132,7 @@ async def refine_season_plan(
         async with session_factory() as db:
             planned = await planner.plan(DbLedger(db, settings, client_hash), session_id, state)
             game_session = await db.get(GameSession, session_id)
-            # A plan already adjusted to the player's decisions wins over a late answer.
+            # A plan already adjusted to the user's decisions wins over a late answer.
             if (
                 planned.source == "model"
                 and game_session is not None
@@ -141,7 +141,7 @@ async def refine_season_plan(
                 game_session.season_plan = dump_plan(planned.plan)
             await db.commit()
     except Exception:
-        # The player never sees this: the default plan is already stored.
+        # The user never sees this: the default plan is already stored.
         logger.exception("season planner task failed for session %s", session_id)
 
 

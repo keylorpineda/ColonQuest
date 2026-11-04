@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// The countdown of an owner who found a stranger in the house: it runs while the player stays inside and
+    /// The countdown of an owner who found a stranger in the house: it runs while the user stays inside and
     /// ends in the call to the police. Plain data, so it can be tested without a scene.
     /// </summary>
     public sealed class TrespassClock
@@ -39,9 +39,9 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Sits in a house that is not the player's. The owner shouts a warning as the player comes in. When the time is up
-    /// and the player is still inside, the owner calls the police: the offense is raised and the officer comes in.
-    /// The fine is not charged here: it arrives only if the officer reaches the player. Walking out through the door
+    /// Sits in a house that is not the user's. The owner shouts a warning as the user comes in. When the time is up
+    /// and the user is still inside, the owner calls the police: the offense is raised and the officer comes in.
+    /// The fine is not charged here: it arrives only if the officer reaches the user. Walking out through the door
     /// loads the town, which destroys this object and the offense with it.
     /// </summary>
     public sealed class TrespassWatch : MonoBehaviour
@@ -52,7 +52,7 @@ namespace ColonQuest.World
 
         private TrespassClock clock;
 
-        /// <summary>The watch of the house the player is in now, or null in any other scene.</summary>
+        /// <summary>The watch of the house the user is in now, or null in any other scene.</summary>
         public static TrespassWatch Active { get; private set; }
 
         public string OwnerName => ownerName;

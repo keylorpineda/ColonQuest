@@ -1,7 +1,7 @@
 """Budget, limits and call recording behind one small interface.
 
-The game master depends on this protocol, not on the database, so its retry and fallback logic
-is unit-tested in memory; DbLedger is the production implementation over Postgres.
+The simulation director depends on this protocol, not on the database, so its retry and fallback
+logic is unit-tested in memory; DbLedger is the production implementation over Postgres.
 """
 
 import uuid

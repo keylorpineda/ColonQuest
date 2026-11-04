@@ -1,7 +1,7 @@
 """What the agents' tools did in each session, kept in memory for the judges' demo.
 
-It is evidence, not game state: nothing reads it to decide anything, and a restart loses it. Calls
-to the models themselves are in the ``model_calls`` table; only the tool steps live here.
+It is evidence, not simulator state: nothing reads it to decide anything, and a restart loses it.
+Calls to the models themselves are in the ``model_calls`` table; only the tool steps live here.
 """
 
 import json

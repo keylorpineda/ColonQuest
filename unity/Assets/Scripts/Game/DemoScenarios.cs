@@ -4,7 +4,7 @@ using ColonQuest.Finance;
 
 namespace ColonQuest.Game
 {
-    /// <summary>One finished situation for the game master of the demo: who the player is this month, ready to send.</summary>
+    /// <summary>One finished situation for the simulation director of the demo: who the user is this month, ready to send.</summary>
     public sealed class DemoScenario
     {
         public readonly string Name;
@@ -21,7 +21,7 @@ namespace ColonQuest.Game
 
     /// <summary>
     /// The situations a judge can try without playing months to get there. Each one is an ordinary
-    /// <see cref="PlayerState"/>: the backend cannot tell it from a real game.
+    /// <see cref="PlayerState"/>: the backend cannot tell it from a real simulator.
     /// </summary>
     public static class DemoScenarios
     {

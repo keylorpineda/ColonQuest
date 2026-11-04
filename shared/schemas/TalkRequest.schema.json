@@ -55,7 +55,7 @@
     },
     "TalkSheetLine": {
       "additionalProperties": false,
-      "description": "One true thing about the deal, from the game's engine, worded for the character.",
+      "description": "One true thing about the deal, from the simulator's engine, worded for the character.",
       "properties": {
         "fact": {
           "$ref": "#/$defs/TalkFact"

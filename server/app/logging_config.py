@@ -1,4 +1,4 @@
-"""Readable application logs (timestamp, level, module) for local runs and Render."""
+"""Readable application logs (timestamp, level, module) for local runs."""
 
 import logging
 import logging.config

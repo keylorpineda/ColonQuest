@@ -117,7 +117,7 @@ namespace ColonQuest.UI
         private void Refresh()
         {
             var settings = GameSettings.Current;
-            // Both names stay in their own language, so the player can always find the way back.
+            // Both names stay in their own language, so the user can always find the way back.
             UiKit.SetLabel(languageButton, settings.Language == GameLanguage.English ? "Language: English" : "Idioma: Español");
             UiKit.SetLabel(soundButton, Loc.T(settings.SoundOn ? "Sonido: activado" : "Sonido: desactivado"));
             UiKit.SetLabel(screenButton, Loc.T(FullscreenKeys.IsFull ? "Pantalla completa: sí" : "Pantalla completa: no"));

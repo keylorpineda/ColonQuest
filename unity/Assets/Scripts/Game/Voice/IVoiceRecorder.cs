@@ -31,7 +31,7 @@ namespace ColonQuest.Game
         /// <summary>How loud the microphone is right now, 0 to 1; stays at 0 when the platform cannot tell.</summary>
         float Level { get; }
 
-        /// <summary>True when the clip also ends by itself after the player stops talking.</summary>
+        /// <summary>True when the clip also ends by itself after the user stops talking.</summary>
         bool StopsOnSilence { get; }
 
         void Start();
@@ -50,7 +50,7 @@ namespace ColonQuest.Game
 
     public static class VoiceRecorders
     {
-        /// <summary>The recorder for the platform the game runs on.</summary>
+        /// <summary>The recorder for the platform the simulator runs on.</summary>
         public static IVoiceRecorder Create()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
