@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The cell, the wardrobe and the beach: the sentence the player serves after an arrest (with the bail as a way out),
+    /// The cell, the wardrobe and the beach: the sentence the user serves after an arrest (with the bail as a way out),
     /// the swimsuit that is bought at home, and the swim it allows once a month.
     /// </summary>
     public sealed partial class GameUi
@@ -30,7 +30,7 @@ namespace ColonQuest.UI
             cellCard.SetActive(false);
         }
 
-        /// <summary>The player is in the cell: the door stays locked until the term in game days is served or the bail is paid.</summary>
+        /// <summary>The user is in the cell: the door stays locked until the term in simulator days is served or the bail is paid.</summary>
         private void StartSentence(int days)
         {
             Door.Locked = true;
@@ -133,7 +133,7 @@ namespace ColonQuest.UI
             modal.Show(Loc.T("El ropero"), Loc.T("Tu ropa"), text.ToString(), options);
         }
 
-        /// <summary>Changes the clothes: the player turns, the clothes swap and a short thought says it.</summary>
+        /// <summary>Changes the clothes: the user turns, the clothes swap and a short thought says it.</summary>
         private void WearOutfit(int outfit)
         {
             if (!session.Loop.Wear(outfit, PlayerOutfit.Swimsuit))

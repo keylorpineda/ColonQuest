@@ -7,8 +7,8 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The opening of a new life, in the house: the player turns 18, the mother gives a present, the phone brings the first job
-    /// and the player says goodbye and walks out to the town. Short lines only, and Space skips it.
+    /// The opening of a new life, in the house: the user turns 18, the mother gives a present, the phone brings the first job
+    /// and the user says goodbye and walks out to the town. Short lines only, and Space skips it.
     /// </summary>
     public sealed partial class GameUi
     {
@@ -17,7 +17,7 @@ namespace ColonQuest.UI
         private static readonly Vector2 OpeningStart = new Vector2(-6.0f, 1.8f);
 
         /// <summary>
-        /// Where the mother stands for the present: by the foot of the bed, above the player's way to the bedroom door so the
+        /// Where the mother stands for the present: by the foot of the bed, above the user's way to the bedroom door so the
         /// walk out never has to go through her. The rest of the time she is in the living room.
         /// </summary>
         private static readonly Vector2 OpeningMotherAt = new Vector2(-3.3f, 2.6f);
@@ -27,7 +27,7 @@ namespace ColonQuest.UI
         /// <summary>How close the camera comes during the opening, as a share of its normal view.</summary>
         private const float OpeningCloseUp = 0.68f;
 
-        /// <summary>How far along the way to the player the mother walks to hand over the present.</summary>
+        /// <summary>How far along the way to the user the mother walks to hand over the present.</summary>
         private const float OpeningMotherApproach = 0.45f;
 
         private CinematicBars openingBars;
@@ -71,7 +71,7 @@ namespace ColonQuest.UI
                 mother.transform.position = OpeningMotherAt;
             }
 
-            // The loading screen goes first: the story begins when the player can see it.
+            // The loading screen goes first: the story begins when the user can see it.
             while (LoadingScreen.IsLoading)
             {
                 yield return null;
@@ -100,7 +100,7 @@ namespace ColonQuest.UI
             openingCashGiven = true;
             promptCard.SetActive(false);
 
-            // The player stays in the bedroom after the goodbye and walks out on their own.
+            // The user stays in the bedroom after the goodbye and walks out on their own.
         }
 
         private Interaction OpeningScene()
@@ -122,7 +122,7 @@ namespace ColonQuest.UI
                 .NpcPose(Mother, PersonPose.Wave, 2f).Sound(SoundEffectKind.Chime).Burst("confetti", aboveMom, 18)
                 .Say("Mamá", Loc.F("¡Feliz cumpleaños, {0}! Ya 18 años, ¿quién lo diría?", name)).Wait(3.2f)
 
-                // She crosses the room to put the present in the player's hands.
+                // She crosses the room to put the present in the user's hands.
                 .NpcWalk(Mother, close, 0.8f).Wait(0.85f)
                 .NpcPose(Mother, PersonPose.Handover, 1.2f).Sound(SoundEffectKind.Swish)
                 .Fly("box", close, me + new Vector2(0f, 0.2f), 0.7f).Wait(0.75f)
@@ -142,7 +142,7 @@ namespace ColonQuest.UI
                 .Say(string.Empty, "Gracias, mami. Qué chiva.").Wait(1.2f)
                 .Say("Mamá", "Ahora te toca manejar tu propia plata. Con cuidado, ¿oyó?").Wait(3.4f)
 
-                // The phone interrupts: both look, and the camera leans in on the player.
+                // The phone interrupts: both look, and the camera leans in on the user.
                 .Sound(SoundEffectKind.Beep).Wait(0.25f).Sound(SoundEffectKind.Beep)
                 .Pose(PersonPose.Pocket, 0.3f).HoldProp("phone").Pose(PersonPose.Type, 0.9f)
                 .Zoom(OpeningCloseUp * 0.92f, 1f)
@@ -154,7 +154,7 @@ namespace ColonQuest.UI
                 .Say("Mamá", "¡Qué orgullo! Ya tenés tu cuartito alquilado en el barrio. Cuidá esa platica.").Wait(3.2f)
                 .NpcWalk(Mother, mom, 0.9f)
 
-                // She steps back, the camera opens and the bars leave: now the player is in charge.
+                // She steps back, the camera opens and the bars leave: now the user is in charge.
                 .Zoom(1f, 1.4f)
                 .Apply(HideOpeningBars)
                 .Say(string.Empty, "Bueno. A empezar mi vida.").Wait(1.6f);

@@ -74,7 +74,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.IsNotNull(Session.CurrentEvent, "the offline run plays a local event");
             Assert.AreEqual(ResultSource.Fallback, Session.CurrentEventSource);
             Assert.IsTrue(ModalOpen, "the event window is open");
-            Assert.IsTrue(PlayerController.Blocked, "the player stands still while a window is open");
+            Assert.IsTrue(PlayerController.Blocked, "the user stands still while a window is open");
 
             long cash = Session.State.Cash;
             string choiceId = Session.CurrentEvent.Choices[0].Id;

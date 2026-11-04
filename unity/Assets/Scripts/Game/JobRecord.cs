@@ -2,7 +2,7 @@ using System;
 
 namespace ColonQuest.Game
 {
-    /// <summary>What happened when the player tried to clock in.</summary>
+    /// <summary>What happened when the user tried to clock in.</summary>
     public enum ClockInResult
     {
         OnTime,
@@ -59,7 +59,7 @@ namespace ColonQuest.Game
             return minutes > StartMinutes + GameRules.WorkGraceMinutes;
         }
 
-        /// <summary>True while the player can still make it to work today.</summary>
+        /// <summary>True while the user can still make it to work today.</summary>
         public bool ExpectedAt(float minutes)
         {
             return !WorkedToday && minutes < EndMinutes;
@@ -98,7 +98,7 @@ namespace ColonQuest.Game
             return wasOnShift;
         }
 
-        /// <summary>Closes the working day. Returns true when the player never came: it counts as a missed day.</summary>
+        /// <summary>Closes the working day. Returns true when the user never came: it counts as a missed day.</summary>
         public bool EndDay()
         {
             bool missed = !WorkedToday;
@@ -126,7 +126,7 @@ namespace ColonQuest.Game
             Position++;
         }
 
-        /// <summary>Puts the record back where a saved game left it.</summary>
+        /// <summary>Puts the record back where a saved simulation left it.</summary>
         public void Restore(int daysWorked, int latesThisMonth, int missedThisMonth, bool workedToday, int punctualDays, JobPosition position)
         {
             PunctualDays = Math.Max(0, punctualDays);

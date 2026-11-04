@@ -8,7 +8,7 @@ using EventType = ColonQuest.Finance.EventType;
 
 namespace ColonQuest.Game
 {
-    /// <summary>Who the player is talking with in their own words.</summary>
+    /// <summary>Who the user is talking with in their own words.</summary>
     public enum TalkPartner
     {
         Collectors,
@@ -22,7 +22,7 @@ namespace ColonQuest.Game
         Stranger
     }
 
-    /// <summary>What the player can find out by asking. Each one is a question worth asking before saying yes.</summary>
+    /// <summary>What the user can find out by asking. Each one is a question worth asking before saying yes.</summary>
     public enum TalkFact
     {
         TotalCost,
@@ -34,7 +34,7 @@ namespace ColonQuest.Game
         Legal
     }
 
-    /// <summary>One exchange of a talk: what the player said and what the other one answered.</summary>
+    /// <summary>One exchange of a talk: what the user said and what the other one answered.</summary>
     public sealed class TalkTurn
     {
         public string Player = string.Empty;
@@ -42,10 +42,10 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// A conversation in the player's own words, typed or spoken, with the collectors, the lender of quick money or the
+    /// A conversation in the user's own words, typed or spoken, with the collectors, the lender of quick money or the
     /// "Invierte Ya 300%" stand. A model writes the answers from <see cref="ToRequest"/>, which holds the true figures; when
     /// the backend cannot answer, <see cref="Say"/> follows fixed rules. Either way the other one never lies about a figure,
-    /// only says it when asked, and every figure comes from the game's numbers. Pure, so it can be tested.
+    /// only says it when asked, and every figure comes from the simulator's numbers. Pure, so it can be tested.
     /// </summary>
     public sealed class DebtTalk
     {
@@ -71,7 +71,7 @@ namespace ColonQuest.Game
         /// <summary>The monthly rate of an informal loan, which every neighbor knows to fear.</summary>
         private const int NeighborLoanRatePct = LenderRatePct;
 
-        /// <summary>What the lender is willing to lend. The contract of the game allows up to the last one.</summary>
+        /// <summary>What the lender is willing to lend. The contract of the simulator allows up to the last one.</summary>
         public static readonly long[] LenderLoans = { ExampleLoan, 200_000L, 300_000L };
 
         public const string TakeOffer = "take";
@@ -88,7 +88,7 @@ namespace ColonQuest.Game
         public IReadOnlyList<TalkTurn> Turns => turns;
         public IReadOnlyList<TalkFact> Asked => asked;
 
-        /// <summary>The monthly rate of the player's card, for the neighbor's advice.</summary>
+        /// <summary>The monthly rate of the user's card, for the neighbor's advice.</summary>
         public decimal CardRatePct { get; }
 
         public DebtTalk(TalkPartner partner, long demand = 0L, decimal cardRatePct = CreditCard.TypicalMonthlyRatePct)
@@ -212,7 +212,7 @@ namespace ColonQuest.Game
             return total;
         }
 
-        /// <summary>The player says something; the answer is added to the turns and returned.</summary>
+        /// <summary>The user says something; the answer is added to the turns and returned.</summary>
         public string Say(string playerText)
         {
             string text = playerText == null ? string.Empty : playerText.Trim();
@@ -257,7 +257,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// What goes to the model for one turn: the true sheet, in the player's language, and the only amounts and
+        /// What goes to the model for one turn: the true sheet, in the user's language, and the only amounts and
         /// percentages the character may say. The model writes the words and never computes a figure.
         /// </summary>
         public TalkRequestDto ToRequest(string playerText, string language)
@@ -326,7 +326,7 @@ namespace ColonQuest.Game
 
         private void FillNeighbor(TalkRequestDto request)
         {
-            Line(request, TalkFact.Rate, Loc.F("Una tarjeta como la del jugador cobra {0}% al mes sobre lo que queda debiendo: pagar solo el mínimo hace crecer la deuda.", CardRatePct.ToString("0.#", CultureInfo.InvariantCulture)));
+            Line(request, TalkFact.Rate, Loc.F("Una tarjeta como la del usuario cobra {0}% al mes sobre lo que queda debiendo: pagar solo el mínimo hace crecer la deuda.", CardRatePct.ToString("0.#", CultureInfo.InvariantCulture)));
             Line(request, TalkFact.TotalCost, Loc.T("Comprar a cuotas casi siempre sale más caro que de contado: hay que preguntar el total, el seguro y la comisión."));
             Line(request, TalkFact.Arrangement, Loc.T("Lo que funciona es apartar algo cada quincena, aunque sea poco, antes de gastar."));
             Line(request, TalkFact.WhatIfNotPaid, Loc.F("Un prestamista gota a gota cobra hasta {0}% al mes y manda a cobrar a la casa: mejor evitarlo.", NeighborLoanRatePct));
@@ -369,8 +369,8 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// The offer of the lender or of the pyramid as an event: what the player signs, with the figures of the sheet. It is not
-        /// asked of a model, because the game master does not know where the player is standing.
+        /// The offer of the lender or of the pyramid as an event: what the user signs, with the figures of the sheet. It is not
+        /// asked of a model, because the simulation director does not know where the user is standing.
         /// </summary>
         public static GameEvent OfferEvent(TalkPartner partner)
         {

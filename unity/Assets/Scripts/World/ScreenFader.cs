@@ -10,7 +10,7 @@ namespace ColonQuest.World
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class ScreenFader : MonoBehaviour
     {
-        /// <summary>Long enough to see the player walk into the dark and out of it, short enough not to wait.</summary>
+        /// <summary>Long enough to see the user walk into the dark and out of it, short enough not to wait.</summary>
         public const float Seconds = 0.45f;
 
         private SpriteRenderer spriteRenderer;

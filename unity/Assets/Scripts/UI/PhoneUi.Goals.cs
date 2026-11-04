@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ColonQuest.UI
 {
-    /// <summary>The goals of the run on the phone, and the two moves of the bank app that get the player closer to them.</summary>
+    /// <summary>The goals of the run on the phone, and the two moves of the bank app that get the user closer to them.</summary>
     public sealed partial class PhoneUi
     {
         private const long BankStep = 10_000L;

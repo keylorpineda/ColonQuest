@@ -242,7 +242,7 @@ namespace ColonQuest.Finance
         }
 
         /// <summary>
-        /// Processes a monthly credit card payment from the player's cash and accrues monthly interest
+        /// Processes a monthly credit card payment from the user's cash and accrues monthly interest
         /// on any remaining unpaid balance. Cash never goes negative.
         /// </summary>
         public static CreditCardCycleResult ProcessCreditCardCycle(PlayerState state, long requestedPaymentColones)

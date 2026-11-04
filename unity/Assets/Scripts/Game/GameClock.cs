@@ -39,8 +39,8 @@ namespace ColonQuest.Game
         private static float EndMinutes => GameRules.DayEndHour * MinutesPerHour;
 
         /// <summary>
-        /// Moves the time on by some real seconds. Returns true once, the moment the day reaches its end: the player has to
-        /// sleep. The time stops there until the player sleeps.
+        /// Moves the time on by some real seconds. Returns true once, the moment the day reaches its end: the user has to
+        /// sleep. The time stops there until the user sleeps.
         /// </summary>
         public bool Advance(float realSeconds, float secondsPerGameHour)
         {
@@ -60,7 +60,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// Sleeps until the next morning. Returns false on the last week: the month only moves on at the bank, so the player
+        /// Sleeps until the next morning. Returns false on the last week: the month only moves on at the bank, so the user
         /// wakes up again in that week.
         /// </summary>
         public bool SleepToMorning()
@@ -90,13 +90,13 @@ namespace ColonQuest.Game
             endReported = false;
         }
 
-        /// <summary>Puts the clock back where a saved game left it, inside the limits of a day and a month.</summary>
+        /// <summary>Puts the clock back where a saved simulation left it, inside the limits of a day and a month.</summary>
         public void Restore(int day, float minutes)
         {
             Day = Math.Max(1, Math.Min(GameRules.DaysPerMonth, day));
             Minutes = Math.Max(StartMinutes, Math.Min(EndMinutes, minutes));
 
-            // A game saved right at the end of the day reports it again, or the clock would stay stuck there.
+            // A simulation saved right at the end of the day reports it again, or the clock would stay stuck there.
             endReported = false;
         }
 

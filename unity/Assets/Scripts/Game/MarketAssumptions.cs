@@ -6,9 +6,9 @@ namespace ColonQuest.Game
 {
     // ======================================================================================================
     // ILLUSTRATIVE VALUES. Every price, rate and percentage in this file was made up to show an idea in the
-    // game (a mortgage is heavy, a car costs more than its installment, a farm takes years to pay off). None
+    // simulator (a mortgage is heavy, a car costs more than its installment, a farm takes years to pay off). None
     // of them comes from a real source. Before any of them is written anywhere as a fact (the README, the
-    // video, a slide, the text of the game without the warning below), verify it against a real source: the
+    // video, a slide, the text of the simulator without the warning below), verify it against a real source: the
     // banks and the Superintendencia General de Entidades Financieras for rates, the Registro Nacional and
     // the INS for cars, the ICAFE, CORFOGA and the MAG for coffee and cattle.
     // All of it lives in this one file so there is a single place to check and to correct.
@@ -180,9 +180,9 @@ namespace ColonQuest.Game
     public static class MarketAssumptions
     {
         /// <summary>To show next to any figure of this file, so nobody takes it for a real quote.</summary>
-        public const string Disclaimer = "Cifras de ejemplo del juego, no son datos oficiales ni una promesa de ganancia. Hay que verificarlas con una fuente real antes de decidir con plata de verdad.";
+        public const string Disclaimer = "Cifras de ejemplo del simulador, no son datos oficiales ni una promesa de ganancia. Hay que verificarlas con una fuente real antes de decidir con plata de verdad.";
 
-        public const string ShortDisclaimer = "Cifras de ejemplo del juego.";
+        public const string ShortDisclaimer = "Cifras de ejemplo del simulador.";
 
         // ---------------------------------------------------------------- housing
 
@@ -266,10 +266,10 @@ namespace ColonQuest.Game
         /// <summary>What a night in the own bed does to the mood, once a month.</summary>
         public const int RestWellbeing = 3;
 
-        /// <summary>The mood lost at the end of a month in which the player never slept in the own bed.</summary>
+        /// <summary>The mood lost at the end of a month in which the user never slept in the own bed.</summary>
         public const int SkippedSleepWellbeingLoss = 2;
 
-        /// <summary>The rent of the room the player starts in, per month, until moving to a home of the real estate agency.</summary>
+        /// <summary>The rent of the room the user starts in, per month, until moving to a home of the real estate agency.</summary>
         public const long RoomRent = 90_000L;
 
         /// <summary>What a service charges this month: electricity follows the appliances, and a house uses more than a room.</summary>
@@ -305,7 +305,7 @@ namespace ColonQuest.Game
             new FurnitureModel(FurnitureKind.Fridge, "Refri pequeña", "refrigerador pequeño", "La comida aguanta más, y el recibo de la luz sube un poco.", 240_000L, 18, 2.9m, 2_000L, 8_000L)
         };
 
-        /// <summary>The mood lost for each week the player did not show up at work.</summary>
+        /// <summary>The mood lost for each week the user did not show up at work.</summary>
         public const int MissedWorkWellbeingLoss = 3;
 
         /// <summary>What cooking at home saves against eating out, in colones, once a month.</summary>
@@ -316,7 +316,7 @@ namespace ColonQuest.Game
         /// <summary>The bail asks this for each minute that is left of the term in the cell, in colones.</summary>
         public const long BailPerMinute = 8_000L;
 
-        /// <summary>The bail asks this for each game day that is left of the sentence in the cell, in colones.</summary>
+        /// <summary>The bail asks this for each simulation day that is left of the sentence in the cell, in colones.</summary>
         public const long BailPerDay = 40_000L;
 
         /// <summary>Days of the month lost to the night in jail and the hearing.</summary>

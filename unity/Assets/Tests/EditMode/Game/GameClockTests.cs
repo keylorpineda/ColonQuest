@@ -85,7 +85,7 @@ namespace ColonQuest.Game.Tests
             clock.Restore(99, 99_999f);
             Assert.AreEqual(GameRules.DaysPerMonth, clock.Day);
             Assert.AreEqual("22:00", clock.Time);
-            Assert.IsTrue(clock.Advance(1f, Hour), "saved right at 22:00: the player still has to sleep");
+            Assert.IsTrue(clock.Advance(1f, Hour), "saved right at 22:00: the user still has to sleep");
 
             clock.Restore(-3, 0f);
             Assert.AreEqual(1, clock.Day);

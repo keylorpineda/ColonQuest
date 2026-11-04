@@ -8,7 +8,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The credits, over the living art of the menu: the team stays on the left and everything else goes by on the right like
-    /// the end of a film. It rolls by itself and waits a moment when the player scrolls or drags. Every line is a fact about
+    /// the end of a film. It rolls by itself and waits a moment when the user scrolls or drags. Every line is a fact about
     /// the project; see <see cref="MenuEntries"/>.
     /// </summary>
     public sealed class CreditsRoll : MonoBehaviour
@@ -281,14 +281,14 @@ namespace ColonQuest.UI
         private float Sound(float width, float y)
         {
             y = Heading("El sonido", width, y);
-            var line = UiKit.Label(content, "Cada sonido del juego lo genera el propio código: no hay un solo archivo de audio.", 24, Cream, new Vector2(width, 40f), Top, new Vector2(0f, y), TextAnchor.UpperCenter);
+            var line = UiKit.Label(content, "Cada sonido del simulador lo genera el propio código: no hay un solo archivo de audio.", 24, Cream, new Vector2(width, 40f), Top, new Vector2(0f, y), TextAnchor.UpperCenter);
             line.fontStyle = FontStyle.Normal;
             return y - 44f - SectionGap;
         }
 
         private float Closing(float width, float y)
         {
-            var thanks = UiKit.Label(content, "Gracias por jugar", 60, Cream, new Vector2(width, 84f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
+            var thanks = UiKit.Label(content, "Gracias por usar ColonQuest", 60, Cream, new Vector2(width, 84f), Top, new Vector2(0f, y), TextAnchor.MiddleCenter);
             thanks.font = UiKit.TitleFont;
             var outline = thanks.gameObject.AddComponent<Outline>();
             outline.effectColor = Night;

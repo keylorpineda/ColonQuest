@@ -21,7 +21,7 @@ namespace ColonQuest.World.PlayModeTests
             ApiClient.Instance.Configure(new OfflineTransport(), new ApiConfig());
             ResetSettings();
 
-            // The saved games live in memory here: a test never touches the real ones.
+            // The saved simulations live in memory here: a test never touches the real ones.
             realSlots = GameSession.Slots;
             GameSession.Slots = new SaveSlots(new MemorySaveStore());
             yield return SceneManager.LoadSceneAsync(SceneNames.Menu);
@@ -33,7 +33,7 @@ namespace ColonQuest.World.PlayModeTests
         {
             ResetSettings();
 
-            // The session outlives the test: without a slot it cannot write in the real saved games later.
+            // The session outlives the test: without a slot it cannot write in the real saved simulations later.
             if (GameSession.Instance != null)
             {
                 GameSession.Instance.StartNewGame();
@@ -129,7 +129,7 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt("Button_Demo de funciones").onClick.Invoke();
             yield return null;
             Assert.IsTrue(DemoLab.IsOpen);
-            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "it does not start a game");
+            Assert.AreEqual(SceneNames.Menu, SceneManager.GetActiveScene().name, "it does not start a simulation");
 
             var lab = GameObject.Find("DemoLab").GetComponent<DemoLab>();
             for (int station = 0; station < DemoLab.StationCount; station++)
@@ -199,7 +199,7 @@ namespace ColonQuest.World.PlayModeTests
             bool saysSo = false;
             foreach (var text in shown)
             {
-                saysSo |= text.text.Contains(Loc.T("No hubo respuesta del servidor. Revisá el internet y probá otra vez."));
+                saysSo |= text.text.Contains(Loc.T("No hubo respuesta del servidor local. Abrí run_local.bat y probá otra vez."));
             }
 
             Assert.IsTrue(saysSo, "the demo never passes a local answer off as the model's");
@@ -379,7 +379,7 @@ namespace ColonQuest.World.PlayModeTests
         [UnityTest]
         public IEnumerator Story_StartsAFreshRunInTheTown()
         {
-            // A run already under way, as when the player comes back to the menu from the pause window.
+            // A run already under way, as when the user comes back to the menu from the pause window.
             var session = GameSession.Create();
             yield return null;
             session.BeginTask(StationType.Garage);
@@ -389,22 +389,22 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual(1, session.Loop.TasksDone, "setup: a task was done");
 
             ButtonAt("Button_Modo historia").onClick.Invoke();
-            Assert.IsTrue(Active("Slots"), "the story button opens the saved games");
-            ButtonAt(SlotButton(0, "Nueva partida")).onClick.Invoke();
-            Assert.IsTrue(Active("NewGame"), "a new life first asks who the player is");
+            Assert.IsTrue(Active("Slots"), "the story button opens the saved simulations");
+            ButtonAt(SlotButton(0, "Nueva simulación")).onClick.Invoke();
+            Assert.IsTrue(Active("NewGame"), "a new life first asks who the user is");
             yield return StartLifeAndSkipOpening();
 
-            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "after the goodbye the player stays in the house");
+            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "after the goodbye the user stays in the house");
             Assert.IsNotNull(GameSession.Instance);
             Assert.AreEqual(0, GameSession.Instance.Loop.TasksDone, "a new life starts from zero");
             Assert.AreEqual(0, GameSession.Instance.Loop.MonthsPlayed);
             Assert.AreEqual(0, GameSession.Instance.ActiveSlot);
-            Assert.IsNotNull(GameSession.Slots.Load(0), "a new game is saved from the start");
+            Assert.IsNotNull(GameSession.Slots.Load(0), "a new simulation is saved from the start");
             Assert.IsNotNull(GameObject.Find("GameUi"));
             Assert.IsTrue(GameObject.Find("GameUi").GetComponent<Canvas>().enabled, "the overlay is back after the opening");
         }
 
-        /// <summary>Presses Empezar in the new game window, waits for the opening in the house and skips it.</summary>
+        /// <summary>Presses Empezar in the new simulation window, waits for the opening in the house and skips it.</summary>
         private static IEnumerator StartLifeAndSkipOpening()
         {
             var nameBox = Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>();
@@ -433,16 +433,16 @@ namespace ColonQuest.World.PlayModeTests
 
             yield return null;
             Assert.Greater(Camera.main.orthographicSize, closeUp, "the camera comes back from the close-up even when the scene is skipped");
-            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "the goodbye does not walk the player out");
+            Assert.AreEqual(SceneNames.Casa, SceneManager.GetActiveScene().name, "the goodbye does not walk the user out");
             Assert.Less(Vector2.Distance(before, GameObject.FindWithTag(Station.PlayerTag).transform.position), 0.5f,
-                "the player stays standing where the goodbye ended");
+                "the user stays standing where the goodbye ended");
         }
 
         [UnityTest]
         public IEnumerator NewGame_DoesNotStartWithoutAName()
         {
             ButtonAt("Button_Modo historia").onClick.Invoke();
-            ButtonAt(SlotButton(1, "Nueva partida")).onClick.Invoke();
+            ButtonAt(SlotButton(1, "Nueva simulación")).onClick.Invoke();
             var nameBox = Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>();
             var question = Menu.Find("NewGame/Card/Body/NameQuestion").GetComponent<Text>();
 
@@ -466,14 +466,14 @@ namespace ColonQuest.World.PlayModeTests
         public IEnumerator NewGame_KeepsTheNameAndTheLook()
         {
             ButtonAt("Button_Modo historia").onClick.Invoke();
-            ButtonAt(SlotButton(1, "Nueva partida")).onClick.Invoke();
+            ButtonAt(SlotButton(1, "Nueva simulación")).onClick.Invoke();
             Menu.Find("NewGame/Card/Body/NameBox").GetComponent<InputField>().text = "  María  ";
             ButtonAt("NewGame/Card/Body/Button_Mujer").onClick.Invoke();
             yield return StartLifeAndSkipOpening();
 
             Assert.AreEqual("María", PlayerProfile.Name);
             Assert.IsTrue(PlayerProfile.Female);
-            Assert.AreEqual("María", GameSession.Instance.RunName, "an empty game name takes the player's");
+            Assert.AreEqual("María", GameSession.Instance.RunName, "an empty simulator name takes the user's");
             var saved = GameSession.Slots.Load(1);
             Assert.AreEqual("María", saved.characterName);
             Assert.IsTrue(saved.female);
@@ -489,7 +489,7 @@ namespace ColonQuest.World.PlayModeTests
             var mother = GameObject.Find("Mama");
             Assert.IsNotNull(mother, "the house is the mother's: she is still there after the opening");
             Assert.Less(mother.transform.position.y, 0.8f, "back in the living room, out of the bedroom");
-            Assert.IsNotNull(GameObject.Find("Thing_Mama"), "the player can talk to her");
+            Assert.IsNotNull(GameObject.Find("Thing_Mama"), "the user can talk to her");
         }
 
         private static string SlotButton(int slot, string text)
@@ -529,7 +529,7 @@ namespace ColonQuest.World.PlayModeTests
             ButtonAt(SlotButton(0, "¿Seguro? Borrar")).onClick.Invoke();
             yield return null;
             Assert.IsNull(GameSession.Slots.Load(0));
-            Assert.IsNotNull(Menu.Find(SlotButton(0, "Nueva partida")), "the slot is empty again");
+            Assert.IsNotNull(Menu.Find(SlotButton(0, "Nueva simulación")), "the slot is empty again");
         }
 
         [UnityTest]
@@ -554,7 +554,7 @@ namespace ColonQuest.World.PlayModeTests
         public IEnumerator BackToTheMenu_SavesTheRun()
         {
             ButtonAt("Button_Modo historia").onClick.Invoke();
-            ButtonAt(SlotButton(2, "Nueva partida")).onClick.Invoke();
+            ButtonAt(SlotButton(2, "Nueva simulación")).onClick.Invoke();
             yield return StartLifeAndSkipOpening();
 
             GameSession.Instance.Loop.Clock.Advance(GameRules.SecondsPerGameHour * 2f, GameRules.SecondsPerGameHour);

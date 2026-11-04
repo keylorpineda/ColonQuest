@@ -10,7 +10,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The end of a run as a report to look at: the verdict, three big figures, the money month by month, the grades, what the
-    /// player did, the picture of how it went and the few words the model wrote. The figures are drawn here: no picture has text.
+    /// user did, the picture of how it went and the few words the model wrote. The figures are drawn here: no picture has text.
     /// </summary>
     public sealed class EndScreen
     {
@@ -94,7 +94,7 @@ namespace ColonQuest.UI
             var right = Vector2.one;
             var heading = UiKit.PlainLabel(band.transform, "Title", title, 54, Cream, new Vector2(740f, 66f), left, new Vector2(30f, -6f), TextAnchor.MiddleLeft);
             heading.font = UiKit.TitleFont;
-            var months = UiKit.PlainLabel(band.transform, "Months", Loc.F("{0} meses jugados", summary.MonthsPlayed), 26, Cream, new Vector2(740f, 36f), left, new Vector2(30f, -74f), TextAnchor.MiddleLeft);
+            var months = UiKit.PlainLabel(band.transform, "Months", Loc.F("{0} meses simulados", summary.MonthsPlayed), 26, Cream, new Vector2(740f, 36f), left, new Vector2(30f, -74f), TextAnchor.MiddleLeft);
             months.fontStyle = FontStyle.Normal;
 
             string verdict = ReportCard.Verdict(summary.NetWorth, summary.TotalDebt, state.InformalLoans.Count > 0);
@@ -137,7 +137,7 @@ namespace ColonQuest.UI
             var tile = UiKit.Fill(card, "Chart", Color.white, new Vector2(ColumnWidth, ChartHeight), Top, new Vector2(LeftX, y));
             if (months.Count == 0)
             {
-                var none = UiKit.Label(tile.transform, "Esta partida no llegó a cerrar un mes.", 26, GameUiColors.Muted, new Vector2(ColumnWidth - 40f, ChartHeight), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
+                var none = UiKit.Label(tile.transform, "Esta simulación no llegó a cerrar un mes.", 26, GameUiColors.Muted, new Vector2(ColumnWidth - 40f, ChartHeight), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleCenter);
                 none.fontStyle = FontStyle.Normal;
                 return;
             }

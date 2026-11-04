@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// Keeps a label in the player's language. It remembers the Spanish text the label was made with and writes
+    /// Keeps a label in the user's language. It remembers the Spanish text the label was made with and writes
     /// it again whenever the language changes. Labels that code fills in later (the money in the HUD) are made
     /// empty, so they never get this component.
     /// </summary>

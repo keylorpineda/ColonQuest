@@ -68,7 +68,7 @@ namespace ColonQuest.Game.Tests
         public void BuyHome_NeedsAFortuneAtTheStartAndWorksWithOne()
         {
             var house = MarketAssumptions.FindHome("casa_vecina_b");
-            Assert.AreEqual(PurchaseFailure.NotEnoughCash, loop.CheckBuyHome(house), "the player starts with ₡120 000");
+            Assert.AreEqual(PurchaseFailure.NotEnoughCash, loop.CheckBuyHome(house), "the user starts with ₡120 000");
 
             loop.State.Cash = 10_000_000L;
             var quote = MarketAssumptions.QuoteMortgage(house);

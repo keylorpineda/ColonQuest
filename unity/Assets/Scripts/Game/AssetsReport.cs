@@ -6,13 +6,13 @@ using ColonQuest.World;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// The lines for the end of the run about what the player bought: the home, the car and the farm. The farm
+    /// The lines for the end of the run about what the user bought: the home, the car and the farm. The farm
     /// is shown as a projection at real time, since the run is only a few months long. It builds text only and
     /// moves no money.
     /// </summary>
     public static class AssetsReport
     {
-        /// <summary>One line per thing owned, then the warning about the figures. Empty when the player bought nothing.</summary>
+        /// <summary>One line per thing owned, then the warning about the figures. Empty when the user bought nothing.</summary>
         public static IReadOnlyList<string> Build(Holdings holdings, int monthsPlayed)
         {
             var lines = new List<string>();
@@ -47,7 +47,7 @@ namespace ColonQuest.Game
             else
             {
                 int paid = Math.Min(monthsPlayed, home.Months);
-                lines.Add(Loc.F("Casa: alquilas {0} por {1} al mes. El contrato es de {2} meses y en la partida pagaste {3}; el resto lo seguirías debiendo.", Loc.T(home.Name), Money.Format(home.Monthly), home.Months, paid));
+                lines.Add(Loc.F("Casa: alquilas {0} por {1} al mes. El contrato es de {2} meses y en la simulación pagaste {3}; el resto lo seguirías debiendo.", Loc.T(home.Name), Money.Format(home.Monthly), home.Months, paid));
             }
         }
 
@@ -73,7 +73,7 @@ namespace ColonQuest.Game
 
             lines.Add(
                 Loc.F("Finca ({0}): metiste {1} y esa plata no vuelve pronto. ", Loc.T(option.Name).ToLowerInvariant(), Money.Format(stake.Invested)) +
-                Loc.F("A tiempo real tarda unos {0} desde la compra; en la partida pasaron {1}, así que todavía faltan {2}. ", wait, held, left) +
+                Loc.F("A tiempo real tarda unos {0} desde la compra; en la simulación pasaron {1}, así que todavía faltan {2}. ", wait, held, left) +
                 Loc.F("Proyección de ejemplo cuando se cobre: en un mal escenario {0}, ", Money.Format(projection.LowValue)) +
                 Loc.F("en uno normal {0} y en uno bueno {1}.", Money.Format(projection.BaseValue), Money.Format(projection.HighValue)));
         }

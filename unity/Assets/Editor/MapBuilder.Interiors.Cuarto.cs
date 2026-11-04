@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// The rented room where the player starts: stained walls, a mattress on the floor, a bare bulb and a plastic chair. The bed,
+    /// The rented room where the user starts: stained walls, a mattress on the floor, a bare bulb and a plastic chair. The bed,
     /// the fridge, the TV and the table are built too, each one in a group with a <see cref="RoomPiece"/> that keeps it hidden
     /// until it is bought at the store.
     /// </summary>

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// The clothes the player wears, chosen at the wardrobe. The body is built once with the everyday clothes; a change of
+    /// The clothes the user wears, chosen at the wardrobe. The body is built once with the everyday clothes; a change of
     /// clothes recolors the shirt and the pants, and the first look is remembered so it can always come back. In the
     /// shower the clothes come off and a pixel blur covers the body.
     /// </summary>
@@ -36,7 +36,7 @@ namespace ColonQuest.World
         /// <summary>The name of the pixel blur of the shower (see <see cref="InteractionProps.Censor"/>).</summary>
         public const string CensorName = "Censor";
 
-        /// <summary>Dresses the player in this outfit. The everyday one brings back the colors the body was built with.</summary>
+        /// <summary>Dresses the user in this outfit. The everyday one brings back the colors the body was built with.</summary>
         public static void Wear(GameObject player, int outfit)
         {
             var memory = Remember(player);
@@ -87,7 +87,7 @@ namespace ColonQuest.World
             Paint(memory, memory.Skin, memory.Skin, true);
         }
 
-        /// <summary>The color of the player's skin, taken from the hands.</summary>
+        /// <summary>The color of the user's skin, taken from the hands.</summary>
         public static Color SkinOf(GameObject player)
         {
             var memory = Remember(player);
@@ -161,7 +161,7 @@ namespace ColonQuest.World
             return Mathf.Abs(a.r - b.r) + Mathf.Abs(a.g - b.g) + Mathf.Abs(a.b - b.b) < 0.02f;
         }
 
-        /// <summary>The colors the player's body was built with, kept on the player itself.</summary>
+        /// <summary>The colors the user's body was built with, kept on the user itself.</summary>
         private sealed class OutfitMemory : MonoBehaviour
         {
             public readonly Dictionary<SpriteRenderer, Color> Original = new Dictionary<SpriteRenderer, Color>();

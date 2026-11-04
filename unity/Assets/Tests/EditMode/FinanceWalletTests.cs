@@ -110,7 +110,7 @@ namespace ColonQuest.Finance.Tests
                 }
             }
 
-            Assert.Greater(winRolls, 30, "small wins come often, to keep the player betting");
+            Assert.Greater(winRolls, 30, "small wins come often, to keep the user betting");
             Assert.Greater(losses, wins, "but the losses add up to more");
         }
 

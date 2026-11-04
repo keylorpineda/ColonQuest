@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ColonQuest.UI
 {
-    /// <summary>The game master station: a situation goes to the model, an event comes back, and the choice goes through the engine.</summary>
+    /// <summary>The simulation director station: a situation goes to the model, an event comes back, and the choice goes through the engine.</summary>
     public sealed partial class DemoLab
     {
         private const float ResultTop = -300f;
@@ -26,7 +26,7 @@ namespace ColonQuest.UI
 
         private void DrawGameMaster()
         {
-            DrawHeading("Game master", "Muse Spark", "Le mandamos el estado financiero de un jugador, como en el juego. El modelo decide qué le pasa este mes y propone las opciones; las cuentas no son cosa suya.");
+            DrawHeading("Director de la simulación", "Muse Spark", "Le mandamos el estado financiero de un usuario, como en el simulador. El modelo decide qué le pasa este mes y propone las opciones; las cuentas no son cosa suya.");
 
             float width = (Width - 36f) / 4f;
             for (int i = 0; i < DemoScenarios.All.Count; i++)
@@ -121,7 +121,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            Note("Cada opción la propuso el modelo. Elegí una: la valida y la aplica el motor del juego.", 22, GameUiColors.Muted, new Vector2(Width, 32f), new Vector2(Left, y));
+            Note("Cada opción la propuso el modelo. Elegí una: la valida y la aplica el motor del simulador.", 22, GameUiColors.Muted, new Vector2(Width, 32f), new Vector2(Left, y));
             y -= 36f;
             foreach (var choice in gmEvent.Choices)
             {
@@ -136,7 +136,7 @@ namespace ColonQuest.UI
             }
         }
 
-        /// <summary>The real engine of the game applies the choice, or rejects it whole if an amount is out of range.</summary>
+        /// <summary>The real engine of the simulator applies the choice, or rejects it whole if an amount is out of range.</summary>
         private void Pick(string choiceId)
         {
             var after = gmBefore.Clone();

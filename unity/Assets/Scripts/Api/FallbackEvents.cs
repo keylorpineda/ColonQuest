@@ -7,10 +7,10 @@ using EventType = ColonQuest.Finance.EventType;
 namespace ColonQuest.Api
 {
     /// <summary>
-    /// The hand-written events the game plays when the backend fails, takes longer than the
+    /// The hand-written events the simulator runs when the backend fails, takes longer than the
     /// timeout or answers something that breaks the contract. The catalog is a copy of
     /// <c>server/app/game_master/fallback_events.json</c> kept in <c>Resources/fallback_events.json</c>.
-    /// Every event is validated with the same rules as a remote one, so a bad copy cannot reach the player.
+    /// Every event is validated with the same rules as a remote one, so a bad copy cannot reach the user.
     /// </summary>
     public static class FallbackEvents
     {
@@ -69,9 +69,9 @@ namespace ColonQuest.Api
         }
 
         /// <summary>
-        /// Picks the event for this month: the one that fits the player's situation when there is one
+        /// Picks the event for this month: the one that fits the user's situation when there is one
         /// (a maxed out card calls the lender, big savings call the pyramid), otherwise the next
-        /// event in the catalog that was not played yet. Events about a vehicle are only for a player who has one.
+        /// event in the catalog that was not played yet. Events about a vehicle are only for a user who has one.
         /// </summary>
         public static GameEvent Next(PlayerState state, ISet<string> seen)
         {
@@ -137,7 +137,7 @@ namespace ColonQuest.Api
             return null;
         }
 
-        /// <summary>Used only if the catalog asset is missing, so the player is never left without an event.</summary>
+        /// <summary>Used only if the catalog asset is missing, so the user is never left without an event.</summary>
         private static GameEvent LastResort()
         {
             return new GameEvent

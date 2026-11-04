@@ -12,7 +12,7 @@ using UnityEngine.TestTools;
 
 namespace ColonQuest.World.PlayModeTests
 {
-    /// <summary>Plays the guided run from the first window to the last, pressing what a player would press.</summary>
+    /// <summary>Plays the guided run from the first window to the last, pressing what a user would press.</summary>
     internal sealed class GuidedDriver
     {
         private const BindingFlags Private = BindingFlags.NonPublic | BindingFlags.Instance;
@@ -61,7 +61,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return null;
         }
 
-        /// <summary>Presses an option as a player does: the first press only finishes the line that is being written.</summary>
+        /// <summary>Presses an option as a user does: the first press only finishes the line that is being written.</summary>
         private IEnumerator Press(int option)
         {
             if (modal.IsRevealing)
@@ -118,7 +118,7 @@ namespace ColonQuest.World.PlayModeTests
         {
             yield return Next("the first window", "intro", profile);
 
-            // Month 1: a short walk and the game master.
+            // Month 1: a short walk and the simulation director.
             yield return Until(() => GuidedType == StationType.Garage && Guided() != null, 10f, "the first objective");
             yield return new WaitForSecondsRealtime(0.6f);
             yield return Shot("to_first_event");
@@ -246,11 +246,11 @@ namespace ColonQuest.World.PlayModeTests
             LoadingScreen.Load(SceneNames.Town);
             yield return GuidedDriver.Until(() => SceneManager.GetActiveScene().name == SceneNames.Town && !LoadingScreen.IsLoading, 30f, "the town");
             Assert.IsTrue(session.Guided);
-            Assert.AreEqual(-1, session.ActiveSlot, "the guided run never touches a saved game");
+            Assert.AreEqual(-1, session.ActiveSlot, "the guided run never touches a saved simulation");
 
             yield return new GuidedDriver(session).Play(0);
 
-            Assert.IsFalse(session.Guided, "it hands the game back");
+            Assert.IsFalse(session.Guided, "it hands the simulator back");
             Assert.AreEqual(GameRules.MonthsToPlay, session.Loop.MonthsPlayed);
         }
 

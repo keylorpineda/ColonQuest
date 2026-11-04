@@ -147,7 +147,7 @@ namespace ColonQuest.Finance.Tests
             long paid = FinanceEngine.PayCollectors(state, 20_000L);
 
             Assert.AreEqual(5_000L, paid);
-            Assert.AreEqual(95_000L, state.Cash, "the rest of the money stays with the player");
+            Assert.AreEqual(95_000L, state.Cash, "the rest of the money stays with the user");
             Assert.AreEqual(0, state.InformalLoans.Count);
         }
 

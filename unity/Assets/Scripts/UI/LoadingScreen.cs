@@ -9,7 +9,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The screen between the menu and the town (and back). It is the picture of the main menu, still alive: the volcano
-    /// smokes and the toucan looks around on its branch, with the name of the game where the menu has it. Under them a tip in
+    /// smokes and the toucan looks around on its branch, with the name of the simulator where the menu has it. Under them a tip in
     /// a paper card and a chunky bar with a colón coin that spins as it rolls. It keeps the screen for a minimum time so it
     /// never flashes, and it hides the change of scene.
     /// </summary>
@@ -260,7 +260,7 @@ namespace ColonQuest.UI
 
             waiting.text = Loc.T("Cargando") + new string('.', 1 + (int)(elapsed * 2.5f) % 3);
 
-            // The name of the game arrives with the picture and then keeps still, as it does in the menu.
+            // The name of the simulator arrives with the picture and then keeps still, as it does in the menu.
             float arrive = 1f - Mathf.Clamp01(elapsed / 0.45f);
             float offset = -36f * arrive * arrive;
             title.anchoredPosition = new Vector2(ColumnX + offset, -70f);

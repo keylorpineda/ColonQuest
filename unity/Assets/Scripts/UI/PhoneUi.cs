@@ -11,7 +11,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// A mobile phone on screen, opened with P: a home screen with apps (SINPE, bank, search, a loan
-    /// calculator, a block game and a casino). Apps only show or ask; every colon that moves goes through
+    /// calculator, a block puzzle and a casino). Apps only show or ask; every colon that moves goes through
     /// <see cref="GameSession"/> and the finance engine.
     /// </summary>
     public sealed partial class PhoneUi
@@ -131,7 +131,7 @@ namespace ColonQuest.UI
             session.Changed += OnSessionChanged;
         }
 
-        /// <summary>A phone on its way down no longer counts as open: the game is free again.</summary>
+        /// <summary>A phone on its way down no longer counts as open: the simulator is free again.</summary>
         public bool IsOpen => root.activeSelf && !closing;
 
         /// <summary>True while a text box has the keyboard, so letters like P do not close the phone.</summary>
@@ -369,7 +369,7 @@ namespace ColonQuest.UI
             }
 
             text.AppendLine();
-            text.AppendLine(Loc.F("SINPE enviado en esta partida: {0}", Money.Format(session.SinpeSent)));
+            text.AppendLine(Loc.F("SINPE enviado en esta simulación: {0}", Money.Format(session.SinpeSent)));
             text.Append(Loc.F("Lo que tenés menos lo que debés: {0}", Money.Format(GameRules.NetWorth(state, session.Holdings))));
             Label(text.ToString(), 26, UiKit.Ink, InnerWidth, new Vector2(0f, -64f));
             AddBankMoves();
@@ -696,8 +696,8 @@ namespace ColonQuest.UI
 
             long net = session.CasinoNet;
             casinoTotal.text = net >= 0L
-                ? Loc.F("En esta partida vas ganando {0}", Money.Format(net))
-                : Loc.F("En esta partida llevás perdidos {0}", Money.Format(-net));
+                ? Loc.F("En esta simulación vas ganando {0}", Money.Format(net))
+                : Loc.F("En esta simulación llevás perdidos {0}", Money.Format(-net));
         }
     }
 }

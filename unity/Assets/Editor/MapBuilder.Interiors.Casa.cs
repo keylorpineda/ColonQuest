@@ -6,7 +6,7 @@ namespace ColonQuest.EditorTools
     /// <summary>
     /// A simple, working family house. The back half holds the bedroom, the bathroom and the kitchen; the
     /// front half is the living and dining room the front door opens into. The desk with the bills by the
-    /// living room is where the player checks the account statement.
+    /// living room is where the user checks the account statement.
     /// </summary>
     public static partial class MapBuilder
     {

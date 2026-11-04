@@ -186,7 +186,7 @@ namespace ColonQuest.World
             };
             for (int i = 0; i < pieces; i++)
             {
-                // A spread that looks loose but repeats, so nothing here depends on the random numbers of the game.
+                // A spread that looks loose but repeats, so nothing here depends on the random numbers of the simulator.
                 float along = pieces > 1 ? i / (pieces - 1f) : 0.5f;
                 float angle = Mathf.Lerp(25f, 155f, along) * Mathf.Deg2Rad;
                 float reach = 0.8f + (i * 37 % 11) * 0.07f;

@@ -3,7 +3,7 @@ using System.Text;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Who the player is in this run: the name and the gender chosen for a new game. The dialogues read it for the name and
+    /// Who the user is in this run: the name and the gender chosen for a new simulation. The dialogues read it for the name and
     /// for the words that change with the gender, and <see cref="PlayerLookSwitch"/> reads it for the look.
     /// </summary>
     public static class PlayerProfile
@@ -28,7 +28,7 @@ namespace ColonQuest.World
             Set(string.Empty, false);
         }
 
-        /// <summary>The Spanish word or line for the gender of the player. Both forms have the same English entry.</summary>
+        /// <summary>The Spanish word or line for the gender of the user. Both forms have the same English entry.</summary>
         public static string Pick(string male, string female)
         {
             return Female ? female : male;

@@ -7,12 +7,12 @@ namespace ColonQuest.Api
     /// <summary>
     /// The seller when the backend cannot answer. It follows the scripted fallback of
     /// <c>server/app/negotiation/questions.py</c>: it classifies the key questions with fixed patterns and
-    /// only reveals what the player asked about. The figures come from <see cref="SellerOffer"/>.
+    /// only reveals what the user asked about. The figures come from <see cref="SellerOffer"/>.
     /// </summary>
     public static class LocalSeller
     {
         /// <summary>
-        /// Writes a text in the player's language. The API layer does not know the language, so the game sets
+        /// Writes a text in the user's language. The API layer does not know the language, so the simulator sets
         /// this once (to <c>Loc.T</c>); until then the Spanish text is used as it is.
         /// </summary>
         public static System.Func<string, string> Translate = text => text;

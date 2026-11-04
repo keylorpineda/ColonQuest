@@ -5,7 +5,7 @@ namespace ColonQuest.World
     /// <summary>The numbers behind the dog's moods and moves. No scene objects, so it is easy to test.</summary>
     public static class DogMotion
     {
-        /// <summary>Closer than this the dog notices the player, lifts its head and starts to wag.</summary>
+        /// <summary>Closer than this the dog notices the user, lifts its head and starts to wag.</summary>
         public const float NoticeRadius = 2.6f;
 
         /// <summary>Further than this, for a while, and the dog dozes off.</summary>
@@ -17,7 +17,7 @@ namespace ColonQuest.World
         /// <summary>How long the joy of being petted lasts.</summary>
         public const float JoySeconds = 2.6f;
 
-        /// <summary>How excited the dog wants to be with the player at this distance: 0 far away, up to 0.6 right beside it.</summary>
+        /// <summary>How excited the dog wants to be with the user at this distance: 0 far away, up to 0.6 right beside it.</summary>
         public static float ExcitementFor(float distance)
         {
             if (distance >= NoticeRadius)
@@ -86,7 +86,7 @@ namespace ColonQuest.World
 
     /// <summary>
     /// The house dog lying on its cushion. It breathes, flicks an ear, blinks, dozes when nobody is around, lifts its
-    /// head and wags when the player comes close, and jumps with joy (tongue out, a heart floating up) when the player
+    /// head and wags when the user comes close, and jumps with joy (tongue out, a heart floating up) when the user
     /// pets it. Being petted is noticed when the scene shakes the dog (see <c>Interaction.Wobble</c>), so the
     /// interaction code does not need to know about the dog. It only moves its own parts, never the dog's root.
     /// </summary>
@@ -221,7 +221,7 @@ namespace ColonQuest.World
             float breath = DogMotion.Breath(time, asleep, excitement);
             body.localScale = new Vector3(1f, breath, 1f);
 
-            // Head: down on the paws while asleep, up and a little toward the player when awake.
+            // Head: down on the paws while asleep, up and a little toward the user when awake.
             float liftGoal = asleep ? -7f : (distance < DogMotion.NoticeRadius || joyful ? 9f : 2f);
             headLift = Mathf.Lerp(headLift, liftGoal, 1f - Mathf.Exp(-4f * dt));
             float headBob = joyful ? Mathf.Sin(time * 9f) * 3f : 0f;

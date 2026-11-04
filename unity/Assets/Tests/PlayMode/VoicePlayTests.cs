@@ -139,7 +139,7 @@ namespace ColonQuest.World.PlayModeTests
 
             Assert.AreEqual(1, Session.CurrentNegotiation.Turns.Count, "the typed turn is answered");
             Assert.IsTrue(Session.CurrentNegotiation.Turns[0].FromLocalSeller);
-            Assert.IsNull(Session.VoiceNotice, "the notice goes away once the player types");
+            Assert.IsNull(Session.VoiceNotice, "the notice goes away once the user types");
         }
 
         /// <summary>A backend whose transcription answers at once and whose seller answers only when the test says so.</summary>
@@ -186,7 +186,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.AreEqual("Cuanto pago en total?", Session.PendingLine);
             Assert.AreEqual(0, Session.CurrentNegotiation.Turns.Count);
             var bubbles = Ui.Find("Negotiation").GetComponentsInChildren<Text>();
-            Assert.IsTrue(Array.Exists(bubbles, t => t.text == "Cuanto pago en total?"), "the player's line is on screen");
+            Assert.IsTrue(Array.Exists(bubbles, t => t.text == "Cuanto pago en total?"), "the user's line is on screen");
 
             transport.SellerMayAnswer = true;
             yield return new WaitForSeconds(0.1f);

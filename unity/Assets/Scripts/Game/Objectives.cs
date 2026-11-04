@@ -2,7 +2,7 @@ using ColonQuest.World;
 
 namespace ColonQuest.Game
 {
-    /// <summary>What the game wants the player to do next and, when it is a place, where it is.</summary>
+    /// <summary>What the simulator wants the user to do next and, when it is a place, where it is.</summary>
     public sealed class Objective
     {
         /// <summary>What to do, in Spanish; the screen translates it.</summary>

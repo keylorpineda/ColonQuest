@@ -7,7 +7,7 @@ namespace ColonQuest.EditorTools
     {
         /// <summary>
         /// The pedestrian lights of the main crosswalks and an officer next to each group. The lights hold the cars back
-        /// while pedestrians cross; the officers leave a player who crosses on red alone (see <see cref="PoliceOfficer"/>).
+        /// while pedestrians cross; the officers leave a user who crosses on red alone (see <see cref="PoliceOfficer"/>).
         /// </summary>
         private static void BuildCrossings(Transform parent)
         {

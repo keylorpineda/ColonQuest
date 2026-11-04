@@ -32,8 +32,8 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Little puffs of dust (or sand) kicked up by the player's steps on the beach, the dirt paths and the street, and
-    /// footprints that stay a few seconds on the sand. Small pools of sprites live apart from the player, so a puff or a
+    /// Little puffs of dust (or sand) kicked up by the user's steps on the beach, the dirt paths and the street, and
+    /// footprints that stay a few seconds on the sand. Small pools of sprites live apart from the user, so a puff or a
     /// print stays where the foot left it.
     /// </summary>
     public sealed class FootDust : MonoBehaviour

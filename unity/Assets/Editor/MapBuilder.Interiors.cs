@@ -5,7 +5,7 @@ using ColonQuest.World;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// The three buildings the player can enter. Each one is laid out like the real thing: the Casa has a
+    /// The three buildings the user can enter. Each one is laid out like the real thing: the Casa has a
     /// bedroom, a bathroom, a kitchen and a living room; the Banco has a teller line, a queue, a waiting
     /// area and offices; the Tienda sells phones, screens, white goods and motorbikes. The furniture of
     /// each one lives in its own file. Coordinates are in room space, with the origin in the middle.

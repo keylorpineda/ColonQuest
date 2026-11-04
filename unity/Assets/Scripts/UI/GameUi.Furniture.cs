@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The furniture corner of the store. Cash down goes through the till with its beep and its bag; in installments the player
+    /// The furniture corner of the store. Cash down goes through the till with its beep and its bag; in installments the user
     /// sits with the seller, who keeps the insurance and the commission quiet until asked. The money moves in the finance engine.
     /// </summary>
     public sealed partial class GameUi

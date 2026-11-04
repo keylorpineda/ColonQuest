@@ -33,7 +33,7 @@ namespace ColonQuest.EditorTools
             target.transform.localRotation = Quaternion.Euler(0f, 0f, degrees);
         }
 
-        /// <summary>True where the player can stand on plain grass, so grass details do not end up in water or sand.</summary>
+        /// <summary>True where the user can stand on plain grass, so grass details do not end up in water or sand.</summary>
         private static bool OnOpenGrass(float x, float y)
         {
             bool inRiver = x > MapLayout.RiverXMin - 0.5f && x < MapLayout.RiverXMax + 0.5f;
@@ -139,7 +139,7 @@ namespace ColonQuest.EditorTools
                 Flickering(Shape(parent, "Wave", ring, new Vector2(x, y), new Vector2(1.8f, 0.55f), ripple, WorldFoam), 0.5f, 0.9f + (float)random.NextDouble(), x);
             }
 
-            // Rings now and then on the open sea, and at the feet of a player who walks along any water. Never over the pier.
+            // Rings now and then on the open sea, and at the feet of a user who walks along any water. Never over the pier.
             var ripples = new GameObject("Ripples").transform;
             ripples.SetParent(parent, false);
             var seaRipples = ripples.gameObject.AddComponent<RippleField>();
@@ -381,7 +381,7 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Mountain_Snow", circle, new Vector2(x - 0.2f, 27.5f + height * 0.78f), new Vector2(width * 0.2f, height * 0.5f), GamePalette.White, WorldSand + 4);
         }
 
-        /// <summary>A rock face: dark outline, strata lines and round boulders along the edge the player sees.</summary>
+        /// <summary>A rock face: dark outline, strata lines and round boulders along the edge the user sees.</summary>
         private static void CliffBlock(Transform parent, Rect area, int bumpSide, System.Random random)
         {
             Shape(parent, "Cliff_Outline", rounded, area.center, area.size + Vector2.one * 0.3f, GamePalette.Outline, WorldCliff);
@@ -450,7 +450,7 @@ namespace ColonQuest.EditorTools
             Shape(parent, "Line_Left", square, center - new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
             Shape(parent, "Line_Right", square, center + new Vector2(size.x * 0.5f - 0.4f, 0f), new Vector2(0.1f, size.y - 0.8f), line, 8);
 
-            // Ball and players running within the pitch
+            // Ball and users running within the pitch
             Shape(parent, "SoccerBall", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.35f, GamePalette.Hex("#F8F5E8"), 9);
             Shape(parent, "SoccerBallSpot", circle, new Vector2(-34.6f, -23.0f), Vector2.one * 0.12f, GamePalette.Hex("#1D2238"), 10);
 
@@ -481,7 +481,7 @@ namespace ColonQuest.EditorTools
             Wall(parent, "West_Wall", new Vector2(MapLayout.PlayWestX - 0.5f, bounds.center.y), new Vector2(1f, bounds.height));
             Wall(parent, "East_Wall", new Vector2(MapLayout.PlayEastX + 0.5f, bounds.center.y), new Vector2(1f, bounds.height));
 
-            // The sea stops the player at the shore, except along the pier.
+            // The sea stops the user at the shore, except along the pier.
             float shore = MapLayout.ShoreY;
             Wall(parent, "Sea_West", new Vector2((-46f + MapLayout.PierXMin - 0.5f) * 0.5f, shore - 0.5f), new Vector2(46f + MapLayout.PierXMin - 0.5f, 1f));
             Wall(parent, "Sea_East", new Vector2((MapLayout.PierXMax + 0.5f + bounds.xMax) * 0.5f, shore - 0.5f), new Vector2(bounds.xMax - MapLayout.PierXMax - 0.5f, 1f));
@@ -489,7 +489,7 @@ namespace ColonQuest.EditorTools
             Wall(parent, "Pier_East", new Vector2(MapLayout.PierXMax + 0.5f, -30.35f), new Vector2(1f, 6.3f));
             Wall(parent, "Pier_End", new Vector2(5.6f, -33.7f), new Vector2(4.2f, 1f));
 
-            // The river, open over the bridges from railing to railing: the street and both sidewalks, so a player walking
+            // The river, open over the bridges from railing to railing: the street and both sidewalks, so a user walking
             // on the sidewalk crosses too. The railings themselves stay closed.
             float riverX = (MapLayout.RiverXMin + MapLayout.RiverXMax) * 0.5f;
             float riverWidth = MapLayout.RiverXMax - MapLayout.RiverXMin;
@@ -501,7 +501,7 @@ namespace ColonQuest.EditorTools
 
             Wall(parent, "Pool", new Vector2(20.3f, PoolY), new Vector2(5.2f, 2.0f));
 
-            // The pond of the park: the player walks around it.
+            // The pond of the park: the user walks around it.
             Wall(parent, "Pond", new Vector2(19.5f, -5.9f), new Vector2(5.4f, 2.4f));
         }
 
@@ -823,7 +823,7 @@ namespace ColonQuest.EditorTools
         /// <summary>
         /// A coffee shrub: wider than tall, a dense crown of glossy leaves on a few thin stems, with boughs of cherries growing
         /// out of it. The crown leans with the town's breeze, and each bough swings on its own joint, follows the breeze a beat
-        /// after the others and shakes when the player brushes past, so the plant never moves as one piece.
+        /// after the others and shakes when the user brushes past, so the plant never moves as one piece.
         /// </summary>
         private static void CoffeeBush(Transform parent, Transform shadows, float x, float y)
         {

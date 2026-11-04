@@ -41,7 +41,7 @@ namespace ColonQuest.EditorTools
             DogPart(rig, "PawFront", roundedSmall, new Vector2(0.37f, -0.1f), new Vector2(0.26f, 0.1f), DogFur, 12);
             Shape(rig, "PawToe", circle, new Vector2(0.48f, -0.1f), Vector2.one * 0.08f, DogFurLight, 14);
 
-            // The head turns at the neck: down on the paws to sleep, up when the player comes.
+            // The head turns at the neck: down on the paws to sleep, up when the user comes.
             var head = Pivot(rig, "HeadPivot", new Vector2(0.17f, 0.05f), 0f);
             DogPart(head, "Head", circle, new Vector2(0.08f, 0.05f), Vector2.one * 0.32f, DogFur, 14);
             Shape(head, "Muzzle", roundedSmall, new Vector2(0.2f, 0.02f), new Vector2(0.2f, 0.14f), DogFurLight, 16);

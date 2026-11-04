@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColonQuest.World
 {
-    /// <summary>Names of the scenes the player moves between.</summary>
+    /// <summary>Names of the scenes the user moves between.</summary>
     public static class SceneNames
     {
         public const string Menu = "Menu";
@@ -23,8 +23,8 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Ids of the points where the player appears. A scene without a pending spawn id
-    /// keeps the player wherever the scene was built, which is its "Start" point.
+    /// Ids of the points where the user appears. A scene without a pending spawn id
+    /// keeps the user wherever the scene was built, which is its "Start" point.
     /// </summary>
     public static class SpawnIds
     {
@@ -58,7 +58,7 @@ namespace ColonQuest.World
     {
         /// <summary>
         /// Everything the camera may show in the town: the original town plus the north and east districts, which
-        /// bring the playable area to about twice its first size.
+        /// bring the working area to about twice its first size.
         /// </summary>
         public static readonly Rect TownBounds = new Rect(-46f, -34f, 118f, 91f);
 
@@ -68,7 +68,7 @@ namespace ColonQuest.World
 
         public const float NorthShift = 25f;
 
-        /// <summary>Where the rock face and the sea are drawn now; the player is stopped well before them.</summary>
+        /// <summary>Where the rock face and the sea are drawn now; the user is stopped well before them.</summary>
         public const float WorldNorthEdgeY = NorthEdgeY + NorthShift;
 
         /// <summary>The east side ends in a rock face between this line and <see cref="TownBounds"/>.</summary>
@@ -76,7 +76,7 @@ namespace ColonQuest.World
 
         /// <summary>
         /// Where the invisible walls stand. The world goes on past them (roads, trees, river, sea), so the
-        /// player sees there is more but cannot get to it.
+        /// user sees there is more but cannot get to it.
         /// </summary>
         public const float PlayWestX = -44.5f;
         public const float PlayEastX = 64f;

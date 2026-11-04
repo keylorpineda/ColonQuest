@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Rings that spread on the water: now and then somewhere on the sea, and at the player's feet while they walk
+    /// Rings that spread on the water: now and then somewhere on the sea, and at the user's feet while they walk
     /// along the edge of the sea, the river or the pond. A small pool of sprites is reused, nothing is created after
     /// the start.
     /// </summary>
@@ -61,7 +61,7 @@ namespace ColonQuest.World
             every = Mathf.Max(0.05f, secondsBetweenRings);
         }
 
-        /// <summary>Sprite for the drops that jump when the player steps in the water. Without it only rings are made.</summary>
+        /// <summary>Sprite for the drops that jump when the user steps in the water. Without it only rings are made.</summary>
         public void ConfigureDrops(Sprite drop)
         {
             dropSprite = drop;

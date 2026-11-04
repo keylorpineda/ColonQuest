@@ -92,7 +92,7 @@ namespace ColonQuest.Game.Tests
             Assert.AreEqual(15_000L, back.Holdings.HealthPremium);
             Assert.AreEqual(200_000L, back.Holdings.FarmInvested);
             Assert.IsTrue(back.HasSwimsuit);
-            Assert.AreEqual(3, back.Outfit, "the clothes the player wore");
+            Assert.AreEqual(3, back.Outfit, "the clothes the user wore");
             Assert.IsTrue(back.SleptThisMonth);
             Assert.AreEqual(2, back.Clock.Day);
             Assert.AreEqual("09:00", back.Clock.Time);

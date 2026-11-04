@@ -43,7 +43,7 @@ namespace ColonQuest.Game.Tests
 
             Say("trato hecho");
 
-            Assert.IsFalse(negotiation.IsClosed, "the player can still back out");
+            Assert.IsFalse(negotiation.IsClosed, "the user can still back out");
             Assert.IsTrue(negotiation.SoundedLikeYes);
 
             negotiation.ClearYes();

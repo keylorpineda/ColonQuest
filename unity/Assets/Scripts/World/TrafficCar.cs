@@ -6,7 +6,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// A car that drives along a street. The audio director listens for these, so the sound of traffic comes
-    /// from the cars that really pass near the player and from nothing else.
+    /// from the cars that really pass near the user and from nothing else.
     /// </summary>
     public sealed class TrafficCar : MonoBehaviour
     {
@@ -14,10 +14,10 @@ namespace ColonQuest.World
 
         public static IReadOnlyList<TrafficCar> All => all;
 
-        /// <summary>Raised when a moving car runs into the player. The overlay decides what that costs.</summary>
+        /// <summary>Raised when a moving car runs into the user. The overlay decides what that costs.</summary>
         public static event Action PlayerHit;
 
-        /// <summary>Where the car that hit the player was at that moment, so the player is thrown the right way.</summary>
+        /// <summary>Where the car that hit the user was at that moment, so the user is thrown the right way.</summary>
         public static Vector2 LastHitFrom { get; private set; }
 
         private void OnCollisionEnter2D(Collision2D collision)
@@ -31,7 +31,7 @@ namespace ColonQuest.World
 
         private static bool passThrough;
 
-        /// <summary>While true the cars do not touch the player: the guided run has no traffic accidents.</summary>
+        /// <summary>While true the cars do not touch the user: the guided run has no traffic accidents.</summary>
         public static bool PassThrough
         {
             get => passThrough;

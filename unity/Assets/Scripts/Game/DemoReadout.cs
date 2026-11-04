@@ -81,7 +81,7 @@ namespace ColonQuest.Game
         {
             switch (endpoint)
             {
-                case "event_agent": return Loc.T("Game master con herramientas");
+                case "event_agent": return Loc.T("Director de la simulación con herramientas");
                 case "event": return Loc.T("Evento del mes");
                 case "negotiation_agent": return Loc.T("Vendedor con herramientas");
                 case "negotiation": return Loc.T("Respuesta del vendedor");
@@ -152,7 +152,7 @@ namespace ColonQuest.Game
             return false;
         }
 
-        /// <summary>What a proposed effect does, in words: what the player reads next to each choice.</summary>
+        /// <summary>What a proposed effect does, in words: what the user reads next to each choice.</summary>
         public static string Describe(Effect effect)
         {
             switch (effect.Kind)
@@ -195,7 +195,7 @@ namespace ColonQuest.Game
             return "<color=" + hex + "><b>" + value + "</b></color>";
         }
 
-        /// <summary>One real call to a model, as the demo lab and the panel of the game write it.</summary>
+        /// <summary>One real call to a model, as the demo lab and the panel of the simulator write it.</summary>
         public static void AppendCall(StringBuilder text, ModelCallDto call)
         {
             text.Append(Tint(ModelName(call.model), "#F2A23A")).Append("  ").Append(ProviderName(call.provider)).Append('\n');
@@ -215,7 +215,7 @@ namespace ColonQuest.Game
             text.Append("\n\n");
         }
 
-        /// <summary>The same call in two lines, for the panel that stays on the screen during the game.</summary>
+        /// <summary>The same call in two lines, for the panel that stays on the screen during the simulator.</summary>
         public static void AppendShortCall(StringBuilder text, ModelCallDto call)
         {
             text.Append(Tint(ModelName(call.model), "#F2A23A")).Append("  ").Append(ProviderName(call.provider)).Append('\n');

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// The interior of Soda El Muelle: the diner where the player works their first job.
+    /// The interior of Soda El Muelle: the diner where the user works their first job.
     /// Holds the dining tables, the service counter with Doña Lucía, the kitchen in the back,
     /// and the time punch clock station on the wall for marking shifts.
     /// </summary>

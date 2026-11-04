@@ -9,9 +9,9 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The first screen of the game: an inked Costa Rican valley with a toucan that carries a banknote in its beak (made with Muse
+    /// The first screen of the simulator: an inked Costa Rican valley with a toucan that carries a banknote in its beak (made with Muse
     /// Image, see server/scripts/generate_menu_art.py), with a camera that breathes and follows the mouse a little. Over its left
-    /// side, the name of the game and one column of equal buttons; "Modo historia" is the highlighted one.
+    /// side, the name of the simulator and one column of equal buttons; "Modo historia" is the highlighted one.
     /// </summary>
     public sealed partial class MainMenu : MonoBehaviour
     {
@@ -66,7 +66,7 @@ namespace ColonQuest.UI
             BuildSplash();
             if (splash == null && toucan != null)
             {
-                // No splash (coming back from a game): the toucan flies in right away.
+                // No splash (coming back from a simulation): the toucan flies in right away.
                 toucan.Arrive();
             }
         }
@@ -189,7 +189,7 @@ namespace ColonQuest.UI
             LoadingScreen.Load(SceneNames.Casa);
         }
 
-        /// <summary>Three months on a short stretch of the town, with no slot: it never touches the saved games.</summary>
+        /// <summary>Three months on a short stretch of the town, with no slot: it never touches the saved simulations.</summary>
         public void StartGuided()
         {
             var session = GameSession.Create();
@@ -382,12 +382,12 @@ namespace ColonQuest.UI
             credits = CreditsRoll.Build(root, CloseWindows);
         }
 
-        /// <summary>Quitting asks first: a click by mistake on "Salir" should not close the game.</summary>
+        /// <summary>Quitting asks first: a click by mistake on "Salir" should not close the simulator.</summary>
         private void BuildQuitConfirm()
         {
             quitConfirm = UiKit.Overlay(root, "QuitConfirm");
             var card = UiKit.Card(quitConfirm.transform, "Card", UiKit.Paper, new Vector2(820f, 400f), new Vector2(0.5f, 0.5f), Vector2.zero);
-            UiKit.Header(card, "Salir del juego", GameUiColors.Loss);
+            UiKit.Header(card, "Salir del simulador", GameUiColors.Loss);
             UiKit.Label(card, "¿Seguro que querés salir de ColonQuest?", 36, UiKit.Ink, new Vector2(740f, 110f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), TextAnchor.MiddleCenter);
 
             var bottom = new Vector2(0.5f, 0f);
@@ -398,7 +398,7 @@ namespace ColonQuest.UI
 
         // ---------------------------------------------------------------- splash
 
-        /// <summary>The presentation shows once per launch, not every time the player comes back to the menu.</summary>
+        /// <summary>The presentation shows once per launch, not every time the user comes back to the menu.</summary>
         private static bool splashShown;
 
         private const float SplashFadeIn = 0.7f;
@@ -418,7 +418,7 @@ namespace ColonQuest.UI
         }
 
         /// <summary>
-        /// After the Unity logo, a screen of the team: who made the game and who designed it, then the menu. Any key or click skips it.
+        /// After the Unity logo, a screen of the team: who made the simulator and who designed it, then the menu. Any key or click skips it.
         /// </summary>
         private void BuildSplash()
         {

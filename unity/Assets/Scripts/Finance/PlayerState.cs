@@ -130,7 +130,7 @@ namespace ColonQuest.Finance
     }
 
     /// <summary>
-    /// Player financial state mirroring <c>shared/schemas/PlayerState.schema.json</c>.
+    /// User financial state mirroring <c>shared/schemas/PlayerState.schema.json</c>.
     /// </summary>
     [Serializable]
     public sealed class PlayerState

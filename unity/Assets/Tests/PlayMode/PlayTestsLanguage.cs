@@ -2,7 +2,7 @@ using ColonQuest.World;
 using NUnit.Framework;
 
 /// <summary>
-/// The game starts in English, but these tests read its texts by their Spanish keys, so they run in Spanish. It has no
+/// The simulator starts in English, but these tests read its texts by their Spanish keys, so they run in Spanish. It has no
 /// namespace so it covers the whole assembly.
 /// </summary>
 [SetUpFixture]

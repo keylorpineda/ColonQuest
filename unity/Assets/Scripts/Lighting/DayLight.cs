@@ -7,7 +7,7 @@ namespace ColonQuest.Lighting
     /// <summary>
     /// The sun of the town: the one global 2D light, colored and dimmed through the day by <see cref="DayCycle.LightFor"/>.
     /// It reads the same hour as the rest of the town (<see cref="DayTint.Progress"/>) and eases toward it, so the light
-    /// never jumps, not even when the player sleeps and the morning comes.
+    /// never jumps, not even when the user sleeps and the morning comes.
     /// </summary>
     [RequireComponent(typeof(Light2D))]
     public sealed class DayLight : MonoBehaviour

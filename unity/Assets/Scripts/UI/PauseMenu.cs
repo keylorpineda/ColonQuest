@@ -11,7 +11,7 @@ namespace ColonQuest.UI
     public sealed class PauseMenu
     {
         public const string MenuLabel = "Volver al menú";
-        public const string SureLabel = "¿Seguro? Se pierde la partida, ¿quieres guardar?";
+        public const string SureLabel = "¿Seguro? Se pierde la simulación, ¿quieres guardar?";
         public const string YesLabel = "Sí";
         public const string NoLabel = "No";
 

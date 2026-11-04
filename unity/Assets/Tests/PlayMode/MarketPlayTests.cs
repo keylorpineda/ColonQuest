@@ -186,7 +186,7 @@ namespace ColonQuest.World.PlayModeTests
             Assert.Greater(TrafficCar.All.Count, 0);
             foreach (var car in TrafficCar.All)
             {
-                Assert.IsNotNull(car.GetComponent<Collider2D>(), "a car on the street blocks the player");
+                Assert.IsNotNull(car.GetComponent<Collider2D>(), "a car on the street blocks the user");
             }
         }
 

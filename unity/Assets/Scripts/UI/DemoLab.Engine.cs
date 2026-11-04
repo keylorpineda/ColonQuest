@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// "The AI tells the story, the engine keeps the accounts", shown instead of said: the game's own engine rejects an
+    /// "The AI tells the story, the engine keeps the accounts", shown instead of said: the simulator's own engine rejects an
     /// amount out of range, makes the sums of the minimum payment and the installments, and hands out a local event when
     /// the model does not answer. None of this calls a model.
     /// </summary>
@@ -23,7 +23,7 @@ namespace ColonQuest.UI
 
         private void DrawEngine()
         {
-            DrawHeading("Motor y controles", "FinanceEngine (C#)", "La IA propone y este motor decide. Cuenta en colones enteros, sin decimales, y revisa todo lo que manda un modelo. También corre en el servidor, antes de que la respuesta llegue al juego.");
+            DrawHeading("Motor y controles", "FinanceEngine (C#)", "La IA propone y este motor decide. Cuenta en colones enteros, sin decimales, y revisa todo lo que manda un modelo. También corre en el servidor, antes de que la respuesta llegue al simulador.");
 
             float y = -170f;
             Note("Probá a colarle un monto que se sale de las reglas:", 25, UiKit.Ink, new Vector2(Width, 34f), new Vector2(Left, y));
@@ -101,7 +101,7 @@ namespace ColonQuest.UI
 
         private void DrawFallback(float y)
         {
-            Note("Si el modelo no responde, el juego sigue:", 25, UiKit.Ink, new Vector2(560f, 34f), new Vector2(Left, y - 4f), TextAnchor.MiddleLeft);
+            Note("Si el modelo no responde, el simulador sigue:", 25, UiKit.Ink, new Vector2(560f, 34f), new Vector2(Left, y - 4f), TextAnchor.MiddleLeft);
             Action("Sacar un evento de respaldo", GameUiColors.Yellow, new Vector2(400f, 56f), new Vector2(Left + Width - 400f, y), ShowFallback);
             if (localEvent != null)
             {

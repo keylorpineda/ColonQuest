@@ -21,28 +21,28 @@ namespace ColonQuest.Game
         /// <summary>The team's slogan, in English in both languages.</summary>
         public const string Slogan = "From Costa Rica to the World";
 
-        /// <summary>Who made the game.</summary>
+        /// <summary>Who made the simulator.</summary>
         public static readonly string[] Makers = { "Keylor Pineda", "Jefferson Abarca" };
 
-        /// <summary>The Meta tools the game uses, what each one does for the player and the time measured for it (docs/adr/0004-model-roles.md).</summary>
+        /// <summary>The Meta tools the simulator uses, what each one does for the user and the time measured for it (docs/adr/0004-model-roles.md).</summary>
         public static readonly string[][] Tools =
         {
-            new[] { "Muse Spark", "El game master que cuenta cada evento, con sus herramientas", "3 a 4,4 s: el único que siempre llega a tiempo" },
+            new[] { "Muse Spark", "El director de la simulación que cuenta cada evento, con sus herramientas", "3 a 4,4 s: el único que siempre llega a tiempo" },
             new[] { "Muse Spark Open", "Los vendedores que te esconden los cargos, en Baseten", "1,9 a 2,8 s, con pesos abiertos" },
             new[] { "Muse Voice Transcribe", "Entiende lo que le decís al vendedor", "0,7 a 1,5 s, y escribir siempre sirve" },
             new[] { "Muse Wonder", "Planifica tu año y narra cómo terminó", "6 a 10 s: solo donde nadie espera" },
-            new[] { "Muse Image", "Los retratos, las escenas y el final de tu partida", "14 a 17 s: todas se hicieron antes" }
+            new[] { "Muse Image", "Los retratos, las escenas y el final de tu simulación", "14 a 17 s: todas se hicieron antes" }
         };
 
         /// <summary>The agents that decide and use tools, with what each one is after.</summary>
         public static readonly string[][] Agents =
         {
-            new[] { "Game master", "Revisa tu historial y calcula deudas y compras reales antes de contarte qué pasa." },
+            new[] { "Director de la simulación", "Revisa tu historial y calcula deudas y compras reales antes de contarte qué pasa." },
             new[] { "Planificador del año", "Arma los doce meses según tu perfil y trae de vuelta lo que te costó." },
             new[] { "Vendedor", "Busca su comisión. No puede mentir en las cifras: solo calla hasta que preguntás." }
         };
 
-        /// <summary>The game in figures, big number first. "Pruebas" adds the EditMode, PlayMode and server suites of 1 November.</summary>
+        /// <summary>The simulator in figures, big number first. "Pruebas" adds the EditMode, PlayMode and server suites of 1 November.</summary>
         public static readonly string[][] Figures =
         {
             new[] { "5", "modelos de Meta" },
@@ -53,10 +53,9 @@ namespace ColonQuest.Game
         /// <summary>What it is built with and what for.</summary>
         public static readonly string[][] Stack =
         {
-            new[] { "Unity 6 y C#", "El juego y el motor financiero" },
+            new[] { "Unity 6 y C#", "El simulador y el motor financiero" },
             new[] { "FastAPI y Pydantic", "El servidor y sus contratos validados" },
-            new[] { "PostgreSQL en Neon", "Partidas, decisiones y clases" },
-            new[] { "Render", "Donde vive el servidor" },
+            new[] { "SQLite o PostgreSQL", "Simulaciones, decisiones y clases" },
             new[] { "Baseten", "Donde corre el modelo de pesos abiertos" }
         };
 

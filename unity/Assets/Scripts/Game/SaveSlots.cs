@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ColonQuest.Game
 {
-    /// <summary>A home, a car or a farm stake as it is written in a saved game.</summary>
+    /// <summary>A home, a car or a farm stake as it is written in a saved simulation.</summary>
     [Serializable]
     public sealed class HoldingsSnapshot
     {
@@ -40,7 +40,7 @@ namespace ColonQuest.Game
         public long debts;
     }
 
-    /// <summary>Everything a run needs to go on later: the finances, what the player owns, the month and the hour.</summary>
+    /// <summary>Everything a run needs to go on later: the finances, what the user owns, the month and the hour.</summary>
     [Serializable]
     public sealed class RunSnapshot
     {
@@ -84,7 +84,7 @@ namespace ColonQuest.Game
         public bool arrivalDay;
     }
 
-    /// <summary>One saved game: its name, when it was last played and the run.</summary>
+    /// <summary>One saved simulation: its name, when it was last played and the run.</summary>
     [Serializable]
     public sealed class SaveSlot
     {
@@ -117,7 +117,7 @@ namespace ColonQuest.Game
             };
         }
 
-        /// <summary>The date of the last game in the player's local time, short: "30/10 14:05".</summary>
+        /// <summary>The date of the last simulator in the user's local time, short: "30/10 14:05".</summary>
         public string SavedAtLabel
         {
             get
@@ -129,7 +129,7 @@ namespace ColonQuest.Game
         }
     }
 
-    /// <summary>Where the saved games are written. The game uses <see cref="PrefsSaveStore"/>; the tests use one in memory.</summary>
+    /// <summary>Where the saved simulations are written. The simulator uses <see cref="PrefsSaveStore"/>; the tests use one in memory.</summary>
     public interface ISaveStore
     {
         string Read(string key);
@@ -158,7 +158,7 @@ namespace ColonQuest.Game
         }
     }
 
-    /// <summary>A store that lives only in memory: for the tests, so they never touch the player's real saved games.</summary>
+    /// <summary>A store that lives only in memory: for the tests, so they never touch the user's real saved simulations.</summary>
     public sealed class MemorySaveStore : ISaveStore
     {
         private readonly Dictionary<string, string> values = new Dictionary<string, string>();
@@ -179,7 +179,7 @@ namespace ColonQuest.Game
         }
     }
 
-    /// <summary>The three saved games of story mode, as JSON. A slot that cannot be read counts as empty.</summary>
+    /// <summary>The three saved simulations of story mode, as JSON. A slot that cannot be read counts as empty.</summary>
     public sealed class SaveSlots
     {
         public const int Count = 3;
@@ -238,7 +238,7 @@ namespace ColonQuest.Game
         }
     }
 
-    /// <summary>Turns what the player owns into its saved shape and back.</summary>
+    /// <summary>Turns what the user owns into its saved shape and back.</summary>
     public static class HoldingsSaving
     {
         public static HoldingsSnapshot ToSnapshot(Holdings holdings)

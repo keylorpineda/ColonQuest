@@ -10,7 +10,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// What Muse Wonder writes where nobody waits: the plan of the year, which arrives in the background over the base plan
-    /// and changes with the profile of the player, and the story of how the year ended, on a postcard whose figures the game
+    /// and changes with the profile of the user, and the story of how the year ended, on a postcard whose figures the simulator
     /// draws over a picture without text.
     /// </summary>
     public sealed partial class DemoLab
@@ -32,7 +32,7 @@ namespace ColonQuest.UI
 
         private void DrawYear()
         {
-            DrawHeading("Plan y cierre", "Muse Wonder", "Al empezar una partida, Muse Wonder planifica los doce meses según quién sos, sin que te des cuenta de que está trabajando. Probá los dos perfiles y compará.");
+            DrawHeading("Plan y cierre", "Muse Wonder", "Al empezar una simulación, Muse Wonder planifica los doce meses según quién sos, sin que te des cuenta de que está trabajando. Probá los dos perfiles y compará.");
 
             float y = -170f;
             Action("Perfil endeudado", planProfile == 0 ? Beak : GameUiColors.Blue, new Vector2(230f, 64f), new Vector2(Left, y), () => TryPlan(0), !planWaiting);
@@ -129,7 +129,7 @@ namespace ColonQuest.UI
             basePlan = null;
             planFromModel = false;
             planWaiting = true;
-            planNotice = "Pidiendo el primer evento de la partida: ahí arranca el plan...";
+            planNotice = "Pidiendo el primer evento de la simulación: ahí arranca el plan...";
             Redraw();
 
             // The plan is only made on the first event of a session, so each try needs a new one.
@@ -148,7 +148,7 @@ namespace ColonQuest.UI
             state.Month = 1;
             yield return service.RequestEvent(state, _ => { });
 
-            planNotice = "El evento ya llegó. Muse Wonder sigue escribiendo el plan en segundo plano, y el jugador ya está jugando con el plan base...";
+            planNotice = "El evento ya llegó. Muse Wonder sigue escribiendo el plan en segundo plano, y el usuario ya está simulando con el plan base...";
             float started = Time.unscaledTime;
             while (Time.unscaledTime - started < PlanGiveUpSeconds)
             {
@@ -185,7 +185,7 @@ namespace ColonQuest.UI
             }
 
             planWaiting = false;
-            planNotice = planFromModel ? "Este plan lo escribió Muse Wonder para este jugador. Y cambia con sus decisiones." : "Muse Wonder no llegó a tiempo: la partida sigue con el plan base, sin que el jugador lo note.";
+            planNotice = planFromModel ? "Este plan lo escribió Muse Wonder para este usuario. Y cambia con sus decisiones." : "Muse Wonder no llegó a tiempo: la simulación sigue con el plan base, sin que el usuario lo note.";
             if (Current == 2 && !Busy)
             {
                 Redraw();
@@ -245,7 +245,7 @@ namespace ColonQuest.UI
             yield return RefreshEvidence();
         }
 
-        /// <summary>Decisions on the game's own local events, so the summary and the class figures have something real to count.</summary>
+        /// <summary>Decisions on the simulator's own local events, so the summary and the class figures have something real to count.</summary>
         private static IEnumerator RecordSampleDecisions(ApiService service, PlayerState state, int count)
         {
             var seen = new HashSet<string>();

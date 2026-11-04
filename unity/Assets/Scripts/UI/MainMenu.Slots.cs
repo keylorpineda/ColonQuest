@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The three saved games of story mode, opened by "Modo historia". Each slot shows its name, the month and the week, the
+    /// The three saved simulations of story mode, opened by "Modo historia". Each slot shows its name, the month and the week, the
     /// cash, the savings, the mood and when it was last played, with Continuar, Nueva and Borrar. Starting over a used slot
     /// and deleting one both ask for a second press, so a saved life is never lost by one click.
     /// </summary>
@@ -32,7 +32,7 @@ namespace ColonQuest.UI
             var card = UiKit.Card(slots.transform, "Card", UiKit.Paper, new Vector2(1260f, 850f), center, Vector2.zero);
 
             UiKit.Header(card, "Modo historia", Beak);
-            UiKit.Label(card, "Elegí una partida guardada o empezá una vida nueva.", 30, GameUiColors.Muted, new Vector2(1100f, 44f), top, new Vector2(0f, -114f), TextAnchor.MiddleCenter);
+            UiKit.Label(card, "Elegí una simulación guardada o empezá una vida nueva.", 30, GameUiColors.Muted, new Vector2(1100f, 44f), top, new Vector2(0f, -114f), TextAnchor.MiddleCenter);
             Divider(card, -162f, 1140f);
 
             slotRows = UiKit.Rect(card, "Rows", new Vector2(1200f, 580f), top, new Vector2(0f, -170f));
@@ -87,7 +87,7 @@ namespace ColonQuest.UI
                 {
                     UiKit.PlainLabel(row, "Label_SlotTitle", Loc.F("Espacio {0}", slot + 1), 36, UiKit.Ink, new Vector2(650f, 48f), topLeft, new Vector2(32f, -32f));
                     UiKit.PlainLabel(row, "Label_EmptyDesc", Loc.T("Vacío. Aquí empieza una vida nueva."), 26, GameUiColors.Muted, new Vector2(650f, 44f), topLeft, new Vector2(32f, -92f));
-                    var newPartidaBtn = UiKit.MakeButton(row, "Nueva partida", GameUiColors.Green, new Vector2(370f, 72f), new Vector2(1f, 0.5f), new Vector2(-32f, 0f), () => NewInSlot(slot));
+                    var newPartidaBtn = UiKit.MakeButton(row, "Nueva simulación", GameUiColors.Green, new Vector2(370f, 72f), new Vector2(1f, 0.5f), new Vector2(-32f, 0f), () => NewInSlot(slot));
                     UiKit.SetFontSize(newPartidaBtn, 28);
                     continue;
                 }
@@ -138,8 +138,8 @@ namespace ColonQuest.UI
             long debt = GameRules.DebtBalance(st);
             long netWorth = GameRules.NetWorth(st, HoldingsSaving.FromSnapshot(saved.run.holdings));
 
-            reportTitle.text = Loc.T("Reporte Final de la Partida");
-            reportSubtitle.text = saved.name + "  ·  " + Loc.F("{0} meses jugados", saved.run.monthsPlayed);
+            reportTitle.text = Loc.T("Reporte Final de la Simulación");
+            reportSubtitle.text = saved.name + "  ·  " + Loc.F("{0} meses simulados", saved.run.monthsPlayed);
 
             var sb = new System.Text.StringBuilder();
             sb.AppendLine(Loc.F("Personaje: {0}", string.IsNullOrEmpty(saved.characterName) ? saved.name : saved.characterName));
@@ -187,7 +187,7 @@ namespace ColonQuest.UI
             ShowNewGame(slot);
         }
 
-        // ---------------------------------------------------------------- the new game
+        // ---------------------------------------------------------------- the new simulation
 
         private GameObject newGame;
         private InputField nameBox;
@@ -218,7 +218,7 @@ namespace ColonQuest.UI
             manButton = man.transform.Find("Body").GetComponent<Image>();
             womanButton = woman.transform.Find("Body").GetComponent<Image>();
 
-            UiKit.Label(card, "¿Cómo se llama la partida?", 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -384f));
+            UiKit.Label(card, "¿Cómo se llama la simulación?", 32, UiKit.Ink, new Vector2(760f, 44f), top, new Vector2(0f, -384f));
             runBox = UiKit.TextBox(card, "RunBox", "Si la dejás vacía, lleva tu nombre", new Vector2(760f, 80f), top, new Vector2(0f, -432f), PlayerProfile.MaxNameLength);
 
             var bottom = new Vector2(0.5f, 0f);

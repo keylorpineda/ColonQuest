@@ -142,7 +142,7 @@ namespace ColonQuest.Game
             }
         }
 
-        /// <summary>Measures the last moment of the clip and asks the gate whether the player finished.</summary>
+        /// <summary>Measures the last moment of the clip and asks the gate whether the user finished.</summary>
         private bool HeardTheEnd(float delta)
         {
             int position = Microphone.GetPosition(device);

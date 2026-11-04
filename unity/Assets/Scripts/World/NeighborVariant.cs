@@ -4,7 +4,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// Chooses which neighbor interior decoration variant (0..3) to activate based on which house
-    /// the player entered from (Door.RememberedReturn).
+    /// the user entered from (Door.RememberedReturn).
     /// Runs early before other components locate decorated props.
     /// </summary>
     [DefaultExecutionOrder(-150)]

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// The player is built with the two looks; this keeps the one of the run. It runs before anything reads the body, so the
+    /// The user is built with the two looks; this keeps the one of the run. It runs before anything reads the body, so the
     /// animator and the scenes only ever find one "Bob".
     /// </summary>
     [DefaultExecutionOrder(-200)]

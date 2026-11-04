@@ -442,7 +442,7 @@ namespace ColonQuest.UI
             return UiKit.Label(band.transform, text, 30, Color.white, new Vector2(InnerWidth - 32f, 46f), new Vector2(0.5f, 0.5f), Vector2.zero, TextAnchor.MiddleLeft);
         }
 
-        /// <summary>A button of the phone: flat, with a thin edge a little darker than its color instead of the thick game outline.</summary>
+        /// <summary>A button of the phone: flat, with a thin edge a little darker than its color instead of the thick simulator outline.</summary>
         private Button AddButton(string text, Color color, Vector2 size, Vector2 position, Action click)
         {
             var button = UiKit.MakeButton(content, text, color, size, new Vector2(0f, 1f), new Vector2(Margin + position.x, position.y), click);

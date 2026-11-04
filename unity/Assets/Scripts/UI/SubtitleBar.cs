@@ -5,7 +5,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// A line at the bottom of the screen, like the subtitles of a film: who speaks, then the words typing themselves.
-    /// It never stops the player. The player's own thoughts use it too, in italics and with no name.
+    /// It never stops the user. The user's own thoughts use it too, in italics and with no name.
     /// </summary>
     public sealed class SubtitleBar
     {

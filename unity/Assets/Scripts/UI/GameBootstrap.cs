@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// Placed in the first scene. It creates the game session and the overlay once; both then live
+    /// Placed in the first scene. It creates the simulator session and the overlay once; both then live
     /// across scene changes, so coming back to the town does not start a second copy.
     /// </summary>
     public sealed class GameBootstrap : MonoBehaviour

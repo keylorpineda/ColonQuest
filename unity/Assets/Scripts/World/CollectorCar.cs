@@ -32,7 +32,7 @@ namespace ColonQuest.World
             Cooldown = cooldownSeconds;
         }
 
-        /// <summary>True when the player is close enough to the car, in both directions, to be stopped in front of it.</summary>
+        /// <summary>True when the user is close enough to the car, in both directions, to be stopped in front of it.</summary>
         public static bool IsNear(Vector2 car, Vector2 player)
         {
             return Mathf.Abs(car.x - player.x) <= DetectX && Mathf.Abs(car.y - player.y) <= DetectY;
@@ -45,7 +45,7 @@ namespace ColonQuest.World
             Timer = Gap;
         }
 
-        /// <summary>The car stops in front of the player. Only a driving car that is allowed to stop does.</summary>
+        /// <summary>The car stops in front of the user. Only a driving car that is allowed to stop does.</summary>
         public bool TryStop(bool armed, Vector2 car, Vector2 player)
         {
             if (Current != Mode.Driving || !armed || !IsNear(car, player))
@@ -58,7 +58,7 @@ namespace ColonQuest.World
             return true;
         }
 
-        /// <summary>Stops where it is, whatever it was doing: the guided run calls it to the player.</summary>
+        /// <summary>Stops where it is, whatever it was doing: the guided run calls it to the user.</summary>
         public void ForceStop()
         {
             Current = Mode.Stopped;
@@ -94,7 +94,7 @@ namespace ColonQuest.World
 
     /// <summary>
     /// The black car with tinted windows that collects what is owed. It patrols the main street from time to
-    /// time; if the player is in arrears and ends up in front of it, it stops and raises <see cref="Arrived"/>.
+    /// time; if the user is in arrears and ends up in front of it, it stops and raises <see cref="Arrived"/>.
     /// The car never moves money: the overlay asks the finance engine what to do next.
     /// </summary>
     public sealed class CollectorCar : MonoBehaviour
@@ -108,19 +108,19 @@ namespace ColonQuest.World
 
         public static CollectorCar Instance { get; private set; }
 
-        /// <summary>Set by the overlay every frame: true while the player owes enough for the collectors to stop.</summary>
+        /// <summary>Set by the overlay every frame: true while the user owes enough for the collectors to stop.</summary>
         public static bool Armed { get; set; }
 
-        /// <summary>Raised once each time the car stops in front of the player.</summary>
+        /// <summary>Raised once each time the car stops in front of the user.</summary>
         public static event Action<CollectorCar> Arrived;
 
-        /// <summary>The two men in the car. They wait hidden on the street until the car stops in front of the player.</summary>
+        /// <summary>The two men in the car. They wait hidden on the street until the car stops in front of the user.</summary>
         public static readonly string[] MenNames = { "Cobrador_1", "Cobrador_2" };
 
-        /// <summary>While true a stopped car stays stopped: the men are out talking to the player.</summary>
+        /// <summary>While true a stopped car stays stopped: the men are out talking to the user.</summary>
         public static bool Held { get; set; }
 
-        /// <summary>How hard the car brakes when it stops in front of the player, in units per second squared.</summary>
+        /// <summary>How hard the car brakes when it stops in front of the user, in units per second squared.</summary>
         private const float Brake = 9f;
 
         public bool IsVisible => patrol != null && patrol.Current != CollectorPatrol.Mode.Waiting;
@@ -137,7 +137,7 @@ namespace ColonQuest.World
 
         private float currentSpeed;
 
-        /// <summary>The car comes to this spot of the street at once and stops for the player.</summary>
+        /// <summary>The car comes to this spot of the street at once and stops for the user.</summary>
         public void StopFor(Vector2 at)
         {
             SetX(at.x - 2f);
@@ -189,7 +189,7 @@ namespace ColonQuest.World
 
             if (patrol.Current == CollectorPatrol.Mode.Driving || patrol.Current == CollectorPatrol.Mode.Cooling)
             {
-                // It obeys the lights like any car; it only breaks the flow when it stops in front of the player.
+                // It obeys the lights like any car; it only breaks the flow when it stops in front of the user.
                 float target = CarRules.TargetSpeed(speed, Traffic.RoomAhead(transform, 1));
                 currentSpeed = CarRules.NextSpeed(currentSpeed, target, dt);
                 SetX(transform.position.x + currentSpeed * dt);

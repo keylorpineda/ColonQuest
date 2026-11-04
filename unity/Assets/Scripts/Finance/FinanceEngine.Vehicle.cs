@@ -109,8 +109,8 @@ namespace ColonQuest.Finance
         }
 
         /// <summary>
-        /// True when the player has something to drive: a car leaves its mark in the history, and a car or a motorbike bought
-        /// in installments stays in the installments. Events about repairs or the marchamo are only for this player.
+        /// True when the user has something to drive: a car leaves its mark in the history, and a car or a motorbike bought
+        /// in installments stays in the installments. Events about repairs or the marchamo are only for this user.
         /// </summary>
         public static bool OwnsVehicle(PlayerState state)
         {

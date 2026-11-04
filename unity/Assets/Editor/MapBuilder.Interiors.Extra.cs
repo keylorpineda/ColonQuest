@@ -17,13 +17,13 @@ namespace ColonQuest.EditorTools
             return Group(parent, name);
         }
 
-        /// <summary>Furniture: it has an outline, a shadow and a collider, so the player walks around it.</summary>
+        /// <summary>Furniture: it has an outline, a shadow and a collider, so the user walks around it.</summary>
         private static void Solid(Transform g, string name, Sprite sprite, float x, float y, float w, float h, string hex)
         {
             Prop(g, name, sprite, new Vector2(x, y), new Vector2(w, h), GamePalette.Hex(hex));
         }
 
-        /// <summary>A detail drawn on top of furniture or on a wall; it never blocks the player.</summary>
+        /// <summary>A detail drawn on top of furniture or on a wall; it never blocks the user.</summary>
         private static SpriteRenderer Deco(Transform g, string name, Sprite sprite, float x, float y, float w, float h, string hex, float alpha = 1f, int order = 7)
         {
             return Shape(g, name, sprite, new Vector2(x, y), new Vector2(w, h), Hex(hex, alpha), order);

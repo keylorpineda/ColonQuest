@@ -16,7 +16,7 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// What the player has to do now, read from the run: the day of arrival first (room, insurance, first shift), then the
+    /// What the user has to do now, read from the run: the day of arrival first (room, insurance, first shift), then the
     /// work of every day, the bills, the debts and the bank at the end of the month. Pure, so it can be tested.
     /// </summary>
     public static class TaskList

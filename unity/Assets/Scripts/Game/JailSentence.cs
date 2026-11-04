@@ -3,7 +3,7 @@ using System;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// How long the player stays in the cell and what the bail costs. A sentence lasts 1 to 3 game days,
+    /// How long the user stays in the cell and what the bail costs. A sentence lasts 1 to 3 simulator days,
     /// served by sleeping on the cell cot or paying the bail to leave early. Pure rules, tested in EditMode.
     /// </summary>
     public static class JailSentence
@@ -16,7 +16,7 @@ namespace ColonQuest.Game
         public const int MediumSeconds = 10 * 60;
         public const int LongSeconds = 15 * 60;
 
-        /// <summary>The term in game days: 1 day for 1st arrest, 2 days for 2nd, 3 days for 3rd and beyond.</summary>
+        /// <summary>The term in simulator days: 1 day for 1st arrest, 2 days for 2nd, 3 days for 3rd and beyond.</summary>
         public static int TermDays(int priorArrests)
         {
             if (priorArrests <= 0)
@@ -27,7 +27,7 @@ namespace ColonQuest.Game
             return priorArrests == 1 ? MediumDays : LongDays;
         }
 
-        /// <summary>The bail for what is left of the term in game days: ₡40 000 per remaining day.</summary>
+        /// <summary>The bail for what is left of the term in simulator days: ₡40 000 per remaining day.</summary>
         public static long BailCostDays(int remainingDays)
         {
             if (remainingDays <= 0)
@@ -38,7 +38,7 @@ namespace ColonQuest.Game
             return remainingDays * MarketAssumptions.BailPerDay;
         }
 
-        /// <summary>The term for an arrest, from how many times the player was arrested before in this run.</summary>
+        /// <summary>The term for an arrest, from how many times the user was arrested before in this run.</summary>
         public static int TermSeconds(int priorArrests)
         {
             if (priorArrests <= 0)
