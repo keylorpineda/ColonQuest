@@ -3,9 +3,9 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// A doorway or doormat. When the player steps on it, the next scene is loaded
-    /// and the player appears on the given spawn point. A door with an entry direction only opens
-    /// when the player walks that way, so passing along the sidewalk does not go inside.
+    /// A doorway or doormat. When the user steps on it, the next scene is loaded
+    /// and the user appears on the given spawn point. A door with an entry direction only opens
+    /// when the user walks that way, so passing along the sidewalk does not go inside.
     /// </summary>
     [RequireComponent(typeof(BoxCollider2D))]
     public sealed class Door : MonoBehaviour
@@ -19,7 +19,7 @@ namespace ColonQuest.World
         [SerializeField] private GameObject closedSign;
         [SerializeField] private string listingId;
 
-        /// <summary>Where the last house door of the town left the player, so the shared house interior leads back to the right door.</summary>
+        /// <summary>Where the last house door of the town left the user, so the shared house interior leads back to the right door.</summary>
         public static string RememberedReturn { get; set; } = string.Empty;
 
         public static void SetRememberedReturn(string spawn)
@@ -43,10 +43,10 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>When set, a door it says no to stays shut: the guided run keeps the player on its way.</summary>
+        /// <summary>When set, a door it says no to stays shut: the guided run keeps the user on its way.</summary>
         public static System.Func<Door, bool> Allowed { get; set; }
 
-        /// <summary>True while the player serves a sentence: no door of the cell opens.</summary>
+        /// <summary>True while the user serves a sentence: no door of the cell opens.</summary>
         public static bool Locked { get; set; }
 
         public static string LockedThought { get; set; } = string.Empty;
@@ -78,13 +78,13 @@ namespace ColonQuest.World
             returnSpawn = outsideSpawn;
         }
 
-        /// <summary>The door of a house for sale or rent: inside, the house is not the player's until it is rented or bought.</summary>
+        /// <summary>The door of a house for sale or rent: inside, the house is not the user's until it is rented or bought.</summary>
         public void MarkListing(string id)
         {
             listingId = id;
         }
 
-        /// <summary>The mat of the shared house: it leads to the door the player came in by.</summary>
+        /// <summary>The mat of the shared house: it leads to the door the user came in by.</summary>
         public void RememberReturn()
         {
             useRememberedReturn = true;
@@ -155,7 +155,7 @@ namespace ColonQuest.World
 
             var body = other.attachedRigidbody;
 
-            // What the player is trying to do counts, not what is left after bumping into the door frame.
+            // What the user is trying to do counts, not what is left after bumping into the door frame.
             var walker = other.GetComponent<PlayerController>();
             Vector2 velocity = walker != null && walker.WalkIntent != Vector2.zero
                 ? walker.WalkIntent

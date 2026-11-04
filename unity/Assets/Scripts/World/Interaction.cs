@@ -6,9 +6,9 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// A small scene made of steps, like the actions of The Sims: the player walks to the place, turns, takes a pose, a sound
+    /// A small scene made of steps, like the actions of The Sims: the user walks to the place, turns, takes a pose, a sound
     /// plays, an object or a person reacts, a line is said, and only at the end <see cref="Apply"/> runs the action that
-    /// changes the game. The money is always moved by the finance engine inside that action, never by the animation.
+    /// changes the simulator. The money is always moved by the finance engine inside that action, never by the animation.
     /// Space skips the rest of the scene: every step turns instant, but the apply steps still run.
     /// </summary>
     public sealed class Interaction
@@ -59,7 +59,7 @@ namespace ColonQuest.World
 
         private readonly List<Step> steps = new List<Step>();
 
-        /// <summary>Raised with the speaker and the line. The speaker is empty when it is the player's own thought.</summary>
+        /// <summary>Raised with the speaker and the line. The speaker is empty when it is the user's own thought.</summary>
         public static event Action<string, string> Spoke;
 
         /// <summary>True while a scene plays. Nothing else should start meanwhile.</summary>
@@ -94,7 +94,7 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>How many steps change the game (the apply steps).</summary>
+        /// <summary>How many steps change the simulator (the apply steps).</summary>
         public int ApplyCount
         {
             get
@@ -110,7 +110,7 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// Walks the player to a point and waits until there. When the point is inside solid furniture, the player stops at
+        /// Walks the user to a point and waits until there. When the point is inside solid furniture, the user stops at
         /// the closest free spot in front of it instead.
         /// </summary>
         public Interaction WalkTo(Vector2 point)
@@ -119,9 +119,9 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// Like <see cref="WalkTo"/> but the player can get onto furniture, to lie in a bed or sit on a sofa. The player first
+        /// Like <see cref="WalkTo"/> but the user can get onto furniture, to lie in a bed or sit on a sofa. The user first
         /// walks with collisions to the free spot in front of it, and at the end of the scene steps back to that spot before
-        /// the collider comes back, so physics never pushes the player out of the furniture.
+        /// the collider comes back, so physics never pushes the user out of the furniture.
         /// </summary>
         public Interaction WalkInto(Vector2 point)
         {
@@ -134,13 +134,13 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.WalkTo, Point = point, Through = true, HasFront = true, Front = front });
         }
 
-        /// <summary>Gets onto a seat and holds a sitting pose. The player stands up and steps back in front of it at the end.</summary>
+        /// <summary>Gets onto a seat and holds a sitting pose. The user stands up and steps back in front of it at the end.</summary>
         public Interaction SitOn(Vector2 seat, float seconds, PersonPose pose = PersonPose.Sit)
         {
             return WalkInto(seat).Pose(pose, seconds);
         }
 
-        /// <summary>Turns the player toward a point.</summary>
+        /// <summary>Turns the user toward a point.</summary>
         public Interaction Face(Vector2 point)
         {
             return Add(new Step { Kind = Kind.Face, Point = point });
@@ -152,7 +152,7 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.Pose, Pose = pose, Seconds = seconds });
         }
 
-        /// <summary>A line of a person (the speaker) or of the player's own thoughts (an empty speaker). It does not wait.</summary>
+        /// <summary>A line of a person (the speaker) or of the user's own thoughts (an empty speaker). It does not wait.</summary>
         public Interaction Say(string speaker, string text)
         {
             return Add(new Step { Kind = Kind.Say, Name = speaker ?? string.Empty, Text = text });
@@ -243,13 +243,13 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.Reveal, Name = objectName, Through = visible });
         }
 
-        /// <summary>An object appears in the player's right hand and stays there until it is released or the scene ends. It does not wait.</summary>
+        /// <summary>An object appears in the user's right hand and stays there until it is released or the scene ends. It does not wait.</summary>
         public Interaction HoldProp(string prop)
         {
             return Add(new Step { Kind = Kind.HoldProp, Name = prop });
         }
 
-        /// <summary>What the player's hand holds goes away. It does not wait.</summary>
+        /// <summary>What the user's hand holds goes away. It does not wait.</summary>
         public Interaction ReleaseProp()
         {
             return Add(new Step { Kind = Kind.ReleaseProp });
@@ -261,7 +261,7 @@ namespace ColonQuest.World
             return Add(new Step { Kind = Kind.WaitUntil, Condition = condition });
         }
 
-        /// <summary>Changes the player's clothes, as at the wardrobe (see <see cref="PlayerOutfit"/>).</summary>
+        /// <summary>Changes the user's clothes, as at the wardrobe (see <see cref="PlayerOutfit"/>).</summary>
         public Interaction Wear(int outfit)
         {
             return Apply(() => PlayerOutfit.Wear(GameObject.FindWithTag(Station.PlayerTag), outfit));
@@ -283,7 +283,7 @@ namespace ColonQuest.World
             });
         }
 
-        /// <summary>The moment the game changes. It runs even if the player skips the scene.</summary>
+        /// <summary>The moment the simulator changes. It runs even if the user skips the scene.</summary>
         public Interaction Apply(Action action)
         {
             return Add(new Step { Kind = Kind.Apply, Action = action });
@@ -296,7 +296,7 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// Plays the scene. <paramref name="finished"/> runs after the last step, when the player is free again. Nothing plays
+        /// Plays the scene. <paramref name="finished"/> runs after the last step, when the user is free again. Nothing plays
         /// if another scene is already playing; the action of the apply steps then never runs, so the caller falls back to it.
         /// </summary>
         public bool Play(Action finished = null)
@@ -344,7 +344,7 @@ namespace ColonQuest.World
 
             /// <summary>
             /// A scene change destroys the runner in the middle of its script, and the coroutine never reaches its finally:
-            /// without this the game would think a scene is still playing and hide every prompt from then on.
+            /// without this the simulator would think a scene is still playing and hide every prompt from then on.
             /// </summary>
             private void OnDestroy()
             {
@@ -590,7 +590,7 @@ namespace ColonQuest.World
                 Destroy(gameObject);
             }
 
-            /// <summary>The hand at the end of the right forearm of the look the player wears now.</summary>
+            /// <summary>The hand at the end of the right forearm of the look the user wears now.</summary>
             private static Transform RightHand(GameObject player)
             {
                 foreach (var part in player.GetComponentsInChildren<Transform>())
@@ -630,7 +630,7 @@ namespace ColonQuest.World
                         break;
                     }
 
-                    // Pressed against something for a moment: the feet stop colliding and the player walks on past the
+                    // Pressed against something for a moment: the feet stop colliding and the user walks on past the
                     // corner of the furniture, instead of jumping to the end of the walk.
                     still = t > 0.1f && (body.position - last).sqrMagnitude < 0.00002f ? still + Time.deltaTime : 0f;
                     last = body.position;
@@ -660,7 +660,7 @@ namespace ColonQuest.World
                 body.linearVelocity = Vector2.zero;
                 if (skip || (target - body.position).magnitude >= 0.12f)
                 {
-                    // Skipped, or still blocked after walking through: the player ends where the scene meant.
+                    // Skipped, or still blocked after walking through: the user ends where the scene meant.
                     body.position = target;
                     body.transform.position = target;
                 }

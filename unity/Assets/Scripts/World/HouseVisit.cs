@@ -1,14 +1,14 @@
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Which house of the town the player walked into. The houses for sale or rent share the interior of the mother's
-    /// house; while one of them is not the player's, its things only give a thought and the mother is not there.
+    /// Which house of the town the user walked into. The houses for sale or rent share the interior of the mother's
+    /// house; while one of them is not the user's, its things only give a thought and the mother is not there.
     /// </summary>
     public static class HouseVisit
     {
         public const string NotMineThought = "Esta casa no es mía. Si la alquilo o la compro, puedo usarla.";
 
-        /// <summary>The listing of the house the player is in, or empty for the mother's house.</summary>
+        /// <summary>The listing of the house the user is in, or empty for the mother's house.</summary>
         public static string ListingId { get; private set; } = string.Empty;
 
         public static bool InListing => !string.IsNullOrEmpty(ListingId);
@@ -22,7 +22,7 @@ namespace ColonQuest.World
         private static readonly string[] DogHouses = { "Casa_Vecina_A", "Casa_Almendros_4" };
 
         /// <summary>
-        /// Deterministic interior decoration variant (0..3) chosen based on which house door the player entered from.
+        /// Deterministic interior decoration variant (0..3) chosen based on which house door the user entered from.
         /// </summary>
         public static int VariantFor(string doorReturn)
         {
@@ -35,7 +35,7 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// True when the neighbor's house the player came in by has a dog. The key is the spot in front of its door, the
+        /// True when the neighbor's house the user came in by has a dog. The key is the spot in front of its door, the
         /// remembered return of the door (for example "Town_From_Casa_Vecina_A").
         /// </summary>
         public static bool NeighborHasDog(string doorReturn)

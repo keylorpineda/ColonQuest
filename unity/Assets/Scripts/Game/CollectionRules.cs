@@ -5,7 +5,7 @@ namespace ColonQuest.Game
 {
     /// <summary>
     /// When the collectors come and what they ask for. The numbers are in <see cref="MarketAssumptions"/>;
-    /// this only decides, from the player's state, whether they are owed and how much.
+    /// this only decides, from the user's state, whether they are owed and how much.
     /// </summary>
     public static class CollectionRules
     {

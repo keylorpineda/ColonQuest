@@ -7,7 +7,7 @@ namespace ColonQuest.EditorTools
     /// <summary>
     /// The two places that had no inside: the San Isidro farm (a barn with stalls, hay and Don Beto at his desk) and the real
     /// estate agency (a wall of photographs of the houses and the agent at her desk). The windows they open are the same
-    /// as before; now the player walks in and talks to somebody.
+    /// as before; now the user walks in and talks to somebody.
     /// </summary>
     public static partial class MapBuilder
     {
@@ -68,7 +68,7 @@ namespace ColonQuest.EditorTools
                 Solid(stalls, "RailBottom", square, x, 3.25f, 4.2f, 0.12f, "#8B5A3C");
             }
 
-            // Don Beto's desk, in the middle: the player talks to him about the stake in the farm.
+            // Don Beto's desk, in the middle: the user talks to him about the stake in the farm.
             var desk = IL(parts.Props, "FarmDesk");
             Solid(desk, "Desk", rounded, 0f, -0.9f, 3.4f, 0.9f, "#8B5A3C");
             Deco(desk, "Ledger", roundedSmall, -0.7f, -0.8f, 0.8f, 0.5f, "#F8F5E8", 1f, 8);

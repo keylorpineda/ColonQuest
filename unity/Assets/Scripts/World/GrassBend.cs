@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Tall grass and flowers that lean away from the player when stepped near and sway with the town breeze otherwise.
+    /// Tall grass and flowers that lean away from the user when stepped near and sway with the town breeze otherwise.
     /// </summary>
     public sealed class GrassBend : MonoBehaviour
     {
@@ -20,7 +20,7 @@ namespace ColonQuest.World
         private Transform player;
         private float nextLookupTime;
 
-        /// <summary>The angle the plant wants, in degrees: away from the player when near, otherwise the breeze.</summary>
+        /// <summary>The angle the plant wants, in degrees: away from the user when near, otherwise the breeze.</summary>
         public static float TargetAngle(float distance, bool playerIsEast, float breezeAngle)
         {
             if (distance >= ReactRadius)
@@ -29,7 +29,7 @@ namespace ColonQuest.World
             }
 
             float push = 1f - distance / ReactRadius;
-            // Negative degrees lean to the right (east), so a player on the west pushes the plant east.
+            // Negative degrees lean to the right (east), so a user on the west pushes the plant east.
             float sign = playerIsEast ? 1f : -1f;
             return sign * MaxBendDegrees * Mathf.Clamp01(push + 0.35f);
         }

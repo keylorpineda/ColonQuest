@@ -9,7 +9,7 @@ namespace ColonQuest.World
     /// </summary>
     public sealed class RoomPiece : MonoBehaviour
     {
-        /// <summary>Tells whether the player owns the piece with this name.</summary>
+        /// <summary>Tells whether the user owns the piece with this name.</summary>
         public static Func<string, bool> Owned { get; set; }
 
         [SerializeField] private string piece;

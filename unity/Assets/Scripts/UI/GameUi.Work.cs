@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The first job: the arrow that leads to work in the morning, and the scene at the time clock. The player puts the card in,
+    /// The first job: the arrow that leads to work in the morning, and the scene at the time clock. The user puts the card in,
     /// the boss says what being late costs, and a short scene of sweeping, washing and serving covers the morning. The docked pay
     /// is worked out by the finance engine when the salary is paid.
     /// </summary>
@@ -140,7 +140,7 @@ namespace ColonQuest.UI
         private static readonly Vector2 SodaPass = new Vector2(0.6f, 1.4f);
         private static readonly Vector2 SodaRegister = new Vector2(-1.8f, 1.4f);
 
-        /// <summary>One round of the shift for the player's position at the soda.</summary>
+        /// <summary>One round of the shift for the user's position at the soda.</summary>
         private static void ShiftRound(Interaction scene, JobPosition position, int round)
         {
             switch (position)

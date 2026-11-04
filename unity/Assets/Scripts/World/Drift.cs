@@ -24,7 +24,7 @@ namespace ColonQuest.World
 
         /// <summary>
         /// A car on its lane: it wraps around only beyond both ends of the walkable map, so it leaves the street out of
-        /// sight instead of vanishing where the player can see it.
+        /// sight instead of vanishing where the user can see it.
         /// </summary>
         public void ConfigureLane(float speedX, float minX, float maxX)
         {

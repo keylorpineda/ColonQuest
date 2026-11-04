@@ -4,7 +4,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// A lily pad (or anything light) on a pond: it drifts in a small slow circle, bobs, and is pushed away when the
-    /// player walks up to the edge, then floats back on a soft spring. It never leaves the water.
+    /// user walks up to the edge, then floats back on a soft spring. It never leaves the water.
     /// </summary>
     public sealed class FloatingPad : MonoBehaviour
     {

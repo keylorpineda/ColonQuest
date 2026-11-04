@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColonQuest.World
 {
-    /// <summary>What the player did that the law cares about. A fine only exists while an officer sees it.</summary>
+    /// <summary>What the user did that the law cares about. A fine only exists while an officer sees it.</summary>
     public enum OffenseKind
     {
         None,
@@ -11,8 +11,8 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// The offense the player is committing right now, if any. It costs nothing by itself: a fine arrives only when
-    /// an officer sees the player and stops them (<see cref="PoliceOfficer"/>).
+    /// The offense the user is committing right now, if any. It costs nothing by itself: a fine arrives only when
+    /// an officer sees the user and stops them (<see cref="PoliceOfficer"/>).
     /// </summary>
     public static class Offenses
     {
@@ -45,15 +45,15 @@ namespace ColonQuest.World
         Stop
     }
 
-    /// <summary>What an officer does about the player. Pure, so the rules of the law can be tested.</summary>
+    /// <summary>What an officer does about the user. Pure, so the rules of the law can be tested.</summary>
     public static class OfficerLogic
     {
         public const float SightRange = 6f;
         public const float StopRange = 1.3f;
 
         /// <summary>
-        /// No offense, nothing happens, however close the officer is. With an offense the officer stops a player who
-        /// is within reach, goes after one he can see, and goes after any player when he was called to the place.
+        /// No offense, nothing happens, however close the officer is. With an offense the officer stops a user who
+        /// is within reach, goes after one he can see, and goes after any user when he was called to the place.
         /// </summary>
         public static OfficerAction Decide(Vector2 officer, Vector2 player, OffenseKind offense, bool called)
         {
@@ -73,8 +73,8 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// A police officer. He does nothing while the player breaks no rule. When someone called him, or while the player
-    /// commits an offense in his sight, he walks to the player and stops them once; the overlay then charges the fine.
+    /// A police officer. He does nothing while the user breaks no rule. When someone called him, or while the user
+    /// commits an offense in his sight, he walks to the user and stops them once; the overlay then charges the fine.
     /// </summary>
     public sealed class PoliceOfficer : MonoBehaviour
     {
@@ -84,12 +84,12 @@ namespace ColonQuest.World
         private bool called;
         private bool stopped;
 
-        /// <summary>Raised once, when the officer reaches the player and stops them for this offense.</summary>
+        /// <summary>Raised once, when the officer reaches the user and stops them for this offense.</summary>
         public static event Action<OffenseKind> StoppedPlayer;
 
         public bool HasStopped => stopped;
 
-        /// <summary>The owner called the police: the officer appears and heads straight for the player.</summary>
+        /// <summary>The owner called the police: the officer appears and heads straight for the user.</summary>
         public void Alert()
         {
             called = true;
@@ -101,7 +101,7 @@ namespace ColonQuest.World
         {
             if (stopped)
             {
-                // An officer on the street can stop the player again once the offense is over; one who was called cannot.
+                // An officer on the street can stop the user again once the offense is over; one who was called cannot.
                 if (!called && Offenses.Current == OffenseKind.None)
                 {
                     stopped = false;

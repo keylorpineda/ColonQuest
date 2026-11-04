@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// One run of the game: it joins the rules (<see cref="GameLoop"/>) with the backend
+    /// One run of the simulator: it joins the rules (<see cref="GameLoop"/>) with the backend
     /// (<see cref="ApiClient"/>) and tells the UI what happened through events. It lives across
     /// scene changes, so walking into a building does not lose the month.
     /// </summary>
@@ -30,7 +30,7 @@ namespace ColonQuest.Game
 
         private const int MaxNegotiationText = 300;
 
-        // The event asked for ahead of time (see PrefetchTask): the answer kept, or the task waiting for it. A new game
+        // The event asked for ahead of time (see PrefetchTask): the answer kept, or the task waiting for it. A new simulation
         // changes the generation, so an answer from the previous run is dropped.
         private bool prefetching;
         private StationType prefetchStation;
@@ -50,10 +50,10 @@ namespace ColonQuest.Game
         /// <summary>True while a spoken line is being turned into words.</summary>
         public bool Transcribing { get; private set; }
 
-        /// <summary>What the player just said while the seller answers it; shown at once. Null when nothing is on its way.</summary>
+        /// <summary>What the user just said while the seller answers it; shown at once. Null when nothing is on its way.</summary>
         public string PendingLine { get; private set; }
 
-        /// <summary>What the last deal cost and how well the player asked; shown with the result.</summary>
+        /// <summary>What the last deal cost and how well the user asked; shown with the result.</summary>
         public DealReport LastDeal { get; private set; }
 
         /// <summary>The car being negotiated at the agency, or null at the store. The agency is not known to the backend.</summary>
@@ -120,13 +120,13 @@ namespace ColonQuest.Game
             return Instance != null && Enum.TryParse(piece, out FurnitureKind kind) && Instance.Loop.Holdings.Has(kind);
         }
 
-        /// <summary>The three saved games of story mode. The tests swap the store for one in memory.</summary>
+        /// <summary>The three saved simulations of story mode. The tests swap the store for one in memory.</summary>
         public static SaveSlots Slots { get; set; } = new SaveSlots(new PrefsSaveStore());
 
         /// <summary>The slot this run is saved in, or -1 for a run that is not saved (the tests, a quick start).</summary>
         public int ActiveSlot { get; private set; } = -1;
 
-        /// <summary>The name of the saved game.</summary>
+        /// <summary>The name of the saved simulation.</summary>
         public string RunName { get; private set; } = string.Empty;
 
         private void Awake()
@@ -144,7 +144,7 @@ namespace ColonQuest.Game
         private bool skipNextMenuSave;
 
         /// <summary>
-        /// Going back to the main menu saves the run, so nothing played is lost, unless the player chose to leave
+        /// Going back to the main menu saves the run, so nothing played is lost, unless the user chose to leave
         /// without saving (<see cref="LeaveWithoutSaving"/>).
         /// </summary>
         private void OnSceneChanged(UnityEngine.SceneManagement.Scene from, UnityEngine.SceneManagement.Scene to)
@@ -166,7 +166,7 @@ namespace ColonQuest.Game
             }
         }
 
-        /// <summary>The player leaves to the menu and says no to saving: the slot keeps what it had before.</summary>
+        /// <summary>The user leaves to the menu and says no to saving: the slot keeps what it had before.</summary>
         public void LeaveWithoutSaving()
         {
             skipNextMenuSave = true;
@@ -181,7 +181,7 @@ namespace ColonQuest.Game
             SaveNow();
         }
 
-        /// <summary>Goes on with a saved game. False when the slot is empty or cannot be read.</summary>
+        /// <summary>Goes on with a saved simulation. False when the slot is empty or cannot be read.</summary>
         public bool ContinueGame(int slot)
         {
             var saved = Slots.Load(slot);
@@ -272,7 +272,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// Starts asking the game master for the event of this place while the greeting scene plays, without showing a wait.
+        /// Starts asking the simulation director for the event of this place while the greeting scene plays, without showing a wait.
         /// <see cref="BeginTask"/> then takes the answer if it already came, or waits for the one on its way. The state does
         /// not change during the greeting, so the event still fits.
         /// </summary>
@@ -308,7 +308,7 @@ namespace ColonQuest.Game
             });
         }
 
-        /// <summary>Asks the game master for an event for this place. The result arrives through <see cref="EventReady"/>.</summary>
+        /// <summary>Asks the simulation director for an event for this place. The result arrives through <see cref="EventReady"/>.</summary>
         public void BeginTask(StationType station)
         {
             if (Busy || !Loop.CanDoTask(station))
@@ -385,7 +385,7 @@ namespace ColonQuest.Game
             Changed?.Invoke();
         }
 
-        /// <summary>The offer of the lender or the pyramid stand. Its figures come from the game, so nothing is asked of the backend.</summary>
+        /// <summary>The offer of the lender or the pyramid stand. Its figures come from the simulator, so nothing is asked of the backend.</summary>
         public void BeginOffer(TalkPartner partner)
         {
             var station = partner == TalkPartner.Lender ? StationType.Lender : StationType.Pyramid;
@@ -404,10 +404,10 @@ namespace ColonQuest.Game
 
         // ---------------------------------------------------------------- the guided run
 
-        /// <summary>True during the guided run: the clock stands still and only the decisions are left to the player.</summary>
+        /// <summary>True during the guided run: the clock stands still and only the decisions are left to the user.</summary>
         public bool Guided { get; private set; }
 
-        /// <summary>Starts the guided run: a run of the normal rules with no slot, so it never touches the saved games.</summary>
+        /// <summary>Starts the guided run: a run of the normal rules with no slot, so it never touches the saved simulations.</summary>
         public void StartGuided()
         {
             StartNewGame();
@@ -463,7 +463,7 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// One turn typed by the player. The backend seller answers; when it cannot, the local seller
+        /// One turn typed by the user. The backend seller answers; when it cannot, the local seller
         /// does, so the conversation never stops.
         /// </summary>
         public void SendNegotiation(string text)
@@ -524,9 +524,9 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// One turn spoken by the player, in two steps so the player sees their words as soon as they are understood: the
+        /// One turn spoken by the user, in two steps so the user sees their words as soon as they are understood: the
         /// clip becomes text and then goes out like a typed line. Only the backend can transcribe, so when it is missing or
-        /// the voice fails nothing is recorded: <see cref="VoiceNotice"/> asks the player to type instead.
+        /// the voice fails nothing is recorded: <see cref="VoiceNotice"/> asks the user to type instead.
         /// </summary>
         public void SendNegotiationVoice(byte[] wav)
         {
@@ -556,7 +556,7 @@ namespace ColonQuest.Game
                 {
                     if (result.Ok)
                     {
-                        // The seller answers from here on exactly as if the player had typed it.
+                        // The seller answers from here on exactly as if the user had typed it.
                         SendNegotiation(result.Value);
                     }
                     else
@@ -571,13 +571,13 @@ namespace ColonQuest.Game
             });
         }
 
-        /// <summary>The player buys, from the button or because the seller closed the deal on the typed words.</summary>
+        /// <summary>The user buys, from the button or because the seller closed the deal on the typed words.</summary>
         public void AcceptDeal()
         {
             ConcludeNegotiation(true);
         }
 
-        /// <summary>The player leaves without buying.</summary>
+        /// <summary>The user leaves without buying.</summary>
         public void WalkAway()
         {
             ConcludeNegotiation(false);
@@ -705,9 +705,9 @@ namespace ColonQuest.Game
             Changed?.Invoke();
         }
 
-        // ---------------------------------------------------------------- things that happen to the player
+        // ---------------------------------------------------------------- things that happen to the user
 
-        /// <summary>The police take the player away: a fine, days of the month lost and a lower mood.</summary>
+        /// <summary>The police take the user away: a fine, days of the month lost and a lower mood.</summary>
         public bool Arrest()
         {
             if (Loop.IsFinished || Busy)
@@ -720,7 +720,7 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>The player pays the bail and leaves the cell.</summary>
+        /// <summary>The user pays the bail and leaves the cell.</summary>
         public bool PayBail(long cost)
         {
             if (Loop.IsFinished || Busy)
@@ -749,8 +749,8 @@ namespace ColonQuest.Game
         }
 
         /// <summary>
-        /// Moves the clock on by real seconds while the player is free. Returns true the moment the day ends, when the
-        /// player has to sleep. Nothing moves while the run is over or a request is in flight.
+        /// Moves the clock on by real seconds while the user is free. Returns true the moment the day ends, when the
+        /// user has to sleep. Nothing moves while the run is over or a request is in flight.
         /// </summary>
         public bool TickClock(float realSeconds)
         {
@@ -762,7 +762,7 @@ namespace ColonQuest.Game
             return Loop.Clock.Advance(realSeconds, GameSettings.Current.SecondsPerGameHour);
         }
 
-        /// <summary>The player clocks in at work.</summary>
+        /// <summary>The user clocks in at work.</summary>
         public ClockInResult ClockIn()
         {
             return Loop.ClockIn();
@@ -784,7 +784,7 @@ namespace ColonQuest.Game
                 Changed?.Invoke();
             }
 
-            // A night is the moment the game is saved, as in the bed of any story game.
+            // A night is the moment the simulator is saved, as in the bed of any story simulator.
             SaveNow();
         }
 
@@ -826,7 +826,7 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>A car ran the player over. It happens once a month at most; false when it did not count.</summary>
+        /// <summary>A car ran the user over. It happens once a month at most; false when it did not count.</summary>
         public bool Hospitalize()
         {
             if (Loop.IsFinished || Busy || Loop.HurtThisMonth)
@@ -879,7 +879,7 @@ namespace ColonQuest.Game
             return Apply(Loop.PayLender());
         }
 
-        // ---------------------------------------------------------------- talks in the player's own words
+        // ---------------------------------------------------------------- talks in the user's own words
 
         /// <summary>The talk with the collectors, the lender or the pyramid stand, while its window is open.</summary>
         public DebtTalk CurrentTalk { get; private set; }
@@ -898,7 +898,7 @@ namespace ColonQuest.Game
             TalkUpdated?.Invoke(CurrentTalk);
         }
 
-        /// <summary>One turn in the player's words. The model answers from the game's true figures; when it cannot, the talk's own rules do, so it never stops.</summary>
+        /// <summary>One turn in the user's words. The model answers from the simulator's true figures; when it cannot, the talk's own rules do, so it never stops.</summary>
         public void SendTalk(string text)
         {
             var talk = CurrentTalk;
@@ -949,7 +949,7 @@ namespace ColonQuest.Game
 
         /// <summary>
         /// One spoken turn. Only the backend can transcribe; the words then go out like a typed line.
-        /// Without the backend the player is asked to type.
+        /// Without the backend the user is asked to type.
         /// </summary>
         public void SendTalkVoice(byte[] wav)
         {
@@ -979,7 +979,7 @@ namespace ColonQuest.Game
                 {
                     if (result.Ok)
                     {
-                        // The answer comes from here on exactly as if the player had typed it.
+                        // The answer comes from here on exactly as if the user had typed it.
                         SendTalk(result.Value);
                     }
                     else
@@ -993,7 +993,7 @@ namespace ColonQuest.Game
             });
         }
 
-        /// <summary>Closes the talk and keeps the questions the player asked, for the metrics of the pilot.</summary>
+        /// <summary>Closes the talk and keeps the questions the user asked, for the metrics of the pilot.</summary>
         public void EndTalk()
         {
             var talk = CurrentTalk;
@@ -1162,7 +1162,7 @@ namespace ColonQuest.Game
             return true;
         }
 
-        /// <summary>The player sleeps on the cell cot to serve a day of their jail sentence.</summary>
+        /// <summary>The user sleeps on the cell cot to serve a day of their jail sentence.</summary>
         public void SleepInJail()
         {
             if (Busy || Loop.IsFinished)

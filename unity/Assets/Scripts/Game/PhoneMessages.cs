@@ -3,7 +3,7 @@ using ColonQuest.World;
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// The SINPE notices that show up on the player's phone. They only warn and teach: nothing here
+    /// The SINPE notices that show up on the user's phone. They only warn and teach: nothing here
     /// moves money, that is the finance engine's job.
     /// </summary>
     public static class PhoneMessages

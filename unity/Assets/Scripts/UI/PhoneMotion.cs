@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ColonQuest.UI
 {
-    /// <summary>The small animations of the phone: a list of timed steps that run on real time, so a paused game still moves them.</summary>
+    /// <summary>The small animations of the phone: a list of timed steps that run on real time, so a paused simulator still moves them.</summary>
     public sealed class PhoneMotion : MonoBehaviour
     {
         private sealed class Step

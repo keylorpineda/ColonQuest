@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Finds where the player can stand next to something solid. The scenes aim at the middle of a station, and the middle
+    /// Finds where the user can stand next to something solid. The scenes aim at the middle of a station, and the middle
     /// of many stations is the furniture itself; walking there pushes against it and ends inside it. The search looks in
     /// rings around the point, closest first, and in each ring it tries below first: in this top-down view the front of
     /// a piece of furniture faces down the screen.
@@ -16,12 +16,12 @@ namespace ColonQuest.World
         public const float MaxDistance = 3f;
         public const int Directions = 16;
 
-        /// <summary>Extra room around the player's feet, so the spot is not touching the furniture.</summary>
+        /// <summary>Extra room around the user's feet, so the spot is not touching the furniture.</summary>
         private const float Clearance = 0.04f;
 
         private static readonly List<Collider2D> Hits = new List<Collider2D>();
 
-        /// <summary>The closest free spot for this collider (the player's feet) around a point, or the point itself.</summary>
+        /// <summary>The closest free spot for this collider (the user's feet) around a point, or the point itself.</summary>
         public static Vector2 Near(Vector2 point, Collider2D feet)
         {
             if (feet == null)

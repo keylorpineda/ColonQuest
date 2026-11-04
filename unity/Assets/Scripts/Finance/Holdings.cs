@@ -29,7 +29,7 @@ namespace ColonQuest.Finance
     }
 
     /// <summary>
-    /// How a purchase ended. When it did not go through, nothing in the player's state changed.
+    /// How a purchase ended. When it did not go through, nothing in the user's state changed.
     /// <see cref="FinancedOnCard"/> is the part of an obligation that cash could not cover and went to the card.
     /// </summary>
     public readonly struct PurchaseResult
@@ -50,7 +50,7 @@ namespace ColonQuest.Finance
         public static PurchaseResult Failed(PurchaseFailure failure) => new PurchaseResult(false, failure, 0L);
     }
 
-    /// <summary>The home the player lives in because of a purchase: rented or bought with a mortgage.</summary>
+    /// <summary>The home the user lives in because of a purchase: rented or bought with a mortgage.</summary>
     public sealed class HomeHolding
     {
         public string Name { get; }
@@ -114,7 +114,7 @@ namespace ColonQuest.Finance
     }
 
     /// <summary>
-    /// What the player owns beyond cash, savings and debts: a home, a car and money tied up in the farm.
+    /// What the user owns beyond cash, savings and debts: a home, a car and money tied up in the farm.
     /// It lives next to <see cref="PlayerState"/>, so the contract with the backend does not change.
     /// </summary>
     public sealed class Holdings
@@ -125,7 +125,7 @@ namespace ColonQuest.Finance
         public HomeHolding? Home { get; private set; }
         public CarHolding? Car { get; private set; }
 
-        /// <summary>The monthly premium of the health insurance, or zero when the player has none.</summary>
+        /// <summary>The monthly premium of the health insurance, or zero when the user has none.</summary>
         public long HealthPremium { get; private set; }
 
         public bool HasHealthInsurance => HealthPremium > 0L;

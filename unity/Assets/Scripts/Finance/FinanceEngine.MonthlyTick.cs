@@ -98,7 +98,7 @@ namespace ColonQuest.Finance
         }
 
         /// <summary>
-        /// Transfers up to <paramref name="requestedColones"/> from available cash into the player's
+        /// Transfers up to <paramref name="requestedColones"/> from available cash into the user's
         /// emergency fund. Cash never becomes negative.
         /// </summary>
         public static long ContributeToEmergencyFund(

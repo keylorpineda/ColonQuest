@@ -14,7 +14,7 @@ namespace ColonQuest.Api
         public const int MaxChoices = 4;
         public const int MaxEffectsPerChoice = 5;
 
-        // ---------------------------------------------------------------- player state
+        // ---------------------------------------------------------------- user state
 
         public static PlayerStateDto ToDto(PlayerState state)
         {
@@ -55,7 +55,7 @@ namespace ColonQuest.Api
             return dto;
         }
 
-        /// <summary>The way back from <see cref="ToDto(PlayerState)"/>: a saved game is stored in this same shape.</summary>
+        /// <summary>The way back from <see cref="ToDto(PlayerState)"/>: a saved simulation is stored in this same shape.</summary>
         public static PlayerState FromDto(PlayerStateDto dto)
         {
             var card = dto.creditCard ?? new CreditCardDto();
@@ -101,7 +101,7 @@ namespace ColonQuest.Api
             };
         }
 
-        // ---------------------------------------------------------------- game event
+        // ---------------------------------------------------------------- simulator event
 
         /// <summary>Maps and validates an event. Every effect must be inside the ranges the finance engine accepts.</summary>
         public static GameEvent FromDto(GameEventDto dto)

@@ -66,7 +66,7 @@ namespace ColonQuest.World.PlayModeTests
                 }
             }
 
-            Assert.Fail("the player has no right hand");
+            Assert.Fail("the user has no right hand");
             return null;
         }
     }

@@ -10,7 +10,7 @@ namespace ColonQuest.EditorTools
 {
     /// <summary>
     /// The town is lit by real 2D lights (URP 2D Renderer): one global light for the sun that changes through the day,
-    /// and point lights in the street lamps, the porch lights and the player's surroundings that come on at night.
+    /// and point lights in the street lamps, the porch lights and the user's surroundings that come on at night.
     /// </summary>
     /// <remarks>
     /// Only the town has lights. The interiors and the menu have none, and the 2D Renderer draws a sprite with no light

@@ -10,7 +10,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The real calls to the models in this run, on the right of the screen, as the backend reports them: the plan of the year,
-    /// the cost and each call. L or its tab hides it, and the windows of the game move over to leave it room. Nothing here is
+    /// the cost and each call. L or its tab hides it, and the windows of the simulator move over to leave it room. Nothing here is
     /// made up: a call that did not happen does not appear, and it never shows a key.
     /// </summary>
     public sealed class AiCallsPanel
@@ -76,7 +76,7 @@ namespace ColonQuest.UI
             tab.SetActive(false);
         }
 
-        /// <summary>The room the windows of the game have to leave on the right of the screen.</summary>
+        /// <summary>The room the windows of the simulator have to leave on the right of the screen.</summary>
         public float RoomNeeded => panel.activeSelf ? Width + 24f : 0f;
 
         public void SetExpanded(bool expanded)
@@ -89,7 +89,7 @@ namespace ColonQuest.UI
             Expanded = !Expanded;
         }
 
-        /// <summary>Shows the panel or its tab, or neither when the game has no use for them right now.</summary>
+        /// <summary>Shows the panel or its tab, or neither when the simulator has no use for them right now.</summary>
         public void Tick(bool available)
         {
             panel.SetActive(available && Expanded);
@@ -129,7 +129,7 @@ namespace ColonQuest.UI
                 return;
             }
 
-            text.Append(DemoReadout.Tint(Loc.F("Esta partida lleva gastados unos {0}", DemoReadout.Dollars(trace.totalCostUsd)), "#F2A23A")).Append("\n\n");
+            text.Append(DemoReadout.Tint(Loc.F("Esta simulación lleva gastados unos {0}", DemoReadout.Dollars(trace.totalCostUsd)), "#F2A23A")).Append("\n\n");
 
             // In the order they happened, and the panel follows the last one down.
             foreach (var call in trace.calls)

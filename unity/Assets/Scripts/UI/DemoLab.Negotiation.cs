@@ -136,7 +136,7 @@ namespace ColonQuest.UI
             }
 
             y -= 154f;
-            Note(dealStatus == DealStatus.Open ? "Las cifras las calcula el motor, no el modelo. Y estas preguntas son la métrica de impacto del juego." : "El vendedor dio el trato por cerrado. Empezá otra conversación para seguir probando.", 20, GameUiColors.Muted, new Vector2(SideWidth, 100f), new Vector2(SideX, y));
+            Note(dealStatus == DealStatus.Open ? "Las cifras las calcula el motor, no el modelo. Y estas preguntas son la métrica de impacto del simulador." : "El vendedor dio el trato por cerrado. Empezá otra conversación para seguir probando.", 20, GameUiColors.Muted, new Vector2(SideWidth, 100f), new Vector2(SideX, y));
         }
 
         private int SellerOfferIndex()

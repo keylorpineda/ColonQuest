@@ -59,7 +59,7 @@ namespace ColonQuest.UI
             float y = -256f;
             const float width = 234f;
             Tile("Estudiantes", dashboard.students.ToString(), Left, y, width);
-            Tile("Partidas cerradas", dashboard.finishedGames.ToString(), Left + width + 12f, y, width);
+            Tile("Simulaciones cerradas", dashboard.finishedGames.ToString(), Left + width + 12f, y, width);
             Tile("Detectaron la trampa", dashboard.trapDetectionPct == ClassDashboardDto.NoData ? "s/d" : dashboard.trapDetectionPct + "%", Left + (width + 12f) * 2f, y, width);
             Tile("Deuda promedio", dashboard.averageFinalDebt == ClassDashboardDto.NoData ? "s/d" : Money.Format(dashboard.averageFinalDebt), Left + (width + 12f) * 3f, y, width);
 
@@ -116,7 +116,7 @@ namespace ColonQuest.UI
             classError = null;
             classServices.Clear();
             studentsDone = 0;
-            BeginWait("Tres estudiantes están jugando y negociando con el vendedor real");
+            BeginWait("Tres estudiantes están simulando y negociando con el vendedor real");
             Redraw();
 
             var teacher = NewService();

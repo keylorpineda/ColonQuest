@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Keeps a sign of the world in the player's language. It remembers the Spanish text the sign was made with
+    /// Keeps a sign of the world in the user's language. It remembers the Spanish text the sign was made with
     /// and writes it again whenever the language changes; a sign without an English entry keeps its Spanish text.
     /// </summary>
     /// <remarks>

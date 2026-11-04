@@ -22,7 +22,7 @@ namespace ColonQuest.UI
     }
 
     /// <summary>
-    /// The conversation of the negotiation and talk windows as bubbles: the other person on the left and the player on the
+    /// The conversation of the negotiation and talk windows as bubbles: the other person on the left and the user on the
     /// right, the newest at the bottom, with the older ones a scroll away.
     /// </summary>
     public static class ChatView
@@ -117,7 +117,7 @@ namespace ColonQuest.UI
 
     /// <summary>
     /// The button that records: yellow to start, red while it listens with a bar that follows the voice, and the seconds so far.
-    /// Tap to start and tap to send; where the recorder can tell, it also sends by itself when the player stops talking.
+    /// Tap to start and tap to send; where the recorder can tell, it also sends by itself when the user stops talking.
     /// </summary>
     public sealed class VoiceButton
     {

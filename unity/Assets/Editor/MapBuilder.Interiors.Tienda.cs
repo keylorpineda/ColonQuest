@@ -166,7 +166,7 @@ namespace ColonQuest.EditorTools
             WallPlate(parts.Labels, "MOTO 125 CC", new Vector2(7.4f, 2.7f), 1.8f, "#1D4F8C", GamePalette.White, 0.024f);
         }
 
-        /// <summary>A little bed and a little table against the back wall, for the furniture of the player's room.</summary>
+        /// <summary>A little bed and a little table against the back wall, for the furniture of the user's room.</summary>
         private static void BuildFurnitureCorner(InteriorParts parts)
         {
             var corner = IL(parts.Props, "FurnitureCorner");

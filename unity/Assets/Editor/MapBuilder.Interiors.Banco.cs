@@ -137,7 +137,7 @@ namespace ColonQuest.EditorTools
             NpcAt(parts.People, "Gerente", new Vector2(-9.75f, 7.15f), "#F2B84B", "#2A3345");
             NpcAt(parts.People, "Asesora", new Vector2(9.75f, 7.15f), "#F2994A", "#E8505B");
 
-            // The player talks to them from the guest side of the desk.
+            // The user talks to them from the guest side of the desk.
             BuildThing(parts.Stations, "Manager", "Hablar con el gerente", new Vector2(-9.75f, 5.85f), new Vector2(2.6f, 0.6f),
                 "\"Bienvenido. Si algún día tiene un problema con un cobro, venga a hablar antes de dejar de pagar.\"",
                 "\"El banco gana con los intereses que usted paga. Por eso conviene pagar la tarjeta completa cada mes.\"");

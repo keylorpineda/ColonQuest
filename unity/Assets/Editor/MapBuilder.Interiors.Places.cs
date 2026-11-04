@@ -16,7 +16,7 @@ namespace ColonQuest.EditorTools
             return amount.ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(',', ' ');
         }
 
-        /// <summary>A wall of glass: see-through, with a frame, that still stops the player.</summary>
+        /// <summary>A wall of glass: see-through, with a frame, that still stops the user.</summary>
         private static void GlassWall(Transform parent, Vector2 from, Vector2 to)
         {
             bool horizontal = Mathf.Abs(to.y - from.y) < 0.01f;
@@ -96,7 +96,7 @@ namespace ColonQuest.EditorTools
                 "\"La SUV es linda, pero el marchamo y el seguro son más caros. Pregúnteme cuánto sale al año.\"",
                 "\"Si le gusta uno, pase a financiamiento: allá le hacen las cuotas con la prima y el seguro.\"");
 
-            // Don Chepe's reception desk, by the way in: he welcomes the player here and the car negotiation opens here.
+            // Don Chepe's reception desk, by the way in: he welcomes the user here and the car negotiation opens here.
             var reception = IL(parts.Props, "Reception");
             Solid(reception, "Desk", rounded, 1.9f, -3.6f, 3.0f, 0.9f, "#8B5A3C");
             Deco(reception, "Bell", circle, 1.1f, -3.5f, 0.2f, 0.2f, "#FFD23F", 1f, 9);
@@ -221,7 +221,7 @@ namespace ColonQuest.EditorTools
             var half = room.Size * 0.5f;
             FloorChecks(IL(parts.Floor, "TileFloor"), Rect.MinMaxRect(-half.x + 0.5f, -half.y + 0.5f, half.x - 0.5f, half.y - 0.8f), 1f, "#FFFFFF", 0.1f);
 
-            // Four cells along the back, each with bars at the front and a hard bed. The first one is where the player is
+            // Four cells along the back, each with bars at the front and a hard bed. The first one is where the user is
             // locked up: its gate slides shut during the sentence. The other three are always closed.
             var cells = IL(parts.Walls, "Cells");
             float[] centers = { -7.6f, -2.6f, 2.6f, 7.6f };
@@ -254,7 +254,7 @@ namespace ColonQuest.EditorTools
                 }
             }
 
-            // Inmates in non-player cells (sitting on the cot, standing at the bars, resting in the cell)
+            // Inmates in non-user cells (sitting on the cot, standing at the bars, resting in the cell)
             BuildNpc(parts.People, "Reo1", new Vector2(-3.5f, 4.2f), new Look
             {
                 Skin = "#F39C12", Pants = "#2C3E50", Face = Expression.Neutral, Hair = HairStyle.Buzz, HairColor = "#3D2B1F"
@@ -334,7 +334,7 @@ namespace ColonQuest.EditorTools
         /// </summary>
         private static void BuildElevator(InteriorParts parts, Vector2 center, Vector2 doorAt, Vector2 doorSize, string targetScene, string targetSpawn, Vector2 entry, Vector2 inside)
         {
-            // Big enough for a whole person: the player walks in and the doors close in front of them.
+            // Big enough for a whole person: the user walks in and the doors close in front of them.
             const float halfWidth = 1.05f;
             const float height = 1.6f;
             var lift = IL(parts.Props, "Elevator");
@@ -370,7 +370,7 @@ namespace ColonQuest.EditorTools
         private const float CellGateHalf = 0.7f;
 
         /// <summary>
-        /// The sliding gate of the player's cell: a collider that blocks the gap while it is shut, and a leaf of bars that
+        /// The sliding gate of the user's cell: a collider that blocks the gap while it is shut, and a leaf of bars that
         /// slides to the right, over the fixed bars, when it opens (see <see cref="CellGate"/>). It starts open.
         /// </summary>
         private static void CellGateBuild(Transform parent, Vector2 at)
@@ -546,14 +546,14 @@ namespace ColonQuest.EditorTools
         // ---------------------------------------------------------------- the neighbor's house
 
         /// <summary>
-        /// The same rooms as the player's house, with a neighbor in the living room. The player has no business
-        /// here: the owner starts counting down as soon as the player comes in.
+        /// The same rooms as the user's house, with a neighbor in the living room. The user has no business
+        /// here: the owner starts counting down as soon as the user comes in.
         /// </summary>
         private static void BuildNeighborLayout(InteriorParts parts, Room room)
         {
             BuildHouseLayout(parts, room);
 
-            // The statement desk belongs to the player's own house, not to this one.
+            // The statement desk belongs to the user's own house, not to this one.
             foreach (var station in Object.FindObjectsByType<Station>(FindObjectsSortMode.None))
             {
                 if (station.Type == StationType.Home)
@@ -573,7 +573,7 @@ namespace ColonQuest.EditorTools
 
             BuildNpc(parts.People, "DonMario", new Vector2(3.0f, 0.4f), new Look { Skin = "#F2994A", Extra = Accessory.Cap, ExtraColor = "#2A7F8C" }, false);
 
-            // The officer is not here until the owner calls: he comes in by the door and goes straight to the player.
+            // The officer is not here until the owner calls: he comes in by the door and goes straight to the user.
             var officerNpc = BuildNpc(parts.People, "Oficial", MatFor(SceneNames.Vecino) + new Vector2(0f, 0.3f), new Look { Skin = "#3C78D8", Extra = Accessory.Cap, ExtraColor = "#1D2238" }, false);
             var officer = officerNpc.gameObject.AddComponent<PoliceOfficer>();
             officerNpc.gameObject.SetActive(false);

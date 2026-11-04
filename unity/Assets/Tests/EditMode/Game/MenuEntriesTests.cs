@@ -41,7 +41,7 @@ namespace ColonQuest.Game.Tests
         {
             CollectionAssert.AreEqual(new[] { "Keylor Pineda", "Jefferson Abarca" }, MenuEntries.Makers);
 
-            Assert.AreEqual(5, MenuEntries.Tools.Length, "the five models the game uses");
+            Assert.AreEqual(5, MenuEntries.Tools.Length, "the five models the simulator uses");
             foreach (var tool in MenuEntries.Tools)
             {
                 Assert.AreEqual(3, tool.Length);
@@ -56,7 +56,7 @@ namespace ColonQuest.Game.Tests
         {
             Assert.AreEqual("From Costa Rica to the World", MenuEntries.Slogan);
             Assert.IsFalse(ColonQuest.World.Translations.English.ContainsKey("El arte"));
-            Assert.IsFalse(ColonQuest.World.Translations.English.ContainsKey("Arte del juego"));
+            Assert.IsFalse(ColonQuest.World.Translations.English.ContainsKey("Arte del simulador"));
         }
 
         [Test]

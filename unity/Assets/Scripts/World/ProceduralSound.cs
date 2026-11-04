@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Every sound of the game, written as math at start-up: no audio files to ship, which keeps the
+    /// Every sound of the simulator, written as math at start-up: no audio files to ship, which keeps the
     /// web build small. Each method makes a mono clip; loops are made seamless with a short crossfade.
     /// </summary>
     public static class ProceduralSound

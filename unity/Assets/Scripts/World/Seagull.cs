@@ -4,7 +4,7 @@ namespace ColonQuest.World
 {
     /// <summary>
     /// Coastal wildlife that bobs and pecks while resting on the sand, takes flight
-    /// diagonally when the player approaches, and later returns to perch.
+    /// diagonally when the user approaches, and later returns to perch.
     /// </summary>
     public sealed class Seagull : MonoBehaviour
     {
@@ -129,7 +129,7 @@ namespace ColonQuest.World
                 wingTransform.localRotation = wingBaseRotation * Quaternion.Euler(0f, 0f, wingBob);
             }
 
-            // Check if player approaches
+            // Check if user approaches
             if (player != null)
             {
                 float dist = Vector2.Distance(transform.position, player.position);
@@ -187,7 +187,7 @@ namespace ColonQuest.World
         {
             stateTimer += Time.deltaTime;
 
-            // Wait away duration and ensure player isn't standing right at the spot
+            // Wait away duration and ensure user isn't standing right at the spot
             if (stateTimer >= awayDuration)
             {
                 if (player == null || Vector2.Distance(homePosition, player.position) > scareDistance + 1.0f)

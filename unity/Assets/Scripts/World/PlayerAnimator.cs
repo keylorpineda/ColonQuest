@@ -44,7 +44,7 @@ namespace ColonQuest.World
 
     /// <summary>
     /// Brings a person to life with smooth, vector-style motion: a walk cycle with swinging arms and legs,
-    /// breathing and blinking while standing, eyes and head that follow the player, a wave when the player
+    /// breathing and blinking while standing, eyes and head that follow the user, a wave when the user
     /// comes close and speech gestures while someone talks. Put it on the child that holds the visual; the
     /// Rigidbody2D is read from the parent. A character without a rig only bounces and squashes.
     /// </summary>
@@ -121,7 +121,7 @@ namespace ColonQuest.World
         private float settleVelocity;
         private bool stopKicked = true;
 
-        /// <summary>True while the person gestures as if speaking, because the player is close or someone set it.</summary>
+        /// <summary>True while the person gestures as if speaking, because the user is close or someone set it.</summary>
         public bool Talking => talking;
 
         /// <summary>The pose the person holds now, or None.</summary>
@@ -163,7 +163,7 @@ namespace ColonQuest.World
             externalSpeed = Mathf.Clamp01(amount);
         }
 
-        /// <summary>Hands the animator the parts it moves. A social person looks at and greets the player.</summary>
+        /// <summary>Hands the animator the parts it moves. A social person looks at and greets the user.</summary>
         public void Bind(PersonRig parts, bool isSocial, float speakRadius)
         {
             rig = parts;
@@ -350,7 +350,7 @@ namespace ColonQuest.World
         }
 
         /// <summary>
-        /// The walk in world units per second: the Rigidbody2D's velocity for the player, and for the people moved by a
+        /// The walk in world units per second: the Rigidbody2D's velocity for the user, and for the people moved by a
         /// script (pedestrians, officers) how far their root went since the last frame.
         /// </summary>
         private Vector2 WalkVelocity()
@@ -504,7 +504,7 @@ namespace ColonQuest.World
                 }
             }
 
-            // When no player is nearby, pupils wander slightly every few seconds.
+            // When no user is nearby, pupils wander slightly every few seconds.
             if (!social || player == null || Vector2.Distance(player.position, transform.position) >= LookRadius)
             {
                 if (time >= nextWander)

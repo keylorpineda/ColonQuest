@@ -1,7 +1,7 @@
 namespace ColonQuest.Game
 {
     /// <summary>
-    /// The version of the alpha as the player sees it on the title and loading screens. The number after the second dot
+    /// The version of the alpha as the user sees it on the title and loading screens. The number after the second dot
     /// follows the Windows build that is being tested, so a build and a bug report always name the same thing.
     /// </summary>
     public static class BuildInfo

@@ -21,12 +21,12 @@ namespace ColonQuest.Api
 
         /// <summary>
         /// True while the texts written by the models cannot be shown: the backend writes them only in Spanish, so in English
-        /// the local events, seller and summary answer instead, all of them translated. The game sets this (to "the game is in
+        /// the local events, seller and summary answer instead, all of them translated. The simulator sets this (to "the simulator is in
         /// English"); the telemetry and the voice transcription still go to the backend.
         /// </summary>
         public static Func<bool> LocalTextsOnly = () => false;
 
-        /// <summary>The language the backend writes in, "es" or "en". The game sets this from its own language setting.</summary>
+        /// <summary>The language the backend writes in, "es" or "en". The simulator sets this from its own language setting.</summary>
         public static Func<string> Language = () => "es";
 
         public ApiService(IHttpTransport transport, ApiConfig config)
@@ -80,7 +80,7 @@ namespace ColonQuest.Api
             done(result);
         }
 
-        /// <summary>Asks the game master for this month's event. Always calls <paramref name="done"/> with a valid event.</summary>
+        /// <summary>Asks the simulation director for this month's event. Always calls <paramref name="done"/> with a valid event.</summary>
         public IEnumerator RequestEvent(PlayerState state, Action<ApiResult<GameEvent>> done)
         {
             ApiResult<GameEvent> result = null;
@@ -117,7 +117,7 @@ namespace ColonQuest.Api
             done(result);
         }
 
-        /// <summary>Telemetry for the impact metrics. A failure here never blocks the player.</summary>
+        /// <summary>Telemetry for the impact metrics. A failure here never blocks the user.</summary>
         public IEnumerator RecordDecision(int month, GameEvent gameEvent, string choiceId, PlayerState stateAfter, Action<ApiResult<bool>> done)
         {
             if (!HasSession)
@@ -151,7 +151,7 @@ namespace ColonQuest.Api
             done(result);
         }
 
-        /// <summary>One turn of a talk in the model's words. Any failure comes back as such: the game then answers with its local rules.</summary>
+        /// <summary>One turn of a talk in the model's words. Any failure comes back as such: the simulator then answers with its local rules.</summary>
         public IEnumerator SendTalk(TalkRequestDto talk, Action<ApiResult<TalkReplyDto>> done)
         {
             if (!HasSession)

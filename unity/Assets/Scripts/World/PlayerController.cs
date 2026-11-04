@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Top-down player movement. Reads the Horizontal and Vertical axes (arrow keys
+    /// Top-down user movement. Reads the Horizontal and Vertical axes (arrow keys
     /// and WASD) and moves the Rigidbody2D, so walls and furniture block it.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
@@ -15,17 +15,17 @@ namespace ColonQuest.World
         private Rigidbody2D body;
         private Vector2 input;
 
-        /// <summary>The way the player is pressing to walk, whether or not something is in the way.</summary>
+        /// <summary>The way the user is pressing to walk, whether or not something is in the way.</summary>
         public Vector2 WalkIntent => input;
         private int facing = 1;
 
-        /// <summary>Overlay panels turn this off while they are open so the player stands still.</summary>
+        /// <summary>Overlay panels turn this off while they are open so the user stands still.</summary>
         public bool InputEnabled { get; set; } = true;
 
         /// <summary>Set while a modal panel is open. It outlives scene changes, unlike <see cref="InputEnabled"/>.</summary>
         public static bool Blocked { get; set; }
 
-        /// <summary>Set while an animation moves the player (a hit, an arrest): the keys do nothing and the walk does not fight the animation.</summary>
+        /// <summary>Set while an animation moves the user (a hit, an arrest): the keys do nothing and the walk does not fight the animation.</summary>
         public static bool Frozen { get; set; }
 
         private FacingTurn facingTurn;
@@ -40,7 +40,7 @@ namespace ColonQuest.World
             }
         }
 
-        /// <summary>Turns the player to face left (-1) or right (1), for the animated scenes.</summary>
+        /// <summary>Turns the user to face left (-1) or right (1), for the animated scenes.</summary>
         public void Face(int sign)
         {
             facing = sign >= 0 ? 1 : -1;
@@ -57,7 +57,7 @@ namespace ColonQuest.World
         private Vector2 nudge;
         private float nudgeUntil;
 
-        /// <summary>Walks the player a few steps in a direction, as if they had turned around by themselves.</summary>
+        /// <summary>Walks the user a few steps in a direction, as if they had turned around by themselves.</summary>
         public void Nudge(Vector2 direction, float seconds)
         {
             nudge = direction.normalized;

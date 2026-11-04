@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColonQuest.World
 {
-    /// <summary>What the player walks on, which decides how the footsteps sound.</summary>
+    /// <summary>What the user walks on, which decides how the footsteps sound.</summary>
     public enum SurfaceKind
     {
         Grass,
@@ -103,7 +103,7 @@ namespace ColonQuest.World
         }
     }
 
-    /// <summary>What the town tells the player when they walk where they should not: a thought, and a few steps back.</summary>
+    /// <summary>What the town tells the user when they walk where they should not: a thought, and a few steps back.</summary>
     public enum HintKind
     {
         None,
@@ -111,7 +111,7 @@ namespace ColonQuest.World
         Water
     }
 
-    /// <summary>Which water the player walked into: only the sea is for swimming.</summary>
+    /// <summary>Which water the user walked into: only the sea is for swimming.</summary>
     public enum WaterBody
     {
         None,
@@ -136,7 +136,7 @@ namespace ColonQuest.World
         private const float WaterMargin = 0.9f;
 
         /// <summary>
-        /// The river and the pond have walls the size of the water, so only a player pressed against them hears the
+        /// The river and the pond have walls the size of the water, so only a user pressed against them hears the
         /// thought: the feet (radius 0.3) plus a little. A wider margin covered the sidewalks along the river.
         /// </summary>
         public const float TouchMargin = 0.45f;
@@ -189,7 +189,7 @@ namespace ColonQuest.World
 
         private static bool OnDeck(Vector2 p)
         {
-            // From railing to railing, like the walls of the river: a player on the sidewalk of a bridge is not in the water.
+            // From railing to railing, like the walls of the river: a user on the sidewalk of a bridge is not in the water.
             return Between(p.y, MapLayout.BridgeFirstStreet) || Between(p.y, MapLayout.BridgeSouthStreet) || Between(p.y, MapLayout.BridgeAvenue)
                 || (p.y > -19.6f && p.y < -17.0f);
         }
@@ -200,7 +200,7 @@ namespace ColonQuest.World
         }
     }
 
-    /// <summary>The player's own thoughts: short lines shown as a subtitle, never a window and never an error.</summary>
+    /// <summary>The user's own thoughts: short lines shown as a subtitle, never a window and never an error.</summary>
     public static class Thoughts
     {
         public static event System.Action<string> Said;

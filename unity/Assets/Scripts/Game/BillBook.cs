@@ -92,7 +92,7 @@ namespace ColonQuest.Game
 
         /// <summary>
         /// The month closes: every bill that arrived before now goes late. Bills that had not arrived come now, on time, because
-        /// the player never had the chance to pay them. Returns the late fees added.
+        /// the user never had the chance to pay them. Returns the late fees added.
         /// </summary>
         public long CloseMonth(Func<BillKind, long> amountOf)
         {
@@ -122,7 +122,7 @@ namespace ColonQuest.Game
             return due.Find(bill => bill.Kind == kind);
         }
 
-        /// <summary>Puts a bill back where a saved game left it.</summary>
+        /// <summary>Puts a bill back where a saved simulation left it.</summary>
         public void Restore(BillKind kind, long amount, int monthsLate)
         {
             due.Add(new BillDue(kind, amount, monthsLate));

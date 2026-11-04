@@ -36,7 +36,7 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// The three goals the phone proposes at the start, chosen from the player's situation. Pure, so it can be tested. It only
+    /// The three goals the phone proposes at the start, chosen from the user's situation. Pure, so it can be tested. It only
     /// reads the numbers: the money moves in the finance engine.
     /// </summary>
     public sealed class GoalBook
@@ -55,7 +55,7 @@ namespace ColonQuest.Game
             var book = new GoalBook();
             book.goals.Add(new Goal(GoalKind.EmergencyFund, FundTarget, state.EmergencyFund));
 
-            // Half the card is the goal for a short run: all of it would take more months than the game has.
+            // Half the card is the goal for a short run: all of it would take more months than the simulator has.
             long card = state.CreditCard.Balance;
             book.goals.Add(card > 0L
                 ? new Goal(GoalKind.PayDownCard, card / 2L, card)
@@ -65,7 +65,7 @@ namespace ColonQuest.Game
             return book;
         }
 
-        /// <summary>Puts a goal back where a saved game left it.</summary>
+        /// <summary>Puts a goal back where a saved simulation left it.</summary>
         public void Restore(Goal goal)
         {
             goals.Add(goal);

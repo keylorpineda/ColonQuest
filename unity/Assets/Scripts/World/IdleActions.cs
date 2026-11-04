@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// While the player stands still in town, picks a casual pose (scratch head, look around, check phone...)
+    /// While the user stands still in town, picks a casual pose (scratch head, look around, check phone...)
     /// every 6 to 9 seconds, holding it 1.5 to 2.5 seconds. Moving cancels it immediately.
     /// </summary>
     public sealed class IdleActions : MonoBehaviour

@@ -26,7 +26,7 @@ namespace ColonQuest.World.PlayModeTests
             CellGate.Lock(false);
             yield return Walk(InsideTheCell, Vector2.down, 1.5f);
 
-            Assert.Greater(Body.position.y, CellFrontY, "the gate stops the player inside the cell");
+            Assert.Greater(Body.position.y, CellFrontY, "the gate stops the user inside the cell");
         }
 
         [UnityTest]
@@ -38,7 +38,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return new WaitForSeconds(0.6f);
             yield return Walk(InsideTheCell, Vector2.down, 1.5f);
 
-            Assert.Less(Body.position.y, CellFrontY, "with the gate open the player leaves the cell");
+            Assert.Less(Body.position.y, CellFrontY, "with the gate open the user leaves the cell");
         }
 
         [UnityTest]

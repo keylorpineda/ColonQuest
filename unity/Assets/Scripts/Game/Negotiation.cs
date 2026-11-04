@@ -12,7 +12,7 @@ namespace ColonQuest.Game
         public bool FromLocalSeller;
     }
 
-    /// <summary>What to show after a deal: the real cost of the installments and how well the player asked.</summary>
+    /// <summary>What to show after a deal: the real cost of the installments and how well the user asked.</summary>
     public sealed class DealReport
     {
         public string Item = string.Empty;
@@ -25,12 +25,12 @@ namespace ColonQuest.Game
         public bool AskedAboutTotalCost;
         public bool AskedAboutHiddenFees;
 
-        /// <summary>Why the deal did not go through, when it was refused after the player said yes.</summary>
+        /// <summary>Why the deal did not go through, when it was refused after the user said yes.</summary>
         public string Note = string.Empty;
     }
 
     /// <summary>
-    /// One haggling session with a seller: the conversation, which key questions the player has
+    /// One haggling session with a seller: the conversation, which key questions the user has
     /// asked so far and which facts were revealed. It has no Unity code, so it is tested alone.
     /// The deal itself is a <see cref="GameEvent"/> that goes through the finance engine.
     /// </summary>
@@ -71,10 +71,10 @@ namespace ColonQuest.Game
 
         public bool IsClosed => Status != DealStatus.Open;
 
-        /// <summary>True when the player's last words sounded like buying: the window then shows the contract to sign or not.</summary>
+        /// <summary>True when the user's last words sounded like buying: the window then shows the contract to sign or not.</summary>
         public bool SoundedLikeYes { get; private set; }
 
-        /// <summary>The player said not yet, so the last words no longer count as a yes.</summary>
+        /// <summary>The user said not yet, so the last words no longer count as a yes.</summary>
         public void ClearYes()
         {
             SoundedLikeYes = false;
@@ -111,7 +111,7 @@ namespace ColonQuest.Game
             SoundedLikeYes = reply.DealStatus == DealStatus.Accepted;
         }
 
-        /// <summary>The player asked this one with its button: it counts whatever the answer says.</summary>
+        /// <summary>The user asked this one with its button: it counts whatever the answer says.</summary>
         public void MarkAsked(KeyQuestion question)
         {
             if (!asked.Contains(question))

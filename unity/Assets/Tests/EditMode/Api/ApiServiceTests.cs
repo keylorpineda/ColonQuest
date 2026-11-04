@@ -151,7 +151,7 @@ namespace ColonQuest.Api.Tests
                 Run(service.SendNegotiationText("phone", "¿Cuánto pago en total?", 0, r => reply = r));
 
                 Assert.AreEqual(ResultSource.Fallback, gameEvent.Source);
-                Assert.IsFalse(reply.Ok, "the game answers with the local seller");
+                Assert.IsFalse(reply.Ok, "the simulator answers with the local seller");
                 Assert.AreEqual(sent, transport.Requests.Count, "no text is asked to the backend");
             }
             finally

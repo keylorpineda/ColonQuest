@@ -4,13 +4,13 @@ using ColonQuest.Finance;
 
 namespace ColonQuest.Game
 {
-    /// <summary>The numbers that shape one run: how long it is and where the player starts.</summary>
+    /// <summary>The numbers that shape one run: how long it is and where the user starts.</summary>
     public static class GameRules
     {
         /// <summary>Months in a run. The vertical slice is short on purpose; the engine supports 12.</summary>
         public const int MonthsToPlay = 3;
 
-        /// <summary>Tasks (events) the player does each month before collecting the salary at the bank: two a week.</summary>
+        /// <summary>Tasks (events) the user does each month before collecting the salary at the bank: two a week.</summary>
         public const int TasksPerMonth = TasksPerDay * DaysPerMonth;
 
         /// <summary>Tasks a day allows. A day stands for a week, so this is two errands a week.</summary>
@@ -19,7 +19,7 @@ namespace ColonQuest.Game
         /// <summary>Days of play in a month. Each one stands for a week, so the month has four.</summary>
         public const int DaysPerMonth = 4;
 
-        /// <summary>The day starts at this hour and ends at <see cref="DayEndHour"/>, when the player has to sleep.</summary>
+        /// <summary>The day starts at this hour and ends at <see cref="DayEndHour"/>, when the user has to sleep.</summary>
         public const int DayStartHour = 6;
 
         public const int DayEndHour = 22;
@@ -27,7 +27,7 @@ namespace ColonQuest.Game
         /// <summary>From this hour the evening begins: the town gets darker.</summary>
         public const int NightHour = 18;
 
-        /// <summary>Real seconds for one hour of the game: a day of 16 hours lasts 8 minutes in normal speed.</summary>
+        /// <summary>Real seconds for one hour of the simulator: a day of 16 hours lasts 8 minutes in normal speed.</summary>
         public const float NormalSecondsPerGameHour = 30f;
 
         /// <summary>Real seconds for one hour in fast speed mode (for demos and judges, ~2.7 min per day).</summary>
@@ -74,7 +74,7 @@ namespace ColonQuest.Game
             return state;
         }
 
-        /// <summary>What the player owes right now on the card and to informal lenders.</summary>
+        /// <summary>What the user owes right now on the card and to informal lenders.</summary>
         public static long DebtBalance(PlayerState state)
         {
             long total = state.CreditCard.Balance;
@@ -115,7 +115,7 @@ namespace ColonQuest.Game
             return state.Cash + state.Savings + state.EmergencyFund - DebtBalance(state) - installmentsLeft;
         }
 
-        /// <summary>The same, plus what the player bought: an owned home, the resale value of the car and the money in the farm.</summary>
+        /// <summary>The same, plus what the user bought: an owned home, the resale value of the car and the money in the farm.</summary>
         public static long NetWorth(PlayerState state, Holdings holdings)
         {
             return NetWorth(state) + (holdings != null ? holdings.AssetValue : 0L);

@@ -4,7 +4,7 @@ using ColonQuest.World;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// The two districts added around the original town, which bring the playable area to about twice its first
+    /// The two districts added around the original town, which bring the working area to about twice its first
     /// size: the north district (an avenue with the real estate agency, the car agency and a new neighborhood,
     /// behind the forest) and the east district (the farm, a pasture and the beach, past the river). The original
     /// town is not touched: its streets simply run on, and the invisible walls moved out to the new rock faces.
@@ -85,7 +85,7 @@ namespace ColonQuest.EditorTools
             Flowers(parent, random, new Rect(44f, 13f, 19f, 4f), 14);
         }
 
-        /// <summary>The grass the player can reach in each district, kept out of the roads and the beach by the callers.</summary>
+        /// <summary>The grass the user can reach in each district, kept out of the roads and the beach by the callers.</summary>
         private static readonly Rect NorthGrass = new Rect(-44f, 17f, 108f, 25f);
         private static readonly Rect EastGrass = new Rect(43f, -27f, 21f, 44f);
 

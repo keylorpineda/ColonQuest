@@ -8,7 +8,7 @@ using ColonQuest.World;
 namespace ColonQuest.UI
 {
     /// <summary>
-    /// The windows of the places where the player spends big: the real estate agency, the car agency and the
+    /// The windows of the places where the user spends big: the real estate agency, the car agency and the
     /// farm. They only show the true figures and ask the session to buy; the money moves in the finance engine.
     /// Every figure here comes from <see cref="MarketAssumptions"/> and is shown with the warning that it is an example.
     /// </summary>
@@ -51,7 +51,7 @@ namespace ColonQuest.UI
             var listing = id != null ? MarketAssumptions.FindHome(id) : null;
             if (listing != null)
             {
-                // A house on the market is not sold at its door: the player thinks of calling the agency.
+                // A house on the market is not sold at its door: the user thinks of calling the agency.
                 Thoughts.Say(listing.ForSale
                     ? "Esta casa está en venta. Para comprarla tendría que ir a la inmobiliaria."
                     : "Esta casa está en alquiler. Para alquilarla tendría que ir a la inmobiliaria.");
@@ -114,7 +114,7 @@ namespace ColonQuest.UI
                 text.AppendLine(Loc.F("Prima ({0}%)  {1}", Rate(MarketAssumptions.HomeDownPaymentPct), Money.Format(quote.DownPayment)));
                 text.AppendLine(Loc.F("Gastos de formalización ({0}%)  {1}", Rate(MarketAssumptions.HomeClosingCostsPct), Money.Format(quote.ClosingCosts)));
                 text.AppendLine(Loc.F("Para entrar necesitas  {0}  y tienes {1}", Red(Money.Format(quote.UpfrontCost)), Money.Format(state.Cash)));
-                text.AppendLine(Loc.F("Hipoteca de {0} a {1} meses ({2} años, el plazo más largo del juego) con tasa de ejemplo de {3}% al mes", Money.Format(quote.Financed), quote.TermMonths, quote.TermMonths / 12, Rate(quote.MonthlyRatePct)));
+                text.AppendLine(Loc.F("Hipoteca de {0} a {1} meses ({2} años, el plazo más largo del simulador) con tasa de ejemplo de {3}% al mes", Money.Format(quote.Financed), quote.TermMonths, quote.TermMonths / 12, Rate(quote.MonthlyRatePct)));
                 text.AppendLine(Loc.F("Cuota  {0} al mes, que es el {1}% de tu salario", Red(Money.Format(quote.MonthlyPayment)), share));
                 text.AppendLine(Loc.F("En total pagarías  {0}: {1} más que el precio", Money.Format(quote.TotalPaid), Red(Money.Format(quote.TotalPaid - quote.Price))));
                 text.AppendLine(Loc.F("Solo de intereses para el banco  {0}", Money.Format(quote.TotalInterest)));
@@ -137,7 +137,7 @@ namespace ColonQuest.UI
                 text.AppendLine(Loc.F("Alquiler  {0} al mes, que es el {1}% de tu salario", Money.Format(quote.MonthlyRent), share));
                 text.AppendLine(Loc.F("Depósito  {0} ({1} mes), y tienes {2}", Money.Format(quote.Deposit), MarketAssumptions.RentDepositMonths, Money.Format(state.Cash)));
                 text.AppendLine(Loc.F("Contrato de {0} meses: {1} en alquiler", quote.LeaseMonths, Red(Money.Format(quote.LeaseCost))));
-                text.AppendLine(Loc.F("La partida dura {0} meses, pero el contrato sigue después y la casa nunca es tuya", GameRules.MonthsToPlay));
+                text.AppendLine(Loc.F("La simulación dura {0} meses, pero el contrato sigue después y la casa nunca es tuya", GameRules.MonthsToPlay));
 
                 var refusal = session.Loop.CheckRent(home);
                 if (refusal != PurchaseFailure.None)
@@ -181,7 +181,7 @@ namespace ColonQuest.UI
             var owned = session.Holdings.Car;
             if (owned != null)
             {
-                text.Append(Loc.F("Ya tienes {0}. En esta partida cabe un solo carro.", Loc.T(owned.Name)));
+                text.Append(Loc.F("Ya tienes {0}. En esta simulación cabe un solo carro.", Loc.T(owned.Name)));
                 options.Add(Back(Loc.T("1.  Salir")));
                 modal.Show(Loc.T("Agencia de carros"), Loc.T("Financiamiento"), text.ToString(), options, null, MarketFont, MarketBodyHeight);
                 return;
@@ -254,7 +254,7 @@ namespace ColonQuest.UI
             var text = new StringBuilder();
             text.AppendLine(Loc.T(option.Description));
             text.AppendLine();
-            text.AppendLine(Loc.F("Tarda {0} en pagar. La partida dura {1} meses: no vas a ver esa plata de vuelta mientras juegas, la proyección sale al final.", WaitText(option), GameRules.MonthsToPlay));
+            text.AppendLine(Loc.F("Tarda {0} en pagar. La simulación dura {1} meses: no vas a ver esa plata de vuelta mientras simulás, la proyección sale al final.", WaitText(option), GameRules.MonthsToPlay));
             text.AppendLine(Loc.F("Escenarios de ejemplo cuando se cobre: {0} si sale mal, {1} si sale normal, {2} si sale bien.", Pct(option.LowPct), Pct(option.BasePct), Pct(option.HighPct)));
 
             var options = new List<ModalOption>();
@@ -300,7 +300,7 @@ namespace ColonQuest.UI
 
             modal.Show(Loc.T("Lo que compraste"), Loc.T("A tiempo real, no a 3 meses"), text.ToString().TrimEnd(), new[]
             {
-                new ModalOption { Label = Loc.T("Jugar de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
+                new ModalOption { Label = Loc.T("Simular de nuevo"), Color = GameUiColors.Green, OnPress = Restart }
             }, null, 24, 680f);
         }
     }

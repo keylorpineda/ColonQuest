@@ -162,7 +162,7 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// The player: a Rigidbody2D with a round collider, the keyboard controller, and the
+        /// The user: a Rigidbody2D with a round collider, the keyboard controller, and the
         /// bean-shaped visual. In the town it is Y sorted so it can walk behind trees and buildings.
         /// </summary>
         private static Transform BuildPlayer(Vector3 position, bool ySorted)
@@ -186,7 +186,7 @@ namespace ColonQuest.EditorTools
                 MakeYSorted(player, -0.45f);
             }
 
-            // A warm pool of light that travels with the player.
+            // A warm pool of light that travels with the user.
             Glow(player.transform, "Glow", Vector2.zero, 4.2f, "#FFE2A8", 0.16f, OrderPlayer - 3);
 
             var visual = BuildCharacterVisual(player.transform, PlayerLook, false, 0f, true);
@@ -206,14 +206,14 @@ namespace ColonQuest.EditorTools
                 footDust.Configure(softCircle, LayerFloor, 200, -0.45f);
                 footDust.ConfigurePrints(circle, LayerFloor, 199);
 
-                // At night a soft light goes with the player, so the way ahead never gets lost in the dark.
+                // At night a soft light goes with the user, so the way ahead never gets lost in the dark.
                 AddNightLight(player.transform, new Vector2(0f, -0.1f), 3f, "#FFE8C0", 0.45f, 0f);
             }
 
             return player.transform;
         }
 
-        /// <summary>The second look of the player, switched off: <see cref="PlayerLookSwitch"/> keeps the one of the run. One shadow is enough.</summary>
+        /// <summary>The second look of the user, switched off: <see cref="PlayerLookSwitch"/> keeps the one of the run. One shadow is enough.</summary>
         private static void BuildAlternateLook(Transform player)
         {
             int before = player.childCount;
@@ -234,8 +234,8 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// A character that stands in place, such as a vendor. It blocks the player and
-        /// breathes. Pass ySorted in the town so the player can pass in front of or behind it.
+        /// A character that stands in place, such as a vendor. It blocks the user and
+        /// breathes. Pass ySorted in the town so the user can pass in front of or behind it.
         /// </summary>
         private static Transform BuildNpc(Transform parent, string name, Vector2 position, Look look, bool ySorted)
         {
@@ -301,7 +301,7 @@ namespace ColonQuest.EditorTools
 
         /// <summary>
         /// The two men of the collectors' car: an agency's shirt and tie, serious faces, and nothing else in common. They wait
-        /// hidden off the map, without a collider, and the overlay shows them and walks them to the player when the car stops.
+        /// hidden off the map, without a collider, and the overlay shows them and walks them to the user when the car stops.
         /// </summary>
         private static void BuildCollectorMen(Transform parent)
         {

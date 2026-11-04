@@ -11,8 +11,8 @@ namespace ColonQuest.Game
     }
 
     /// <summary>
-    /// The phone's search engine: fixed, short explanations of the money ideas the game teaches. It never
-    /// invents figures; it points to the habit that protects the player. Matching ignores accents and case.
+    /// The phone's search engine: fixed, short explanations of the money ideas the simulator teaches. It never
+    /// invents figures; it points to the habit that protects the user. Matching ignores accents and case.
     /// </summary>
     public static class FinanceGlossary
     {

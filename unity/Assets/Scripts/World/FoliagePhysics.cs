@@ -14,7 +14,7 @@ namespace ColonQuest.World
     /// </remarks>
     public sealed class FoliagePhysics : MonoBehaviour
     {
-        /// <summary>How stiff the bounce is when the player brushes past.</summary>
+        /// <summary>How stiff the bounce is when the user brushes past.</summary>
         public const float RustleStiffness = 30f;
 
         /// <summary>Damping of that bounce: light enough to bounce two or three times so the shake is clearly visible.</summary>

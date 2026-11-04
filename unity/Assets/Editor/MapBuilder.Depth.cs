@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// Extra layers that give the town depth: haze toward the far north, ground cover that the player
+    /// Extra layers that give the town depth: haze toward the far north, ground cover that the user
     /// walks behind and in front of, and floating motes and light beams that slide at their own speed.
     /// </summary>
     public static partial class MapBuilder
@@ -95,7 +95,7 @@ namespace ColonQuest.EditorTools
             return true;
         }
 
-        /// <summary>Tall grass, flowers, bushes and rocks sorted by their feet, so the player passes behind some and in front of others.</summary>
+        /// <summary>Tall grass, flowers, bushes and rocks sorted by their feet, so the user passes behind some and in front of others.</summary>
         private static void BuildGroundCover(Transform parent, Transform shadows, System.Random random)
         {
             var map = parent.parent;
@@ -131,7 +131,7 @@ namespace ColonQuest.EditorTools
             }
         }
 
-        /// <summary>A child at the clump's foot that bends away from the player; the root keeps its sorting group still.</summary>
+        /// <summary>A child at the clump's foot that bends away from the user; the root keeps its sorting group still.</summary>
         private static Transform BendRig(Transform root)
         {
             var rig = new GameObject("BendRig").transform;

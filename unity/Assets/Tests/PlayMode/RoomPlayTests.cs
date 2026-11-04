@@ -51,7 +51,7 @@ namespace ColonQuest.World.PlayModeTests
             yield return LoadRoom();
 
             Assert.IsNotNull(Piece("Mattress"));
-            Assert.IsNotNull(Piece("Thing_Bed"), "the player can sleep on the mattress");
+            Assert.IsNotNull(Piece("Thing_Bed"), "the user can sleep on the mattress");
             Assert.IsNotNull(Piece("Station_Home"), "the papers of the month are in the room");
             Assert.IsNotNull(Piece("PlasticChair"));
             Assert.IsNull(Piece("Bed"));
@@ -90,7 +90,7 @@ namespace ColonQuest.World.PlayModeTests
                 yield return null;
             }
 
-            Assert.Less(closest, 0.3f, "the player lies down on the bed");
+            Assert.Less(closest, 0.3f, "the user lies down on the bed");
         }
 
         [UnityTest]

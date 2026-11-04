@@ -10,9 +10,9 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// The text of the game in two languages. The Spanish text is the key: <c>Loc.T("Ajustes")</c> gives "Settings" in
+    /// The text of the simulator in two languages. The Spanish text is the key: <c>Loc.T("Ajustes")</c> gives "Settings" in
     /// English and "Ajustes" in Spanish. A text with no English entry stays in Spanish, so a missing translation
-    /// shows up as Spanish and never breaks the game. Costa Rican words are carried over into colloquial English
+    /// shows up as Spanish and never breaks the simulator. Costa Rican words are carried over into colloquial English
     /// (see <c>docs/localization.md</c> for the glossary).
     /// </summary>
     public static class Loc

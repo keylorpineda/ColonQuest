@@ -65,7 +65,7 @@ namespace ColonQuest.World
     /// </summary>
     public static class PersonPoses
     {
-        /// <summary>How far a seated body sinks onto the seat. The seat point already puts the player on it.</summary>
+        /// <summary>How far a seated body sinks onto the seat. The seat point already puts the user on it.</summary>
         public const float SeatDrop = -0.04f;
 
         /// <summary>How far the legs turn out while sitting.</summary>

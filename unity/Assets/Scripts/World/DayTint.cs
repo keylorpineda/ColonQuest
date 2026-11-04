@@ -6,7 +6,7 @@ namespace ColonQuest.World
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class DayTint : MonoBehaviour
     {
-        /// <summary>Set by the game session; the town reads it when it loads or while it is open.</summary>
+        /// <summary>Set by the simulator session; the town reads it when it loads or while it is open.</summary>
         public static float Progress;
 
         /// <summary>True during night hours (18:00 to 06:00), updated by the active session.</summary>

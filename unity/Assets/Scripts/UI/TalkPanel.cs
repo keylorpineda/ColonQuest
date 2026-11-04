@@ -9,7 +9,7 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The window to talk with the collectors, the lender or the pyramid stand: questions worth asking, one click each, or the
-    /// player's own words by text or voice. Under them, the ways out the game window gives (pay, accept, listen, leave).
+    /// user's own words by text or voice. Under them, the ways out the simulator window gives (pay, accept, listen, leave).
     /// </summary>
     public sealed class TalkPanel
     {
@@ -207,7 +207,7 @@ namespace ColonQuest.UI
                 lines.Add(new ChatLine(name, Loc.T(turn.Reply), false));
             }
 
-            // What the player said shows at once, and the other one is seen thinking until the answer comes.
+            // What the user said shows at once, and the other one is seen thinking until the answer comes.
             ChatLine? wait = null;
             if (session.Transcribing)
             {

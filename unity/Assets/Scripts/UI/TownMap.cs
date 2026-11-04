@@ -8,8 +8,8 @@ namespace ColonQuest.UI
 {
     /// <summary>
     /// The minimap in the corner of the town and the full map on M. Both show one real picture of the town, taken the first
-    /// time the player walks out: it looks exactly like the game and costs nothing per frame. Over it go the places, the
-    /// player and, when the game wants the player somewhere, where to go.
+    /// time the user walks out: it looks exactly like the simulator and costs nothing per frame. Over it go the places, the
+    /// user and, when the simulator wants the user somewhere, where to go.
     /// </summary>
     public sealed class TownMap
     {
@@ -94,10 +94,10 @@ namespace ColonQuest.UI
 
         public bool IsOpen => full.activeSelf;
 
-        /// <summary>Where the game wants the player to go, or null. Set every frame by whoever knows it.</summary>
+        /// <summary>Where the simulator wants the user to go, or null. Set every frame by whoever knows it.</summary>
         public Vector2? GoalPosition { get; set; }
 
-        /// <summary>The corner of the screen the minimap covers, for fading it when the player walks under it.</summary>
+        /// <summary>The corner of the screen the minimap covers, for fading it when the user walks under it.</summary>
         public RectTransform MiniRect => miniRect;
 
         public void SceneLoaded(Scene scene)
@@ -130,7 +130,7 @@ namespace ColonQuest.UI
             full.SetActive(false);
         }
 
-        /// <summary>Takes the picture when the town is ready, and follows the player on the minimap.</summary>
+        /// <summary>Takes the picture when the town is ready, and follows the user on the minimap.</summary>
         public void Tick(bool showMini, float alpha)
         {
             if (pendingPicture)
@@ -292,7 +292,7 @@ namespace ColonQuest.UI
                 fullMarkers.Add(new Marker { Rect = dot, World = found.transform.position });
             }
 
-            // The player and the goal go over the places.
+            // The user and the goal go over the places.
             miniGoal.SetAsLastSibling();
             miniYou.SetAsLastSibling();
             mini.GetComponentInChildren<RectMask2D>().transform.SetAsFirstSibling();
@@ -301,7 +301,7 @@ namespace ColonQuest.UI
             fullNote.transform.SetAsLastSibling();
         }
 
-        /// <summary>One render of the whole town, without the player or the tint of the hour.</summary>
+        /// <summary>One render of the whole town, without the user or the tint of the hour.</summary>
         private void EnsurePicture()
         {
             if (picture != null && picture.IsCreated())

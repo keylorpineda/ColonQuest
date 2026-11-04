@@ -4,8 +4,8 @@ using UnityEngine.SceneManagement;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// Follows the player's feet: a step sound that fits the ground every stride, and a thought with a few steps
-    /// back when the player tries to leave the map or enter the water. It is added by <see cref="PlayerController"/>.
+    /// Follows the user's feet: a step sound that fits the ground every stride, and a thought with a few steps
+    /// back when the user tries to leave the map or enter the water. It is added by <see cref="PlayerController"/>.
     /// </summary>
     public sealed class WalkWatch : MonoBehaviour
     {
@@ -18,22 +18,22 @@ namespace ColonQuest.World
         public const string RiverThought = "Mejor no me meto al río.";
         public const string PondThought = "Mejor no me meto al estanque.";
 
-        /// <summary>Set by the game from the player's things: with a swimsuit the sea no longer asks for one.</summary>
+        /// <summary>Set by the simulator from the user's things: with a swimsuit the sea no longer asks for one.</summary>
         public static bool HasSwimsuit { get; set; }
 
-        /// <summary>The walking speed of the player, the same as the controller's.</summary>
+        /// <summary>The walking speed of the user, the same as the controller's.</summary>
         public const float WalkSpeed = 4.5f;
 
         /// <summary>
         /// How long the step back lasts: just enough to leave the warning zone and a little more. A long step pushed the
-        /// player across the beach by the pier and back into the next warning.
+        /// user across the beach by the pier and back into the next warning.
         /// </summary>
         public static float NudgeSeconds(float depth)
         {
             return Mathf.Clamp((Mathf.Max(0f, depth) + 0.25f) / WalkSpeed, 0.1f, 0.35f);
         }
 
-        /// <summary>What the player thinks at the edge of the water.</summary>
+        /// <summary>What the user thinks at the edge of the water.</summary>
         public static string ThoughtFor(WaterBody water, bool hasSwimsuit)
         {
             switch (water)
@@ -80,7 +80,7 @@ namespace ColonQuest.World
                 }
             }
 
-            // A scene (the swim) moves the player on purpose; it must not be interrupted by a warning.
+            // A scene (the swim) moves the user on purpose; it must not be interrupted by a warning.
             if (Interaction.Playing)
             {
                 return;

@@ -195,7 +195,7 @@ namespace ColonQuest.Api
         public string reply = string.Empty;
     }
 
-    /// <summary>One turn of a talk: the true sheet and the only figures the character may say, all from the game's engine.</summary>
+    /// <summary>One turn of a talk: the true sheet and the only figures the character may say, all from the simulator's engine.</summary>
     [Serializable]
     public sealed class TalkRequestDto
     {

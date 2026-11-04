@@ -11,7 +11,7 @@ namespace ColonQuest.World
         void Write(string key, string value);
     }
 
-    /// <summary>Keeps the settings in PlayerPrefs. A browser with blocked storage must not break the game, so every call is guarded.</summary>
+    /// <summary>Keeps the settings in PlayerPrefs. A browser with blocked storage must not break the simulator, so every call is guarded.</summary>
     public sealed class PlayerPrefsStore : ISettingsStore
     {
         public string Read(string key)
@@ -47,7 +47,7 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// What the player can change in the settings: sound on or off, the volume and clock speed. It is plain data with
+    /// What the user can change in the settings: sound on or off, the volume and clock speed. It is plain data with
     /// a text form (<c>"1;0.8"</c>) so it can be stored anywhere and tested without Unity.
     /// </summary>
     public sealed class GameSettings
@@ -76,13 +76,13 @@ namespace ColonQuest.World
 
         public bool SoundOn { get; set; } = true;
 
-        /// <summary>The language of the text. English unless the player chose Spanish: the judges of the hackathon read English.</summary>
+        /// <summary>The language of the text. English unless the user chose Spanish: the judges of the hackathon read English.</summary>
         public GameLanguage Language { get; set; } = GameLanguage.English;
 
         /// <summary>Clock progression speed: normal (30s/h) or fast (10s/h, for judging and demos).</summary>
         public TimeSpeed Speed { get; set; } = TimeSpeed.Normal;
 
-        /// <summary>Real seconds elapsed for one in-game hour.</summary>
+        /// <summary>Real seconds elapsed for one in-simulator hour.</summary>
         public float SecondsPerGameHour => Speed == TimeSpeed.Fast ? 10f : 30f;
 
         /// <summary>From 0 to 1. Any value outside that range is brought back into it.</summary>
@@ -109,7 +109,7 @@ namespace ColonQuest.World
             Volume = volume + steps * VolumeStep;
         }
 
-        /// <summary>The volume as the percentage the player sees.</summary>
+        /// <summary>The volume as the percentage the user sees.</summary>
         public int VolumePercent => Mathf.RoundToInt(volume * 100f);
 
         public string Serialize()

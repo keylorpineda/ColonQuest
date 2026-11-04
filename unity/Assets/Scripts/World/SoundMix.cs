@@ -52,7 +52,7 @@ namespace ColonQuest.World
     }
 
     /// <summary>
-    /// Decides what the player hears from the scene and the position: a soft tune everywhere, people
+    /// Decides what the user hears from the scene and the position: a soft tune everywhere, people
     /// talking in the bank, shop music in the store, cars on the streets, the sea on the beach and the
     /// river in the east. Pure math so it can be tested; <see cref="AudioDirector"/> plays the result.
     /// </summary>

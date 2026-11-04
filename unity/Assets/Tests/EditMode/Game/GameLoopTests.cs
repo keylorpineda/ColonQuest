@@ -208,7 +208,7 @@ namespace ColonQuest.Game.Tests
             Assert.IsFalse(testLoop.CanSleepEarly, "never in the middle of a shift");
 
             testLoop.FinishShift();
-            Assert.IsTrue(testLoop.CanSleepEarly, "after work the player may go to bed for the night");
+            Assert.IsTrue(testLoop.CanSleepEarly, "after work the user may go to bed for the night");
 
             var lazy = new GameLoop();
             lazy.Clock.SkipTo(GameRules.WorkEndHour * 60f);

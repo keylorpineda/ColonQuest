@@ -8,7 +8,7 @@ using ColonQuest.World;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// Builds every scene of the game from code: the town overworld and the Casa, Tienda
+    /// Builds every scene of the simulator from code: the town overworld and the Casa, Tienda
     /// and Banco interiors. Run ColonQuest > Build All Scenes; each scene is rebuilt from
     /// scratch every time. This file holds the helpers shared by all of them.
     /// </summary>
@@ -324,7 +324,7 @@ namespace ColonQuest.EditorTools
 
         /// <summary>
         /// A dark outline shape with the colored body on top, the core look of the style.
-        /// Props at the default order are furniture and block the player; props drawn above
+        /// Props at the default order are furniture and block the user; props drawn above
         /// it (order greater than OrderProp) are decoration lying on furniture and do not.
         /// </summary>
         private static void Prop(Transform parent, string name, Sprite sprite, Vector2 center, Vector2 size, Color color, int order = OrderProp)
@@ -538,9 +538,9 @@ namespace ColonQuest.EditorTools
         }
 
         /// <summary>
-        /// An everyday object the player can use: walking next to it shows "[E] <paramref name="prompt"/>"
+        /// An everyday object the user can use: walking next to it shows "[E] <paramref name="prompt"/>"
         /// and pressing E shows one of its lines. The zone is a little larger than the object so the
-        /// player can reach it even when the object itself is solid.
+        /// user can reach it even when the object itself is solid.
         /// </summary>
         private static Transform BuildThing(Transform parent, string name, string prompt, Vector2 center, Vector2 size, params string[] lines)
         {

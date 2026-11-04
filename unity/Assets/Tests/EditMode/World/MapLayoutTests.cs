@@ -5,7 +5,7 @@ namespace ColonQuest.World.Tests
     [TestFixture]
     public sealed class MapLayoutTests
     {
-        // The playable box of the original town, before the north and east districts: walls at x -44.5 and 40,
+        // The working box of the original town, before the north and east districts: walls at x -44.5 and 40,
         // the shore at y -27.2 and the north wall at 17.
         private const float OriginalArea = (40f + 44.5f) * (17f + 27.2f);
 

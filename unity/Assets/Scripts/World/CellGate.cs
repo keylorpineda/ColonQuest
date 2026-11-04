@@ -4,8 +4,8 @@ using UnityEngine;
 namespace ColonQuest.World
 {
     /// <summary>
-    /// The barred gate of the cell the player is locked in. While the sentence lasts it is shut and its collider keeps
-    /// the player inside; with the bail paid or the term served it slides open behind the bars beside it. The lock is
+    /// The barred gate of the cell the user is locked in. While the sentence lasts it is shut and its collider keeps
+    /// the user inside; with the bail paid or the term served it slides open behind the bars beside it. The lock is
     /// static, so it survives the change of scene from the town to the station.
     /// </summary>
     public sealed class CellGate : MonoBehaviour
@@ -19,7 +19,7 @@ namespace ColonQuest.World
         private static CellGate current;
         private Coroutine sliding;
 
-        /// <summary>True while the player must stay in the cell.</summary>
+        /// <summary>True while the user must stay in the cell.</summary>
         public static bool Locked { get; private set; }
 
         public void Configure(Transform gateLeaf, Collider2D gateBlock, float slideBy)
