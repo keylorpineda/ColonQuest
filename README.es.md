@@ -78,7 +78,8 @@ la comisión reales solo salen si preguntás.
 
 Corre en tu propia computadora con tu propia llave de Meta; no hay ningún servicio en línea. [Bajá el simulador para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest),
 descomprimilo, hacé doble clic en `start_colonquest.bat` y pegá tu llave cuando te la pida. Instala lo que necesita,
-levanta el backend local y abre el simulador ([detalles](RUN_AND_BUILD.es.md#1-evaluarlo-con-tu-propia-llave)). Elegí **Simulación guiada**,
+levanta el backend local y abre el simulador; el primer arranque tarda un minuto ([detalles](RUN_AND_BUILD.es.md#1-evaluarlo-con-tu-propia-llave),
+[preguntas](RUN_AND_BUILD.es.md#preguntas-que-puede-tener-un-juez)). Elegí **Simulación guiada**,
 lo primero del menú. Es el simulador real en un tramo corto del pueblo,
 durante tres meses, y vos solo tomás las decisiones:
 
