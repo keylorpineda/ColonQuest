@@ -1,30 +1,30 @@
 # ColonQuest — Guía de implementación para Claude Code
 
-Simulador de finanzas personales que se juega como un juego, para Costa Rica, con el lema
+Simulador de finanzas personales, para Costa Rica, con el lema
 **From Costa Rica to the World**, construido para el
-**Meta Global AI Developer Hackathon** (track Indie). Un game master con IA convierte cada
-decisión de plata en una historia con consecuencias; el jugador negocia por voz con
+**Meta Global AI Developer Hackathon** (track Indie). Un director de la simulación con IA convierte cada
+decisión de plata en una historia con consecuencias; el usuario negocia por voz con
 personajes que intentan engañarlo (cuotas con cargos escondidos, préstamos "gota a gota",
 esquemas piramidales).
 
 - **Equipo:** DoWhile Team. Keylor (backend, IA, motor financiero) y Jefferson (Unity, arte, flujo).
 - **Entrega:** lunes 2 de noviembre de 2026. Todo debe estar terminado el domingo 1 o, a más
   tardar, el lunes 2. Hora exacta de cierre por confirmar.
-- **Objetivo de alcance:** un *vertical slice* pulido. Un mes jugable de 2 a 3 minutos que
+- **Objetivo de alcance:** un *vertical slice* pulido. Un mes funcional de 2 a 3 minutos que
   funcione en vivo es mejor que un año completo a medias.
 
 ## Cómo nos evalúan (decide las prioridades)
 
 | Criterio | Peso | Qué implica para el código |
 | --- | --- | --- |
-| Impacto | 30% | Registrar métricas reales de juego para la prueba piloto con estudiantes |
+| Impacto | 30% | Registrar métricas reales de simulador para la prueba piloto con estudiantes |
 | Uso de herramientas de Meta | 25% | Wonder, Voice Transcribe, Image y Spark con roles claros, no un chatbot |
-| Demo | 25% | Build web jugable con un link, sin errores, que aguante en vivo |
+| Demo | 25% | Build web funcional con un link, sin errores, que aguante en vivo |
 | Profundidad técnica | 20% | Contratos JSON validados, motor financiero exacto, control de costos |
 
 ## Premios extra ($50K) y qué entra en el plan
 
-Además del track Indie, hay cinco premios extra. **Prioridad absoluta: el mes jugable con la
+Además del track Indie, hay cinco premios extra. **Prioridad absoluta: el mes funcional con la
 negociación funcionando.** Nada de esta tabla se hace a costa de eso.
 
 | Premio | Monto | Estado en el plan | Qué exige |
@@ -33,7 +33,7 @@ negociación funcionando.** Nada de esta tabla se hace a costa de eso.
 | Most Viral Project | $20K | **Entra seguro.** Es campaña, no código | Post del demo en X con más interacción hasta el 8 nov, 11:59 p. m. ET |
 | Community Vote | $10K | **Entra seguro.** Es campaña, no código | Más votos en la galería pública (ganador el 16 nov) |
 | Best Build on Meta Open Weights | $10K | **Entra (decidido el 28 oct).** Créditos de Baseten y Modal aprobados; los vendedores corren en Muse Spark Open en Baseten | Parte central del proyecto corriendo en Muse Glimmer o Muse Spark Open |
-| Best Agentic Use-Case | $5K | **Entra (decidido el 29 oct).** Game master con herramientas y planificador de temporada encendidos en Render | Agentes que deciden y ejecutan tareas de varios pasos |
+| Best Agentic Use-Case | $5K | **Entra (decidido el 29 oct).** Director de la simulación con herramientas y planificador de temporada encendidos en Render | Agentes que deciden y ejecutan tareas de varios pasos |
 
 Pendiente de confirmar en Discord: si un proyecto puede ganar un premio de track y uno extra,
 y si para Open Weights basta con que una parte central use el modelo abierto.
@@ -47,11 +47,11 @@ y si para Open Weights basta con que una parte central use el modelo abierto.
    Se leen de variables de entorno.
 3. **Toda respuesta de un modelo se valida contra un esquema** (Pydantic en el backend).
    Si no valida, se reintenta una vez y luego se usa un evento de respaldo predefinido.
-   El juego nunca se rompe por una respuesta mala del modelo.
+   El simulador nunca se rompe por una respuesta mala del modelo.
 4. **Cada llamada a un modelo pasa por el control de costos** (ver más abajo).
 5. **El dinero se maneja en enteros** (colones, sin decimales). Nada de `float` para montos.
-6. **Código en inglés** (nombres, comentarios). Textos del juego en español de Costa Rica, traducidos en
-   `Translations.cs`. El juego arranca en inglés porque los jueces solo leen inglés; el español queda en Ajustes.
+6. **Código en inglés** (nombres, comentarios). Textos del simulador en español de Costa Rica, traducidos en
+   `Translations.cs`. El simulador arranca en inglés porque los jueces solo leen inglés; el español queda en Ajustes.
 
 ## Arquitectura
 
@@ -68,7 +68,7 @@ Backend FastAPI (Python 3.12, Pydantic v2)
   └─ Telemetría de partidas y Modo Clase
         │                         │
         ▼                         ▼
-Meta Model API              Neon (PostgreSQL)
+Meta Model API              SQLite local (o PostgreSQL)
 https://api.meta.ai/v1      sesiones, decisiones, clases
 ```
 
@@ -80,12 +80,12 @@ https://api.meta.ai/v1      sesiones, decisiones, clases
   `base_url="https://api.meta.ai/v1"` y `api_key=os.environ["MODEL_API_KEY"]`. La API de Meta
   es compatible con el SDK de OpenAI. Envolverlo en `app/providers/meta.py` para que el resto
   del código no dependa del SDK.
-- **Base de datos:** Neon (PostgreSQL) con SQLAlchemy 2 o psycopg 3 y migraciones con Alembic.
-- **Despliegue:** backend en Render (servicio `colon-quest-api`, región Ohio junto a Neon,
-  https://colon-quest-api.onrender.com). Despliega `develop` mientras se desarrolla; antes de la
-  evaluación se saca una versión a `main` y Render pasa a `main`. Build WebGL de Unity como sitio
-  estático, publicado con `pnpm` (ver `docs/prompts/model-roles-session.md`, punto 8). Configurar
-  CORS para el dominio del build.
+- **Base de datos:** SQLite local por defecto (`server/colonquest_local.db`, tablas creadas al arrancar). PostgreSQL sigue
+  disponible con `DATABASE_URL`, psycopg 3 y migraciones con Alembic.
+- **Ejecución (decidido el 3 de noviembre):** no hay backend desplegado. Los evaluadores corren todo en su computadora: el
+  simulador usa `http://localhost:8000/api` por defecto, `python scripts/run_local.py` levanta el backend con SQLite, y sin
+  `MODEL_API_KEY` usa el contenido escrito a mano. `render.yaml` queda solo como opción para alojar una copia propia.
+  Guía en `RUN_AND_BUILD.md`.
 
 ### Antes de escribir código contra la API: verificar en la documentación
 
@@ -102,20 +102,20 @@ Decidido el 29 de octubre con latencias medidas. Las métricas y el porqué de c
 [`docs/adr/0004-model-roles.md`](docs/adr/0004-model-roles.md). Lo marcado *pendiente* está descrito
 en [`docs/prompts/model-roles-session.md`](docs/prompts/model-roles-session.md).
 
-| Modelo | ID | Rol en el juego | Por qué | Costo |
+| Modelo | ID | Rol en el simulador | Por qué | Costo |
 | --- | --- | --- | --- | --- |
-| Muse Spark | `muse-spark-1.3` | Game master en vivo (evento del mes y game master con herramientas), informe del Modo Clase, respaldo de los vendedores | Único modelo de Meta que responde siempre dentro de los 8 s de Unity: 3,0 a 4,4 s con `minimal` | $1.25 / $4.25 por millón |
-| Muse Wonder | `muse-wonder-1.0` | Planifica el año del jugador en segundo plano y narra el resumen final; escribe el banco de eventos (*pendiente*) | El mejor escritor, pero tarda 5,8 a 10,5 s aun con `minimal`: solo donde el jugador no espera | $4 / $20 por millón |
-| Muse Spark Open | `meta-models/muse-spark-open-1026` (Baseten) | Los vendedores: esconden el seguro y la comisión hasta que les preguntan. Tácticas con herramientas y memoria de la partida *pendientes* | 1,9 a 2,8 s, pagado con los $100 de Baseten, pieza del premio Open Weights | $1.25 / $4.25 por millón (créditos de Baseten) |
-| Muse Image | `muse-image-1.0` | Retratos de los NPC, escenas de los eventos y la imagen del resumen final, elegida por las cifras de la partida (`Game/EndingArt.cs`), **sin texto** | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
-| Muse Voice Transcribe | `muse-voice-transcribe-1.0` | La voz del jugador al negociar | 0,7 a 1,5 s; escribir siempre sirve de respaldo | $0.18 por hora de audio |
+| Muse Spark | `muse-spark-1.3` | Director de la simulación en vivo (evento del mes y director de la simulación con herramientas), informe del Modo Clase, respaldo de los vendedores | Único modelo de Meta que responde siempre dentro de los 8 s de Unity: 3,0 a 4,4 s con `minimal` | $1.25 / $4.25 por millón |
+| Muse Wonder | `muse-wonder-1.0` | Planifica el año del usuario en segundo plano y narra el resumen final; escribe el banco de eventos (*pendiente*) | El mejor escritor, pero tarda 5,8 a 10,5 s aun con `minimal`: solo donde el usuario no espera | $4 / $20 por millón |
+| Muse Spark Open | `meta-models/muse-spark-open-1026` (Baseten) | Los vendedores: esconden el seguro y la comisión hasta que les preguntan. Tácticas con herramientas y memoria de la simulación *pendientes* | 1,9 a 2,8 s, pagado con los $100 de Baseten, pieza del premio Open Weights | $1.25 / $4.25 por millón (créditos de Baseten) |
+| Muse Image | `muse-image-1.0` | Retratos de los NPC, escenas de los eventos y la imagen del resumen final, elegida por las cifras de la simulación (`Game/EndingArt.cs`), **sin texto** | Tarda 14 a 17 s: siempre pre-generar y cachear, nunca en vivo | $0.01 por imagen |
+| Muse Voice Transcribe | `muse-voice-transcribe-1.0` | La voz del usuario al negociar | 0,7 a 1,5 s; escribir siempre sirve de respaldo | $0.18 por hora de audio |
 
 Reglas que salen de las mediciones:
 
 - **Todos los modelos razonan antes de responder**, y esos tokens cuentan contra `max_tokens`. Con
-  poco margen la respuesta llega vacía y el juego cae al respaldo sin avisar. Toda llamada deja
+  poco margen la respuesta llega vacía y el simulador cae al respaldo sin avisar. Toda llamada deja
   margen: 2000 tokens o más en texto, y 3072 extra en Baseten.
-- Las llamadas que el jugador espera usan `LIVE_REASONING_EFFORT=minimal` (`none` no existe).
+- Las llamadas que el usuario espera usan `LIVE_REASONING_EFFORT=minimal` (`none` no existe).
 - Un modelo lento nunca va en el camino de una llamada en vivo: corre en segundo plano, fuera de
   línea o detrás de una pantalla de carga con su propio tiempo de espera.
 - Unity se rinde a los 8 s en el evento y a los 10 s en las demás llamadas.
@@ -132,13 +132,13 @@ pendiente y no hace falta.
   `meta-models/muse-spark-open-1026` (no el `muse-spark-open` de su documentación).
 - Acepta salida con esquema JSON estricto. Siempre razona: se le manda `reasoning_effort: low` y
   3072 tokens de margen, o devuelve respuestas vacías.
-- `NPC_PROVIDER=open_weights` y `OPEN_WEIGHTS_TIMEOUT_S=5` en Render.
+- `NPC_PROVIDER=open_weights` y `OPEN_WEIGHTS_TIMEOUT_S=5` en `server/.env`.
 
 - Implementar un **segundo proveedor** en `app/providers/open_weights.py` con la misma interfaz
   que `app/providers/meta.py`. Si el endpoint del socio es compatible con OpenAI, reutilizar
   el mismo SDK con otro `base_url` y otra llave.
 - Variable `NPC_PROVIDER` con valores `meta_api` u `open_weights`, para cambiar sin tocar código.
-- **Si el proveedor abierto falla, volver automáticamente a la API de Meta.** El juego no se cae.
+- **Si el proveedor abierto falla, volver automáticamente a la API de Meta.** El simulador no se cae.
 - Registrar en `model_calls` qué proveedor respondió, para demostrarle al socio que el
   proyecto corre en un modelo abierto elegible.
 - Ventaja extra: la parte de más volumen (la negociación) deja de gastar los $150 de la API
@@ -151,7 +151,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 
 | Método y ruta | Qué hace |
 | --- | --- |
-| `POST /api/sessions` | Crea una partida. Opcional: `classCode` para Modo Clase. Devuelve `sessionId` |
+| `POST /api/sessions` | Crea una simulación. Opcional: `classCode` para Modo Clase. Devuelve `sessionId` |
 | `POST /api/sessions/{id}/event` | Recibe el estado financiero del mes y devuelve un `GameEvent` |
 | `POST /api/sessions/{id}/decisions` | Registra la decisión tomada y el estado resultante (telemetría) |
 | `POST /api/sessions/{id}/negotiation` | Recibe audio (o texto de respaldo) y devuelve un `NegotiationReply` |
@@ -179,7 +179,7 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 }
 ```
 
-### `GameEvent` (lo devuelve el game master, validado)
+### `GameEvent` (lo devuelve el director de la simulación, validado)
 
 ```json
 {
@@ -228,31 +228,31 @@ exportar el esquema OpenAPI y generar o escribir a mano las clases C# equivalent
 
 - El vendedor tiene una **ficha oculta con la verdad** (precio de contado, cuota, plazo,
   seguros, comisiones) generada y calculada por el motor, no por el modelo. El modelo solo
-  decide cómo revelarla según las preguntas del jugador.
+  decide cómo revelarla según las preguntas del usuario.
 - `termMonths` va y vuelve en cada turno: el plazo que el vendedor cotizó de último es el que se firma. El precio de contado nunca cambia.
-- `keyQuestionsAsked` alimenta la métrica de impacto: ¿el jugador hizo las preguntas correctas?
+- `keyQuestionsAsked` alimenta la métrica de impacto: ¿el usuario hizo las preguntas correctas?
 - Siempre ofrecer **entrada de texto como respaldo** si el micrófono falla.
 
-## Game master: diseño del prompt
+## Director de la simulación: diseño del prompt
 
 - **Instrucciones fijas** (system prompt) que no cambian entre llamadas, para aprovechar la
   caché de entrada ($0.20 por millón en vez de $4): reglas del mundo, tono tico, enums
   permitidos, rangos de montos y el formato JSON exacto.
 - **Entrada variable:** `PlayerState` resumido y los últimos eventos para no repetirlos.
-- **Reglas narrativas:** reaccionar a la situación del jugador (tarjeta al límite →
+- **Reglas narrativas:** reaccionar a la situación del usuario (tarjeta al límite →
   prestamista; ahorro alto → "negocio" piramidal; diciembre → aguinaldo y marchamo).
   Nunca sermonear: mostrar la consecuencia, no decir "estuvo mal".
 - **Eventos de respaldo:** un archivo `fallback_events.json` con 15 a 20 eventos escritos a
   mano. Si el modelo falla, tarda más de 8 segundos o se acaba el presupuesto, se usa uno.
 
-## Game master agéntico (para Best Agentic Use-Case)
+## Director de la simulación agéntico (para Best Agentic Use-Case)
 
-**Decidido el 29 de octubre: va.** El mes jugable funciona de punta a punta. En Render están
+**Decidido el 29 de octubre: va.** El mes completo funciona de punta a punta. En `server/.env.example` están
 encendidos `AGENTIC_GAME_MASTER` (1,4 a 4,2 s, usa sus herramientas) y `SEASON_PLANNER` (3,6 s).
 `SELLER_AGENT` también está encendido: el vendedor agente corre en Baseten (visto en vivo el 1 de
 noviembre). Detalle en `docs/adr/0003-agentic-game-master.md`.
 
-La versión base del game master hace una llamada por mes. La versión agéntica:
+La versión base del director de la simulación hace una llamada por mes. La versión agéntica:
 
 1. **Usa herramientas (tool calling)** conectadas a funciones deterministas del backend:
    - `get_player_history(session_id)`: decisiones y eventos anteriores.
@@ -260,26 +260,26 @@ La versión base del game master hace una llamada por mes. La versión agéntica
    - `project_debt(balance, rate, payment, months)`: cómo evoluciona una deuda.
    - `get_concepts_not_yet_taught(session_id)`: qué conceptos faltan por enseñar.
 2. **Planifica la temporada:** al empezar, arma un plan de eventos para el año según el perfil
-   del jugador y lo ajusta mes a mes según sus decisiones. El plan se guarda en `sessions`.
+   del usuario y lo ajusta mes a mes según sus decisiones. El plan se guarda en `sessions`.
 3. **Vendedor con objetivo propio:** en la negociación, el vendedor es un agente que intenta
    maximizar su comisión dentro de reglas fijas (no puede mentir sobre cifras, solo omitirlas
    hasta que le pregunten). Usa `simulate_purchase` para responder con números exactos.
 
 Reglas: máximo de pasos por llamada (5), timeout total de 10 s, y si algo falla se usa la
-versión base de una sola llamada. Las herramientas nunca escriben el estado del jugador;
+versión base de una sola llamada. Las herramientas nunca escriben el estado del usuario;
 solo lo leen o calculan.
 
 ## Simulación guiada (lo primero del menú)
 
 Decidido el 1 de noviembre: una lista de funciones no demuestra que esto sea un simulador. La simulación
-guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador solo decide. Está en
+guiada es el simulador real en un tramo corto del pueblo, tres meses, y el usuario solo decide. Está en
 `unity/Assets/Scripts/UI/GameUi.Guided.cs` y sus reglas puras en `Game/GuidedRoute.cs`.
 
-- **Mes 1:** elige su situación, cae la quincena y el game master trae un evento. Antes de pedir el mes 2 espera
+- **Mes 1:** elige su situación, cae la quincena y el director de la simulación trae un evento. Antes de pedir el mes 2 espera
   a Muse Wonder (`GuidedRoute.PlanWaitSeconds`): si el siguiente evento llega antes, el servidor descarta su plan.
 - **Mes 2:** la flecha lleva a la tienda y al vendedor.
 - **Mes 3:** con poca plata, el prestamista y luego los cobradores; con plata de sobra, la pirámide.
-- Mientras dura: el reloj no corre, sin atropellos ni policía, solo abren las puertas de la ruta y no toca las partidas guardadas.
+- Mientras dura: el reloj no corre, sin atropellos ni policía, solo abren las puertas de la ruta y no toca las simulaciones guardadas.
 - El panel de llamadas (`UI/AiCallsPanel.cs`, tecla L) lee `/trace`. Nunca muestra llaves.
 - Los objetivos (`Game/Objectives.cs`, `UI/GameUi.Objective.cs`) son los mismos en el modo historia.
 
@@ -303,22 +303,21 @@ guiada es el juego real en un tramo corto del pueblo, tres meses, y el jugador s
 ## Control de costos (obligatorio)
 
 Créditos: $150 en la API de Meta por persona y $100 en Baseten. Medido el 28 de octubre: una
-partida de 3 meses cuesta unos $0.04 de Meta; un turno de negociación en Baseten, unos $0.0025.
+simulación de 3 meses cuesta unos $0.04 de Meta; un turno de negociación en Baseten, unos $0.0025.
 
 - `app/cost_guard.py`: estima el costo de cada llamada con los precios oficiales y acumula el
   gasto diario en la base de datos.
-- `DAILY_BUDGET_USD` (variable de entorno). Al llegar al 80%, el game master pasa
+- `DAILY_BUDGET_USD` (variable de entorno). Al llegar al 80%, el director de la simulación pasa
   automáticamente a Muse Spark. Al 100%, solo eventos de respaldo.
-- Límite por sesión: máximo de llamadas por partida y por IP.
+- Límite por sesión: máximo de llamadas por simulación y por IP.
 - Caché de respuestas idénticas.
 - En desarrollo, `GAME_MASTER_MODEL=muse-spark-1.3-contributor`.
 - El gasto de Baseten tiene tope propio: `OPEN_WEIGHTS_DAILY_BUDGET_USD` (3 por defecto). Al llegar,
   los personajes pasan a la API de Meta hasta la medianoche UTC. `/api/health` muestra ambos presupuestos.
-- `GET /api/ping` responde sin tocar Neon ni los modelos: es el que usa UptimeRobot para mantener
-  despierto Render.
+- `GET /api/ping` responde sin tocar la base ni los modelos.
 - `MAX_CALLS_PER_CLIENT_PER_DAY` es 200 por IP; el día del piloto subirlo (todo el colegio sale por una IP).
 
-## Base de datos (Neon)
+## Base de datos (SQLite local o PostgreSQL)
 
 | Tabla | Campos principales |
 | --- | --- |
@@ -329,7 +328,7 @@ partida de 3 meses cuesta unos $0.04 de Meta; un turno de negociación en Basete
 | `model_calls` | `model`, `endpoint`, `input_tokens`, `output_tokens`, `estimated_cost_usd`, `latency_ms`, `ok` |
 | `images` | `key`, `url`, `created_at` |
 
-`model_calls` sirve para controlar el gasto y para mostrar en el video cuánto cuesta una partida.
+`model_calls` sirve para controlar el gasto y para mostrar en el video cuánto cuesta una simulación.
 
 ## Modo Clase
 
@@ -380,8 +379,8 @@ Cada fase es un sprint de Jira (proyecto `SCRUM`). Detalle en `docs/workflow.md`
 | Sprint y fechas | Keylor (backend, IA, motor) | Jefferson (Unity, arte, flujo) | Listo cuando |
 | --- | --- | --- | --- |
 | **Sprint 1: Foundations** (lun 26 y mar 27 oct) | Repo, FastAPI, proveedor de Meta, prueba de cada modelo (Wonder JSON, transcripción en español tico, una imagen). Esquemas Pydantic y contrato en `shared/`. Neon y migración base. Pedir créditos de Baseten, Modal y Fireworks | Proyecto Unity 2D, mapa cenital con 3 estaciones (cajero, tienda, casa), movimiento y colisiones | Cada modelo responde desde el backend; el personaje camina entre estaciones |
-| **Sprint 2: Playable Month** (mié 28 y jue 29 oct) | Game master con validación, recorte de montos y eventos de respaldo. Control de costos. Motor financiero C# con tests. **[CONDICIONAL, decidir el 28]** proveedor open-weight para los personajes | Paneles overlay: alerta SINPE, estado de cuenta, ventana de decisión. Conexión al endpoint de eventos | Un mes completo jugable de punta a punta |
-| **Sprint 3: Negotiation & Deploy** (vie 30 y sáb 31 oct) | Negociación por texto y voz: transcripción, ficha oculta del vendedor, `keyQuestionsAsked`. Imágenes pre-generadas. Telemetría. Despliegue en Render. **[SI DA TIEMPO, decidir el 29]** game master con herramientas | Grabación de voz (jslib en WebGL), panel de negociación, retratos. Build WebGL desplegado | La negociación funciona en el build web desplegado (voz, o texto como respaldo) |
+| **Sprint 2: Working Month** (mié 28 y jue 29 oct) | Director de la simulación con validación, recorte de montos y eventos de respaldo. Control de costos. Motor financiero C# con tests. **[CONDICIONAL, decidir el 28]** proveedor open-weight para los personajes | Paneles overlay: alerta SINPE, estado de cuenta, ventana de decisión. Conexión al endpoint de eventos | Un mes completo funcional de punta a punta |
+| **Sprint 3: Negotiation & Deploy** (vie 30 y sáb 31 oct) | Negociación por texto y voz: transcripción, ficha oculta del vendedor, `keyQuestionsAsked`. Imágenes pre-generadas. Telemetría. Despliegue en Render. **[SI DA TIEMPO, decidir el 29]** director de la simulación con herramientas | Grabación de voz (jslib en WebGL), panel de negociación, retratos. Build WebGL desplegado | La negociación funciona en el build web desplegado (voz, o texto como respaldo) |
 | **Sprint 4: Pilot & Submission** (dom 1 y lun 2 nov) | **Prueba piloto con estudiantes** (mañana del 1). Modo Clase y panel del profesor si da tiempo. Correcciones, métricas para el video, README, publicar en la galería | Pulido, sonido, pantalla final. Video de 3 min para los jueces y clip vertical de 30 a 45 s para X | **Proyecto entregado el 2 de noviembre** |
 | Después de la entrega (hasta el 8 nov) | Vigilar gasto y errores de la demo en vivo | Campaña en X | Post en X con la mayor interacción posible |
 | Hasta el 16 nov | Campaña de votos de la comunidad | Campaña de votos de la comunidad | Votos en la galería pública |
@@ -396,24 +395,24 @@ Cada fase es un sprint de Jira (proyecto `SCRUM`). Detalle en `docs/workflow.md`
   galería. Mencionar las cuentas oficiales del hackathon.
 - **Publicar el 2 o 3 de noviembre**, apenas se entregue, y moverlo en grupos de la UNA, comunidades tech de Costa
   Rica, y con los estudiantes de la prueba piloto.
-- **Community Vote:** pedir votos con el link directo a la galería. Mensaje: un juego
+- **Community Vote:** pedir votos con el link directo a la galería. Mensaje: un simulador
   costarricense compitiendo en un hackathon mundial de Meta.
 - **Fecha límite del viral:** 8 de noviembre, 11:59 p. m. hora del Este (10:59 p. m. en Costa Rica).
 
 ## Riesgos conocidos
 
-- **Latencia del game master:** mostrar una animación mientras responde; timeout de 8 s con
+- **Latencia del director de la simulación:** mostrar una animación mientras responde; timeout de 8 s con
   evento de respaldo.
 - **Micrófono en WebGL:** probarlo el 30 de octubre como máximo (inicio del Sprint 3); el respaldo de texto debe existir siempre.
 - **Unity WebGL pesado:** comprimir assets y probar la carga en una conexión lenta.
 - **Alcance:** si algo se atrasa, se recorta en este orden:
-  1. Game master agéntico **[SI DA TIEMPO]**.
+  1. Director de la simulación agéntico **[SI DA TIEMPO]**.
   2. Proveedor open-weight **[CONDICIONAL]**.
   3. Modo Clase.
   4. Imágenes en tiempo real (quedan las pre-generadas).
   5. Voz en la versión web (queda el texto; la voz se muestra en el video desde escritorio).
 
-  El mes jugable y la negociación por texto **no se recortan nunca**.
+  El mes funcional y la negociación por texto **no se recortan nunca**.
 - **Créditos:** verificar en los Credit Terms cuándo vencen; la demo debe seguir funcionando
   desde la entrega del 2 de noviembre y durante toda la evaluación.
 
@@ -441,8 +440,8 @@ uv run python scripts/smoke_models.py --audio pregunta.wav
 python ../scripts/smoke_test.py
 ```
 
-El ejecutable para los jueces se arma con `python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué
-backend habla el juego; se puede cambiar al lado del exe sin volver a armar. Guía en `RUN_AND_BUILD.md`.
+Los evaluadores levantan el backend con `python scripts/run_local.py`. El ejecutable se arma con
+`python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué backend habla el simulador. Guía en `RUN_AND_BUILD.md`.
 
 Variables de entorno (`server/.env`, nunca en el repo): `MODEL_API_KEY`, `DATABASE_URL`,
 `GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S`,

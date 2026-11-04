@@ -14,7 +14,7 @@ para elegir en las ventanas.
 - un sonido;
 - el cambio de plata **al final** de la escena.
 
-Además, Espacio debe saltar la escena sin dejar al jugador congelado.
+Además, Espacio debe saltar la escena sin dejar al usuario congelado.
 
 ---
 
@@ -23,19 +23,19 @@ Además, Espacio debe saltar la escena sin dejar al jugador congelado.
 - [ ] El .exe abre sin errores, en pantalla completa.
 - [ ] F11 y Alt+Enter cambian entre ventana y pantalla completa, y el cambio se recuerda al reiniciar.
 - [ ] En una ventana pequeña (arrastra el borde) nada del menú ni del HUD se corta.
-- [ ] Cerrar el juego con la X de la ventana no deja el proceso abierto (revisa el Administrador de tareas).
+- [ ] Cerrar el simulador con la X de la ventana no deja el proceso abierto (revisa el Administrador de tareas).
 
 ## 1. Menú principal
 
 - [ ] Se ve la ilustración del tucán de fondo, con capas que se mueven un poco con el mouse.
 - [ ] Hay música propia del menú.
-- [ ] Botones: Modo historia, Jugar online, Ajustes, Créditos y Salir. Ninguno se monta sobre otro ni sobre el título.
+- [ ] Botones: Modo historia, Simular online, Ajustes, Créditos y Salir. Ninguno se monta sobre otro ni sobre el título.
 - [ ] Al pasar el mouse cada botón crece, cambia el borde y suena un toque suave. Al hacer clic suena el clic.
 - [ ] Las flechas y Enter sirven igual que el mouse.
 - [ ] Arriba a la izquierda dice la versión (Alpha 0.1.x); abajo, "Design by DoWhile Team". Los dos son legibles.
 - [ ] **Créditos:** se abren, se leen completos (nada se sale de la tarjeta) y se cierran con Volver y con Esc.
-- [ ] **Jugar online:** sale el aviso de la versión completa, se cierra bien y su texto cabe.
-- [ ] **Salir:** cierra el juego.
+- [ ] **Simular online:** sale el aviso de la versión completa, se cierra bien y su texto cabe.
+- [ ] **Salir:** cierra el simulador.
 
 ## 2. Ajustes
 
@@ -45,20 +45,20 @@ Además, Espacio debe saltar la escena sin dejar al jugador congelado.
 - [ ] Pantalla completa desde Ajustes.
 - [ ] Volver y Esc cierran Ajustes sin cambiar nada más.
 
-## 3. Partidas guardadas (Modo historia)
+## 3. Simulaciones guardadas (Modo historia)
 
 - [ ] Modo historia abre la lista de **3 espacios**. Los vacíos dicen que están libres.
-- [ ] **Nueva partida:** pide el nombre y el género, más el nombre de la partida.
+- [ ] **Nueva simulación:** pide el nombre y el género, más el nombre de la simulación.
 - [ ] No deja empezar sin nombre.
 - [ ] Nombres con tilde y ñ ("Sofía", "Begoña") se ven bien.
 - [ ] Un nombre muy largo no rompe la ventana.
-- [ ] Con mujer y con hombre, el personaje del juego sale distinto (pelo, ropa).
+- [ ] Con mujer y con hombre, el personaje del simulador sale distinto (pelo, ropa).
 - [ ] Cada espacio ocupado muestra nombre, mes y semana, plata, ánimo y fecha de la última vez.
-- [ ] **Continuar** carga la partida exactamente donde quedó (lugar, plata, muebles, puesto, metas).
+- [ ] **Continuar** carga la simulación exactamente donde quedó (lugar, plata, muebles, puesto, metas).
 - [ ] **Borrar** pide confirmación y deja el espacio libre.
 - [ ] Llenar los 3 espacios: no deja crear un cuarto sin borrar uno.
-- [ ] Se guarda al dormir y al salir al menú. Cierra el .exe con la X a mitad del día y vuelve a abrir: la partida está en el último punto guardado, no corrupta.
-- [ ] Una partida terminada (fin del año) se ve como terminada y no se puede seguir jugando.
+- [ ] Se guarda al dormir y al salir al menú. Cierra el .exe con la X a mitad del día y vuelve a abrir: la simulación está en el último punto guardado, no corrupta.
+- [ ] Una simulación terminada (fin del año) se ve como terminada y no se puede seguir simulando.
 
 ## 4. Pantalla de carga y apertura
 
@@ -80,7 +80,7 @@ Además, Espacio debe saltar la escena sin dejar al jugador congelado.
 
 ## 6. Personajes (v2)
 
-- [ ] **Jugador:** mochila, camisa naranja (o la versión femenina), con los brazos pegados al cuerpo al caminar.
+- [ ] **Usuario:** mochila, camisa naranja (o la versión femenina), con los brazos pegados al cuerpo al caminar.
 - [ ] Codos sin picos, barbilla y cuello sin hueco, y cintura sin hueco entre las piernas.
 - [ ] Mira de cerca a cada personaje con nombre: Kevin (tienda), Don Rafa, Doña Marta, el prestamista, Brayan, Don Beto, la cajera, el oficial, la jueza, el enfermero, la doctora, la asesora de la coope, Doña Lucía, Don Chepe, Don Mario, la financiera, la agente inmobiliaria, la estudiante y el repartidor.
   Para cada uno revisa:
@@ -131,7 +131,7 @@ Además, Espacio debe saltar la escena sin dejar al jugador congelado.
 - [ ] Sal a tiempo: no pasa nada.
 - [ ] **Quédate:** sirena, el oficial llega, levantas las manos, esposas, fundido y celda.
 - [ ] En la celda la **reja está cerrada**: no puedes salir por el frente ni por los lados.
-- [ ] La condena se cuenta en días de juego.
+- [ ] La condena se cuenta en días de simulador.
 - [ ] Con el botón de **fianza** pagas y la reja se abre con animación y sonido.
 - [ ] **Cumplir la condena** también abre la reja.
 - [ ] Sin plata para la fianza, el botón no deja pagar y lo dice.
@@ -217,7 +217,7 @@ Para cada una, revisa:
 
 ## 17. Lugares de tareas del mes
 
-Para cada uno revisa: la persona saluda, hay un gesto, el evento del game master llega y la decisión cambia la plata.
+Para cada uno revisa: la persona saluda, hay un gesto, el evento del director de la simulación llega y la decisión cambia la plata.
 
 - [ ] Taller de Don Rafa.
 - [ ] Pulpería de Doña Marta.
@@ -225,10 +225,10 @@ Para cada uno revisa: la persona saluda, hay un gesto, el evento del game master
 - [ ] Brayan, el de la pirámide: folleto.
 - [ ] Cooperativa: firma.
 - [ ] Soda: plato.
-- [ ] El aviso "El game master está pensando" es chico, no tapa el centro y dura poco.
+- [ ] El aviso "El director de la simulación está pensando" es chico, no tapa el centro y dura poco.
 - [ ] Ya hecha la tarea del mes, el lugar dice "Ya pasaste por aquí este mes".
 - [ ] Con internet: evento distinto cada vez. Sin internet: evento de respaldo, sin errores.
-- [ ] Los eventos nunca hablan de un carro, una moto, una refri o una lavadora que el jugador no tiene.
+- [ ] Los eventos nunca hablan de un carro, una moto, una refri o una lavadora que el usuario no tiene.
 
 ## 18. Agencias, finca y vecino
 
@@ -288,21 +288,21 @@ Para cada uno revisa: la persona saluda, hay un gesto, el evento del game master
 ## 23. Fin del año y reporte
 
 - [ ] Al cerrar el último mes: "Armando tu año", con el resumen del año (Muse Wonder) o el de respaldo sin internet.
-- [ ] La postal del año con las cifras dibujadas por el juego (la imagen sin texto).
-- [ ] **Boleta de calificaciones** de la A a la D por concepto, que cuadra con lo jugado.
+- [ ] La postal del año con las cifras dibujadas por el simulador (la imagen sin texto).
+- [ ] **Boleta de calificaciones** de la A a la D por concepto, que cuadra con lo simulado.
 - [ ] Metas cumplidas y no cumplidas.
-- [ ] Volver al menú. La partida queda como terminada.
+- [ ] Volver al menú. La simulación queda como terminada.
 
 ## 24. Pausa
 
 - [ ] Esc en el pueblo: pausa. El tiempo y el reloj se detienen.
 - [ ] Reanudar, Ajustes y Volver al menú (guarda y pasa por la pantalla de carga).
-- [ ] Desde el menú, Continuar retoma la misma partida.
+- [ ] Desde el menú, Continuar retoma la misma simulación.
 
 ## 25. Inglés
 
 Cambia a English y repite:
-- [ ] menú, créditos, nueva partida, apertura y HUD;
+- [ ] menú, créditos, nueva simulación, apertura y HUD;
 - [ ] una escena animada de la casa y una del banco;
 - [ ] la negociación (Kevin responde en inglés);
 - [ ] el celular y el reporte final.
@@ -321,11 +321,11 @@ Anota cada texto que siga en español (incluidos los letreros del pueblo y los n
 - [ ] FPS en el pueblo con mucha gente y carros: sin tirones. Anota el número aproximado.
 - [ ] Juega 30 minutos seguidos: sin cierres ni lentitud creciente.
 - [ ] Entra y sal de 10 interiores seguidos: sin errores.
-- [ ] Revisa el log del jugador (`%USERPROFILE%\AppData\LocalLow\<empresa>\ColonQuest\Player.log`) y busca `Exception`, `NullReference` y `error`.
+- [ ] Revisa el log del usuario (`%USERPROFILE%\AppData\LocalLow\<empresa>\ColonQuest\Player.log`) y busca `Exception`, `NullReference` y `error`.
 
 ## 28. Lo que NO está hecho (no es falla, no lo busques)
 
-- El año de 12 meses (hoy la partida dura 3).
+- El año de 12 meses (hoy la simulación dura 3).
 - La mascota.
 - Los interiores de la pulpería y del taller.
 - Los animales nuevos.

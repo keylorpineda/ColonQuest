@@ -50,15 +50,15 @@ El README dice "260+". Es verdadero, pero subestima. No cambiarlo a otro número
 
 | Pasaje del README | Problema | Criterio afectado | Acción |
 | --- | --- | --- | --- |
-| "A 2D financial-literacy game" | El equipo decidió que es un simulador de finanzas personales, y los ganadores documentados no son juegos | Impacto, Demo | Cambiar el encuadre en la primera frase |
+| Primera frase del README | El equipo decidió que es un simulador de finanzas personales | Impacto, Demo | Hecho: el encuadre es de simulador |
 | "Many young Costa Ricans make their first big money decisions alone" | Sin ninguna cifra | Impacto (30%) | Añadir la OCF 2025: 87% tiene alguna deuda y destina en promedio 34% de sus ingresos; CINPE y UNA: más del 80% sin educación financiera. Aclarar que el 87% mide cualquier deuda |
 | Tabla de criterios: "a student pilot" | **No hay evidencia en el repositorio.** `docs/README.md` apunta a `docs/pilot/`, y esa carpeta no existe | Impacto, credibilidad | Subir cifras agregadas del piloto a `docs/pilot/`, o quitar la frase hasta tenerlas. Una afirmación sin respaldo daña a todo el documento |
 | No hay enlace a la demo, al video ni a la galería al inicio | El perfil D busca el link primero | Demo (25%) | Poner "Play now" y el video en las primeras líneas |
 | "Try every feature in two minutes" (Demo Lab) | Buena para los perfiles A y C, pero no es la ruta del revisor masivo | Demo | Añadir antes la ruta "Play in 90 seconds" cuando exista |
 | "260+ tests in CI" | Impreciso (sección 2, M3) | Técnica | Escribir: motor con NUnit y backend con pytest en CI, más pruebas de Unity en local |
 | Class Mode "a real test class of three simulated students, labelled as such" | Está bien: es honesto | Impacto | Mantener |
-| Accesibilidad con estados "Done / In progress / Planned" | Está bien, pero "Keyboard play" y "Not by color alone" siguen en progreso | Impacto | Mantener o terminar si da tiempo |
-| No se menciona Muse Code ni el costo por partida | Los jueces de Meta lo buscan | Meta (25%) | Decirlo en el envío (ya está en el ticket 13) y poner el costo por partida (~$0,04) |
+| Accesibilidad con estados "Done / In progress / Planned" | Está bien, pero "Keyboard use" y "Not by color alone" siguen en progreso | Impacto | Mantener o terminar si da tiempo |
+| No se menciona Muse Code ni el costo por simulación | Los jueces de Meta lo buscan | Meta (25%) | Decirlo en el envío (ya está en el ticket 13) y poner el costo por simulación (~$0,04) |
 
 ## 4. CLAUDE.md: lo desactualizado o riesgoso
 
@@ -66,9 +66,9 @@ El README dice "260+". Es verdadero, pero subestima. No cambiarlo a otro número
 | --- | --- | --- |
 | "Entrega: lunes 2 de noviembre... hora exacta por confirmar" | El plazo oficial es el 4 de nov, 9:00 PM ET (8:00 PM en Costa Rica); el 2 es solo el corte interno | Corregir el encabezado y las fases |
 | Tabla de "Premios extra" con cinco premios nombrados | El texto oficial solo habla de "hasta $50K en conjunto" sin nombrar los cinco | Marcarlos como "sin confirmar" |
-| "Juego 2D de educación financiera" | Contradice el encuadre decidido | Cambiar a simulador |
+| Primera línea de CLAUDE.md | Coincide con el encuadre decidido | Hecho |
 | Créditos de Meta: "$150 por persona" | No menciona la ventana de 10 días para el desarrollo, que es un riesgo durante el juicio | Añadir el riesgo y su mitigación |
-| Regla 6 y "el juego arranca en inglés" | Coincide con lo implementado | Sin cambio |
+| Regla 6 y "el simulador arranca en inglés" | Coincide con lo implementado | Sin cambio |
 | Pruebas obligatorias del motor | Cumplidas (sección 2) | Sin cambio |
 
 ## 5. Rúbrica contra evidencia (estimación nuestra, no puntaje oficial)

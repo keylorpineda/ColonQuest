@@ -75,7 +75,7 @@ su latencia y su costo en la descripción del PR.
 ## 5. Banco de eventos escrito por Wonder (complemento)
 
 - `server/scripts/generate_event_bank.py`: pide a Muse Wonder unos 30 eventos, cubriendo todos los
-  `TeachingConcept` y tipos de evento, usando el `SYSTEM_PROMPT` del game master.
+  `TeachingConcept` y tipos de evento, usando el `SYSTEM_PROMPT` del director de la simulación.
 - Validar cada uno con `GameEvent` y `clamp_event`. Descartar los que cambien al recortar.
 - Escribir el resultado en `server/app/game_master/fallback_events.json` sin borrar los eventos
   escritos a mano. Revisar ids repetidos y el tope de 280 caracteres de la narrativa.
@@ -92,8 +92,8 @@ su latencia y su costo en la descripción del PR.
   después Meta si falla o se pasa del tiempo.
 - En `app/main.py`, `SellerAgent` recibe el proveedor de los personajes (el `FallbackProvider`)
   en vez de `MetaProvider`.
-- **Memoria de la partida:** `run_turn` en `app/api/negotiation.py` arma, además del historial de
-  la oferta, un resumen de las preguntas clave que el jugador hizo en **otras** ofertas de la misma
+- **Memoria de la simulación:** `run_turn` en `app/api/negotiation.py` arma, además del historial de
+  la oferta, un resumen de las preguntas clave que el usuario hizo en **otras** ofertas de la misma
   sesión (tabla `negotiations`, campo `key_questions_asked`). Se agrega al prompt como
   `playerHabits`, para que el vendedor cambie de táctica ("ya sé que vos preguntás por el seguro").
   El guardia de cifras no cambia.

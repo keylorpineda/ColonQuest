@@ -1,6 +1,6 @@
 # Errores de la prueba en el motor (31 de octubre)
 
-Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su estado.
+Jefferson los encontró simulando en el motor con windows_r19. Cada punto lleva su estado.
 
 ## Tanda 1
 
@@ -20,7 +20,7 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
 - [x] T1-06 "Acostarte un rato" no muestra al personaje acostándose.
   Hecho: De día la cama es una siesta corta con el personaje acostado y las Z.
 - [x] T1-07 Ropero: al menos tres mudadas para elegir (bañador y dos más).
-  Hecho: Ropero con ropa de diario, de domingo, deportiva y el bañador; se guarda en la partida y se aplica en cada escena.
+  Hecho: Ropero con ropa de diario, de domingo, deportiva y el bañador; se guarda en la simulación y se aplica en cada escena.
 - [x] T1-08 Baño: falta la opción de usar el servicio.
   Hecho: Thing `Toilet` "Usar el servicio" con su escena (se oscurece y suena la cadena).
 - [x] T1-09 Ducha: se baña con ropa. Simular que se la quita, con censura en el cuerpo.
@@ -43,13 +43,13 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
   Hecho: La caja 4 recibe depósitos de efectivo a los ahorros.
 - [x] T1-17 Las cajeras parecen paradas sobre los carteles; un cartel tiene información incoherente.
   Hecho: El cartel CAJA n bajó al frente del mostrador; la pizarra muestra el tipo de cambio.
-- [x] T1-18 Banco vacío: clientes con rutinas variables y el jugador espera su turno unos segundos.
-  Hecho: Cuatro clientes con diligencias al azar que no cruzan la soga ni el mostrador; el jugador espera su turno (máximo 8 s).
+- [x] T1-18 Banco vacío: clientes con rutinas variables y el usuario espera su turno unos segundos.
+  Hecho: Cuatro clientes con diligencias al azar que no cruzan la soga ni el mostrador; el usuario espera su turno (máximo 8 s).
 
 ### Ciudad
 - [x] T1-19 La valla del mirador no tiene colisión.
   Hecho: La valla del mirador tiene collider (Antigravity).
-- [x] T1-20 Fuente del banco: al caminar al lado, el juego cree que el personaje se quiere meter.
+- [x] T1-20 Fuente del banco: al caminar al lado, el simulador cree que el personaje se quiere meter.
   Hecho: La fuente solo se ofrece de frente y la escena se queda delante del borde.
 - [x] T1-21 El cartel de los cursos no tiene colisión.
   Hecho: El cartel de los cursos tiene collider (Antigravity).
@@ -71,7 +71,7 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
 ### Interiores
 - [x] T2-06 La cooperativa no tiene interior: crearlo con trámites.
   Hecho: Nueva escena `Cooperativa` con la asesora, la tarea, el ahorro a plazo, sillas, afiche y planta.
-- [x] T2-07 Casas de alquiler: se usan como propias al entrar. Bloquear si no son del jugador.
+- [x] T2-07 Casas de alquiler: se usan como propias al entrar. Bloquear si no son del usuario.
   Hecho: Las casas en venta o alquiler no llevan a la mamá y sus cosas solo dan un pensamiento hasta alquilarlas o comprarlas.
 - [x] T2-08 Enriquecer el detalle de los interiores.
   Hecho: Relojes, extintores, dispensadores y más en el cuarto, la tienda, la finca, la inmobiliaria, el hospital y la agencia (Antigravity).
@@ -80,7 +80,7 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
 - [x] T2-10 Ascensor del hospital: el personaje es más grande que el ascensor y en el segundo piso sale por el lado contrario.
   Hecho: Cabina y marco más grandes; al llegar el personaje sale caminando desde adentro hacia el pasillo, en los dos pisos.
 - [x] T2-11 Celdas de la policía vacías: agregar reos.
-  Hecho: Tres reos en las celdas que no son del jugador (Antigravity).
+  Hecho: Tres reos en las celdas que no son del usuario (Antigravity).
 - [x] T2-12 Sodas vacías: agregar clientes.
   Hecho: Cuatro clientes sentados en la soda (Antigravity).
 
@@ -99,27 +99,27 @@ Jefferson los encontró jugando en el motor con windows_r19. Cada punto lleva su
 ## Tanda 3
 
 Lista de la tercera prueba, tal cual la pasó Jefferson. Rama `fix/SCRUM-58-playtest-oct31` (base `54fe0cd`).
-Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
+Responsable: S = senior (Claude), A = Antigravity, J = solo se ve simulando.
 
 ### Interfaz y experiencia de usuario
 - [x] T3-01 (A) Créditos de desarrolladores: en la pantalla que dice "Diseñado por DoWhile Team" se deben ocultar o eliminar los nombres individuales de los desarrolladores.
   Hecho (Antigravity): créditos solo con "DoWhile Team".
-- [x] T3-02 (A) Transparencia del HUD: aplicar un poco de opacidad/transparencia al HUD general, ya que su opacidad total tapa información importante del juego.
+- [x] T3-02 (A) Transparencia del HUD: aplicar un poco de opacidad/transparencia al HUD general, ya que su opacidad total tapa información importante del simulador.
   Hecho (Antigravity): fondo de la tarjeta del HUD semitransparente.
-- [x] T3-03 (S) Sistema de misiones/tareas: implementar un menú o apartado visual en pantalla donde el jugador pueda revisar las tareas pendientes, ya que el flujo actual es poco intuitivo.
-  Hecho: lista "Tareas de hoy" bajo el HUD (Tab la esconde), leída de la partida: día de llegada, trabajo, recibos, deudas, cierre del mes y dormir.
+- [x] T3-03 (S) Sistema de misiones/tareas: implementar un menú o apartado visual en pantalla donde el usuario pueda revisar las tareas pendientes, ya que el flujo actual es poco intuitivo.
+  Hecho: lista "Tareas de hoy" bajo el HUD (Tab la esconde), leída de la simulación: día de llegada, trabajo, recibos, deudas, cierre del mes y dormir.
 - [x] T3-04 (S) Gestión del tiempo muerto: como las tareas se completan rápido, implementar una mecánica para adelantar el tiempo o irse a dormir sin tener que esperar de forma pasiva a que termine el día después de trabajar.
   Hecho: en la cama de día, menú con "Descansar un par de horas" (+2 h) y, si ya trabajaste o pasó la mañana, "Dormir hasta mañana".
 
 ### Mecánicas y progresión
 - [x] T3-05 (S) Animación de salida de la casa: eliminar por completo la animación al salir de la casa de la madre. Al despedirse, el personaje simplemente debe quedarse parado sin ejecutar ninguna acción automática de salida.
   Hecho: al despedirse el personaje se queda parado en el cuarto; ya no camina solo ni pasa al pueblo.
-- [x] T3-06 (S) Paso del tiempo laboral: el tiempo del juego debe avanzar de manera progresiva y realista mientras el personaje está trabajando, no dar un salto repentino de horas únicamente al finalizar el turno.
+- [x] T3-06 (S) Paso del tiempo laboral: el tiempo del simulador debe avanzar de manera progresiva y realista mientras el personaje está trabajando, no dar un salto repentino de horas únicamente al finalizar el turno.
   Hecho: el reloj avanza poco a poco durante la escena del turno, de la entrada a las 12:00.
 - [x] T3-07 (A) Multas de tránsito: ajustar el valor exacto de la multa por saltarse un semáforo en rojo a 5,000 colones.
   Hecho (Antigravity): multa del semáforo en rojo de ₡5 000.
-- [x] T3-08 (S) Día de introducción/rutina previa: lógica obligatoria en el día a día donde el jugador deba cumplir ciertos requisitos previos antes de iniciar su jornada laboral (por ejemplo: pagar el seguro, ir a visitar su nuevo cuarto de alquiler, etc.).
-  Hecho: día de llegada en una partida nueva: el primer turno espera a conocer el cuarto y sacar el seguro de salud; ese turno nunca cuenta como tarde.
+- [x] T3-08 (S) Día de introducción/rutina previa: lógica obligatoria en el día a día donde el usuario deba cumplir ciertos requisitos previos antes de iniciar su jornada laboral (por ejemplo: pagar el seguro, ir a visitar su nuevo cuarto de alquiler, etc.).
+  Hecho: día de llegada en una simulación nueva: el primer turno espera a conocer el cuarto y sacar el seguro de salud; ese turno nunca cuenta como tarde.
 - [x] T3-09 (A) Sistema de cursos: rediseñar la lógica para llevar los cursos, haciéndola más fácil de entender. Crear o asignar un espacio/edificio físico específico para ir a recibirlos.
   Hecho (Antigravity): edificio "INA · CURSOS" en la acera sur con su estación en la puerta; modal más claro.
 - [x] T3-10 (J→A) Puertas bloqueadas: revisar las casas del mapa, ya que algunas puertas están bloqueadas y no permiten la entrada.
@@ -128,7 +128,7 @@ Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
 ### Entorno, objetos y colisiones
 - [x] T3-11 (S) Error crítico de colisión (barco): un barco pequeño está atravesando el muelle por encima. Corregir de inmediato ajustando las rutas o colisiones del barco.
   Hecho: los barcos van y vuelven, dos al oeste y uno al este del muelle, y dan la vuelta antes de llegar a él.
-- [x] T3-12 (A) Poste en la Cooperativa: el poste de luz sigue apareciendo justo frente a la cooperativa y su colisión bloquea completamente la entrada al jugador.
+- [x] T3-12 (A) Poste en la Cooperativa: el poste de luz sigue apareciendo justo frente a la cooperativa y su colisión bloquea completamente la entrada al usuario.
   Hecho (Antigravity): el poste se movió fuera de la puerta de la Cooperativa.
 - [x] T3-13 (A) Muro del límite derecho: el muro que delimita el lado derecho del mapa sigue visible y mal posicionado, cortando de forma poco natural áreas como la calle.
   Hecho (Antigravity): las calles del este terminan antes del acantilado.
@@ -146,23 +146,23 @@ Responsable: S = senior (Claude), A = Antigravity, J = solo se ve jugando.
     Hecho: el prestamista dice la tasa (20% al mes) y el total real (₡100 000 se vuelven ₡172 800 en 3 meses) cuando le preguntan.
 - [x] T3-17 (A) Vida en el mapa:
   Hecho (Antigravity).
-  - [x] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros jugando en la cancha de fútbol.
-    Hecho (Antigravity): gente en la playa y jugadores en la cancha.
+  - [x] T3-17a (A) Playa y cancha: NPC pasando el rato en la playa y otros simulando en la cancha de fútbol.
+    Hecho (Antigravity): gente en la playa y usuarios en la cancha.
   - [x] T3-17b (A) Torre de salvavidas: el NPC salvavidas no está en su puesto, la torre está vacía.
     Hecho (Antigravity): salvavidas en la torre.
 - [x] T3-18 (A) Animación de las gaviotas: las gaviotas de la playa están estáticas y parecen piedras. Agregarles animaciones de movimiento o vuelo.
   Hecho (Antigravity): gaviotas que picotean y vuelan cuando te acercás.
 
 ### Evento de cobradores y sistema de negociación
-- [x] T3-19 (S) Animación y sincronización con el prólogo: el evento de los cobradores debe ejecutarse literalmente como lo describe el texto: un carro negro polarizado frena físicamente frente al jugador, se bajan dos hombres y caminan hacia el personaje para realizar el cobro.
-  Hecho: el carro frena, se bajan dos cobradores, caminan hasta el jugador, hablan y después sale el menú; al elegir vuelven al carro.
+- [x] T3-19 (S) Animación y sincronización con el prólogo: el evento de los cobradores debe ejecutarse literalmente como lo describe el texto: un carro negro polarizado frena físicamente frente al usuario, se bajan dos hombres y caminan hacia el personaje para realizar el cobro.
+  Hecho: el carro frena, se bajan dos cobradores, caminan hasta el usuario, hablan y después sale el menú; al elegir vuelven al carro.
 - [x] T3-20 (S) Opción interactiva de negociación: al ser abordado por los cobradores, el menú de interacción debe incluir obligatoriamente una opción de "Negociar".
   Hecho: el menú de los cobradores tiene "Negociar con tus palabras"; el arreglo (mitad hoy, resto con recargo) aparece solo si lo pedís.
-- [x] T3-21 (S) Soporte de input por texto y voz: la negociación debe soportar input escrito (teclado) y reconocimiento de voz (micrófono), para que el jugador negocie con sus propias palabras.
+- [x] T3-21 (S) Soporte de input por texto y voz: la negociación debe soportar input escrito (teclado) y reconocimiento de voz (micrófono), para que el usuario negocie con sus propias palabras.
   Hecho: ventana de conversación con caja de texto y botón Hablar (micrófono). La voz se transcribe en el backend; sin backend pide escribir.
 
-### Sistema de guardado y salida del juego
-- [x] T3-22 (S) Mensaje de confirmación exacto: al intentar salir de la partida, mostrar obligatoriamente una alerta con el texto exacto: "¿Seguro? Se pierde la partida, ¿quieres guardar?".
+### Sistema de guardado y salida del simulador
+- [x] T3-22 (S) Mensaje de confirmación exacto: al intentar salir de la simulación, mostrar obligatoriamente una alerta con el texto exacto: "¿Seguro? Se pierde la simulación, ¿quieres guardar?".
   Hecho: "Volver al menú" abre el cuadro con el texto exacto.
 - [x] T3-23 (S) Opciones de interacción: el cuadro debe tener únicamente dos botones, "Sí" y "No": Sí guarda y cierra, No solo cierra.
   Hecho: solo "Sí" (guarda y sale) y "No" (sale sin guardar).

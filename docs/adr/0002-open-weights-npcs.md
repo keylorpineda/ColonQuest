@@ -6,7 +6,7 @@
 
 ## Context
 
-The Best Build on Meta Open Weights prize needs a central part of the game running on Muse Spark
+The Best Build on Meta Open Weights prize needs a central part of the simulator running on Muse Spark
 Open or Muse Glimmer through a partner (Baseten or Modal). Negotiation is the highest-volume
 model use, so moving it also protects the Meta API credits during judging.
 
@@ -14,9 +14,9 @@ model use, so moving it also protects the Meta API credits during judging.
 
 - `NPC_PROVIDER=open_weights` routes negotiation NPCs to `OpenWeightsProvider`, an
   OpenAI-compatible client (`OPEN_WEIGHTS_BASE_URL`, `OPEN_WEIGHTS_API_KEY`,
-  `OPEN_WEIGHTS_NPC_MODEL`). The game master, voice and images stay on the Meta API.
+  `OPEN_WEIGHTS_NPC_MODEL`). The simulation director, voice and images stay on the Meta API.
 - `FallbackProvider` gives the partner `OPEN_WEIGHTS_TIMEOUT_S` (5 s) and then sends the same
-  request to Meta, leaving room inside the 8 s turn deadline. Errors never reach the player.
+  request to Meta, leaving room inside the 8 s turn deadline. Errors never reach the user.
 - `model_calls.provider` records who answered (`open_weights` or `meta_api`), which is the
   evidence for the prize. Open-weights usage costs zero against `DAILY_BUDGET_USD` because it
   runs on partner credits.

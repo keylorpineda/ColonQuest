@@ -23,16 +23,16 @@ el pueblo se arma con el aspecto anterior (tinte de color y sprites sin luz).
 | Parte | Qué se ve | Dónde |
 | --- | --- | --- |
 | Luz del día | Una luz global 2D cambia de color e intensidad con la hora: mañana cálida, mediodía blanco, atardecer dorado a las 18:00 y noche azul. Nunca baja de 0,55 para que todo se lea | `DayCycle.LightFor`, `Lighting/DayLight.cs` |
-| Luces de noche | Postes, faroles coloniales, luces de porche y una luz suave alrededor del jugador se encienden de noche (con un parpadeo leve) y se apagan de día | `Lighting/NightLight.cs`, `MapBuilder.Lighting.cs` |
+| Luces de noche | Postes, faroles coloniales, luces de porche y una luz suave alrededor del usuario se encienden de noche (con un parpadeo leve) y se apagan de día | `Lighting/NightLight.cs`, `MapBuilder.Lighting.cs` |
 | Ventanas | De noche, tres de cada cuatro ventanas de las casas se iluminan en tono cálido | `WindowNightGlow` en `MapBuilder.Town.Props.cs` |
-| Árboles y palmeras | Una sola brisa cruza el mapa de oeste a este; cada copa se dobla desde el pie del tronco, la sigue con un resorte suave y se asienta en uno o dos vaivenes cuando el jugador pasa | `FoliagePhysics` (modo `UseGlobalWind`, `PivotDrop`) |
+| Árboles y palmeras | Una sola brisa cruza el mapa de oeste a este; cada copa se dobla desde el pie del tronco, la sigue con un resorte suave y se asienta en uno o dos vaivenes cuando el usuario pasa | `FoliagePhysics` (modo `UseGlobalWind`, `PivotDrop`) |
 | Mar | Espuma que sube por la arena y se retira, líneas de oleaje que llegan a la orilla, anillos en el agua y botes que se mecen | `ShoreLap`, `Swell`, `RippleField`, `BoatRock` |
 | Río | Corriente con estelas que bajan bajo los puentes | `WaterFlow` |
-| Jugador junto al agua | Anillos a los pies al caminar por la orilla del mar, el río o la laguna | `RippleField` |
-| Perro | Respira, mueve la oreja, parpadea, se duerme si nadie se acerca, levanta la cabeza y mueve la cola al acercarse el jugador, y al acariciarlo salta, saca la lengua y suelta un corazón | `DogAnimator`, `MapBuilder.Dog.cs` |
+| Usuario junto al agua | Anillos a los pies al caminar por la orilla del mar, el río o la laguna | `RippleField` |
+| Perro | Respira, mueve la oreja, parpadea, se duerme si nadie se acerca, levanta la cabeza y mueve la cola al acercarse el usuario, y al acariciarlo salta, saca la lengua y suelta un corazón | `DogAnimator`, `MapBuilder.Dog.cs` |
 | Personajes | De espaldas al caminar hacia arriba (nuca de pelo; se ocultan cara, flequillo, corbata y gafetes), paso con peso, pequeño rebote al frenar y leve inclinación al caminar de lado | `PlayerAnimator`, `BuildBackView` en `MapBuilder.People.cs` |
 | Polvo | Nubecitas de arena o polvo al caminar por la playa y la calle | `FootDust` |
-| Vegetación reactiva | Sacudida elástica al contacto del jugador, ráfagas de hojas con física y pasto que se aparta al caminar | `FoliagePhysics`, `LeafBurst`, `MapBuilder.Town.Props.cs` |
+| Vegetación reactiva | Sacudida elástica al contacto del usuario, ráfagas de hojas con física y pasto que se aparta al caminar | `FoliagePhysics`, `LeafBurst`, `MapBuilder.Town.Props.cs` |
 | Agua y cascada viva | Oleaje cáustico multicapa, resaca en arena húmeda, corriente de río con estelas en puentes y cascada con niebla, salpicaduras y arcoíris | `MapBuilder.World.cs`, `WaterFlow`, `Swell` |
 | Reacciones de personajes | Giros con inclinación elástica, parpadeo e idles con cambio de peso, y burbujas de reacción contextual | `PersonBob`, `ReactionBubble`, `MapBuilder.People.cs` |
 | Fachadas y envejecimiento | Texturas procedurales (estuco, zinc, madera, ladrillo, tejas), manchas de óxido/humedad, verjas coloniales, medidor de luz, bajantes y antenas | `SpriteFactory.cs`, `BuildingMath.cs`, `MapBuilder.Town.Props.cs` |
@@ -42,7 +42,7 @@ el pueblo se arma con el aspecto anterior (tinte de color y sprites sin luz).
 
 1. **Fase 1: Vegetación y follaje reactivo**:
    - `LeafBurst` suelta hojas que caen y se dispersan al rozar árboles y arbustos.
-   - `FoliagePhysics` reacciona tanto al viento global como a la presencia y velocidad del jugador.
+   - `FoliagePhysics` reacciona tanto al viento global como a la presencia y velocidad del usuario.
 2. **Fase 2: Agua, río y cascada**:
    - Mar con espuma volumétrica, resaca dinámica en arena mojada y vaivén de barcos.
    - Río animado con corriente y espuma alrededor de los pilotes de los puentes.

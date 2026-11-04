@@ -38,7 +38,7 @@ Before writing code against the Meta Model API we verified the four open questio
 - Values: `minimal`, `low`, `medium`, `high`, `xhigh`, `max`. `none` returns HTTP 400 on Wonder and Spark.
   `muse-spark-1.3-contributor` does not support `max`.
 - Reasoning tokens count toward `max_tokens` and are billed as output tokens; reported in
-  `usage.completion_tokens_details.reasoning_tokens`. The game master uses `low`.
+  `usage.completion_tokens_details.reasoning_tokens`. The simulation director uses `low`.
 
 ### 3. Speech to text: `POST /v1/asr/transcribe`
 

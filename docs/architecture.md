@@ -1,6 +1,6 @@
 # Architecture
 
-How ColonQuest is put together, what keeps a model from breaking the game, and what one run costs.
+How ColonQuest is put together, what keeps a model from breaking the simulator, and what one run costs.
 The decisions behind each part are in [`docs/adr/`](adr/); this page is the map.
 
 ## The pieces
@@ -13,7 +13,7 @@ flowchart LR
         Local["Local fallbacks<br/>events, seller, collectors"]
     end
 
-    subgraph Backend["FastAPI backend on Render"]
+    subgraph Backend["FastAPI backend on your computer"]
         API["/api endpoints<br/>Pydantic v2 contracts"]
         Guard["Cost guard<br/>daily budgets, per-session and per-IP limits"]
         GM["Game master + tools<br/>season planner"]
@@ -39,10 +39,10 @@ flowchart LR
 | Piece | Where | What it owns |
 | --- | --- | --- |
 | Finance engine | `unity/Assets/Scripts/Finance/` | Salary with CCSS and income tax, card interest, minimum payment, installments, aguinaldo, informal loans. Every amount is a `long` of colones |
-| Game client | `unity/Assets/Scripts/` | The town, the panels, the guided run, the local fallbacks and the calls panel (key **L**) |
+| Simulator client | `unity/Assets/Scripts/` | The town, the panels, the guided run, the local fallbacks and the calls panel (key **L**) |
 | API | `server/app/api/` | The contract the client talks to; every request and reply is a Pydantic model |
 | Cost guard | `server/app/cost_guard.py` | Estimates each call with the official prices and keeps the daily spend |
-| Game master | `server/app/game_master/` | The monthly event, its read-only tools, the season planner and the amount limits |
+| Simulation director | `server/app/game_master/` | The monthly event, its read-only tools, the season planner and the amount limits |
 | Characters | `server/app/negotiation/`, `server/app/talks/` | The seller's hidden sheet and agent, and the collectors, lender and pyramid promoter |
 | Telemetry | `server/app/db/` | Sessions, decisions, negotiations and every model call, for Class Mode and for this page |
 
@@ -51,14 +51,14 @@ flowchart LR
 1. The client sends the month's `PlayerState`, computed by the engine.
 2. The cost guard checks the daily budget, the calls of the session (40 at most) and of the client's IP
    (200 a day).
-3. The game master asks Muse Spark for an event. In the agentic version the model may call tools such
+3. The simulation director asks Muse Spark for an event. In the agentic version the model may call tools such
    as `simulate_purchase` or `project_debt`, with at most 5 steps inside 10 seconds; the tools read and
-   compute, and never write the player's state.
+   compute, and never write the user's state.
 4. The reply is validated against the `GameEvent` schema. If it does not validate, it is retried once
    and then replaced by one of 48 hand-written events.
 5. Every amount is clamped to the range of its event type: an emergency stays between ₡20 000 and
    ₡250 000, an installment between ₡5 000 and ₡80 000 a month (`server/app/game_master/limits.py`).
-6. The client waits 8 seconds at most. If nothing valid arrives, it plays a local event.
+6. The client waits 8 seconds at most. If nothing valid arrives, it runs a local event.
 7. The engine validates the effects again and applies them in whole colones.
 
 The same pattern holds for every model: the model proposes words, the engine and the sheets own the
@@ -73,7 +73,7 @@ rejects any amount or percentage that is not in the sheet the client sent.
 | A malformed answer | Schema validation, one retry, then a predefined fallback |
 | A slow model | Only Muse Spark is on a live path (3 to 4.4 s measured); Wonder runs in the background or behind a loading screen |
 | An empty reply | Every call leaves at least 2 000 tokens for reasoning, 3 072 more on Baseten |
-| Runaway spend | `DAILY_BUDGET_USD`: at 80% the game master moves to Muse Spark, at 100% only fallback events. Baseten has its own `OPEN_WEIGHTS_DAILY_BUDGET_USD` |
+| Runaway spend | `DAILY_BUDGET_USD`: at 80% the simulation director moves to Muse Spark, at 100% only fallback events. Baseten has its own `OPEN_WEIGHTS_DAILY_BUDGET_USD` |
 | A leaked key | Keys live only in the backend's environment; the client only knows a URL |
 | The open-weights provider fails | The characters fall back to the Meta API, and `model_calls` records which provider answered |
 
@@ -100,6 +100,6 @@ backend can serve roughly 80 to 120 full runs a day before it falls back to Muse
 
 - [ADR 0001: Meta API contracts](adr/0001-meta-api-contracts.md)
 - [ADR 0002: open-weights characters](adr/0002-open-weights-npcs.md)
-- [ADR 0003: agentic game master](adr/0003-agentic-game-master.md)
+- [ADR 0003: agentic simulation director](adr/0003-agentic-game-master.md)
 - [ADR 0004: model roles by measured latency](adr/0004-model-roles.md)
 - [Deployment](deployment.md)

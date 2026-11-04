@@ -31,7 +31,7 @@ Plan de demo y video que sale de esta investigación: [DEMO_Y_VIDEO_POR_PERFIL.m
 | B. Inversor o fundador | Capital de riesgo y comunidad CV | Quién paga, una frase, escala, viralidad | Corto | Media | No (decidido el 1 nov) |
 | C. Impacto y educación | Panel de impacto (30% del puntaje) | Evidencia con estudiantes, problema real, docentes | Medio | Media | Sí |
 | D. Revisor masivo asíncrono | Ve muchos envíos, primero el video, luego prueba el link | Que abra, que se entienda en 10 s, que no se rompa | Muy corto | Alta | Sí |
-| E. Jugador o diseñador creativo | Juzga el lente Indie | Que se sienta juego, personalidad, pulido | Corto | Media | Sí |
+| E. Usuario o diseñador creativo | Juzga el lente Indie | Que se sienta simulador, personalidad, pulido | Corto | Media | Sí |
 
 ## 4. Fuentes sobre los evaluadores
 
@@ -42,7 +42,7 @@ Plan de demo y video que sale de esta investigación: [DEMO_Y_VIDEO_POR_PERFIL.m
 | Eventos previos de Meta y CV (Llama 3, LlamaCon, Llama Impact) | Tipo de panel: Meta y socios patrocinadores; criterios: creatividad, potencial, implementación, pitch | Media, sin nombres |
 | Notas de un juez real (DEV Community, 3 hackatones) | Lo que decide son: que la demo corra, decir qué es en la primera frase, alcance angosto | Media, un solo juez |
 | Guías de juzgamiento asíncrono (Builderbase, Reskilll, HackerEarth) | Ver el video completo antes de puntuar; probar todo antes | Baja a media |
-| Guías de game jams (itch.io) | Bucle entendible en 30 s; los builds en navegador reciben más valoraciones | Media |
+| Guías de simulator jams (itch.io) | Bucle entendible en 30 s; los builds en navegador reciben más valoraciones | Media |
 | Criterios de edtech (Chartered College, DigiEduHack, GDG) | La evidencia de piloto pesa más que el brillo | Media |
 
 ## 5. Proyectos ganadores documentados
@@ -72,16 +72,16 @@ Fuentes: [LlamaCon, Meta](https://ai.meta.com/blog/llamacon-hackathon/), [Llama 
 | # | Patrón | Evidencia | Lectura para ColonQuest |
 | --- | --- | --- | --- |
 | 1 | Usuario y problema concretos, no "para todos" | Agricultores, urgencias del NHS, construcción, fraude | Estudiantes de Costa Rica frente a cuotas con cargos escondidos y gota a gota |
-| 2 | El modelo hace trabajo, no solo conversa | Atlas es "agente clínico"; OrgLens arma un grafo; Compliance Wizards analiza transacciones | Game master con herramientas, vendedor agente, planificador de temporada |
-| 3 | Voz, visión o varios idiomas | OpenGlass (visión), Compliance Wizards (voz), Farmipole y Guardian (multilingüe) | Negociación por voz y juego en inglés y español |
+| 2 | El modelo hace trabajo, no solo conversa | Atlas es "agente clínico"; OrgLens arma un grafo; Compliance Wizards analiza transacciones | Director de la simulación con herramientas, vendedor agente, planificador de temporada |
+| 3 | Voz, visión o varios idiomas | OpenGlass (visión), Compliance Wizards (voz), Farmipole y Guardian (multilingüe) | Negociación por voz y simulador en inglés y español |
 | 4 | Un momento "wow" que se entiende en segundos | Lentes que describen un frutero; extensión que te lleva a la información | La revelación de la ficha oculta del vendedor |
 | 5 | Se puede probar y funciona | Demo web, extensión instalable | Link que abre sin login, respaldo local |
 | 6 | Encaja con la herramienta del organizador | Premio aparte de "mejor uso de Llama API" | Cinco modelos de Meta con un trabajo cada uno, más Muse Spark Open |
-| 7 | Alcance angosto y terminado | Todos son una sola cosa bien hecha | Un mes jugable pulido, no un año a medias |
+| 7 | Alcance angosto y terminado | Todos son una sola cosa bien hecha | Un mes funcional pulido, no un año a medias |
 
-Observación: entre los ganadores documentados no aparece ningún juego ni producto de entretenimiento.
-Ganan herramientas con un usuario y una utilidad claros. Decisión del equipo (1 nov): ColonQuest no se presenta como
-un juego sino como un simulador de finanzas personales con IA, para aprender a manejar un salario durante el mes y a evitar estafas.
+Observación: entre los ganadores documentados no aparece ningún simulador ni producto de entretenimiento.
+Ganan herramientas con un usuario y una utilidad claros. Decisión del equipo (1 nov): ColonQuest se presenta como
+un simulador de finanzas personales con IA, para aprender a manejar un salario durante el mes y a evitar estafas.
 El formato interactivo es el método de enseñanza, no el producto.
 
 ## 7. Modelo de la "ecuación"
@@ -99,7 +99,7 @@ y que haya evidencia de que la solución sirve.
 | --- | --- | --- | --- | --- |
 | 1a. Problema documentado | Cifra oficial, usuario concreto, vigente | 3 de 3 | OCF, Tercera Encuesta Nacional de Endeudamiento 2025: 87% tiene alguna deuda y destina en promedio 34% de sus ingresos a pagarla. CINPE y UNA: más del 80% no ha tenido educación financiera | Citar la fuente en el video y el README, con el matiz de que el 87% mide cualquier deuda; el dato fuerte es el 34% del ingreso |
 | 1b. Evidencia de que la solución sirve | Resultados con usuarios reales | 1 de 3 (sin datos) | Prueba piloto con adultos, aún sin cifras en el repositorio | N y porcentajes agregados, sin nombres |
-| 2. Agente que trabaja | Herramientas, decisiones de varios pasos, números exactos | 3 de 3 | Game master con herramientas, vendedor agente, planificador de temporada, motor C# | Mostrarlo dentro de la escena (chips), no solo en el panel |
+| 2. Agente que trabaja | Herramientas, decisiones de varios pasos, números exactos | 3 de 3 | Director de la simulación con herramientas, vendedor agente, planificador de temporada, motor C# | Mostrarlo dentro de la escena (chips), no solo en el panel |
 | 3. Wow de 10 s | Un momento que se entiende sin explicar | 2 de 3 | Negociación por voz con ficha oculta ya existe | Animación de revelación con barra de costo real |
 | 4. Funciona en vivo | Link que abre, sin errores, con respaldo | Sin verificar | Respaldo local ya existe | Link web público, keep-alive de Render, prueba en incógnito |
 | Bono Meta | Varios modelos con rol claro, open weights | 3 de 3 | Cinco modelos, Muse Spark Open en Baseten | Declararlo en el envío |

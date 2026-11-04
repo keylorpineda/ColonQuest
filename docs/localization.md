@@ -1,13 +1,13 @@
 # Localization: Spanish and English
 
-The game text exists in Spanish (Costa Rica) and English. The player changes it in Ajustes (Settings), the button
+The simulator text exists in Spanish (Costa Rica) and English. The user changes it in Ajustes (Settings), the button
 "Idioma: Español" / "Language: English". The choice is kept with the other settings (`GameSettings`, text form
 `1;1.00;en`; Spanish adds nothing).
 
 ## How it works
 
 - `Loc.T("texto en español")` returns the English text when the language is English and the Spanish text otherwise.
-  The Spanish text is the key. A text with no entry stays in Spanish: a missing translation never breaks the game.
+  The Spanish text is the key. A text with no entry stays in Spanish: a missing translation never breaks the simulator.
 - `Loc.F("Mes {0} de {1}", a, b)` is for texts with holes: it translates the template and then fills the holes.
   The `{n}` holes must be the same in both languages (a test checks it).
 - Every label made with `UiKit.Label` or `UiKit.MakeButton` is translated when it is created and writes itself again
@@ -47,7 +47,7 @@ objects. A test (`TranslationCoverageTests`) fails when one of those data driven
 
 ## What is not translated yet
 
-- Text that comes from the backend (the game master events, the seller replies and the final summary when the server
+- Text that comes from the backend (the simulation director events, the seller replies and the final summary when the server
   answers). The backend answers in Spanish and `server/` is not touched from here, so it needs its own translation step.
 - The letters painted on signs inside the scenes (for example "SE VENDE", "BANCO DEL PUEBLO"): they are part of the
   generated scenes, not labels.

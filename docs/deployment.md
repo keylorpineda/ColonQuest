@@ -1,4 +1,7 @@
-# Deployment guide (Render + WebGL)
+# Optional self-hosting guide
+
+ColonQuest is evaluated on a local run, see [Run and build](../RUN_AND_BUILD.md). There is no hosted instance; this
+guide is only for someone who wants to host their own copy.
 
 ## Backend on Render (`render.yaml`)
 
@@ -34,5 +37,5 @@ FastAPI backend (`server/`) from `main` only after GitHub Actions CI passes (`au
 Run the end-to-end HTTP smoke test against the live URL:
 
 ```bash
-API_URL=https://colon-quest-api.onrender.com python scripts/smoke_test.py
+API_URL=https://your-service.onrender.com python scripts/smoke_test.py
 ```

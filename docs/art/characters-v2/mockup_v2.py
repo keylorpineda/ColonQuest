@@ -1,4 +1,4 @@
-"""Mockup of the v2 cast (reference only, not used by the game).
+"""Mockup of the v2 cast (reference only, not used by the simulator).
 
 Draws the 20 characters with the same primitives Unity has (circle, rounded rect, square, rotation)
 so the numbers can be copied into MapBuilder.People.cs. Units match Unity world units.

@@ -1,7 +1,7 @@
 # Demo y video por perfil de evaluador
 
 Decidido el 1 de noviembre de 2026. Perfiles elegidos: A (ingeniero o investigador de Meta),
-C (impacto y educación), D (revisor masivo asíncrono) y E (jugador o diseñador creativo).
+C (impacto y educación), D (revisor masivo asíncrono) y E (usuario o diseñador creativo).
 El perfil B (inversor) queda fuera: no se diseña nada para él, pero tampoco se le estorba.
 
 ## Honestidad sobre la base
@@ -25,7 +25,7 @@ Hay dos entregas separadas y cada perfil las usa distinto:
 | D Revisor masivo | El video | Pocos minutos, y solo si el link abre | Que abra, que se entienda en 10 s, que no se rompa |
 | A Meta | El video, luego el app | Busca debajo del capó | Roles por modelo, validación, costos, open weights |
 | C Impacto | El video | Va al Modo Clase y al piloto | Evidencia con estudiantes, problema real |
-| E Creativo | El video | Juega unos minutos | Que se sienta juego, personalidad, pulido |
+| E Creativo | El video | Juega unos minutos | Que se sienta simulador, personalidad, pulido |
 
 ## Demo: la "Judge Run" de 90 segundos
 
@@ -37,7 +37,7 @@ ve el 80% de los jueces. El Demo Lab queda como puerta aparte ("Under the hood")
 | 0:00 | Botón en el menú, carga corta con una frase tica y un dato financiero | D |
 | 0:05 | Apertura tipo película acortada (con opción de saltar) | E |
 | 0:10 | Cae el salario, suena el SINPE, el contador de colones corre | E |
-| 0:20 | El game master lanza un evento adaptado al jugador. Chip: modelo, segundos, costo | A |
+| 0:20 | El director de la simulación lanza un evento adaptado al usuario. Chip: modelo, segundos, costo | A |
 | 0:35 | Llega el vendedor. Tres preguntas sugeridas en pantalla para que nadie se quede en blanco; voz o texto | D, E |
 | 0:55 | Revelación: la ficha oculta se abre línea por línea, el precio de contado se tacha y la cuota real sube en una barra "lo prometido vs el costo real" | E, C |
 | 1:10 | El motor aplica el efecto en colones enteros. Chip desplegable con el rastro de herramientas (`simulate_purchase`) | A |
@@ -65,8 +65,8 @@ Recortable a 90 s si el formulario pide menos.
 
 | Tiempo | Contenido | Perfil |
 | --- | --- | --- |
-| 0:00 a 0:10 | Gancho completo: el vendedor suelta el seguro escondido, el jugador lo cacha y la cuota real sube en pantalla. Primera frase en voz: "ColonQuest teaches you to catch the hidden fee by talking to the seller" | D, E |
-| 0:10 a 0:35 | Un mes jugado: salario, evento, decisión, consecuencia. Sin sermón | E |
+| 0:00 a 0:10 | Gancho completo: el vendedor suelta el seguro escondido, el usuario lo cacha y la cuota real sube en pantalla. Primera frase en voz: "ColonQuest teaches you to catch the hidden fee by talking to the seller" | D, E |
+| 0:10 a 0:35 | Un mes simulado: salario, evento, decisión, consecuencia. Sin sermón | E |
 | 0:35 a 1:05 | Negociación por voz real, con la transcripción y la respuesta | A, E |
 | 1:05 a 1:35 | Arquitectura animada: 5 modelos, un trabajo cada uno por latencia, el motor C# que lleva las cuentas, el fallback a la API de Meta | A |
 | 1:35 a 2:05 | Modo Clase y dato de la prueba piloto (N y porcentajes agregados, sin nombres ni rostros) | C |

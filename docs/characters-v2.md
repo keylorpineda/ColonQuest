@@ -1,6 +1,6 @@
 # Personajes v2: contexto y pasos de implementación
 
-Guía para llevar al juego el rediseño de los personajes: cabeza, pelo, brazos, proporciones y
+Guía para llevar al simulador el rediseño de los personajes: cabeza, pelo, brazos, proporciones y
 un elenco de 20 personajes con identidad propia. Está escrita para quien lo implemente en Unity
 (Jefferson, Keylor o una sesión de Claude Code) sin haber visto la conversación donde se diseñó.
 
@@ -8,7 +8,7 @@ un elenco de 20 personajes con identidad propia. Está escrita para quien lo imp
 - **Rama base:** `feat/SCRUM-58-alpha-fixes`. Ahí está el código de personajes más reciente; en
   `develop` es una versión anterior.
 - **Referencias visuales:** `docs/art/characters-v2/`. Las imágenes son una aproximación dibujada
-  con PIL usando solo las formas que tiene Unity. No son capturas del juego.
+  con PIL usando solo las formas que tiene Unity. No son capturas del simulador.
 
 | Archivo | Qué muestra |
 | --- | --- |
@@ -66,7 +66,7 @@ private struct Look { public string Skin; public Accessory Extra; public string 
 | Pelo | **Error:** el moño sale encima del casco o la gorra | `DrawHairStyle` caso 2 dibuja `Bun` sin mirar si hay sombrero (le pasa a Don Rafa) |
 | Siluetas | Todos son la misma figura | Mismas proporciones para todos |
 | Roles | El prestamista y el juez usan la misma capucha; el oficial y la enfermera, la misma gorra | Solo hay 6 accesorios |
-| Retratos | No combinan con el juego | `STYLE_PROMPT` de `server/app/images/service.py` pide "16-bit pixel art" y el juego es vectorial |
+| Retratos | No combinan con el simulador | `STYLE_PROMPT` de `server/app/images/service.py` pide "16-bit pixel art" y el simulador es vectorial |
 
 ---
 
@@ -210,7 +210,7 @@ llamadas a `BuildNpc`/`BuildPedestrian`; los que dicen *nuevo* no existen todav�
 
 | # | Personaje | En el código | Piel | Pelo (color, estilo) | Camisa / pantalón | Proporción (W, Hh, headW) | Sombrero | Expresión | Extras |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Jugador | `Player` | `#D9A47A` | `#3A2418`, Side | `#E07A3F` / `#2F3E66` | 1, 1, 1 | — | Smile, mira al frente | Backpack |
+| 1 | Usuario | `Player` | `#D9A47A` | `#3A2418`, Side | `#E07A3F` / `#2F3E66` | 1, 1, 1 | — | Smile, mira al frente | Backpack |
 | 2 | Kevin, vendedor de cuotas | `Vendedor` (Tienda) | `#EBC29A` | `#2A1F1A`, Spiky | `#2E86C1` / `#3A3F52` | 0.92, 1.06, 1 | — | Smile, mira de lado (0.018) | Tie `#E8505B`, Badge, Phone |
 | 3 | Don Rafa, mecánico | `DonRafa`, `Mecanico` | `#8A5A3C` | `#2A1F1A`, Buzz | `#5B6E8C` / `#3E4A63` | 1.14, 0.94, 1.05 | Cap `#C0392B`, visera a la izquierda | Frown | Mandíbula cuadrada, bigote, Overall `#3E5A86` |
 | 4 | Doña Marta, pulpería | `DonaMarta` | `#C98E66` | `#9A9A9A`, Bun | `#D9707F` / `#5B4B4B` | 1.1, 0.9, 1 | — | Warm | Lentes, cachetes, Apron |
@@ -308,7 +308,7 @@ private static readonly Dictionary<string, Look> Cast = new Dictionary<string, L
 
 En `BuildNpc` y `BuildPedestrian`, si `Cast` tiene el `name`, usar esa ficha en lugar del `look`
 que llega. Así no hay que tocar las 40 llamadas, y los NPC que comparten nombre (`Oficial`,
-`Doctor1..`) reciben la misma ficha. Para el jugador, cambiar `PlayerLook`.
+`Doctor1..`) reciben la misma ficha. Para el usuario, cambiar `PlayerLook`.
 
 ### Paso 3. Cuerpo y brazos
 
@@ -374,8 +374,8 @@ Reescribir `BuildHead` y `Eye` con la tabla de la sección 3:
 1. Abrir Unity y correr `ColonQuest > Build All Scenes`.
 2. Correr los tests de EditMode y PlayMode. Hoy pasan 146 y 51; tienen que seguir pasando.
 3. **Mirarlo en pantalla** (esto no lo cubre ningún test):
-   - Caminar con el jugador: que los brazos se balanceen sin despegarse y el codo no se vea raro.
-   - Acercarse a un NPC: saludo con el codo doblado, ojos que siguen al jugador, parpadeo.
+   - Caminar con el usuario: que los brazos se balanceen sin despegarse y el codo no se vea raro.
+   - Acercarse a un NPC: saludo con el codo doblado, ojos que siguen al usuario, parpadeo.
    - Hablar con el vendedor: la boca de media luna se mueve y no desaparece en reposo.
    - Que la sombra, el orden por altura (`YSort`) y las colisiones sigan bien con los personajes más
      anchos o más altos.
