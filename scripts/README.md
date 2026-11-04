@@ -5,4 +5,5 @@ Scripts read secrets from environment variables, never from arguments or files i
 
 - `build_readme_art.py`: regenerates the cards of the README and the docs (`docs/assets/*.svg`).
 - `run_tests.py`: runs only the test suites a change can affect, and skips those that already passed as they are.
-- `build_game.py`: builds the Windows game from `colonquest.env` and zips it in `dist/`.
+- `run_local.py`: starts the backend on this computer, with SQLite and no hosted service.
+- `build_game.py`: builds the Windows simulator from `colonquest.env` and zips it in `dist/`.

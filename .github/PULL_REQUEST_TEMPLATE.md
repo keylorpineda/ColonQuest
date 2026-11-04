@@ -18,7 +18,7 @@
 ## Area
 
 - [ ] `server` (FastAPI backend)
-- [ ] `unity` (game client)
+- [ ] `unity` (simulator client)
 - [ ] `engine` (C# finance engine)
 - [ ] `shared` (API contract — teammate notified)
 - [ ] `scripts` / `docs` / `ci`
