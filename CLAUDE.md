@@ -83,8 +83,11 @@ https://api.meta.ai/v1      sesiones, decisiones, clases
 - **Base de datos:** SQLite local por defecto (`server/colonquest_local.db`, tablas creadas al arrancar). PostgreSQL sigue
   disponible con `DATABASE_URL`, psycopg 3 y migraciones con Alembic.
 - **Ejecución (decidido el 3 de noviembre):** no hay backend desplegado. Los evaluadores corren todo en su computadora: el
-  simulador usa `http://localhost:8000/api` por defecto, `python scripts/run_local.py` levanta el backend con SQLite, y sin
-  `MODEL_API_KEY` usa el contenido escrito a mano. `render.yaml` queda solo como opción para alojar una copia propia.
+  simulador usa `http://localhost:8000/api` por defecto. El zip del release trae el juego en `game/`, el backend en
+  `server/` y `start_colonquest.bat`, que instala uv si falta, pide la llave de Meta del evaluador (y la de Baseten,
+  opcional), la valida gratis contra `/v1/models`, levanta el backend con SQLite y abre el exe; al cerrar el juego se
+  apaga el backend. Las imágenes pre-generadas viajan en `server/app/images/bundled` (`scripts/export_images.py`).
+  Sin `MODEL_API_KEY` usa el contenido escrito a mano. `render.yaml` queda solo como opción para alojar una copia propia.
   Guía en `RUN_AND_BUILD.md`.
 
 ### Antes de escribir código contra la API: verificar en la documentación
@@ -440,8 +443,8 @@ uv run python scripts/smoke_models.py --audio pregunta.wav
 python ../scripts/smoke_test.py
 ```
 
-Los evaluadores levantan el backend con `python scripts/run_local.py`. El ejecutable se arma con
-`python scripts/build_game.py` desde `colonquest.env`, que solo dice a qué backend habla el simulador. Guía en `RUN_AND_BUILD.md`.
+Los evaluadores hacen doble clic en `start_colonquest.bat` (o `python scripts/run_local.py` desde el repo). El zip se arma con
+`python scripts/build_game.py` (necesita Unity Hub abierto con sesión para la licencia) desde `colonquest.env`, que solo dice a qué backend habla el simulador. Guía en `RUN_AND_BUILD.md`.
 
 Variables de entorno (`server/.env`, nunca en el repo): `MODEL_API_KEY`, `DATABASE_URL`,
 `GAME_MASTER_MODEL`, `SUMMARY_MODEL`, `LIVE_REASONING_EFFORT`, `IMAGE_TIMEOUT_S`,

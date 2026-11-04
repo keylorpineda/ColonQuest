@@ -76,8 +76,9 @@ commission only come out if you ask.
 
 ### Try it in about three minutes
 
-It runs on your own computer; there is no hosted service. [Download the Windows build](https://github.com/keylorpineda/ColonQuest/releases/latest), unzip it and,
-for the live AI, [start the local backend](RUN_AND_BUILD.md#3-start-the-local-backend) with your Meta key. Open `ColonQuest.exe` and choose **Guided simulation**,
+It runs on your own computer with your own Meta key; there is no hosted service. [Download the Windows build](https://github.com/keylorpineda/ColonQuest/releases/latest),
+unzip it, double-click `start_colonquest.bat` and paste your key when it asks. It installs what it needs, starts the
+local backend and opens the simulator ([details](RUN_AND_BUILD.md#1-evaluate-it-with-your-own-key)). Choose **Guided simulation**,
 the first entry of the main menu. It is the real simulator on a short
 stretch of the town, for three months, and you only make the decisions:
 
@@ -173,12 +174,13 @@ are in [Architecture](docs/architecture.md).
 
 ### Run it and build it
 
-Everything runs on your computer. Without a backend the simulator uses its local content; this starts the
-local backend, with its data in a SQLite file and no database to install. Put your Meta key in `server/.env`
-for the live AI; the keys never go inside the executable. The full guide: [Run and build](RUN_AND_BUILD.md).
+Everything runs on your computer with your own keys. `start_colonquest.bat` installs uv if it is missing, asks for
+your Meta key, starts the local backend (SQLite, no database to install) and opens the simulator. The keys stay in
+`server/.env` and never go inside the executable. On other systems, `python scripts/run_local.py` does the same.
+The full guide: [Run and build](RUN_AND_BUILD.md).
 
 ```bash
-python scripts/run_local.py
+start_colonquest.bat
 ```
 
 ```bash

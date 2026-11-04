@@ -11,7 +11,7 @@ inglés; el texto entre comillas es la clave en español y, si aparece, su versi
 
 ## Antes de empezar (10 s)
 
-1. Backend local abierto: `run_local.bat` con tu `MODEL_API_KEY` en `server/.env`, e internet para que el backend llegue a los modelos.
+1. Backend local abierto: `start_colonquest.bat` con tu `MODEL_API_KEY`, e internet para que el backend llegue a los modelos.
 2. Backend listo: `GET http://localhost:8000/api/ping` responde sin tocar la base ni los modelos.
 3. Micrófono opcional: todo se puede escribir. Si no hay micrófono, el botón "Hablar" muestra "No pude usar el micrófono, escribilo."
 

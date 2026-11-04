@@ -76,8 +76,9 @@ la comisión reales solo salen si preguntás.
 
 ### Probalo en unos tres minutos
 
-Corre en tu propia computadora; no hay ningún servicio en línea. [Bajá el simulador para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest), descomprimilo y,
-para la IA en vivo, [levantá el backend local](RUN_AND_BUILD.es.md#3-levantar-el-backend-local) con tu llave de Meta. Abrí `ColonQuest.exe` y elegí **Simulación guiada**,
+Corre en tu propia computadora con tu propia llave de Meta; no hay ningún servicio en línea. [Bajá el simulador para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest),
+descomprimilo, hacé doble clic en `start_colonquest.bat` y pegá tu llave cuando te la pida. Instala lo que necesita,
+levanta el backend local y abre el simulador ([detalles](RUN_AND_BUILD.es.md#1-evaluarlo-con-tu-propia-llave)). Elegí **Simulación guiada**,
 lo primero del menú. Es el simulador real en un tramo corto del pueblo,
 durante tres meses, y vos solo tomás las decisiones:
 
@@ -173,12 +174,13 @@ de una simulación (unos $0,06) están en [Arquitectura](docs/architecture.md), 
 
 ### Correrlo y armarlo
 
-Todo corre en tu computadora. Sin backend, el simulador usa su contenido local; esto levanta el backend local,
-con sus datos en un archivo SQLite y sin base de datos que instalar. Poné tu llave de Meta en `server/.env` para
-la IA en vivo; las llaves nunca van dentro del ejecutable. La guía completa: [Correr y armar](RUN_AND_BUILD.es.md).
+Todo corre en tu computadora con tus propias llaves. `start_colonquest.bat` instala uv si falta, te pide la llave
+de Meta, levanta el backend local (SQLite, sin base de datos que instalar) y abre el simulador. Las llaves se quedan
+en `server/.env` y nunca van dentro del ejecutable. En otros sistemas, `python scripts/run_local.py` hace lo mismo.
+La guía completa: [Correr y armar](RUN_AND_BUILD.es.md).
 
 ```bash
-python scripts/run_local.py
+start_colonquest.bat
 ```
 
 ```bash
