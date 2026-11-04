@@ -9,8 +9,8 @@ no se conoce cuántos proyectos se enviarán y no se pudo leer el portal de env�
 
 ## Hallazgo que condiciona todo
 
-Ejecutar el juego desde el repositorio exige hoy **abrir el proyecto con Unity 6000.3.27f1** (`unity/ProjectSettings/ProjectVersion.txt`).
-El README solo explica cómo correr el backend; **no explica cómo correr el juego**. No hay ninguna versión publicada (`gh release list` vacío).
+Ejecutar el simulador desde el repositorio exige hoy **abrir el proyecto con Unity 6000.3.27f1** (`unity/ProjectSettings/ProjectVersion.txt`).
+El README solo explica cómo correr el backend; **no explica cómo correr el simulador**. No hay ninguna versión publicada (`gh release list` vacío).
 Un juez que no tenga ese editor no puede probar nada. Esto aplasta el criterio de Demo si no se resuelve.
 
 ## Puntaje por criterio (0 a 100, cómo lo puntuaría un juez)
@@ -36,7 +36,7 @@ Cálculo con acciones: 0,30 x 84 + 0,25 x 86 + 0,25 x 80 + 0,20 x 88 = 84,3.
 
 ## Probabilidad de ganar
 
-Supuestos: la final en vivo la juegan 10 proyectos; el track Indie paga 5 premios (150, 100, 75, 50 y 25 mil dólares);
+Supuestos: la final en vivo la simulan 10 proyectos; el track Indie paga 5 premios (150, 100, 75, 50 y 25 mil dólares);
 los ganadores documentados de eventos anteriores eran herramientas con usuario claro y demo que corre. El número de envíos
 es desconocido: en eventos previos enviaron entre el 14% y el 45% de los asistentes (LlamaCon 44 de 238, Llama 3 51 de 354,
 Opus 4.6 de Cerebral Valley 227 de 500). Con hasta 20 000 aceptados, la competencia podría ir de cientos a miles de envíos.
@@ -65,7 +65,7 @@ Los puntos son estimaciones nuestras.
 | 6 | Corregir el README: encuadre de simulador, dato de la OCF (87% con deudas, 34% del ingreso), enlaces arriba | Ambos | Bajo | Impacto +2 a +4, Técnica +1 | 14 |
 | 7 | Animación de revelación con barra de costo real | Jefferson | Medio | Demo e Impacto +2 a +5 | 7 |
 | 8 | Chips de evidencia dentro de la escena (modelo, latencia, costo, herramientas) | Jefferson | Medio | Meta +2 a +4 | 10 |
-| 9 | Declarar Muse Code, los cinco modelos y el costo por partida (~$0,04) en el envío | Ambos | Bajo | Meta +2 | 13 |
+| 9 | Declarar Muse Code, los cinco modelos y el costo por simulación (~$0,04) en el envío | Ambos | Bajo | Meta +2 | 13 |
 | 10 | Quitar el `double` de la cuota y documentar los créditos fiscales | Keylor | Bajo | Técnica +2 a +4 | 15 |
 | 11 | Actualizar CLAUDE.md (plazo del 4 de nov, premios sin confirmar, ventana de 10 días) | Keylor | Bajo | Credibilidad | 16 |
 | 12 | Keep-alive de Render, créditos de Meta y prueba sin internet | Keylor | Bajo | Protege Demo | 2, 3, 4 |

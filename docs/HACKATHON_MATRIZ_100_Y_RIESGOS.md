@@ -15,9 +15,9 @@ A continuación se detallan los riesgos operativos, técnicos y legales no evide
 | ID | Riesgo Latente | Severidad | Probabilidad | Impacto en Evaluación | Medida de Mitigación Obligatoria (Solución) | Estado |
 | :--- | :--- | :---: | :---: | :--- | :--- | :---: |
 | **R-01** | **Vencimiento de Créditos de Meta (10 días)**<br>Los $150 de Meta duran "una ventana de 10 días" (desde el 26 oct expirarían el 5 nov). Los jueces evalúan del 4 al 8 de nov. | **CRÍTICA**<br>(10/10) | Media-Alta | **Demo (25%) / Meta AI (25%)**<br>Si un juez entra el 6 o 7 de nov, la API rechaza las llamadas con error 401/403/Quota y no ve la IA. | **Doble API Key en Backend + Baseten:**<br>1. Jefferson ya tiene sus propios $150 de Meta. Configurar en `server/` soporte de llave secundaria (`MODEL_API_KEY_FALLBACK`).<br>2. Vendedores corren en Baseten ($100 sin ventana de 10 días).<br>3. Fallback gracioso a contenido local (`LocalSeller`) garantizado. | 🟡 Pendiente config de fallback key |
-| **R-02** | **Desconexión / Cold Start del Backend en Render**<br>Los servidores gratuitos o de baja demanda de Render entran en suspensión ("spin down") tras 15 min sin tráfico. Tardan 50s en reiniciar. | **CRÍTICA**<br>(10/10) | Alta | **Demo (25%)**<br>Un juez no espera 50 segundos en WebGL; asumirá que el juego no sirve y cerrará la pestaña. | **Keep-Alive Automatizado (Monitor Ping):**<br>Configurar un monitor gratuito (UptimeRobot o cron de GitHub Actions) haciendo `GET /api/health` cada 8 minutos desde el 4 hasta el 9 de noviembre. | 🟡 Pendiente activar ping |
+| **R-02** | **Desconexión / Cold Start del Backend en Render**<br>Los servidores gratuitos o de baja demanda de Render entran en suspensión ("spin down") tras 15 min sin tráfico. Tardan 50s en reiniciar. | **CRÍTICA**<br>(10/10) | Alta | **Demo (25%)**<br>Un juez no espera 50 segundos en WebGL; asumirá que el simulador no sirve y cerrará la pestaña. | **Keep-Alive Automatizado (Monitor Ping):**<br>Configurar un monitor gratuito (UptimeRobot o cron de GitHub Actions) haciendo `GET /api/health` cada 8 minutos desde el 4 hasta el 9 de noviembre. | 🟡 Pendiente activar ping |
 | **R-03** | **Enlace WebGL Inaccesible (`colon-quest.pages.dev` no resuelve)**<br>Actualmente el dominio de Cloudflare Pages da error de DNS en pruebas externas. | **CRÍTICA**<br>(10/10) | Alta | **Demo (25%)**<br>Sin un enlace que funcione en un clic, el criterio de Demo se califica con 0 automático. | **Despliegue y Verificación en Navegadores Limpios:**<br>Vincular Cloudflare Pages al directorio de build WebGL o usar GitHub Pages / Vercel como espejo secundario. Probar en modo incógnito desde móvil y PC. | 🔴 En curso (Jefferson / WebGL) |
-| **R-04** | **Juez Impaciente / Falta de Tiempo para Explorar**<br>Los jueces tienen decenas de proyectos. Si deben jugar 10 minutos de tutorial para ver la IA de Meta, podrían calificar sin verla. | **ALTA**<br>(9/10) | Muy Alta | **Demo (25%) / Meta AI (25%)**<br>Pérdida de puntos por no presenciar la negociación por voz ni la narración con herramientas. | **Botón Fast-Track ("Demo Rápida Jurado"):**<br>Colocar en la pantalla de inicio un botón directo que cargue al jugador frente al vendedor, con dinero disponible y el micrófono listo para negociar con Muse Spark Open. | 🟡 Pendiente botón en UI |
+| **R-04** | **Juez Impaciente / Falta de Tiempo para Explorar**<br>Los jueces tienen decenas de proyectos. Si deben simular 10 minutos de tutorial para ver la IA de Meta, podrían calificar sin verla. | **ALTA**<br>(9/10) | Muy Alta | **Demo (25%) / Meta AI (25%)**<br>Pérdida de puntos por no presenciar la negociación por voz ni la narración con herramientas. | **Botón Fast-Track ("Demo Rápida Jurado"):**<br>Colocar en la pantalla de inicio un botón directo que cargue al usuario frente al vendedor, con dinero disponible y el micrófono listo para negociar con Muse Spark Open. | 🟡 Pendiente botón en UI |
 | **R-05** | **Video Demostrativo Débil o No Enfocado en los Criterios**<br>Hacer un video largo o puramente visual sin evidenciar la arquitectura ni el uso de Meta AI. | **ALTA**<br>(9/10) | Media | **Demo (25%)**<br>El reglamento indica literalmente que se evalúa "the quality of the demo video". | **Guion Estructurado de 2:15 min (Inglés + Subtítulos):**<br>0:00-0:25 Problema social -> 0:25-1:15 Negociación por voz en vivo -> 1:15-1:45 Arquitectura Multi-Modelo y C# -> 1:45-2:15 Modo Clase y conclusión. | 🟡 Pendiente grabación (3 nov) |
 | **R-06** | **Riesgo de Privacidad en Datos de la Prueba Piloto**<br>El reglamento descalifica violaciones a derechos de privacidad ("privacy rights"). | **MEDIA**<br>(8/10) | Baja | **Descalificación Legal**<br>Exponer nombres, rostros o datos personales sin consentimiento formal. | **Datos 100% Agregados y Anonimizados:**<br>No mostrar nombres reales de estudiantes ni capturas de chats privados. Presentar solo estadísticas consolidadas (ej. "82% evitó el gota a gota tras la ronda 2"). | 🟢 Mitigado (Participantes 18+) |
 | **R-07** | **Omisión de Herramientas Destacadas en el Portal**<br>Cerebral Valley menciona: Muse Spark, Muse Wonder, Muse Image, SAM 3.1, Muse Code y Open Weights. | **MEDIA**<br>(7/10) | Media | **Uso de Herramientas Meta (25%)**<br>No aprovechar todo el arsenal citado por los organizadores resta ventaja frente a otros finalistas. | **Cobertura y Declaración Documentada:**<br>1. Generar con `Muse Image` los retratos y la postal anual.<br>2. Declarar en el formulario que `Muse Code` asistió en la creación de contratos Pydantic y suites de pruebas.<br>3. Resaltar la integración híbrida Cloud + Open Weights en Baseten. | 🟡 Pendiente Muse Image en ADR 0004 |
@@ -49,11 +49,11 @@ Para garantizar el puntaje perfecto, cada uno de los cuatro criterios evaluados 
 * [x] **Ajuste Perfecto a la Temática ("Build for Your World")**:
   - Plantea un problema vivido en carne propia: el analfabetismo financiero juvenil en Costa Rica y América Latina frente a cobradores abusivos, "gota a gota", tarjetas de crédito y esquemas piramidales.
 * [x] **Mecánica Educativa Práctica (No Teórica)**:
-  - En lugar de cuestionarios aburridos, el jugador se enfrenta a vendedores que cobran comisiones ocultas y aprende a interrogar con su propia voz sobre tasas reales, seguros escondidos y Costo Anual Total.
+  - En lugar de cuestionarios aburridos, el usuario se enfrenta a vendedores que cobran comisiones ocultas y aprende a interrogar con su propia voz sobre tasas reales, seguros escondidos y Costo Anual Total.
 * [ ] **Plataforma Educativa para Docentes: Modo Clase (Class Mode)**:
   - **Requisito para 100%:** Mostrar el panel donde los profesores visualizan la telemetría agregada de su grupo: qué porcentaje cayó en la trampa del pago mínimo, quién negoció con éxito y cómo evolucionó su toma de decisiones.
 * [ ] **Evidencia Cuantitativa de la Prueba Piloto**:
-  - **Requisito para 100%:** Incluir en el README y en el video una tarjeta gráfica con los resultados de la prueba piloto realizada con mayores de edad (ejemplo: *"N=25 jugadores: 76% redujo su endeudamiento tras el mes 3; 100% aprendió a exigir la tasa efectiva"*).
+  - **Requisito para 100%:** Incluir en el README y en el video una tarjeta gráfica con los resultados de la prueba piloto realizada con mayores de edad (ejemplo: *"N=25 usuarios: 76% redujo su endeudamiento tras el mes 3; 100% aprendió a exigir la tasa efectiva"*).
 
 ---
 
@@ -62,14 +62,14 @@ Para garantizar el puntaje perfecto, cada uno de los cuatro criterios evaluados 
 > **Pregunta del Jurado:** *¿Qué tan creativamente se usaron las herramientas de Meta? ¿Fueron más allá de una integración básica? ¿Demostraron capacidades inesperadas?*
 
 * [x] **Especialización Multi-Modelo Justificada por Latencia ([ADR 0004](docs/adr/0004-model-roles.md))**:
-  - **Muse Spark 1.3** (`minimal reasoning`): Game Master en vivo que narra eventos mensuales adaptados al historial del jugador en menos de 4 segundos.
+  - **Muse Spark 1.3** (`minimal reasoning`): Director de la Simulación en vivo que narra eventos mensuales adaptados al historial del usuario en menos de 4 segundos.
   - **Muse Wonder**: Planificador de temporada (12 meses) y resumen de fin de año en segundo plano (calidad narrativa superior sin bloquear la UI).
   - **Muse Spark Open en Baseten**: Modelos abiertos de Meta corriendo en infraestructura de inferencia asociada (aprovechando los créditos y límites de 2M TPM).
-  - **Voice Transcribe**: Interacción natural por voz donde el jugador negocia cara a cara con los personajes.
+  - **Voice Transcribe**: Interacción natural por voz donde el usuario negocia cara a cara con los personajes.
 * [ ] **Completar `Muse Image` en la Pipeline**:
   - **Requisito para 100%:** Cerrar la tarea pendiente del ADR 0004. Pre-generar y cachear retratos de NPCs, fondos de eventos y la ilustración de la tarjeta anual de balance financiero.
 * [x] **Agentes con Herramientas Deterministas ([ADR 0003](docs/adr/0003-agentic-game-master.md))**:
-  - Los modelos no inventan números; tienen herramientas (`simulate_purchase`, `project_debt`). Si el vendedor quiere engañar al jugador, sus cifras provienen de su hoja de cálculo oculta validada en backend.
+  - Los modelos no inventan números; tienen herramientas (`simulate_purchase`, `project_debt`). Si el vendedor quiere engañar al usuario, sus cifras provienen de su hoja de cálculo oculta validada en backend.
 * [x] **Arquitectura de Inferencia Híbrida (Cloud + Open Weights)**:
   - Combinación pionera entre la API administrada de Meta y el modelo de pesos abiertos en Baseten con balanceo de carga y fallback automático.
 * [ ] **Mención de Muse Code en el Proceso de Ingeniería**:
@@ -82,11 +82,11 @@ Para garantizar el puntaje perfecto, cada uno de los cuatro criterios evaluados 
 > **Pregunta del Jurado:** *¿Funciona la demo? ¿Es impresionante? ¿Aguanta en vivo sin romperse? ¿Cuál es la calidad del video demostrativo?*
 
 * [ ] **Un Solo Enlace Público WebGL Operativo**:
-  - **Requisito para 100%:** Resolver el DNS de Cloudflare Pages (`colon-quest.pages.dev`). El juego debe cargar en menos de 8 segundos, soportar teclado/mouse y solicitar permisos de micrófono limpiamente.
+  - **Requisito para 100%:** Resolver el DNS de Cloudflare Pages (`colon-quest.pages.dev`). El simulador debe cargar en menos de 8 segundos, soportar teclado/mouse y solicitar permisos de micrófono limpiamente.
 * [ ] **Botón Fast-Track para el Jurado**:
   - **Requisito para 100%:** Agregar en el menú principal la opción `"Demo Rápida (Evaluación Meta AI)"` para que el juez experimente la negociación por voz y la narración inteligente en sus primeros 60 segundos.
 * [x] **Resiliencia Extrema ("Holds up live")**:
-  - Si el backend se satura, falla el internet o se acaba la cuota de la API, el juego pasa a modo local sin mostrar pantallas de error ni congelarse.
+  - Si el backend se satura, falla el internet o se acaba la cuota de la API, el simulador pasa a modo local sin mostrar pantallas de error ni congelarse.
 * [ ] **Video Demostrativo de Alta Factura (2:15 minutos)**:
   - **Requisito para 100%:** Video en 1080p/4K grabado en inglés (o español con subtítulos en inglés perfectos), mostrando la interacción por voz real, la respuesta de la IA en tiempo real y la pantalla de resumen.
 * [ ] **Keep-Alive Activo en Render**:
@@ -116,7 +116,7 @@ Para garantizar el puntaje perfecto, cada uno de los cuatro criterios evaluados 
 Cerebral Valley contempla hasta $50,000 acumulados en categorías discrecionales:
 
 1. **Premio "Most Viral Project" (Proyecto Más Viral)**:
-   - **Mecánica:** Al completar el año financiero, el juego genera una postal gráfica tipo *Spotify Wrapped*: *"Sobreviví 1 año en Costa Rica sin caer en el gota a gota. Ahorros: ₡450,000. Negociaciones ganadas: 4/4."*
+   - **Mecánica:** Al completar el año financiero, el simulador genera una postal gráfica tipo *Spotify Wrapped*: *"Sobreviví 1 año en Costa Rica sin caer en el gota a gota. Ahorros: ₡450,000. Negociaciones ganadas: 4/4."*
    - **Botón de compartir:** Genera un tweet / post de LinkedIn listo con hashtags `#MetaAIHackathon #ColonQuest @Meta @CerebralValley`.
 2. **Premio "Community Vote" (Voto de la Comunidad)**:
    - **Mecánica:** Publicar un hilo en X (Twitter) y LinkedIn el día de la entrega con el video y el enlace WebGL, etiquetando a los organizadores y activando a la comunidad de desarrolladores y educadores de Costa Rica y LATAM.

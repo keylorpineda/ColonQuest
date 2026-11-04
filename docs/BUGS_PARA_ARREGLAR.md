@@ -1,12 +1,12 @@
 # ColonQuest: bugs de la alpha y diseño del modo historia (2026-10-29)
 
-Parte 1: 15 bugs encontrados al jugar. Parte 2 (al final): el modo historia definido con Jefferson.
+Parte 1: 15 bugs encontrados al simular. Parte 2 (al final): el modo historia definido con Jefferson.
 
 Rama: `feat/SCRUM-58-alpha-fixes` (PR 58), commit `feef017`. Rutas relativas a `unity/Assets/`.
 Cada punto dice: qué se ve, la causa encontrada en el código (o "probable" si hay que confirmarla en pantalla), qué
 cambiar, cómo verificarlo y qué otros lugares tienen el mismo problema.
 
-Reglas del repo para quien arregle: código y comentarios en inglés, textos del juego en español con su entrada en inglés
+Reglas del repo para quien arregle: código y comentarios en inglés, textos del simulador en español con su entrada en inglés
 en `Scripts/World/Translations.cs`, el dinero solo lo mueve `FinanceEngine`, escenas regeneradas en commit aparte,
 y no tocar `server/` ni `shared/`.
 
@@ -14,11 +14,11 @@ Antes de los 13 puntos, hay **tres causas comunes** que explican varios a la vez
 
 - **A. Caminar al centro de un mueble sólido.** Las escenas animadas (`Scripts/UI/GameUi.Scenes.cs`) hacen
   `WalkTo(Here(station))`, y el centro de muchas estaciones es el centro del mueble (`BuildThing` en
-  `Editor/MapBuilder.Things.cs` usa la posición del objeto). El jugador choca, camina 4 s contra el mueble y
+  `Editor/MapBuilder.Things.cs` usa la posición del objeto). El usuario choca, camina 4 s contra el mueble y
   `Interaction.Walk` (`Scripts/World/Interaction.cs`) lo **teletransporta dentro** del mueble.
 - **B. El colisionador se reactiva dentro del mueble.** `WalkInto` apaga el colisionador para subirse a la cama, al
   sillón o a la banca, y el bloque `finally` de `InteractionRunner.Run` lo vuelve a encender **sin sacar antes al
-  jugador**. La física lo empuja hacia un lado (saltos, quedar trabado).
+  usuario**. La física lo empuja hacia un lado (saltos, quedar trabado).
 - **C. Manos detrás del pecho.** En `Editor/MapBuilder.People.cs` la mano (`Hand`, orden `OrderPlayer + 5`) y el
   antebrazo (+3) se dibujan **debajo** del torso (+6). Las poses que llevan la mano al pecho o a la boca (`Eat`, `Read`,
   `Type`, `Count`, `Sign`, `Wash`, `Cook`) esconden la mano detrás del cuerpo y parecen rotas.
@@ -51,7 +51,7 @@ Antes de los 13 puntos, hay **tres causas comunes** que explican varios a la vez
 - Agregar una pieza de cadera (rectángulo redondeado del color del pantalón, ancho `0.42·W`, alto 0.12) entre torso y piernas, debajo del torso.
 - Causa C: dibujar mano y antebrazo **encima** del torso cuando la pose los lleva al frente (un `sortingOrder` alterno que active el animador), o siempre encima con el hombro escondido.
 
-**Cómo verificar:** pararse frente a Kevin, Don Rafa y el jugador y comparar con `docs/art/characters-v2/elenco_v2.png`.
+**Cómo verificar:** pararse frente a Kevin, Don Rafa y el usuario y comparar con `docs/art/characters-v2/elenco_v2.png`.
 Caminar 10 s y mirar barbilla y cuello. Sentarse a la mesa, usar el cajero y abrir el celular (P): codos sin picos,
 manos visibles frente al pecho.
 
@@ -64,7 +64,7 @@ manos visibles frente al pecho.
 **Causa (verificada):**
 - `BuildJailLayout` (`Editor/MapBuilder.Interiors.Places.cs`) arma cada celda con barras de `left` a `x - 0.7` y de
   `x + 0.7` a `right`. Queda un **hueco de 1.4 sin reja ni puerta** (el comentario dice "a gate that is open").
-- El jugador aparece en `SpawnIds.JailCell` (-7.6, 3.0), pero puede salir caminando.
+- El usuario aparece en `SpawnIds.JailCell` (-7.6, 3.0), pero puede salir caminando.
 - Lo único que se bloquea es la puerta a la calle (`Door.Locked` en `Scripts/UI/GameUi.Cell.cs`).
 
 **Qué cambiar:**
@@ -82,25 +82,25 @@ Pagar la fianza: la reja se abre y se puede salir. Esperar la condena: lo mismo.
 
 ## 3. La animación del arresto no existe, es demasiado simple
 
-**Causa (verificada):** `ArrestSequence` (`Scripts/UI/GameUi.Incidents.cs`) solo congela al jugador, pinta la sirena
+**Causa (verificada):** `ArrestSequence` (`Scripts/UI/GameUi.Incidents.cs`) solo congela al usuario, pinta la sirena
 roja y azul sobre la pantalla 2.2 s y cambia de escena. No hay oficial, ni esposas, ni gesto del personaje.
 
 **Qué cambiar:** reescribirlo con el marco `Interaction` (`Scripts/World/Interaction.cs`), en este orden:
 1. Sirena (sonido y luces).
-2. El oficial más cercano (`PoliceOfficer`) camina hasta el jugador.
-3. El jugador levanta las manos: falta una pose nueva `HandsUp` en `Scripts/World/PersonPose.cs`.
+2. El oficial más cercano (`PoliceOfficer`) camina hasta el usuario.
+3. El usuario levanta las manos: falta una pose nueva `HandsUp` en `Scripts/World/PersonPose.cs`.
 4. Esposas: prop nuevo en `InteractionProps`, sonido metálico.
 5. Caminan juntos 2 o 3 pasos.
 6. Fundido a negro.
 7. En la celda, la reja se cierra con `Slam` (punto 2).
 
-Espacio debe saltarlo, y el cambio de juego (`session.Arrest()`) se aplica al final, como hoy.
+Espacio debe saltarlo, y el cambio de simulador (`session.Arrest()`) se aplica al final, como hoy.
 
 **Cómo verificar:** entrar a una casa ajena y esperar 9 s. Se ve al oficial llegar, el gesto de las manos, las esposas,
 y luego la celda. Probar también saltando con Espacio.
 
 **Similares:**
-- La multa por cruzar en rojo (`PoliceOfficer.StoppedPlayer`) tampoco tiene gesto del oficial ni del jugador.
+- La multa por cruzar en rojo (`PoliceOfficer.StoppedPlayer`) tampoco tiene gesto del oficial ni del usuario.
 - El atropello sí tiene animación (`HitAnimation`), pero la llegada al hospital no: falta la cama con suero.
 
 ---
@@ -110,7 +110,7 @@ y luego la celda. Probar también saltando con Espacio.
 **Causa (verificada):**
 - `WorldHints.Check` (`Scripts/World/Surfaces.cs`) marca como agua **toda la franja x entre `RiverXMin - 0.9` y `RiverXMax + 0.9`**
   (27.1 a 31.9) para cualquier `y` sobre la playa, salvo los tableros de los puentes (`OnDeck`).
-- Ese margen de 0.9 cae sobre las aceras que corren junto al río. `WalkWatch` empuja al jugador hacia atrás (`Nudge`) y dice `WaterThought`.
+- Ese margen de 0.9 cae sobre las aceras que corren junto al río. `WalkWatch` empuja al usuario hacia atrás (`Nudge`) y dice `WaterThought`.
 - El texto es el del bañador, aunque en el río ni en el estanque se puede nadar.
 
 **Qué cambiar:**
@@ -141,7 +141,7 @@ y luego la celda. Probar también saltando con Espacio.
 - Usarlo en banca, sillón, mesa y sala de espera.
 
 **Cómo verificar:** sentarse en las 5 bancas del pueblo: el cuerpo queda sobre el asiento, delante del respaldo. Al
-levantarse, el jugador queda frente a la banca, sin saltos.
+levantarse, el usuario queda frente a la banca, sin saltos.
 
 **Similares:** sillón de la casa (`Thing_Sofa`), mesa del comedor (`Thing_DiningTable`), sala de urgencias del hospital (`Thing_EmergencyWard`, se sienta en el aire).
 
@@ -151,7 +151,7 @@ levantarse, el jugador queda frente a la banca, sin saltos.
 
 **Causas:**
 - La 5 en todos los asientos.
-- Causa A: si el centro de la estación es el mueble, el jugador camina 4 s contra él y aparece dentro.
+- Causa A: si el centro de la estación es el mueble, el usuario camina 4 s contra él y aparece dentro.
 - Causa B: la cama (`BedScene`), la ducha, el sillón y la mesa reactivan el colisionador dentro del mueble. Ese es el "a veces se buguea": depende de por dónde lo empuje la física.
 - Causa C: en `Eat` y `Read` la mano queda detrás del pecho.
 - La pose `Sit` abre las piernas ±26° y baja el cuerpo, en lugar de doblarlas. No hay rodillas en el esqueleto.
@@ -165,7 +165,7 @@ levantarse, el jugador queda frente a la banca, sin saltos.
 lados distintos: nunca queda trabado, nunca aparece dentro del mueble, nunca salta al terminar.
 
 **Similares (todas en `GameUi.Scenes.cs` con `Here(station)` sin desplazamiento):**
-- **Causa A:** `Thing_Fridge` (refri sólida), `Thing_Fountain` (fuente sólida de 3.7 × 3.0: el jugador termina dentro del agua), `Thing_Sink`, `Thing_Washer`, `Thing_Coffee`, `Thing_TicketMachine`, `Thing_FinePrint`.
+- **Causa A:** `Thing_Fridge` (refri sólida), `Thing_Fountain` (fuente sólida de 3.7 × 3.0: el usuario termina dentro del agua), `Thing_Sink`, `Thing_Washer`, `Thing_Coffee`, `Thing_TicketMachine`, `Thing_FinePrint`.
 - **Causa B:** `Thing_Shower` (`WalkInto`).
 - Revisar cada una en pantalla y darles un punto de frente.
 
@@ -180,7 +180,7 @@ lados distintos: nunca queda trabado, nunca aparece dentro del mueble, nunca sal
 **Qué cambiar:**
 - Cambiar el dibujo de los escalones por un ascensor en los dos pisos: marco metálico, dos hojas de puerta, botonera y la placa "ASCENSOR" con su traducción.
 - Antes de cambiar de escena, una escena de `Interaction`:
-  1. el jugador pulsa el botón (pose `Reach`);
+  1. el usuario pulsa el botón (pose `Reach`);
   2. suena `Chime`;
   3. las hojas se abren deslizándose;
   4. entra;
@@ -188,9 +188,9 @@ lados distintos: nunca queda trabado, nunca aparece dentro del mueble, nunca sal
   6. en el otro piso, `Chime` y las puertas se abren.
 - La lógica de puertas (`Door`, `SpawnIds` de los dos extremos en `Scripts/World/MapLayout.cs`) se reutiliza tal cual; solo cambian el dibujo y la animación.
 
-**Cómo verificar:** subir y bajar dos veces: el jugador aparece frente al ascensor del otro piso, sin quedar dentro de un mueble. Los textos salen en inglés con el idioma cambiado.
+**Cómo verificar:** subir y bajar dos veces: el usuario aparece frente al ascensor del otro piso, sin quedar dentro de un mueble. Los textos salen en inglés con el idioma cambiado.
 
-**Similares:** ninguno (es la única escalera del juego).
+**Similares:** ninguno (es la única escalera del simulador).
 
 ---
 
@@ -216,18 +216,18 @@ que el pasillo no quede bloqueado.
 
 **Causa (verificada):**
 - `SubtitleBar.Show` (`Scripts/UI/SubtitleBar.cs`) pone un tiempo fijo de 3 a 10 s según el largo del texto.
-- Nada lo oculta cuando el jugador sale de la zona. `OnStationExited` en `Scripts/UI/GameUi.cs` solo quita la estación de la lista.
+- Nada lo oculta cuando el usuario sale de la zona. `OnStationExited` en `Scripts/UI/GameUi.cs` solo quita la estación de la lista.
 
 **Qué cambiar:**
 - Guardar en `GameUi` qué estación originó el subtítulo (en `ShowThing` y en las escenas).
 - En `OnStationExited` llamar a `subtitles.Hide()` si es esa estación.
-- Como respaldo, ocultarlo si el jugador se aleja más de 3.5 unidades del NPC.
-- Los pensamientos del jugador (sin nombre) pueden seguir con su tiempo.
+- Como respaldo, ocultarlo si el usuario se aleja más de 3.5 unidades del NPC.
+- Los pensamientos del usuario (sin nombre) pueden seguir con su tiempo.
 
 **Cómo verificar:** hablar con un peatón, con Brayan y con Doña Marta y alejarse caminando: el subtítulo desaparece al salir de la zona. Quedarse quieto: el subtítulo dura lo de siempre.
 
 **Similares:**
-- Las líneas que dicen los personajes dentro de las escenas animadas (`Interaction.Spoke`) se quedan igual si el jugador sale de la escena.
+- Las líneas que dicen los personajes dentro de las escenas animadas (`Interaction.Spoke`) se quedan igual si el usuario sale de la escena.
 - El vendedor de la negociación habla con `AudioDirector.Talk` además del subtítulo.
 
 ---
@@ -245,11 +245,11 @@ llamar a `Interact`. Las cosas cotidianas (`ShowThing`) rotan sus líneas en cad
 
 **Cómo verificar:** pulsar E en la refri: sale la escena. Pulsar E otra vez sin moverse: no pasa nada y no hay aviso. Salir de la zona y volver: aparece el aviso y funciona. Probar con un peatón, la banca y el cajero automático.
 
-**Similares:** la tecla P del celular se puede repetir mientras el jugador está quieto (eso está bien, es un menú, pero que no se apile con la escena del celular).
+**Similares:** la tecla P del celular se puede repetir mientras el usuario está quieto (eso está bien, es un menú, pero que no se apile con la escena del celular).
 
 ---
 
-## 11. El aviso "El game master está pensando" tapa el medio de la pantalla y es lento
+## 11. El aviso "El director de la simulación está pensando" tapa el medio de la pantalla y es lento
 
 **Causa (verificada):**
 - `BuildLoading` en `Scripts/UI/GameUi.cs` crea una tarjeta de 640 × 120 anclada al **centro** de la pantalla.
@@ -266,7 +266,7 @@ llamar a `Interact`. Las cosas cotidianas (`ShowThing`) rotan sus líneas en cad
 - No tocar el servidor (es de Keylor). Si se quiere bajar `EventTimeoutSeconds`, coordinarlo con él, porque el respaldo (`FallbackEvents`) entra cuando se agota.
 
 **Cómo verificar:** con el backend de Render, ir al taller de Don Rafa y medir con reloj desde E hasta que abre el
-evento. Antes y después del cambio, 3 veces cada uno. El aviso nunca tapa al jugador ni el centro.
+evento. Antes y después del cambio, 3 veces cada uno. El aviso nunca tapa al usuario ni el centro.
 
 **Similares:** el resumen del año ("Armando tu año", 25 s) usa la misma tarjeta central.
 
@@ -277,7 +277,7 @@ evento. Antes y después del cambio, 3 veces cada uno. El aviso nunca tapa al ju
 **Causa probable (confirmar en pantalla):**
 - El ropero sólido está en (-7.6, 2.3) con alto 2.2 (de `y` 1.2 a 3.4). La estación `Station_Wardrobe` está en (-7.6, 1.0), pegada a su borde.
 - La escena del ropero (`case StationType.Wardrobe` en `GameUi.Scenes.cs`) hace:
-  1. `WalkTo(-7.6, 1.0)`: el pie del jugador (radio 0.3, desplazado -0.1) toca el mueble antes de llegar, así que puede quedarse empujando 4 s y luego teletransportarse (causa A);
+  1. `WalkTo(-7.6, 1.0)`: el pie del usuario (radio 0.3, desplazado -0.1) toca el mueble antes de llegar, así que puede quedarse empujando 4 s y luego teletransportarse (causa A);
   2. `Face(Here(station, -1f, 0.5f))`: mira hacia la izquierda (la pared) en lugar del ropero, que está arriba;
   3. luego abre la ventana.
 - Si ya tiene bañador, `ShowWardrobe` solo dice un pensamiento: la escena entera (ruido, papel) termina en un pensamiento y parece fallar.
@@ -298,7 +298,7 @@ Nunca se queda trabado. La ventana de compra aparece después del gesto. Con ba�
 ## 13. El tema del bañador también está bugueado
 
 **Causas (verificadas):**
-- **Después de nadar sale "Mejor me compro un bañador".** `BeachScene` deja al jugador en `y = -26.5` (`shore`), dentro
+- **Después de nadar sale "Mejor me compro un bañador".** `BeachScene` deja al usuario en `y = -26.5` (`shore`), dentro
   del margen de agua de `WorldHints` (hasta `ShoreY + 0.9 = -26.3`). Al terminar la escena, `WalkWatch` dice el
   pensamiento del bañador y lo empuja hacia arriba.
 - **El aviso no sabe si ya tiene bañador.** `WalkWatch` (`Scripts/World/WalkWatch.cs`) siempre dice `WaterThought`,
@@ -306,18 +306,18 @@ Nunca se queda trabado. La ventana de compra aparece después del gesto. Con ba�
 - **El mismo texto sale en el río y el estanque**, donde no se nada (punto 4).
 
 **Qué cambiar:**
-- Al terminar `BeachScene`, devolver al jugador a la arena (`y ≈ -25.4`) antes de soltarlo.
+- Al terminar `BeachScene`, devolver al usuario a la arena (`y ≈ -25.4`) antes de soltarlo.
 - Agregar a `WalkWatch` una bandera estática que ponga `GameUi`: `WalkWatch.HasSwimsuit = session.Loop.HasSwimsuit` en cada `Refresh`. Con bañador, la orilla del mar dice "Puedo darme un chapuzón en la playa (E)" o nada.
 - Separar los textos de mar, río y estanque, con sus traducciones.
 
 **Cómo verificar:**
 1. Sin bañador, ir al mar: sale el pensamiento del bañador.
 2. Comprarlo en el ropero, volver: ya no sale; pulsar E en la orilla: nada, salpica y sube el ánimo.
-3. Al terminar, el jugador queda en la arena, sin empujón ni pensamiento.
+3. Al terminar, el usuario queda en la arena, sin empujón ni pensamiento.
 4. Segunda vez en el mes: pensamiento de "ya me di mi chapuzón".
 5. Cerrar el mes y repetir: vuelve a funcionar.
 
-**Similares:** la escena de la ducha y la de la fuente sueltan al jugador donde el aviso de agua no aplica (no es el
+**Similares:** la escena de la ducha y la de la fuente sueltan al usuario donde el aviso de agua no aplica (no es el
 pueblo o no hay margen), pero conviene revisar la fuente por la causa A.
 
 ---
@@ -336,7 +336,7 @@ pueblo o no hay margen), pero conviene revisar la fuente por la causa A.
 - Si el cruce cambia a rojo con el carro ya encima de la línea, sigue de largo, como en la vida real.
 - Mantener una distancia mínima con el carro de adelante en el mismo carril: frenan en fila.
 - Pruebas de EditMode para la función pura: frena antes de la línea, no frena si ya la pasó, respeta la distancia.
-- Mirar también `CollectorCar.cs` (el carro de los cobradores): debe respetar lo mismo, salvo cuando se detiene frente al jugador.
+- Mirar también `CollectorCar.cs` (el carro de los cobradores): debe respetar lo mismo, salvo cuando se detiene frente al usuario.
 
 **Cómo verificar:** pararse en cada cruce del pueblo 2 ciclos completos (unos 40 s): con el muñequito verde ningún
 carro pisa la cebra, con rojo pasan. Los carros forman fila y no se montan. Cruzar con verde nunca termina en atropello.
@@ -357,7 +357,7 @@ antes de empezar: _______________________________________________
   - sonido de clic;
   - "Alpha 0.1.16" arriba a la izquierda y "Design by DoWhile Team" abajo;
   - pantalla de carga;
-  - créditos y aviso de jugar online nuevos.
+  - créditos y aviso de simular online nuevos.
 - **Nada de eso se ha visto en pantalla todavía:** la RONDA 8 de Antigravity dejó el humo del menú como "no probado". La lista original de lo pedido está en `C:\Users\USUARIO\ColonQuestBuild\PENDIENTES_MENU_Y_CARGA.md`.
 
 **Qué revisar y arreglar (abrir el build `windows_r16` o el editor en la escena `Menu`):**
@@ -365,11 +365,11 @@ antes de empezar: _______________________________________________
 - **Hover:** visible con mouse y con teclado (flechas y Enter).
 - **Textos:**
   - "Alpha 0.1.16" y "Design by DoWhile Team" legibles y fuera de los botones;
-  - créditos y aviso de jugar online sin texto que se salga de su tarjeta;
+  - créditos y aviso de simular online sin texto que se salga de su tarjeta;
   - todo en inglés al cambiar el idioma.
 - **Pantalla de carga:** aparece al entrar a Modo historia y al volver al menú desde Pausa, y desaparece sola.
 - **Música:** la del menú no sigue sonando en el pueblo.
-- **Integración con el modo historia:** "Modo historia" debe abrir la lista de 3 partidas guardadas (idea 3) y la pantalla de nueva partida (idea 1). Diseñar la ventana de inicio ya pensando en eso, para no rehacerla dos veces.
+- **Integración con el modo historia:** "Modo historia" debe abrir la lista de 3 simulaciones guardadas (idea 3) y la pantalla de nueva simulación (idea 1). Diseñar la ventana de inicio ya pensando en eso, para no rehacerla dos veces.
 
 **Cómo verificar:**
 - Captura del menú en 16:9 y en 4:3, en español y en inglés.
@@ -385,17 +385,17 @@ componentes de UI (`UiKit`): revisar que no tengan los mismos solapes.
 
 # MODO HISTORIA (definido con Jefferson el 2026-10-29: entran TODAS las ideas)
 
-Hoy el juego dura 3 meses fijos (`GameRules.MonthsToPlay = 3`, `TasksPerMonth = 3`) y no guarda nada. El día y la
+Hoy el simulador dura 3 meses fijos (`GameRules.MonthsToPlay = 3`, `TasksPerMonth = 3`) y no guarda nada. El día y la
 noche (`Scripts/World/DayCycle.cs`) avanzan con las tareas hechas, no con un reloj. Todo lo de abajo cambia eso.
 
-Reglas que no cambian: el dinero lo mueve `FinanceEngine` (en Unity, `Scripts/Finance`), el game master solo cuenta la
+Reglas que no cambian: el dinero lo mueve `FinanceEngine` (en Unity, `Scripts/Finance`), el director de la simulación solo cuenta la
 historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nuevo, se le pide a él.
 
 ## Tiempo: el mes dura 4 días y cada día es una semana
 
-- **Calendario:** 1 mes = 4 días de juego, y cada día representa una semana (semana 1 a 4). El HUD muestra "Mes 3 ·
+- **Calendario:** 1 mes = 4 días de simulador, y cada día representa una semana (semana 1 a 4). El HUD muestra "Mes 3 ·
   Semana 2 · 14:30".
-- **Reloj del día:** de 06:00 a 22:00. Propuesta: 1 hora de juego = 15 s reales, así un día dura unos 4 minutos y un mes
+- **Reloj del día:** de 06:00 a 22:00. Propuesta: 1 hora de simulador = 15 s reales, así un día dura unos 4 minutos y un mes
   unos 16. Ajustable en `GameRules` y con una opción "velocidad del tiempo" en Ajustes (normal y rápida), para la demo
   de 3 minutos y para los jueces.
 - **Franjas:**
@@ -411,23 +411,23 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
   día 4. El motor hoy paga una vez al mes: hay que partir `RunMonthlyTick` en dos pagos.
 - **Tareas:** las 3 tareas del mes pasan a ser eventos repartidos en los 4 días: como máximo uno por día, y el día de
   pago no hay evento.
-- **Cárcel:** la condena de 5 a 15 minutos reales (`JailSentence`) choca con el reloj. Se pasa a días de juego:
+- **Cárcel:** la condena de 5 a 15 minutos reales (`JailSentence`) choca con el reloj. Se pasa a días de simulador:
   1 a 3 días sin trabajar, con fianza igual.
 - **Duración:** un año completo = 12 meses = 48 días. El final del año es el resumen.
 
-## Inicio y partidas guardadas
+## Inicio y simulaciones guardadas
 
-1. **Nueva partida:**
-   - Al tocar "Modo historia" se abre la lista de partidas (idea 3).
-   - "Nueva partida" pide el nombre del personaje, el género (idea 2) y el nombre de la partida (por defecto, el del personaje).
-   - El nombre se usa en los diálogos y el game master lo recibe en el estado.
+1. **Nueva simulación:**
+   - Al tocar "Modo historia" se abre la lista de simulaciones (idea 3).
+   - "Nueva simulación" pide el nombre del personaje, el género (idea 2) y el nombre de la simulación (por defecto, el del personaje).
+   - El nombre se usa en los diálogos y el director de la simulación lo recibe en el estado.
 2. **Mujer u hombre:**
-   - Cambia la ficha del jugador en `Editor/MapBuilder.Cast.cs`: dos fichas, `PlayerLook` y `PlayerLookF`, con pelo y ropa distintos. Como el jugador se construye en el editor, en tiempo de juego se elige cuál de los dos objetos activar (o se arman los dos y se oculta uno).
+   - Cambia la ficha del usuario en `Editor/MapBuilder.Cast.cs`: dos fichas, `PlayerLook` y `PlayerLookF`, con pelo y ropa distintos. Como el usuario se construye en el editor, en tiempo de simulador se elige cuál de los dos objetos activar (o se arman los dos y se oculta uno).
    - Los textos con género ("un joven" o "una joven", "contratado" o "contratada") se escriben en las dos formas en español y en inglés (`Translations.cs`).
 3. **3 espacios de guardado:**
-   - Cada uno muestra nombre, mes y semana, efectivo, ahorros, ánimo y la fecha real del último juego; botones Continuar, Nueva y Borrar (con confirmación).
+   - Cada uno muestra nombre, mes y semana, efectivo, ahorros, ánimo y la fecha real del último simulador; botones Continuar, Nueva y Borrar (con confirmación).
    - Se guarda en JSON con `PlayerPrefs`, que en WebGL queda en IndexedDB.
-   - Se guarda solo al dormir y al salir al menú. Incluye `PlayerState`, `Holdings`, el día, la hora, las metas, el trabajo, el puesto y el `sessionId` del servidor (si el servidor ya no tiene esa sesión, se crea otra sin romper la partida).
+   - Se guarda solo al dormir y al salir al menú. Incluye `PlayerState`, `Holdings`, el día, la hora, las metas, el trabajo, el puesto y el `sessionId` del servidor (si el servidor ya no tiene esa sesión, se crea otra sin romper la simulación).
    - Pruebas de EditMode para guardar y leer.
 4. **Escena de apertura (30 a 45 s, se salta con Espacio):**
    1. El personaje cumple 18 en el cuarto de su mamá.
@@ -442,7 +442,7 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
    comentario de la fuente. El motor ya rebaja la CCSS y la renta.
 6. **Lugar de trabajo en el mapa:**
    - Un local nuevo o uno existente (soda El Muelle o pulpería) con un interior.
-   - El jugador va en persona, marca entrada en un reloj de tarjetas (escena: mete la tarjeta, suena el timbre) y trabaja con una escena animada de unos 10 s (barrer, atender, lavar platos) que cubre la mañana; luego queda libre.
+   - El usuario va en persona, marca entrada en un reloj de tarjetas (escena: mete la tarjeta, suena el timbre) y trabaja con una escena animada de unos 10 s (barrer, atender, lavar platos) que cubre la mañana; luego queda libre.
 7. **Llegar tarde:**
    - Hora de entrada 07:00 y 15 minutos de gracia.
    - Tarde una vez: llamada de atención (diálogo con el jefe).
@@ -487,7 +487,7 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
     - Al cerrar el mes 12, la postal del año (ya existe) con lo logrado.
     - Una nota de A a D por concepto financiero: presupuesto, fondo de emergencia, deudas, cuotas, inversiones.
     - El resumen con Muse Wonder (ya existe).
-    - La partida guardada queda como "terminada" y se puede ver.
+    - La simulación guardada queda como "terminada" y se puede ver.
 18. **Año completo:**
     - `MonthsToPlay` pasa a 12.
     - Balancear la economía (salario mínimo contra alquiler, recibos y comida) para que ahorrar sea posible pero cueste.
@@ -497,7 +497,7 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
 
 19. **Eventos de la vida:**
     - Cumpleaños de un amigo, un familiar que pide plata prestada, el marchamo en diciembre, el aguinaldo en diciembre (el motor ya lo calcula), una emergencia médica.
-    - El game master los cuenta; el motor aplica el efecto.
+    - El director de la simulación los cuenta; el motor aplica el efecto.
 20. **Dinámicas ticas:**
     - Black Friday con el celular a cuotas.
     - La tanda entre compañeros del trabajo (cada uno pone cada quincena y uno se lleva todo por turno: enseñar el riesgo de que alguien no pague).
@@ -523,15 +523,15 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
   - metas;
   - el descanso pasa a ser diario.
 - **`Scripts/Game/SaveSlots.cs` (nuevo, con pruebas):** 3 espacios de guardado, JSON en `PlayerPrefs`.
-- **`Scripts/UI/MainMenu.cs`:** la lista de partidas y la pantalla de nueva partida (nombre, género, nombre de la partida).
+- **`Scripts/UI/MainMenu.cs`:** la lista de simulaciones y la pantalla de nueva simulación (nombre, género, nombre de la simulación).
 - **`Editor/MapBuilder.*`:**
   - interior del cuarto y del trabajo;
   - muebles que se activan según `Holdings`;
   - letreros CERRADO de noche;
-  - segunda ficha del jugador.
+  - segunda ficha del usuario.
 - **HUD:** reloj y semana; app de metas en el celular.
 - **Servidor (pedírselo a Keylor):**
-  - que `PlayerState` acepte el nombre, la semana y el puesto si el game master los va a usar;
+  - que `PlayerState` acepte el nombre, la semana y el puesto si el director de la simulación los va a usar;
   - el concepto de enseñanza nuevo ("invertir en uno mismo").
 
 ## Orden sugerido
@@ -543,8 +543,8 @@ historia, y `server/` y `shared/` son de Keylor. Si algo necesita un endpoint nu
 5. Punto 7 (ascensor).
 6. Modo historia, en este orden:
    1. reloj y calendario de 4 días;
-   2. guardado de 3 partidas;
-   3. nueva partida (nombre, género) y escena de apertura;
+   2. guardado de 3 simulaciones;
+   3. nueva simulación (nombre, género) y escena de apertura;
    4. trabajo con salario mínimo y llegar tarde;
    5. cuarto feo y mejoras;
    6. recibos;

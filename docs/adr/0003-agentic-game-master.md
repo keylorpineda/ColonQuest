@@ -1,4 +1,4 @@
-# ADR 0003: Agentic game master and seller
+# ADR 0003: Agentic simulation director and seller
 
 - **Status:** Accepted (features off by default)
 - **Date:** 2026-10-27
@@ -6,33 +6,33 @@
 
 ## Context
 
-The Best Agentic Use-Case prize rewards agents that decide and run multi-step tasks. The game
-master already works with one model call per month; agents must never make the demo slower or
+The Best Agentic Use-Case prize rewards agents that decide and run multi-step tasks. The simulation
+director already works with one model call per month; agents must never make the demo slower or
 less reliable.
 
 ## Decisions
 
 - **Tools are deterministic and read-only** (`app/agents/tools.py`): `simulate_purchase`,
   `project_debt`, `get_player_history`, `get_concepts_not_yet_taught`. They compute with
-  `Decimal` and integer colones and never write the player's state.
+  `Decimal` and integer colones and never write the user's state.
 - **Bounded loop** (`app/agents/loop.py`): at most `AGENT_MAX_STEPS` (5) model calls inside
   `AGENT_TIMEOUT_S` (10 s); every step is recorded in `model_calls` (`endpoint=event_agent`).
-- **Agentic game master** (`AGENTIC_GAME_MASTER`): reads the history and computes figures before
+- **Agentic simulation director** (`AGENTIC_GAME_MASTER`): reads the history and computes figures before
   writing. The event is clamped like any model event. Provider errors fall back to the
-  single-call game master; a **timeout serves a hand-written event directly** (deviation from
-  CLAUDE.md, which says "use the base version") so a player never waits for a second model call
+  single-call simulation director; a **timeout serves a hand-written event directly** (deviation from
+  CLAUDE.md, which says "use the base version") so a user never waits for a second model call
   after the full agent budget.
 - **Season planner** (`SEASON_PLANNER`, `app/game_master/planner.py`): the first event of a
-  session stores the deterministic `default_plan`, ordered by the player's profile, and answers
+  session stores the deterministic `default_plan`, ordered by the user's profile, and answers
   at once. A FastAPI background task, with its own database session, then asks Muse Wonder
   (`PLANNER_MODEL`, `PLANNER_TIMEOUT_S` = 30 s) for a 12-month plan (`sessions.season_plan`,
   JSONB); if it validates and the stored plan is still the default one, it replaces it from
   month 2. Measured on Oct 29: 6.2 to 16.7 s and about $0.015 per plan, none of it on the
-  player's request. The schema enforces months 1 to 12 in order, at least 8 distinct concepts and
+  user's request. The schema enforces months 1 to 12 in order, at least 8 distinct concepts and
   December as aguinaldo or year-end expenses; any failure keeps the default plan.
-  Each later event adjusts the plan without a model call: when the last decision left the player
+  Each later event adjusts the plan without a model call: when the last decision left the user
   with more debt than the one before, that concept is reinforced in the next free month (never
-  December, never twice). The month's slot reaches the game master as `plannedFocus`.
+  December, never twice). The month's slot reaches the simulation director as `plannedFocus`.
 - **Seller agent** (`SELLER_AGENT`, `app/negotiation/agent.py`): the salesperson tries to
   maximize its earnings, which grow with the term. `quote_term(months)` re-prices the offer under
   negotiation and returns the seller's private earnings. The agent may omit figures until asked
@@ -45,7 +45,7 @@ less reliable.
   tokens of headroom); any failing or late step goes to Meta through `FallbackProvider.chat`.
   Baseten does not enforce the JSON schema when tools are present, so the prompt spells out the
   three keys of the final answer.
-- **Seller memory**: each turn also receives `playerHabits`, the key questions the player asked
+- **Seller memory**: each turn also receives `playerHabits`, the key questions the user asked
   other sellers in the same session (`negotiations.key_questions_asked`), so the seller changes
   tactic ("ya sé que vos preguntás por el seguro"). The figure guard is unchanged.
 - Measured on QA (Oct 29, 5 turns, 2 offers): 3.3 to 5.3 s per turn, 8 Baseten steps of 1.5 to
@@ -57,5 +57,5 @@ less reliable.
 ## How to enable
 
 Apply the migration first (`uv run alembic upgrade head`), then set `SEASON_PLANNER=true`,
-`SELLER_AGENT=true` and `AGENTIC_GAME_MASTER=true` in Render once the playable month is stable, then watch
+`SELLER_AGENT=true` and `AGENTIC_GAME_MASTER=true` in Render once the working month is stable, then watch
 `SELECT endpoint, count(*), avg(latency_ms) FROM model_calls GROUP BY 1`.

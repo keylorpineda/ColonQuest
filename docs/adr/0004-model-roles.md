@@ -11,19 +11,19 @@ live smoke test (`server/scripts/smoke_models.py`) and an end-to-end run against
 showed two problems:
 
 1. **Every Meta model reasons before it answers.** Reasoning makes calls slow, and reasoning
-   tokens count against `max_tokens`, so a short budget returns an empty answer and the game
+   tokens count against `max_tokens`, so a short budget returns an empty answer and the simulator
    silently falls back to hand-written content.
 2. **Unity gives up early.** `ApiConfig.EventTimeoutSeconds` is 8 s for the monthly event and
    `DefaultTimeoutSeconds` is 10 s for every other call. Any model slower than that is invisible
-   to the player.
+   to the user.
 
-As a result Muse Wonder and Muse Image were configured but never reached the player.
+As a result Muse Wonder and Muse Image were configured but never reached the user.
 
 ## Measurements (Oct 28, real keys)
 
 All times are wall-clock from the backend, single requests from Costa Rica.
 
-### Monthly event (game master prompt, about 1 600 input tokens)
+### Monthly event (simulation director prompt, about 1 600 input tokens)
 
 | Model | `reasoning_effort` | Samples (s) | Output tokens | Cost per event |
 | --- | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ All times are wall-clock from the backend, single requests from Costa Rica.
 | Feature | Provider and model | Latency | Result |
 | --- | --- | --- | --- |
 | Monthly event | Meta, Spark `minimal` | 2.5 to 3.8 s | OK |
-| Agentic game master | Meta, Spark `minimal` | 1.4 to 4.2 s | OK, called `get_player_history` and `get_concepts_not_yet_taught` |
+| Agentic simulation director | Meta, Spark `minimal` | 1.4 to 4.2 s | OK, called `get_player_history` and `get_concepts_not_yet_taught` |
 | Season planner | Meta, Spark `minimal` | 3.6 s | OK, 12-month plan stored (failed before: budget spent on reasoning) |
 | Negotiation | Baseten, Muse Spark Open | 1.9 to 2.8 s | OK, exact figures of the hidden sheet (₡19 600, ₡3 500, ₡569 400) |
 | Seller agent | Meta, Spark `minimal` | 2.1 s | OK (failed before: budget spent on reasoning) |
@@ -74,19 +74,19 @@ credits; all the tests on Oct 28 cost under $0.15.
 
 | Model | Role | Why | Status |
 | --- | --- | --- | --- |
-| **Muse Spark 1.3** | Live game master (monthly event, agentic game master with tools), Class Mode report, Meta fallback for the sellers | The only Meta text model that answers inside Unity's 8 s every time (3.0 to 4.4 s with `minimal`) | Done, live on Render |
-| **Muse Wonder** | Plans the player's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the player is not waiting, or once offline | Year-end summary (5.2 to 7.6 s) and background season plan (6.2 to 16.7 s) done on Oct 29; event bank *pending* |
-| **Muse Spark Open** (Baseten) | The sellers: tactics to earn commission, exact figures through tools, memory of what the player asked during the run | Fastest option (about 2 s), paid by Baseten credits instead of Meta, and the central piece for the Open Weights prize | Dialogue, tactics with tools and memory of the run done on Oct 29 (3.3 to 5.3 s per turn) |
+| **Muse Spark 1.3** | Live simulation director (monthly event, agentic simulation director with tools), Class Mode report, Meta fallback for the sellers | The only Meta text model that answers inside Unity's 8 s every time (3.0 to 4.4 s with `minimal`) | Done, live on Render |
+| **Muse Wonder** | Plans the user's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the user is not waiting, or once offline | Year-end summary (5.2 to 7.6 s) and background season plan (6.2 to 16.7 s) done on Oct 29; event bank *pending* |
+| **Muse Spark Open** (Baseten) | The sellers: tactics to earn commission, exact figures through tools, memory of what the user asked during the run | Fastest option (about 2 s), paid by Baseten credits instead of Meta, and the central piece for the Open Weights prize | Dialogue, tactics with tools and memory of the run done on Oct 29 (3.3 to 5.3 s per turn) |
 | **Muse Image** | NPC portraits, event scenes and the illustration of the shareable year card | 14 to 17 s per image rules out live use, so images are pre-generated and cached. The year card is an illustration **without text**: the code draws the figures on top, because no amount may come from a model and image models misdraw digits | *Pending* |
-| **Voice Transcribe** | The player's voice when negotiating | 0.7 to 1.5 s and almost free; typing always works as a fallback | Done |
+| **Voice Transcribe** | The user's voice when negotiating | 0.7 to 1.5 s and almost free; typing always works as a fallback | Done |
 
 ### Rules that follow from the measurements
 
-- Calls the player waits on use `LIVE_REASONING_EFFORT=minimal`.
+- Calls the user waits on use `LIVE_REASONING_EFFORT=minimal`.
 - Every `max_tokens` leaves room for reasoning (2 000 or more for text, plus 3 072 on Baseten).
 - A slow model never sits on the request path of a live call: it runs in the background, offline,
   or behind a loading screen with its own timeout.
-- Muse Wonder may return to the live game master only if Unity requests the next event ahead of
+- Muse Wonder may return to the live simulation director only if Unity requests the next event ahead of
   time, with an automatic switch to Spark when Wonder is late.
 
 ## Consequences
