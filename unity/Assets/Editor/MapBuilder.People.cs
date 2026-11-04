@@ -6,7 +6,7 @@ namespace ColonQuest.EditorTools
     /// <summary>
     /// The people of the simulator, version 2: a cartoon person built from separate vector shapes (head with hair,
     /// eyes, eyelids and mouth, torso, arms with an elbow and legs), each on its own pivot so PlayerAnimator can
-    /// move them. The measures follow docs/characters-v2.md; the look of each person comes from MapBuilder.Cast.cs.
+    /// move them. The measures follow docs/team-notes/characters-v2.md; the look of each person comes from MapBuilder.Cast.cs.
     /// </summary>
     public static partial class MapBuilder
     {
