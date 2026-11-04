@@ -53,7 +53,7 @@ OPEN_WEIGHTS_PRICE = TokenPrice(Decimal("1.25"), Decimal("0.15"), Decimal("4.25"
 
 class BudgetMode(StrEnum):
     NORMAL = "normal"
-    DOWNGRADED = "downgraded"  # >= 80 %: game master switches to Muse Spark
+    DOWNGRADED = "downgraded"  # >= 80 %: simulation director switches to Muse Spark
     FALLBACK_ONLY = "fallback_only"  # >= 100 %: no model calls, fallback events only
 
 
@@ -144,7 +144,7 @@ async def spent_today(
             ModelCall.created_at >= start_of_day(now), ModelCall.provider == provider
         )
     )
-    return Decimal(total or 0)
+    return Decimal(str(total or 0))  # SQLite sums to a float
 
 
 async def budget_status(
