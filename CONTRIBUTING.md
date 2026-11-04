@@ -107,7 +107,7 @@ SCRUM-7 #done
 
 ## Code standards
 
-- **All code in English** (names, comments, docs). In-game text in Costa Rican Spanish.
+- **All code in English** (names, comments, docs). Simulator texts in English and Costa Rican Spanish, paired in `Translations.cs`.
 - **Money is always an integer** (colones). Never use `float` for amounts.
 - **API keys live only in backend environment variables.** Never in Unity, never in the repository.
 - Every model response is validated against a Pydantic schema, with a predefined fallback.
