@@ -202,7 +202,7 @@ def main() -> int:
     )
     check(
         "cached image source header",
-        img_source in {"model", "cache", "fallback"},
+        img_source in {"model", "cache", "bundled", "fallback"},
         img_source,
     )
 
