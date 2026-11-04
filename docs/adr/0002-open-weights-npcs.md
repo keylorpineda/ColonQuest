@@ -1,6 +1,8 @@
 # ADR 0002: Open-weights provider for NPC dialogue
 
-- **Status:** Accepted (feature off by default)
+- **Status:** Accepted. **On by default since 29 October:** `NPC_PROVIDER=open_weights` is in `server/.env.example`,
+  and every character runs on Baseten: the sellers, the collectors, the lender, the pyramid promoter and the
+  people of the town. Modal was not used. Measured times: [Benchmarks](../../BENCHMARKS.md).
 - **Date:** 2026-10-27
 - **Ticket:** SCRUM-68
 
@@ -24,8 +26,9 @@ model use, so moving it also protects the Meta API credits during judging.
 
 ## How to enable
 
-1. Deploy Muse Spark Open on Baseten or Modal and copy its OpenAI-compatible base URL and key.
-2. Set `NPC_PROVIDER=open_weights`, `OPEN_WEIGHTS_BASE_URL` and `OPEN_WEIGHTS_API_KEY` in Render.
+1. Get a Baseten key; the hackathon model is already at `https://inference.baseten.co/v1`.
+2. Paste it when `start_colonquest.bat` asks, or set `OPEN_WEIGHTS_API_KEY` in `server/.env`. `NPC_PROVIDER` and
+   `OPEN_WEIGHTS_BASE_URL` already come set in `server/.env.example`.
 3. Play a negotiation and check `SELECT provider, count(*) FROM model_calls GROUP BY 1`.
 
 ## Baseten in practice (Oct 28)
