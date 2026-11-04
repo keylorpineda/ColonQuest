@@ -376,11 +376,19 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "models_title": "META MODELS",
         "models": [
-            ("bolt", "Muse Spark", "Live simulation director with tools; Class Mode reports."),
-            ("spark", "Muse Wonder", "Plans your year, writes the summary and event bank."),
-            ("person", "Muse Spark Open", "The sellers on Baseten: tactics and memory."),
-            ("mic", "Voice Transcribe", "You negotiate out loud; typing always works too."),
-            ("picture", "Muse Image", "Portraits, event scenes and your ending, no text."),
+            ("bolt", "Muse Spark", "Meta API. Live simulation director with tools."),
+            ("spark", "Muse Wonder", "Meta API, background. Plans your year, writes the end."),
+            ("person", "Muse Spark Open", "Baseten. Every character you talk to."),
+            ("mic", "Voice Transcribe", "Meta API. You negotiate out loud, or you type."),
+            ("picture", "Muse Image", "Meta API, pre-generated. Portraits, scenes, endings."),
+        ],
+        "categories_title": "CATEGORIES WE ENTER",
+        "categories": [
+            ("Indie track", "Impact, Meta tools, demo and technical depth: the criteria above."),
+            ("Best Build on Meta Open Weights", "Every character you talk to runs on Muse Spark Open in Baseten."),
+            ("Best Agentic Use-Case", "Three agents with tools: the simulation director, the year planner and the seller."),
+            ("Best Creative Build", "An original Costa Rican town. Muse Image draws it, Muse Wonder writes your year."),
+            ("Most Viral and Community Vote", "The demo clip on X and the votes in the public gallery."),
         ],
         "agents_title": "AGENTS",
         "agents": [
@@ -472,11 +480,19 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "models_title": "MODELOS DE META",
         "models": [
-            ("bolt", "Muse Spark", "Director de la simulación en vivo con herramientas; Modo Clase."),
-            ("spark", "Muse Wonder", "Planifica tu año, escribe el resumen y los eventos."),
-            ("person", "Muse Spark Open", "Los vendedores en Baseten: tácticas y memoria."),
-            ("mic", "Voice Transcribe", "Negociás en voz alta; escribir siempre sirve."),
-            ("picture", "Muse Image", "Retratos, escenas y tu final, pre-generados, sin texto."),
+            ("bolt", "Muse Spark", "API de Meta. Director en vivo con herramientas."),
+            ("spark", "Muse Wonder", "API de Meta, en segundo plano. Tu año y tu final."),
+            ("person", "Muse Spark Open", "Baseten. Cada personaje con el que hablás."),
+            ("mic", "Voice Transcribe", "API de Meta. Negociás en voz alta o escribís."),
+            ("picture", "Muse Image", "API de Meta, pre-generadas. Retratos y finales."),
+        ],
+        "categories_title": "CATEGORÍAS",
+        "categories": [
+            ("Track Indie", "Impacto, herramientas de Meta, demo y técnica: los criterios de arriba."),
+            ("Best Build on Meta Open Weights", "Cada personaje con el que hablás corre en Muse Spark Open en Baseten."),
+            ("Best Agentic Use-Case", "Tres agentes con herramientas: el director, el planificador y el vendedor."),
+            ("Best Creative Build", "Un pueblo tico original. Muse Image lo dibuja, Muse Wonder escribe tu año."),
+            ("Most Viral y Community Vote", "El clip de la demo en X y los votos en la galería pública."),
         ],
         "agents_title": "AGENTES",
         "agents": [
@@ -715,7 +731,7 @@ COMMANDS = [
     "python scripts/build_game.py",
 ]
 MEMBERS = ["Keylor Pineda", "Jefferson Abarca"]
-SECTION_ICONS = ["warning", "coin", "chart", "spark", "bolt", "stack", "person", "terminal", "team"]
+SECTION_ICONS = ["warning", "coin", "chart", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
 
 
 def wrap(text: str, width: int) -> list[str]:
@@ -833,8 +849,13 @@ def criteria(card: Card, copy: dict[str, Any]) -> None:
 
 
 def agents(card: Card, copy: dict[str, Any]) -> None:
+    entries(card, copy["agents"])
+
+
+def entries(card: Card, items: Sequence[tuple[str, str]]) -> None:
+    """A list of named entries, each with a short paragraph under its name."""
     body, y = "", 20
-    for name, text in copy["agents"]:
+    for name, text in items:
         rows = wrap(text, 46)
         body += f'<rect x="{LEFT}" y="{y - 18}" width="14" height="14" fill="{OCHRE}" stroke="{INK}" stroke-width="2"/>'
         body += f'<text class="label" x="{LEFT + 30}" y="{y}">{escape(name)}</text>'
@@ -1007,6 +1028,8 @@ def build(copy: dict[str, Any]) -> None:
     card.paragraph(copy["month"][1])
     card.header(copy["criteria_title"])
     criteria(card, copy)
+    card.header(copy["categories_title"])
+    entries(card, copy["categories"])
     card.header(copy["models_title"])
     tile_rows(card, copy["models"])
     card.header(copy["agents_title"])
