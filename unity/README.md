@@ -117,7 +117,7 @@ Windows block the user's movement (`PlayerController.Blocked`).
 | `Scripts/UI/GameBootstrap.cs` | Placed in the Town scene; creates the session and the overlay once |
 
 Without a backend the run works with the local events and the local seller. For the real one, start
-it with `python scripts/run_local.py` and keep the default `ApiConfig.LocalUrl`. There is no hosted
+it with `start_colonquest.bat` (or `python scripts/run_local.py`) and keep the default `ApiConfig.LocalUrl`. There is no hosted
 backend.
 
 ## Backend client
