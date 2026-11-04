@@ -258,7 +258,7 @@ namespace ColonQuest.World
             { "Muse Wonder es el mejor escritor, pero suele tardar de 6 a 10 s. Por eso solo trabaja donde nadie espera: planifica en segundo plano y narra detrás de una pantalla de carga.", "Muse Wonder is the best writer, but it often takes 6 to 10 s. So it only works where nobody is waiting: it plans in the background and narrates behind a loading screen." },
             { "Esta estación no llama a ningún modelo: es lo que mantiene a la IA dentro de las reglas.", "This station calls no model: it is what keeps the AI within the rules." },
             { "Las cifras salen de la base de datos. Muse Spark solo las explica en lenguaje claro; no inventa números.", "The figures come from the database. Muse Spark only explains them in plain words; it makes up no numbers." },
-            { "No hubo respuesta del servidor local. Abrí run_local.bat y probá otra vez.", "The local server did not answer. Open run_local.bat and try again." },
+            { "No hubo respuesta del servidor local. Abrí start_colonquest.bat y probá otra vez.", "The local server did not answer. Open start_colonquest.bat and try again." },
             { "Si el modelo tarda, la primera respuesta puede tomar hasta un minuto.", "If the model is slow, the first answer can take up to a minute." },
             { "Servidor en línea", "Server online" },
             { "El servidor no responde", "The server is not answering" },
