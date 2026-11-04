@@ -5,6 +5,7 @@
 - [Development workflow and Jira integration](workflow.md)
 - [Optional self-hosting guide](deployment.md)
 - [Localization: English and Spanish](localization.md)
+- [Benchmarks and model decisions](../BENCHMARKS.md) ([español](../BENCHMARKS.es.md))
 - [Architecture: the pieces, one event end to end, guardrails and cost per run](architecture.md)
 - Architecture decisions: `docs/adr/` (one file per decision, `NNNN-title.md`)
 - [Team notes from the hackathon, in Spanish](team-notes/README.md)
