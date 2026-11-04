@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/run-en.svg" width="100%" alt="How to run ColonQuest, point it to another backend and build the executable from the env files. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/run-en.svg" width="100%" alt="How to run ColonQuest on your computer, start its local backend and build the executable from the env files. The full content of this card is available as text in the section below.">
 </p>
 
 <details open>
@@ -14,19 +14,20 @@
 
 ## Run and build
 
+ColonQuest runs entirely on your computer. There is no hosted service: nothing here talks to a server of ours.
 There are three ways in, from the fastest to the most complete. Each one only adds to the last.
 
 | You want to | You need | Time |
 | --- | --- | --- |
-| [Play it](#1-just-play-it) | Windows and internet | 1 minute |
-| [Use your own backend and keys](#3-run-your-own-backend) | uv, Postgres and your keys | 10 minutes |
+| [Run the simulator on its own](#1-run-the-simulator-on-its-own) | Windows | 1 minute |
+| [Add the local backend and the live AI](#3-start-the-local-backend) | Python, uv and, for the AI, your Meta key | 5 minutes |
 | [Build the executable](#4-build-the-executable) | Unity 6000.3.27f1 and Python | 10 minutes |
 
-### 1. Just play it
+### 1. Run the simulator on its own
 
-Download `ColonQuest-Windows.zip` from the [latest release](https://github.com/keylorpineda/ColonQuest/releases/latest), unzip it, open `ColonQuest.exe` and choose **Guided simulation**. It talks to our
-hosted backend, so it only needs internet. The first answer can take up to a minute if the server was
-asleep; the game plays a scripted event if it does not arrive in time.
+Download `ColonQuest-Windows.zip` from the [latest release](https://github.com/keylorpineda/ColonQuest/releases/latest), unzip it, open `ColonQuest.exe` and choose **Guided simulation**.
+With no backend running it uses its local content: the finance engine, the scripted events and the scripted
+seller all work, with no internet and no keys. The live models need [the local backend](#3-start-the-local-backend).
 
 ### 2. The two env files
 
@@ -35,59 +36,41 @@ Everything you can change lives in two files, and neither is in the repository.
 | File | Who reads it | What it holds | Secrets |
 | --- | --- | --- | --- |
 | `server/.env` | The backend | API keys, models, budgets, database | **Yes** |
-| `colonquest.env` | The game | Which backend it talks to | No |
+| `colonquest.env` | The simulator | Which backend it talks to | No |
 
-**The API keys never go inside the executable.** The game only knows a URL; the backend holds the keys and
+**The API keys never go inside the executable.** The simulator only knows a URL; the backend holds the keys and
 calls the models.
 
-The game looks for its backend in this order:
+The simulator looks for its backend in this order:
 
 1. The environment variable `COLONQUEST_API_URL`.
 2. The file `colonquest.env` beside `ColonQuest.exe`.
-3. Our hosted backend.
+3. `http://localhost:8000/api`, this computer.
 
-So you can move an existing build to another backend without building anything: edit `colonquest.env`
-beside the exe and open the game again.
+### 3. Start the local backend
 
-```
-COLONQUEST_API_URL=http://localhost:8000/api
-```
-
-### 3. Run your own backend
-
-You need [uv](https://docs.astral.sh/uv/), a Postgres database and your keys.
+You need Python 3.12 and [uv](https://docs.astral.sh/uv/) (`python -m pip install uv`). No database to install:
+it keeps its data in a local SQLite file. From the root of the repository, double-click `run_local.bat` or run:
 
 ```bash
-cd server
-cp .env.example .env
+python scripts/run_local.py
 ```
 
-Fill in `server/.env`. These three are the ones you must set; the rest of the file already holds the values
-we run in production.
+The first run creates `server/.env` and installs the dependencies. Leave that window open and open
+`ColonQuest.exe`. Check that it answers at `http://localhost:8000/api/health`.
+
+Without keys the backend answers with the scripted events and records every decision. To turn on the live AI,
+put your keys in `server/.env` and start it again:
 
 | Variable | What it is |
 | --- | --- |
-| `MODEL_API_KEY` | Your key for the Meta Model API |
-| `OPEN_WEIGHTS_API_KEY` | Your Baseten key, for Muse Spark Open. Without it, set `NPC_PROVIDER=meta_api` and the characters use Meta |
-| `DATABASE_URL` | Your Postgres database |
+| `MODEL_API_KEY` | Your key for the Meta Model API. Without it, the models do not run |
+| `OPEN_WEIGHTS_API_KEY` | Optional: your Baseten key, for Muse Spark Open. Without it, the characters use Meta |
 
-If you do not have a database at hand, this starts one, and its `DATABASE_URL` is
-`postgresql://test:test@localhost:55432/colon_quest_test`:
+To use Postgres instead of SQLite, set `DATABASE_URL` in `server/.env`; the script applies the migrations.
 
-```bash
-docker run -d --name cq-pg -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=colon_quest_test -p 55432:5432 postgres:17-alpine
-```
-
-Then start the server. Check that it answers at `http://localhost:8000/api/health`.
-
-```bash
-uv sync
-uv run alembic upgrade head
-uv run python -m app.dev
-```
-
-Portraits and scenes are generated the first time they are asked for, which takes a while. To have them all
-ready, run `uv run python scripts/pregenerate_images.py` once; each one costs $0.01.
+Portraits and scenes are generated the first time they are asked for, which takes a while and needs your Meta key.
+To have them all ready, run `uv run python scripts/pregenerate_images.py` once in `server/`; each one costs $0.01.
 
 ### 4. Build the executable
 
@@ -98,17 +81,17 @@ cp colonquest.env.example colonquest.env
 python scripts/build_game.py
 ```
 
-Edit `colonquest.env` first if the build should talk to your backend. The script builds the game with Unity,
-puts that file beside the exe and leaves everything zipped in `dist/ColonQuest-Windows.zip`. If Unity is not in
-its usual folder, set `UNITY_PATH` to its `Unity.exe`.
+The script builds the simulator with Unity, puts `colonquest.env` beside the exe and leaves everything zipped in
+`dist/ColonQuest-Windows.zip`. If Unity is not in its usual folder, set `UNITY_PATH` to its `Unity.exe`.
 
 Close the Unity editor first: Unity does not open the same project twice.
 
 ### Check that it is all connected
 
-In the game, the panel on the right shows every real call with its model, provider, time and cost. If it stays
-empty and the game still answers, the game could not reach the backend and is playing its local rules: check
-the URL in `colonquest.env` and `/api/health`. The game writes the backend it uses in its log, on a line that starts with
+In the simulator, the panel on the right shows every real call with its model, provider, time and cost. If it stays
+empty and the simulator still answers, it could not reach the backend and is running its local rules: check
+that `run_local.bat` is open and that `http://localhost:8000/api/health` answers. If the panel shows calls marked as failed, the
+backend has no valid key. The simulator writes the backend it uses in its log, on a line that starts with
 `[ColonQuest] Backend:`, at `%USERPROFILE%\AppData\LocalLow\DoWhile Team\ColonQuest\Player.log`.
 
 </details>

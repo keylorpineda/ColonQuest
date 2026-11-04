@@ -25,7 +25,7 @@ in dollars, and local words are explained below. Consulted on 2 November 2026.
   education.
 - **The traps are not theoretical.** Investigators counted 2 930 cases of street lenders in 2025, with
   interest from 20% to 100%, and the loan offers arrive by WhatsApp, Facebook and TikTok.
-- **So the game uses the real rules.** You live on the real minimum wage, with the real deductions and a
+- **So the simulator uses the real rules.** You live on the real minimum wage, with the real deductions and a
   card under the real legal cap, and you practice before it costs you anything.
 
 ### Words you may need
@@ -62,7 +62,7 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | **73.89%** | People who say at least one course would help them | Same survey |
 | **2025** | Law 10627 on financial education came into force, and was regulated in 2026 | [Column in La Nación](https://www.nacion.com/opinion/foros/entre-la-tarjeta-y-la-loteria-tenemos-cultura/LRYCPI4W65HN3IG2EQ256KSCPU/story/) |
 
-### 3. The traps of the game are real
+### 3. The traps of the simulator are real
 
 | Trap | Figure | What it means | Source |
 | --- | --- | --- | --- |
@@ -74,9 +74,9 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | **Pyramids** | **50+** | Complaints about apparent pyramid scams that the financial regulator sent to prosecutors in 2021 | [Teletica](https://www.teletica.com/288694_sugef-traslada-a-fiscalia-50-denuncias-por-aparentes-estafas-en-piramides) |
 | | **600+** | Investors, as those affected believe, in a scheme across three countries under investigation in 2025 | [CRHoy](https://crhoy.com/fiscalia-investiga-multimillonario-fraude-con-esquema-piramidal-en-tres-paises/) |
 
-### 4. What the game copies from reality
+### 4. What the simulator copies from reality
 
-| In the game | The real rule | Source |
+| In the simulator | The real rule | Source |
 | --- | --- | --- |
 | Gross salary of ₡373 092 (about $750) | The 2026 minimum wage of an unskilled worker | Decree 45303-MTSS, in [Bloomberg Línea](https://www.bloomberglinea.com/latinoamerica/costa-rica/salario-minimo-2026-en-costa-rica-nuevos-montos-para-el-sector-privado/) |
 | 10.83% off the salary | Worker's social charges in 2026: 5.50 + 4.33 + 1.00 | [Our review of the engine](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
@@ -86,11 +86,11 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | Lender at 20% a month | The lowest rate the OIJ found: 240% a year, more than six times the legal cap. Asked if it is legal, the lender says so | OIJ and BCCR, in the table above |
 
 We simplified two things: income tax has no credits for children or a spouse, and the prices of the town
-are examples, as the game itself says.
+are examples, as the simulator itself says.
 
-### 5. What the player practices
+### 5. What the user practices
 
-| What happens in Costa Rica | What the player does |
+| What happens in Costa Rica | What the user does |
 | --- | --- |
 | A third of income goes to debts | Lives month by month on the real salary |
 | Installments with costs nobody mentions | Asks the seller for the total, the insurance and the commission, out loud |
@@ -109,7 +109,7 @@ are examples, as the game itself says.
 - **The survey and the police point in different directions.** In the survey, people who took a gota a gota
   fell from 12% to 3% (about 92 000 people in three years), while investigators report more cases. One asks
   people, the other counts reports, so we do not add them up.
-- **We cannot claim yet that the game works.** There are no pilot results to publish, so this page describes
+- **We cannot claim yet that the simulator works.** There are no pilot results to publish, so this page describes
   the problem and the design, not an effect. Class Mode and the telemetry are there to measure it, and the
   results will go in `docs/pilot/`.
 
