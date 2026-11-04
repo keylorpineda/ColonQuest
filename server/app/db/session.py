@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.config import get_settings
+from app.db.base import Base
 
 
 def normalize_url(url: str) -> str:
@@ -22,13 +23,21 @@ def normalize_url(url: str) -> str:
     return parsed.render_as_string(hide_password=False)
 
 
+def is_sqlite(url: str) -> bool:
+    return make_url(url).get_backend_name() == "sqlite"
+
+
 @lru_cache
 def get_engine() -> AsyncEngine:
     settings = get_settings()
     if not settings.database_url:
         raise RuntimeError("DATABASE_URL is not configured")
+    url = normalize_url(settings.database_url)
+    if is_sqlite(url):
+        # Background writers (the year planner) can overlap a request: wait instead of failing.
+        return create_async_engine(url, connect_args={"timeout": 30})
     return create_async_engine(
-        normalize_url(settings.database_url),
+        url,
         pool_pre_ping=True,  # Neon suspends idle computes
         pool_size=5,
         max_overflow=5,
@@ -38,6 +47,14 @@ def get_engine() -> AsyncEngine:
 @lru_cache
 def get_sessionmaker() -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(get_engine(), expire_on_commit=False)
+
+
+async def prepare_local_database() -> None:
+    """Create the tables of a local SQLite file; Postgres gets its schema from the migrations."""
+    url = get_settings().database_url
+    if url and is_sqlite(url):
+        async with get_engine().begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:

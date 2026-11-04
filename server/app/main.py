@@ -21,7 +21,7 @@ from app.api import (
 from app.classes.explainer import ClassExplainer
 from app.config import get_settings
 from app.cost_guard import OpenWeightsBudget
-from app.db.session import get_sessionmaker
+from app.db.session import get_sessionmaker, prepare_local_database
 from app.game_master.agentic import AgenticGameMaster
 from app.game_master.planner import SeasonPlanner
 from app.game_master.service import GameMaster
@@ -40,15 +40,16 @@ from app.talks.service import TalkResponder
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Create one provider and one game master per process and close them on shutdown."""
+    """Create one provider and one simulation director per process and close them on shutdown."""
     settings = get_settings()
+    await prepare_local_database()
     provider = MetaProvider(settings)
     open_weights = OpenWeightsProvider(settings)
     cache: TTLCache[GameEvent] = TTLCache(
         max_entries=settings.response_cache_max_entries, ttl_s=settings.response_cache_ttl_s
     )
     app.state.provider = provider
-    # The agentic wrapper delegates to the single-call game master unless AGENTIC_GAME_MASTER.
+    # The agentic wrapper delegates to the single-call director unless AGENTIC_GAME_MASTER.
     app.state.game_master = AgenticGameMaster(
         GameMaster(provider, settings, cache), provider, settings
     )
@@ -81,7 +82,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="ColonQuest API",
         version="0.1.0",
-        description="Backend for the ColonQuest financial-literacy game.",
+        description="Backend for the ColonQuest financial-literacy simulator.",
         lifespan=lifespan,
     )
     app.add_middleware(

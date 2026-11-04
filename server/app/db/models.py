@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import (
+    JSON,
     BigInteger,
     Boolean,
     CheckConstraint,
@@ -17,12 +18,18 @@ from sqlalchemy import (
     SmallInteger,
     String,
     Text,
+    Uuid,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+
+# Postgres keeps its native types; a local run on SQLite gets the portable ones (RUN_AND_BUILD.md).
+JsonDocument = JSON().with_variant(JSONB(), "postgresql")
+Identifier = Uuid(as_uuid=True).with_variant(UUID(as_uuid=True), "postgresql")
+RowId = BigInteger().with_variant(Integer(), "sqlite")
 
 
 def _created_at() -> Mapped[datetime]:
@@ -42,7 +49,7 @@ class SchoolClass(Base):
 class GameSession(Base):
     __tablename__ = "sessions"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Identifier, primary_key=True, default=uuid.uuid4)
     class_code: Mapped[str | None] = mapped_column(
         ForeignKey("classes.code", ondelete="SET NULL"), index=True
     )
@@ -51,8 +58,8 @@ class GameSession(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    final_state: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
-    season_plan: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    final_state: Mapped[dict[str, Any] | None] = mapped_column(JsonDocument)
+    season_plan: Mapped[dict[str, Any] | None] = mapped_column(JsonDocument)
     language: Mapped[str] = mapped_column(String(5), nullable=False, server_default="es")
 
 
@@ -60,7 +67,7 @@ class Decision(Base):
     __tablename__ = "decisions"
     __table_args__ = (CheckConstraint("month BETWEEN 1 AND 12", name="month_range"),)
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(RowId, primary_key=True, autoincrement=True)
     session_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("sessions.id", ondelete="CASCADE"), index=True, nullable=False
     )
@@ -68,14 +75,14 @@ class Decision(Base):
     event_id: Mapped[str] = mapped_column(String(64), nullable=False)
     teaching_concept: Mapped[str] = mapped_column(String(40), index=True, nullable=False)
     choice_id: Mapped[str] = mapped_column(String(64), nullable=False)
-    state_after: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    state_after: Mapped[dict[str, Any]] = mapped_column(JsonDocument, nullable=False)
     created_at: Mapped[datetime] = _created_at()
 
 
 class Negotiation(Base):
     __tablename__ = "negotiations"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(RowId, primary_key=True, autoincrement=True)
     session_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("sessions.id", ondelete="CASCADE"), index=True, nullable=False
     )
@@ -83,18 +90,20 @@ class Negotiation(Base):
     transcript: Mapped[str] = mapped_column(Text, nullable=False)
     npc_reply: Mapped[str] = mapped_column(Text, nullable=False, server_default="")
     source: Mapped[str] = mapped_column(String(10), nullable=False, server_default="model")
-    key_questions_asked: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
-    revealed_facts: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    key_questions_asked: Mapped[list[str]] = mapped_column(
+        JsonDocument, nullable=False, default=list
+    )
+    revealed_facts: Mapped[list[str]] = mapped_column(JsonDocument, nullable=False, default=list)
     deal_status: Mapped[str] = mapped_column(String(20), nullable=False)
     created_at: Mapped[datetime] = _created_at()
 
 
 class ModelCall(Base):
-    """One row per model call: drives the cost guard and the cost-per-game metric."""
+    """One row per model call: drives the cost guard and the cost-per-run metric."""
 
     __tablename__ = "model_calls"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(RowId, primary_key=True, autoincrement=True)
     session_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("sessions.id", ondelete="SET NULL"), index=True
     )
