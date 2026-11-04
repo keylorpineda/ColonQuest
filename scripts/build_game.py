@@ -1,4 +1,4 @@
-"""Build the Windows game from colonquest.env and zip it for the judges.
+"""Build the Windows simulator from colonquest.env and zip it for the judges.
 
 Usage:
     cp colonquest.env.example colonquest.env
@@ -6,7 +6,7 @@ Usage:
 
 Leaves dist/ColonQuest-Windows.zip, with colonquest.env beside the exe so it can still be changed
 without building again. UNITY_PATH overrides where Unity is. Close the Unity editor first. The file
-only says which backend the game talks to: API keys belong in server/.env and never reach the build.
+only says which backend the simulator talks to: API keys belong in server/.env and never reach the build.
 Standard library only.
 """
 
@@ -40,7 +40,7 @@ def read_env(path: Path) -> dict[str, str]:
 
 def main() -> int:
     if not ENV_FILE.exists():
-        print(f"{ENV_FILE.name} does not exist: copying {ENV_EXAMPLE.name}, the hosted backend.")
+        print(f"{ENV_FILE.name} does not exist: copying {ENV_EXAMPLE.name}, the local backend.")
         shutil.copyfile(ENV_EXAMPLE, ENV_FILE)
 
     values = read_env(ENV_FILE)

@@ -7,7 +7,7 @@ body:
     id: problem
     attributes:
       label: Problem
-      description: What player or teacher problem does this solve?
+      description: What user or teacher problem does this solve?
     validations:
       required: true
   - type: textarea

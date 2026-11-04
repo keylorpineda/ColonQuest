@@ -1,10 +1,10 @@
-"""End-to-end smoke test of the game flow over HTTP (local or deployed backend).
+"""End-to-end smoke test of the simulator flow over HTTP (local or deployed backend).
 
 Usage:
     python scripts/smoke_test.py                       # http://127.0.0.1:8000
-    API_URL=https://colon-quest-api.onrender.com python scripts/smoke_test.py
+    API_URL=http://localhost:8000 python scripts/smoke_test.py
 
-It plays one short game: class -> session -> event -> decision -> event -> negotiation by text
+It plays one short simulator: class -> session -> event -> decision -> event -> negotiation by text
 and voice -> summary -> dashboard, and checks the contract of every response. It works with or
 without a Meta API key: without one, every model call must fall back cleanly.
 Exit code 0 when every check passes.
