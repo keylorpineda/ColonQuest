@@ -76,13 +76,21 @@ def list_models(base_url: str, key: str) -> list[str] | None:
 
 
 def check_meta_key() -> None:
-    key = read_value("MODEL_API_KEY")
-    if not key:
-        return
-    models = list_models(read_value("META_BASE_URL") or "https://api.meta.ai/v1", key)
-    if models is None:
-        print("Meta rejected MODEL_API_KEY in server/.env. The simulator will use its scripted content.")
-        return
+    """Check the Meta key for free; a rejected one is asked for again, or cleared if skipped."""
+    tries = 3
+    while True:
+        key = read_value("MODEL_API_KEY")
+        if not key:
+            return
+        models = list_models(read_value("META_BASE_URL") or "https://api.meta.ai/v1", key)
+        if models is not None:
+            break
+        tries -= 1
+        print("Meta rejected that key.")
+        if tries == 0 or "--no-prompt" in sys.argv or not sys.stdin.isatty():
+            print("The simulator will use its scripted content. Fix MODEL_API_KEY in server/.env.")
+            return
+        write_value("MODEL_API_KEY", input("Paste it again (Enter to skip): ").strip())
     wanted = {read_value(name) for name in ("GAME_MASTER_MODEL", "SUMMARY_MODEL", "IMAGE_MODEL")}
     missing = sorted(model for model in wanted if model and models and model not in models)
     if missing:
