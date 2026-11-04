@@ -1,6 +1,10 @@
 # ADR 0004: One clear role per model, chosen by measured latency
 
-- **Status:** Accepted (roles marked *Pending* are still to be built)
+- **Status:** Accepted, and every role is built (4 November 2026). Since this record: Muse Image draws the
+  portraits, the scenes and ten endings, pre-generated and shipped in the release zip; every character, not only
+  the sellers, runs on Muse Spark Open in Baseten, and so does the seller agent; the backend runs on the judge's
+  computer instead of Render. The measurements below are kept as they were taken. A readable summary, with the
+  cost of a run: [Benchmarks](../../BENCHMARKS.md).
 - **Date:** 2026-10-29
 - **Tickets:** SCRUM-20, SCRUM-41, SCRUM-42, SCRUM-49
 
@@ -74,10 +78,10 @@ credits; all the tests on Oct 28 cost under $0.15.
 
 | Model | Role | Why | Status |
 | --- | --- | --- | --- |
-| **Muse Spark 1.3** | Live simulation director (monthly event, agentic simulation director with tools), Class Mode report, Meta fallback for the sellers | The only Meta text model that answers inside Unity's 8 s every time (3.0 to 4.4 s with `minimal`) | Done, live on Render |
-| **Muse Wonder** | Plans the user's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the user is not waiting, or once offline | Year-end summary (5.2 to 7.6 s) and background season plan (6.2 to 16.7 s) done on Oct 29; event bank *pending* |
+| **Muse Spark 1.3** | Live simulation director (monthly event, agentic simulation director with tools), Class Mode report, Meta fallback for the sellers | The only Meta text model that answers inside Unity's 8 s every time (3.0 to 4.4 s with `minimal`) | Done |
+| **Muse Wonder** | Plans the user's year and narrates the year-end summary; writes the offline event bank | Too slow and too variable for live calls (5.8 to 10.5 s even at `minimal`), but the best writer. These calls happen where the user is not waiting, or once offline | Done: the year-end story and the background season plan. The offline event bank has its script, `scripts/generate_event_bank.py` |
 | **Muse Spark Open** (Baseten) | The sellers: tactics to earn commission, exact figures through tools, memory of what the user asked during the run | Fastest option (about 2 s), paid by Baseten credits instead of Meta, and the central piece for the Open Weights prize | Dialogue, tactics with tools and memory of the run done on Oct 29 (3.3 to 5.3 s per turn) |
-| **Muse Image** | NPC portraits, event scenes and the illustration of the shareable year card | 14 to 17 s per image rules out live use, so images are pre-generated and cached. The year card is an illustration **without text**: the code draws the figures on top, because no amount may come from a model and image models misdraw digits | *Pending* |
+| **Muse Image** | NPC portraits, event scenes and the illustration of the shareable year card | 14 to 17 s per image rules out live use, so images are pre-generated and cached. The year card is an illustration **without text**: the code draws the figures on top, because no amount may come from a model and image models misdraw digits | Done: portraits, scenes and ten endings chosen by the engine's figures, pre-generated and shipped in the zip |
 | **Voice Transcribe** | The user's voice when negotiating | 0.7 to 1.5 s and almost free; typing always works as a fallback | Done |
 
 ### Rules that follow from the measurements

@@ -1,6 +1,8 @@
 # ADR 0003: Agentic simulation director and seller
 
-- **Status:** Accepted (features off by default)
+- **Status:** Accepted. **On by default:** `AGENTIC_GAME_MASTER`, `SEASON_PLANNER` and `SELLER_AGENT` are `true` in
+  `server/.env.example`. The season planner runs on Muse Wonder in the background, and the seller agent on Muse
+  Spark Open in Baseten. Measured times: [Benchmarks](../../BENCHMARKS.md).
 - **Date:** 2026-10-27
 - **Tickets:** SCRUM-69, SCRUM-70, SCRUM-71
 
@@ -56,6 +58,6 @@ less reliable.
 
 ## How to enable
 
-Apply the migration first (`uv run alembic upgrade head`), then set `SEASON_PLANNER=true`,
-`SELLER_AGENT=true` and `AGENTIC_GAME_MASTER=true` in Render once the working month is stable, then watch
+They are already on in `server/.env.example`. Each one can be turned off in `server/.env` (`SEASON_PLANNER`,
+`SELLER_AGENT`, `AGENTIC_GAME_MASTER`); on Postgres, apply the migrations first (`uv run alembic upgrade head`). Watch
 `SELECT endpoint, count(*), avg(latency_ms) FROM model_calls GROUP BY 1`.
