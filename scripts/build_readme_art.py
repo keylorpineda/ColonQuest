@@ -536,10 +536,67 @@ COPY: dict[str, dict[str, Any]] = {
 # The other pages of the docs, per language: what each one says, block by block.
 COSTA_RICA_ICONS = ["coin", "person", "warning", "chart", "spark"]
 RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
+BENCHMARK_ICONS = ["clock", "coin", "warning", "spark"]
 CONTRIBUTING_ICONS = ["folder", "terminal", "team", "warning"]
 SECURITY_ICONS = ["warning", "stack"]
 CONDUCT_ICONS = ["team", "person", "warning", "spark"]
 PAGES: dict[str, dict[str, dict[str, Any]]] = {
+    "benchmarks": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR THE JUDGES",
+            "title": "BENCHMARKS",
+            "tagline": "Every model got its job by the clock.",
+            "desc": "The latency and cost of every Meta model in ColonQuest, measured with real keys, and the decisions that came from them. The full content of this card is repeated as text below it.",
+            "icons": BENCHMARK_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Measured on 28 and 29 October with real keys",
+            "blocks": [
+                ("header", "WHO ANSWERS IN TIME"),
+                ("stats", [
+                    ("4.4 s", "Muse Spark at most, with minimal effort: always inside the 8 s, so it runs live."),
+                    ("10.5 s", "Muse Wonder at most: the best writer, too slow live, so it runs in the background."),
+                    ("2.8 s", "Muse Spark Open on Baseten at most: the fastest, so it voices every character."),
+                    ("17 s", "Muse Image per picture: drawn once beforehand, never while you play."),
+                ]),
+                ("header", "WHAT A RUN COSTS"),
+                ("stats", [
+                    ("$0.06", "a three-month run: $0.04 of Meta credit and $0.02 of Baseten."),
+                    ("$0.0025", "one turn of a conversation on Baseten."),
+                    ("$0", "in images per run: they come in the zip."),
+                ]),
+                ("header", "WHAT WE LEARNED"),
+                ("paragraph", "Every Meta model reasons before it answers, and those tokens count against max_tokens. With little room the answer came back empty, so every call leaves 2 000 tokens or more, and 3 072 more on Baseten."),
+            ],
+        },
+        "es": {
+            "lang": "es",
+            "kicker": "PARA LOS JUECES",
+            "title": "BENCHMARKS",
+            "tagline": "Cada modelo tiene su trabajo por el reloj.",
+            "desc": "La latencia y el costo de cada modelo de Meta en ColonQuest, medidos con llaves reales, y las decisiones que salieron de ahí. Todo el contenido de esta tarjeta se repite como texto debajo de ella.",
+            "icons": BENCHMARK_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Medido el 28 y el 29 de octubre con llaves reales",
+            "blocks": [
+                ("header", "QUIÉN RESPONDE A TIEMPO"),
+                ("stats", [
+                    ("4,4 s", "Muse Spark como máximo, con esfuerzo mínimo: siempre dentro de los 8 s, así que corre en vivo."),
+                    ("10,5 s", "Muse Wonder como máximo: el que mejor escribe, muy lento en vivo, así que corre en segundo plano."),
+                    ("2,8 s", "Muse Spark Open en Baseten como máximo: el más rápido, así que le da voz a cada personaje."),
+                    ("17 s", "Muse Image por imagen: se dibuja antes, nunca mientras jugás."),
+                ]),
+                ("header", "LO QUE CUESTA UNA SIMULACIÓN"),
+                ("stats", [
+                    ("$0,06", "tres meses: $0,04 de crédito de Meta y $0,02 de Baseten."),
+                    ("$0,0025", "un turno de conversación en Baseten."),
+                    ("$0", "en imágenes por simulación: vienen en el zip."),
+                ]),
+                ("header", "LO QUE APRENDIMOS"),
+                ("paragraph", "Todos los modelos de Meta razonan antes de responder, y esos tokens cuentan contra max_tokens. Con poco margen la respuesta llegaba vacía, así que cada llamada deja 2 000 tokens o más, y 3 072 extra en Baseten."),
+            ],
+        },
+    },
     "costa-rica": {
         "en": {
             "lang": "en",
@@ -1050,6 +1107,7 @@ TABS = {
     "readme": {"en": "README", "es": "README"},
     "costa-rica": {"en": "COSTA RICA", "es": "COSTA RICA"},
     "run": {"en": "RUN AND BUILD", "es": "CORRER Y ARMAR"},
+    "benchmarks": {"en": "BENCHMARKS", "es": "BENCHMARKS"},
     "download": {"en": "DOWNLOAD", "es": "DESCARGAR"},
 }
 
