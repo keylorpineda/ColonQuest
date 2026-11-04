@@ -1,7 +1,7 @@
 """Season plan: which teaching concept and kind of event each month of the year focuses on.
 
 The plan is created once per session (by the model, or deterministically as a fallback) and
-adjusted month by month without any model call: when a decision increases the player's debt,
+adjusted month by month without any model call: when a decision increases the user's debt,
 that concept comes back in a later month as reinforcement.
 """
 
@@ -87,7 +87,7 @@ class SeasonPlan(ContractModel):
 
 
 def concept_priority(state: PlayerState) -> list[TeachingConcept]:
-    """Most relevant concepts first, based on the player's starting situation."""
+    """Most relevant concepts first, based on the user's starting situation."""
     card = state.credit_card
     priority: list[TeachingConcept] = []
     if card.limit and card.balance * 100 >= card.limit * 50:
@@ -142,7 +142,7 @@ def adjust_plan(
     *,
     english: bool = False,
 ) -> SeasonPlan:
-    """Reinforce concepts the player struggled with in a later month (never December).
+    """Reinforce concepts the user struggled with in a later month (never December).
 
     Idempotent: a concept already planned for an upcoming month is left alone.
     """

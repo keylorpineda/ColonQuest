@@ -650,7 +650,7 @@
         "type": "object"
       },
       "KeyQuestion": {
-        "description": "Questions a financially literate player should ask (impact metric).",
+        "description": "Questions a financially literate user should ask (impact metric).",
         "enum": [
           "total_cost",
           "hidden_fees",
@@ -1308,7 +1308,7 @@
       },
       "TalkSheetLine": {
         "additionalProperties": false,
-        "description": "One true thing about the deal, from the game's engine, worded for the character.",
+        "description": "One true thing about the deal, from the simulator's engine, worded for the character.",
         "properties": {
           "fact": {
             "$ref": "#/components/schemas/TalkFact"
@@ -1436,7 +1436,7 @@
     }
   },
   "info": {
-    "description": "Backend for the ColonQuest financial-literacy game.",
+    "description": "Backend for the ColonQuest financial-literacy simulator.",
     "title": "ColonQuest API",
     "version": "0.1.0"
   },
@@ -1444,7 +1444,7 @@
   "paths": {
     "/api/classes": {
       "post": {
-        "description": "Create a class and return the short code students type when they start a game.",
+        "description": "Create a class and return the short code students type when they start a simulation.",
         "operationId": "create_class_api_classes_post",
         "requestBody": {
           "content": {
@@ -1602,7 +1602,7 @@
     },
     "/api/ping": {
       "get": {
-        "description": "Keep-alive for UptimeRobot: wakes Render without touching Neon or any model.",
+        "description": "Liveness check that touches neither the database nor any model.",
         "operationId": "ping_api_ping_get",
         "responses": {
           "200": {
@@ -1624,7 +1624,7 @@
     },
     "/api/sessions": {
       "post": {
-        "description": "Start a game. A classCode joins the session to a Class Mode class.",
+        "description": "Start a simulation. A classCode joins the session to a Class Mode class.",
         "operationId": "create_session_api_sessions_post",
         "requestBody": {
           "content": {
@@ -1666,7 +1666,7 @@
     },
     "/api/sessions/{session_id}/decisions": {
       "post": {
-        "description": "Store the choice the player made and the resulting state (impact telemetry).",
+        "description": "Store the choice the user made and the resulting state (impact telemetry).",
         "operationId": "record_decision_api_sessions__session_id__decisions_post",
         "parameters": [
           {
@@ -1828,7 +1828,7 @@
     },
     "/api/sessions/{session_id}/negotiation/voice": {
       "post": {
-        "description": "One negotiation turn spoken by the player, for builds older than /transcribe.\n\nIf voice fails the response is 503 and the client switches to the text endpoint, so the\nnegotiation never blocks.",
+        "description": "One negotiation turn spoken by the user, for builds older than /transcribe.\n\nIf voice fails the response is 503 and the client switches to the text endpoint, so the\nnegotiation never blocks.",
         "operationId": "negotiate_voice_api_sessions__session_id__negotiation_voice_post",
         "parameters": [
           {
@@ -1936,7 +1936,7 @@
     },
     "/api/sessions/{session_id}/talk": {
       "post": {
-        "description": "The character's words, from the true sheet the game sends. 503 means: use the local rules.",
+        "description": "The character's words, from the true sheet sent to it. 503 means: use the local rules.",
         "operationId": "talk_api_sessions__session_id__talk_post",
         "parameters": [
           {
@@ -2034,7 +2034,7 @@
     },
     "/api/sessions/{session_id}/transcribe": {
       "post": {
-        "description": "Only the player's words, so the game can show them at once and then ask the seller.",
+        "description": "Only the user's words, so the simulator can show them at once and then ask the seller.",
         "operationId": "transcribe_api_sessions__session_id__transcribe_post",
         "parameters": [
           {

@@ -55,8 +55,8 @@ CONCEPT_NAMES_EN = {
     "invest_in_yourself": "investing in yourself",
 }
 
-SYSTEM_PROMPT = """You explain classroom results of "ColonQuest", a financial-literacy game, to \
-a Costa Rican high-school teacher.
+SYSTEM_PROMPT = """You explain classroom results of "ColonQuest", a financial-literacy \
+simulator, to a Costa Rican high-school teacher.
 
 - Spanish, clear and professional, at most 600 characters, no bullet points.
 - Point out the concept with the highest share of risky choices and suggest one short classroom \
@@ -146,9 +146,9 @@ def fallback_explanation(figures: ClassFigures, language: str = "es") -> str:
     if is_english(language):
         return fallback_explanation_en(figures)
     if figures.students == 0:
-        return "Todavía nadie de esta clase ha jugado. Compartí el código con tus estudiantes."
+        return "Todavía nadie de esta clase ha simulado. Compartí el código con tus estudiantes."
     parts = [
-        f"{figures.students} estudiantes jugaron y {figures.finished_games} terminaron el año."
+        f"{figures.students} estudiantes simularon y {figures.finished_games} terminaron el año."
     ]
     measured = [m for m in figures.concepts if m.risky_choice_pct is not None]
     if measured:

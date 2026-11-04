@@ -27,7 +27,7 @@ OptionalDbSession = Annotated[AsyncSession | None, Depends(get_optional_session)
 
 
 def client_ip(request: Request) -> str:
-    """Client IP behind Render's proxy: first X-Forwarded-For entry, else the socket peer."""
+    """Client IP behind a proxy: first X-Forwarded-For entry, else the socket peer."""
     forwarded = request.headers.get("x-forwarded-for", "")
     if forwarded:
         return forwarded.split(",")[0].strip()

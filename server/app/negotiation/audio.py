@@ -2,7 +2,7 @@
 
 The API accepts only mono, 16-bit PCM WAV at 16 or 24 kHz. Browsers usually record at 44.1 or
 48 kHz, often in stereo, so the clip is down-mixed and resampled here with the standard library
-(no ffmpeg needed on Render).
+(no ffmpeg needed).
 """
 
 import io

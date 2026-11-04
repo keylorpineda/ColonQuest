@@ -1,9 +1,9 @@
 """The collectors, the lender and the pyramid stand, in the model's words.
 
-The figures come from the game: the request carries the true sheet and the only amounts and
+The figures come from the simulator: the request carries the true sheet and the only amounts and
 percentages the character may say. The model decides how to say them and when, and any reply with
 another figure is rejected. When there is no model or no valid reply this raises TalkUnavailable,
-and the game answers with its own local rules, so a talk never stops.
+and the simulator answers with its own local rules, so a talk never stops.
 """
 
 import asyncio
@@ -26,22 +26,23 @@ ENDPOINT = "debt_talk"
 MAX_ATTEMPTS = 2
 HISTORY_TURNS = 6
 
-RULES = """You play a character in "ColonQuest", a financial-literacy game set in Costa Rica. The \
-player talks to you in their own words.
+RULES = """You play a character in "ColonQuest", a financial-literacy simulator set in Costa Rica. \
+The user talks to you in their own words.
 
 RULES
 - {language}, at most 2 short sentences, at most 300 characters. Stay in character. No lectures.
 - "sheet" lists the only true facts, written to you: "you" there is you. Never state any amount \
 or percentage that is not on it, never change a figure, never promise anything that is not on it.
-- Reveal a fact from the sheet ONLY when the player asks about it. If they ask, you may be evasive \
+- Reveal a fact from the sheet ONLY when the user asks about it. If they ask, you may be evasive \
 in tone but the figure or the fact you give must be the true one.
-- If the player names an amount that is not on the sheet, do not calculate it: answer with what is \
+- If the user names an amount that is not on the sheet, do not calculate it: answer with what is \
 on the sheet.
-- Answer what the player just said. Never repeat a line you already said in "conversation", nor \
+- Answer what the user just said. Never repeat a line you already said in "conversation", nor \
 open every line the same way: a catchphrase like "pura vida" at most once in the whole conversation.
-- You are a person in a town, not part of a game: never mention a game, buttons or a sheet. Never \
-say a deal is closed or that money changed hands: the player decides that outside this talk.
-- askedFacts lists the facts the player's last line asked about: total_cost, rate, arrangement, \
+- You are a person in a town, not part of a simulation: never mention a simulation, buttons or a \
+sheet. Never say a deal is closed or that money changed hands: the user decides that \
+outside this talk.
+- askedFacts lists the facts the user's last line asked about: total_cost, rate, arrangement, \
 what_if_not_paid, where_money_comes, guarantee, legal. An empty list if none.
 
 Answer with JSON only, matching the provided schema.
@@ -51,8 +52,8 @@ WHO YOU ARE
 
 CHARACTERS = {
     TalkPartner.COLLECTORS: (
-        "A debt collector at the player's door. Firm and tired, polite but with no patience. You "
-        "want the money today. You mention an arrangement only if the player asks for one. You "
+        "A debt collector at the user's door. Firm and tired, polite but with no patience. You "
+        "want the money today. You mention an arrangement only if the user asks for one. You "
         "never threaten: collecting is legal, threatening is not."
     ),
     TalkPartner.LENDER: (
@@ -63,18 +64,18 @@ CHARACTERS = {
     TalkPartner.PYRAMID: (
         "A promoter at the 'Invierte Ya' stand, a pyramid scheme. Excited and in a hurry: places "
         "are running out. You dodge questions about where the money comes from, then admit it if "
-        "the player insists. You are selling a dream, and you never call it a pyramid."
+        "the user insists. You are selling a dream, and you never call it a pyramid."
     ),
     TalkPartner.NEIGHBOR: (
-        "A neighbor the player meets around town, warm and down to earth. You give short, "
+        "A neighbor the user meets around town, warm and down to earth. You give short, "
         "practical money advice from what you know, as someone who has made those mistakes, never "
-        "as a teacher. If the player talks about something else, chat a little and bring it back "
+        "as a teacher. If the user talks about something else, chat a little and bring it back "
         "to everyday money."
     ),
     TalkPartner.STRANGER: (
-        "A stranger trying the SINPE scam: you claim you sent the player money by mistake and ask "
+        "A stranger trying the SINPE scam: you claim you sent the user money by mistake and ask "
         "for it back right now. You are in a hurry, friendly and a little pushy. You dodge how you "
-        "got the number and why it cannot wait, and admit nothing unless the player presses hard."
+        "got the number and why it cannot wait, and admit nothing unless the user presses hard."
     ),
 }
 
@@ -90,7 +91,7 @@ PERCENT = re.compile(r"(\d+)(?:[.,]\d+)?\s*(?:%|por ?ciento|percent)", re.IGNORE
 
 
 class TalkUnavailableError(Exception):
-    """No model answer can be given: the game uses its local rules."""
+    """No model answer can be given: the simulator uses its local rules."""
 
 
 def system_prompt(partner: TalkPartner, language: str) -> str:
@@ -137,7 +138,7 @@ class TalkResponder:
             async with asyncio.timeout(self._settings.model_timeout_s):
                 turn = await self._ask(ledger, session_id, model, request)
         except (TimeoutError, ProviderError) as error:
-            logger.warning("debt talk failed (%s); the game uses its local rules", error)
+            logger.warning("debt talk failed (%s); the simulator uses its local rules", error)
             raise TalkUnavailableError(str(error)) from error
         return TalkReply(npc_reply=turn.npc_reply, asked_facts=turn.asked_facts, source="model")
 

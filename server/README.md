@@ -1,6 +1,6 @@
 # ColonQuest — Server
 
-FastAPI backend: AI game master, negotiation, image cache, cost guard and Class Mode telemetry.
+FastAPI backend: AI simulation director, negotiation, image cache, cost guard and Class Mode telemetry.
 
 See the [root README](../README.md) for setup commands and [CONTRIBUTING.md](../CONTRIBUTING.md) for conventions.
 
@@ -16,8 +16,8 @@ tests/           # pytest suite
 
 ## Database
 
-Neon (PostgreSQL 17) through SQLAlchemy 2 and psycopg 3. `DATABASE_URL` comes from `.env`;
-plain `postgresql://` URLs from the Neon console are switched to the psycopg driver automatically.
+SQLAlchemy 2. `DATABASE_URL` comes from `.env`: by default a local SQLite file, whose tables are created on
+start. For PostgreSQL 17, plain `postgresql://` URLs are switched to the psycopg driver automatically.
 
 ```bash
 uv run alembic upgrade head                                 # apply migrations

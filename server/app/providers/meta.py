@@ -49,7 +49,7 @@ class MetaProvider:
             api_key=settings.model_api_key.get_secret_value() or "missing-key",
             base_url=settings.meta_base_url,
             timeout=settings.model_timeout_s,
-            max_retries=0,  # retries and fallbacks are decided by the game master layer
+            max_retries=0,  # retries and fallbacks are decided by the simulation director layer
             http_client=self._http,
         )
 
@@ -96,7 +96,7 @@ class MetaProvider:
         reasoning_effort: ReasoningEffort | None = None,
         max_tokens: int = 2048,
     ) -> ChatTurn:
-        """One tool-calling step (agentic game master and seller)."""
+        """One tool-calling step (agentic simulation director and seller)."""
         self._require_key()
         return await chat_completion(
             self._client,
