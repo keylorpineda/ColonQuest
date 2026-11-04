@@ -361,7 +361,7 @@ COPY: dict[str, dict[str, Any]] = {
         "why_close": "A law can cap a rate. It cannot teach anyone the right question. "
         "That is why Costa Rica needs financial education, and why ColonQuest exists.",
         "month": (
-            "HOW A MONTH PLAYS",
+            "HOW A MONTH WORKS",
             "Your salary arrives with CCSS and income tax already deducted. You decide what to "
             "pay, save or borrow. Muse Spark writes one event built for your situation and the "
             "C# engine applies it in whole colones. When a seller shows up, you negotiate out "
@@ -399,10 +399,10 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "arch_title": "ARCHITECTURE",
         "boxes": [
-            ("Unity 2D client", ["WebGL and desktop", "C# finance engine"]),
+            ("Unity 2D client", ["Windows desktop", "C# finance engine"]),
             ("FastAPI backend", ["Pydantic v2 contracts", "cost guard, agents"]),
             ("Meta Model API", ["Wonder, Spark,", "Voice, Image"]),
-            ("SQLite or Postgres", ["sessions,", "decisions, calls"]),
+            ("Database", ["SQLite or Postgres:", "sessions, decisions"]),
             ("Open weights", ["sellers on Baseten", "Muse Spark Open"]),
         ],
         "rules": [
@@ -411,17 +411,6 @@ COPY: dict[str, dict[str, Any]] = {
             "Every model answer is validated, with a fallback.",
             "Every call goes through a daily cost guard.",
             "API keys live only in the backend.",
-        ],
-        "access_title": "ACCESSIBILITY",
-        "status": {"done": "DONE", "progress": "IN PROGRESS", "planned": "PLANNED"},
-        "access": [
-            ("done", "Voice is optional", "Every negotiation turn accepts typed text."),
-            ("done", "Plain language", "Short texts in everyday Costa Rican Spanish."),
-            ("done", "No dead ends", "If a model fails, scripted content takes over."),
-            ("done", "Readable page", "A text version below, motion stops on request."),
-            ("progress", "Keyboard use", "Movement and every panel without a mouse."),
-            ("progress", "Not by color alone", "Every color also has a label or an icon."),
-            ("planned", "Adjustable text", "A larger font for panels and dialogue."),
         ],
         "run_title": "RUN IT AND BUILD IT",
         "run_note": "The full guide, with the env files: RUN_AND_BUILD.md",
@@ -468,7 +457,7 @@ COPY: dict[str, dict[str, Any]] = {
         "why_close": "Una ley puede topar una tasa. No puede enseñar la pregunta correcta. "
         "Por eso Costa Rica necesita educación financiera, y por eso existe ColonQuest.",
         "month": (
-            "CÓMO SE JUEGA UN MES",
+            "CÓMO FUNCIONA UN MES",
             "Te llega el salario con el rebajo de la CCSS y la renta. Decidís qué pagar, ahorrar "
             "o pedir prestado. Muse Spark escribe un evento hecho para tu situación y el motor "
             "en C# lo aplica en colones enteros. Cuando aparece un vendedor, negociás en voz "
@@ -492,7 +481,7 @@ COPY: dict[str, dict[str, Any]] = {
         "agents_title": "AGENTES",
         "agents": [
             (
-                "Simulation director",
+                "Director de la simulación",
                 "Usa herramientas de solo lectura como simulate_purchase y project_debt, así las consecuencias que narra usan números reales.",
             ),
             (
@@ -506,10 +495,10 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "arch_title": "ARQUITECTURA",
         "boxes": [
-            ("Cliente Unity 2D", ["WebGL y escritorio", "motor financiero C#"]),
+            ("Cliente Unity 2D", ["Escritorio Windows", "motor financiero C#"]),
             ("Backend FastAPI", ["contratos Pydantic v2", "costos, agentes"]),
             ("API de Meta", ["Wonder, Spark,", "Voice, Image"]),
-            ("SQLite o Postgres", ["sesiones,", "decisiones"]),
+            ("Base de datos", ["SQLite o Postgres:", "sesiones, decisiones"]),
             ("Modelos abiertos", ["vendedores en Baseten", "Muse Spark Open"]),
         ],
         "rules": [
@@ -518,17 +507,6 @@ COPY: dict[str, dict[str, Any]] = {
             "Toda respuesta de un modelo se valida y tiene respaldo.",
             "Toda llamada pasa por un control de costos diario.",
             "Las llaves de API viven solo en el backend.",
-        ],
-        "access_title": "ACCESIBILIDAD",
-        "status": {"done": "LISTO", "progress": "EN PROGRESO", "planned": "PENDIENTE"},
-        "access": [
-            ("done", "Voz opcional", "Cada turno de negociación acepta texto."),
-            ("done", "Lenguaje claro", "Narraciones cortas en español tico cotidiano."),
-            ("done", "Sin bloqueos", "Si un modelo falla, entra contenido escrito."),
-            ("done", "Página legible", "Versión en texto y animación que se puede parar."),
-            ("progress", "Teclado", "Movimiento y paneles sin usar el mouse."),
-            ("progress", "No solo color", "Cada color lleva también etiqueta o ícono."),
-            ("planned", "Texto ajustable", "Letra más grande en paneles y diálogos."),
         ],
         "run_title": "CORRERLO Y ARMARLO",
         "run_note": "La guía completa, con los archivos env: RUN_AND_BUILD.es.md",
@@ -904,20 +882,6 @@ def architecture(card: Card, copy: dict[str, Any]) -> None:
     card.add(body, y)
 
 
-def accessibility(card: Card, copy: dict[str, Any]) -> None:
-    fills = {"done": (INK, CARD), "progress": (OCHRE, INK), "planned": (CARD, INK)}
-    body = ""
-    for i, (status, label, text) in enumerate(copy["access"]):
-        y = 16 + i * 84
-        background, foreground = fills[status]
-        body += (
-            f'<rect x="{LEFT}" y="{y + 4}" width="164" height="32" fill="{background}" stroke="{INK}" stroke-width="2"/>'
-            f'<text class="chip" x="{LEFT + 82}" y="{y + 26}" text-anchor="middle" fill="{foreground}">{escape(copy["status"][status])}</text>'
-            f'<text class="label-sm" x="{LEFT + 188}" y="{y + 28}">{escape(label)}</text>'
-            f'<text class="detail" x="{LEFT + 188}" y="{y + 60}">{escape(text)}</text>'
-        )
-    card.add(body, 16 + 84 * len(copy["access"]))
-
 
 def terminal(commands: Sequence[str]) -> tuple[str, int]:
     height = 40 + 36 * len(commands)
@@ -1049,8 +1013,6 @@ def build(copy: dict[str, Any]) -> None:
     agents(card, copy)
     card.header(copy["arch_title"])
     architecture(card, copy)
-    card.header(copy["access_title"])
-    accessibility(card, copy)
     card.header(copy["run_title"])
     run_locally(card, copy)
     card.header(copy["team_title"])

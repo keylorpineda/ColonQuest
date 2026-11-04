@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=4" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=5" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -118,7 +118,7 @@ It needs the local backend with your Meta key, because the models run there. A w
 | Impact | 30% | Sourced Costa Rican figures, the real minimum wage and the Law 9859 rate cap in the engine, telemetry per decision, Class Mode for teachers |
 | Meta tools | 25% | Five Meta models, one clear job each, plus tool-using agents |
 | Demo | 25% | A guided three-month run and a feature demo in the simulator's menu; every model call has a timeout and a fallback |
-| Technical depth | 20% | Validated contracts, an exact engine, more than 1 300 tests: the engine's NUnit and the server's pytest run in CI, the Unity suites locally |
+| Technical depth | 20% | Validated contracts, an exact engine, more than 1 300 tests: the engine's NUnit, the server's pytest and Unity's EditMode run in CI on every change |
 
 ### Meta models
 
@@ -136,7 +136,7 @@ slow writer, Wonder, only runs where you are not waiting. See
 
 ### Agents
 
-Behind feature flags, see [ADR 0003](docs/adr/0003-agentic-game-master.md).
+On by default in the local backend, each behind its own switch in `server/.env`; if an agent fails, the single-call version answers, and if it takes too long, a scripted event does. See [ADR 0003](docs/adr/0003-agentic-game-master.md).
 
 - **Simulation director:** calls read-only tools such as `simulate_purchase` and `project_debt`, so the
   consequences it narrates use real numbers.
@@ -158,19 +158,6 @@ are in [Architecture](docs/architecture.md).
 - Every model answer is validated, with a fallback.
 - Every call goes through a daily cost guard.
 - API keys live only in the backend.
-
-### Accessibility
-
-| Area | Status | What it means |
-| --- | --- | --- |
-| Voice is optional | Done | Every negotiation turn accepts typed text |
-| One-click questions | Done | The key questions are buttons; typing or talking is optional |
-| Plain language | Done | Short texts in plain English or everyday Costa Rican Spanish |
-| No dead ends | Done | If a model fails, scripted content takes over |
-| Readable page | Done | This text version, and the card stops moving under reduced motion |
-| Keyboard use | In progress | Movement and every panel without a mouse |
-| Not by color alone | In progress | Every color also has a label or an icon |
-| Adjustable text | Planned | A larger font for panels and dialogue |
 
 ### Run it and build it
 
