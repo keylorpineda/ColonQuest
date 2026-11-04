@@ -37,7 +37,7 @@ namespace ColonQuest.UI
         private const float Left = 28f;
         private const float Width = 972f;
 
-        private const string NoServer = "No hubo respuesta del servidor local. Abrí run_local.bat y probá otra vez.";
+        private const string NoServer = "No hubo respuesta del servidor local. Abrí start_colonquest.bat y probá otra vez.";
 
         private static readonly Vector2 TopLeft = new Vector2(0f, 1f);
         private static readonly Vector2 Center = new Vector2(0.5f, 0.5f);

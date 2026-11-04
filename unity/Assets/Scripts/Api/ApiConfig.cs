@@ -10,7 +10,7 @@ namespace ColonQuest.Api
     /// </summary>
     public sealed class ApiConfig
     {
-        /// <summary>The backend on this computer, started with <c>python scripts/run_local.py</c>. There is no hosted one.</summary>
+        /// <summary>The backend on this computer, started by <c>start_colonquest.bat</c> (<c>scripts/run_local.py</c>). There is no hosted one.</summary>
         public const string LocalUrl = "http://localhost:8000/api";
 
         /// <summary>The environment variable that says where the backend is.</summary>

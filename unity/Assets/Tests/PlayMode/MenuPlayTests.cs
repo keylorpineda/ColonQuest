@@ -199,7 +199,7 @@ namespace ColonQuest.World.PlayModeTests
             bool saysSo = false;
             foreach (var text in shown)
             {
-                saysSo |= text.text.Contains(Loc.T("No hubo respuesta del servidor local. Abrí run_local.bat y probá otra vez."));
+                saysSo |= text.text.Contains(Loc.T("No hubo respuesta del servidor local. Abrí start_colonquest.bat y probá otra vez."));
             }
 
             Assert.IsTrue(saysSo, "the demo never passes a local answer off as the model's");
