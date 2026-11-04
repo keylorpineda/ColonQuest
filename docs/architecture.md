@@ -16,7 +16,7 @@ flowchart LR
     subgraph Backend["FastAPI backend on your computer"]
         API["/api endpoints<br/>Pydantic v2 contracts"]
         Guard["Cost guard<br/>daily budgets, per-session and per-IP limits"]
-        GM["Game master + tools<br/>season planner"]
+        GM["Simulation director + tools<br/>season planner"]
         Talk["Seller agent, collectors,<br/>lender, pyramid"]
     end
 

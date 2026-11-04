@@ -54,7 +54,7 @@ show 118 by 91 units (`MapLayout.TownBounds`), and every edge is a natural barri
 
 Each place is a kind of money decision. `TownPlaces.All` lists what the map shows.
 
-![The original town, before the two districts](../docs/art/town.png)
+![The whole town with its districts, the beach and the sea](../docs/art/world.png)
 
 | Place | Scene or station | What it is for |
 | --- | --- | --- |
@@ -184,17 +184,17 @@ The camera follows the user smoothly and never shows past the edge of the map
 
 ## Art style
 
-The whole simulation uses an Among Us style cartoon look, not pixel art:
+The whole simulator uses a flat cartoon look, not pixel art:
 
 - Flat solid fills with thick dark outlines and rounded corners. No gradients, no pixel filtering.
 - Colors come only from `Scripts/World/GamePalette.cs`. Green is money in, red is debt, blue is an alert, yellow marks a station.
 - Shapes are white sprites tinted per object, so there are no hand-drawn assets to keep in sync.
 
-What the camera saw during a run on 27 October, and an interior:
+A street of the town and the bank, rendered from the current scenes with `MapBuilder.RenderPreview` on 4 November:
 
-![Simulator view](../docs/art/town-ingame.png)
+![A street with the lender and the pyramid stand](../docs/art/town-ingame.png)
 
-![Banco interior](../docs/art/interior-banco.png)
+![The bank interior](../docs/art/interior-banco.png)
 
 ## Depth and lighting
 

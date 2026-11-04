@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace ColonQuest.EditorTools
 {
     /// <summary>
-    /// The v2 cast: one sheet per named person (see docs/characters-v2.md, section 4). A person with a sheet
+    /// The v2 cast: one sheet per named person (see docs/team-notes/characters-v2.md, section 4). A person with a sheet
     /// ignores the look the town gives it; everyone else keeps the color hash with the new head, hair and arms.
     /// A skin tone never goes with a role: the people who collect and lend, and the ones who cure and judge, come in every tone.
     /// </summary>

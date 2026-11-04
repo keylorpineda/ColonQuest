@@ -79,7 +79,7 @@ A survey of 1 200 adults aged 18 to 70, in July 2025, with a margin of error of 
 | In the simulator | The real rule | Source |
 | --- | --- | --- |
 | Gross salary of ₡373 092 (about $750) | The 2026 minimum wage of an unskilled worker | Decree 45303-MTSS, in [Bloomberg Línea](https://www.bloomberglinea.com/latinoamerica/costa-rica/salario-minimo-2026-en-costa-rica-nuevos-montos-para-el-sector-privado/) |
-| 10.83% off the salary | Worker's social charges in 2026: 5.50 + 4.33 + 1.00 | [Our review of the engine](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
+| 10.83% off the salary | Worker's social charges in 2026: 5.50 + 4.33 + 1.00 | [EY tax alert, 2026](https://www.ey.com/es_ce/technical/tax/tax-alerts/costa-rica-aumento-en-cuotas-obrero-patronales-aplicable-desde-enero-20261) |
 | No income tax up to ₡918 000 | 2026 brackets: 10%, 15%, 20% and 25% above that | Decree 45333-H, same review |
 | Aguinaldo of one twelfth | Free of charges and of income tax | Law 2412, same review |
 | Card at 3% a month | 36% a year, under the cap of 36.48% | BCCR, in the table above |

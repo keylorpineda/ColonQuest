@@ -78,7 +78,7 @@ Encuesta a 1 200 adultos de 18 a 70 años, en julio de 2025, con un margen de er
 | En el simulador | La regla real | Fuente |
 | --- | --- | --- |
 | Salario bruto de ₡373 092 (unos $750) | Salario mínimo 2026 de un trabajador no calificado | Decreto 45303-MTSS, en [Bloomberg Línea](https://www.bloomberglinea.com/latinoamerica/costa-rica/salario-minimo-2026-en-costa-rica-nuevos-montos-para-el-sector-privado/) |
-| 10,83% rebajado del salario | Cargas del trabajador en 2026: 5,50 + 4,33 + 1,00 | [Nuestro análisis del motor](docs/ANALISIS_RUBRICA_README_MOTOR.md) |
+| 10,83% rebajado del salario | Cargas del trabajador en 2026: 5,50 + 4,33 + 1,00 | [Alerta tributaria de EY, 2026](https://www.ey.com/es_ce/technical/tax/tax-alerts/costa-rica-aumento-en-cuotas-obrero-patronales-aplicable-desde-enero-20261) |
 | Sin renta hasta ₡918 000 | Tramos 2026: 10%, 15%, 20% y 25% de ahí para arriba | Decreto 45333-H, mismo análisis |
 | Aguinaldo de un doceavo | Libre de cargas y de renta | Ley 2412, mismo análisis |
 | Tarjeta al 3% mensual | 36% anual, bajo el tope de 36,48% | BCCR, en la tabla de arriba |

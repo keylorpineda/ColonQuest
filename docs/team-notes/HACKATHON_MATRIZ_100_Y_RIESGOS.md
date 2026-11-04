@@ -61,14 +61,14 @@ Para garantizar el puntaje perfecto, cada uno de los cuatro criterios evaluados 
 
 > **Pregunta del Jurado:** *¿Qué tan creativamente se usaron las herramientas de Meta? ¿Fueron más allá de una integración básica? ¿Demostraron capacidades inesperadas?*
 
-* [x] **Especialización Multi-Modelo Justificada por Latencia ([ADR 0004](docs/adr/0004-model-roles.md))**:
+* [x] **Especialización Multi-Modelo Justificada por Latencia ([ADR 0004](../adr/0004-model-roles.md))**:
   - **Muse Spark 1.3** (`minimal reasoning`): Director de la Simulación en vivo que narra eventos mensuales adaptados al historial del usuario en menos de 4 segundos.
   - **Muse Wonder**: Planificador de temporada (12 meses) y resumen de fin de año en segundo plano (calidad narrativa superior sin bloquear la UI).
   - **Muse Spark Open en Baseten**: Modelos abiertos de Meta corriendo en infraestructura de inferencia asociada (aprovechando los créditos y límites de 2M TPM).
   - **Voice Transcribe**: Interacción natural por voz donde el usuario negocia cara a cara con los personajes.
 * [ ] **Completar `Muse Image` en la Pipeline**:
   - **Requisito para 100%:** Cerrar la tarea pendiente del ADR 0004. Pre-generar y cachear retratos de NPCs, fondos de eventos y la ilustración de la tarjeta anual de balance financiero.
-* [x] **Agentes con Herramientas Deterministas ([ADR 0003](docs/adr/0003-agentic-game-master.md))**:
+* [x] **Agentes con Herramientas Deterministas ([ADR 0003](../adr/0003-agentic-game-master.md))**:
   - Los modelos no inventan números; tienen herramientas (`simulate_purchase`, `project_debt`). Si el vendedor quiere engañar al usuario, sus cifras provienen de su hoja de cálculo oculta validada en backend.
 * [x] **Arquitectura de Inferencia Híbrida (Cloud + Open Weights)**:
   - Combinación pionera entre la API administrada de Meta y el modelo de pesos abiertos en Baseten con balanceo de carga y fallback automático.
