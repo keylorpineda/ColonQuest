@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=5" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=6" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -120,30 +120,52 @@ Necesita el backend local con tu llave de Meta, porque los modelos corren ahí. 
 | Demo | 25% | Una ruta guiada de tres meses y una demo de funciones en el menú; cada llamada a un modelo tiene tiempo límite y respaldo |
 | Profundidad técnica | 20% | Contratos validados, un motor exacto y más de 1 300 pruebas: NUnit del motor, pytest del servidor y EditMode de Unity corren en CI con cada cambio |
 
-### Modelos de Meta
+### Categorías en las que participamos
 
-| Modelo | Rol |
-| --- | --- |
-| Muse Spark | Director de la simulación en vivo: el evento de cada mes, con herramientas; reportes del Modo Clase |
-| Muse Wonder | Planifica tu año en segundo plano y escribe el resumen final |
-| Muse Spark Open (Baseten) | Los vendedores, con tácticas de comisión y memoria de lo que preguntaste; los cobradores, el prestamista, el de la pirámide y la gente del pueblo |
-| Muse Voice Transcribe | Negociás en voz alta; escribir siempre sirve |
-| Muse Image | Retratos, escenas de los eventos y la imagen de tu final, elegida por lo que pasó en tu simulación; pre-generados y sin texto |
+| Categoría | Qué pide | Dónde está en ColonQuest |
+| --- | --- | --- |
+| **Track Indie** | Un proyecto evaluado por impacto, uso de herramientas de Meta, demo y profundidad técnica | Los [criterios del jurado](#criterios-del-jurado) de arriba, y una ruta guiada de tres meses que se prueba en tres minutos |
+| **Best Build on Meta Open Weights** | Una parte central del proyecto corriendo en Muse Spark Open o Muse Glimmer | El centro del simulador es hablar con gente que quiere tu plata, y cada una corre en Muse Spark Open en Baseten: vendedores, cobradores, el prestamista, el de la pirámide y la gente del pueblo. Cada llamada registra su proveedor |
+| **Best Agentic Use-Case** | Agentes que deciden y ejecutan tareas de varios pasos | Tres agentes: el director de la simulación consulta cuatro herramientas de solo lectura antes de escribir (hasta 5 pasos en 10 s), el planificador arma tu año y lo ajusta a tus decisiones, y el vendedor vuelve a cotizar con una herramienta para empujar el plazo que más le deja. Ver [Agentes](#agentes) |
+| **Best Creative Build** | Un proyecto original hecho con Muse Image o Muse Wonder | Un pueblo y un elenco costarricenses originales. Muse Image dibuja los retratos, las escenas y diez finales distintos; Muse Wonder planifica tu año y escribe cómo terminó |
+| **Most Viral Project** y **Community Vote** | La elección del público | El clip de la demo en X y los votos en la galería pública |
 
-Cada rol sale de latencias medidas: solo Spark responde siempre dentro de los 8 s del simulador, así
-que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver
-[ADR 0004](docs/adr/0004-model-roles.md).
+### Modelos de Meta: quién hace qué y dónde corre
+
+Cinco modelos de Meta, un trabajo cada uno. Cuatro corren en la **API de modelos de Meta**
+(`https://api.meta.ai/v1`). El modelo abierto, **Muse Spark Open, corre en Baseten**
+(`https://inference.baseten.co/v1`), y ahí vive cada personaje con el que hablás. Ningún monto, tasa ni
+saldo sale de ellos: el motor en C# y el backend calculan cada cifra, y los modelos solo eligen cómo
+contarla.
+
+| Modelo e ID | Dónde corre | Qué hace en el simulador | Cuándo se llama | Tiempo medido |
+| --- | --- | --- | --- | --- |
+| **Muse Spark** `muse-spark-1.3` | API de Meta | El director de la simulación en vivo: escribe el evento de cada mes para tu situación, después de consultar herramientas de solo lectura. También redacta el reporte del Modo Clase a partir de cifras de SQL | Cada mes, mientras esperás | 1,4 a 4,4 s |
+| **Muse Wonder** `muse-wonder-1.0` | API de Meta | Planifica tu año (qué conceptos y en qué orden) y escribe la historia de tu reporte final. También puede escribir eventos de respaldo fuera de línea | En segundo plano después del primer evento y al final de la simulación; nunca en una llamada en vivo | 5 a 17 s |
+| **Muse Spark Open** `meta-models/muse-spark-open-1026` | **Baseten** | Cada personaje con el que hablás: los vendedores que esconden el seguro y la comisión hasta que preguntás, los cobradores, el prestamista gota a gota, el de la pirámide y la gente del pueblo. El vendedor es un agente que vuelve a cotizar con una herramienta | Cada turno de una conversación | 1,9 a 5,3 s |
+| **Muse Voice Transcribe** `muse-voice-transcribe-1.0` | API de Meta | Pasa a texto lo que decís, para que negocies en voz alta. Escribir siempre sirve | Cada turno hablado | 0,7 a 1,5 s |
+| **Muse Image** `muse-image-1.0` | API de Meta | Retratos, escenas de los eventos y las diez imágenes del final, elegidas por los números del motor. Ninguna imagen lleva texto ni números | Pre-generadas una vez y dentro del zip; nunca mientras jugás | 14 a 17 s cada una |
+
+Si Baseten falla, tarda más de 5 s o llega a su propio presupuesto diario, los personajes pasan a Muse
+Spark en la API de Meta; si un modelo falla del todo, responde contenido escrito a mano. El panel de la
+derecha del simulador y la tabla `model_calls` muestran qué modelo y qué proveedor respondió cada
+llamada, con su tiempo y su costo. Cada rol sale de latencias medidas: solo Spark responde siempre
+dentro de los 8 s del simulador, así que Wonder solo corre donde no estás esperando
+([ADR 0004](docs/adr/0004-model-roles.md) y [ADR 0002](docs/adr/0002-open-weights-npcs.md), en inglés).
 
 ### Agentes
 
 Encendidos por defecto en el backend local, cada uno con su propio interruptor en `server/.env`; si un agente
 falla, responde la versión de una sola llamada, y si tarda demasiado, un evento escrito a mano. Ver [ADR 0003](docs/adr/0003-agentic-game-master.md) (en inglés).
 
-- **Director de la simulación:** usa herramientas de solo lectura como `simulate_purchase` y `project_debt`, así
-  las consecuencias que narra usan números reales.
-- **Planificador:** arma el recorrido del año y repasa los conceptos en los que el usuario falló.
-- **Vendedor:** empuja plazos más largos para ganar más comisión, pero solo puede decir cifras de
-  su ficha oculta o de sus herramientas.
+| Agente | Modelo y proveedor | Qué decide | Sus herramientas |
+| --- | --- | --- | --- |
+| **Director de la simulación** | Muse Spark, API de Meta | Qué evento le sirve a tu mes y cómo contarlo, después de ver tu historial y el costo real de cada opción | `get_player_history`, `get_concepts_not_yet_taught`, `simulate_purchase`, `project_debt` |
+| **Planificador** | Muse Wonder, API de Meta, en segundo plano | El recorrido de tu año: qué concepto va cuándo, y repasa los que te costaron | Tu perfil y tus decisiones hasta ahora |
+| **Vendedor** | Muse Spark Open, Baseten | Qué plazo empujar para ganar más comisión, sin dejar de responder con la verdad cuando preguntás | `quote_term`, que vuelve a cotizar la oferta a otro plazo con la fórmula del motor |
+
+Las herramientas solo leen o calculan; ninguna escribe tu estado. Cada monto que dice un agente sale de
+la ficha oculta o de una herramienta, y el evento igual pasa por el mismo control de rangos que cualquier otro.
 
 ### Arquitectura
 

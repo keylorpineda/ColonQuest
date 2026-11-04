@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=5" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=6" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -120,30 +120,50 @@ It needs the local backend with your Meta key, because the models run there. A w
 | Demo | 25% | A guided three-month run and a feature demo in the simulator's menu; every model call has a timeout and a fallback |
 | Technical depth | 20% | Validated contracts, an exact engine, more than 1 300 tests: the engine's NUnit, the server's pytest and Unity's EditMode run in CI on every change |
 
-### Meta models
+### Categories we enter
 
-| Model | Role |
-| --- | --- |
-| Muse Spark | Live simulation director: the monthly event, with tools; Class Mode reports |
-| Muse Wonder | Plans your year in the background and writes the year-end summary |
-| Muse Spark Open (Baseten) | The sellers, with commission tactics and memory of what you asked; the collectors, the lender, the pyramid promoter and the people of the town |
-| Muse Voice Transcribe | You negotiate out loud; typing always works too |
-| Muse Image | Portraits, event scenes and the picture of your ending, chosen by what happened in your run; pre-generated and without text |
+| Category | What it asks for | Where it is in ColonQuest |
+| --- | --- | --- |
+| **Indie track** | A project judged on impact, use of Meta tools, demo and technical depth | The [judging criteria](#judging-criteria) above, and a guided three-month run you can try in three minutes |
+| **Best Build on Meta Open Weights** | A central part of the project running on Muse Spark Open or Muse Glimmer | The heart of the simulator is talking to people who want your money, and every one of them runs on Muse Spark Open in Baseten: sellers, collectors, the lender, the pyramid promoter and the townspeople. Each call records its provider |
+| **Best Agentic Use-Case** | Agents that decide and carry out tasks of several steps | Three agents: the simulation director calls four read-only tools before writing (up to 5 steps in 10 s), the season planner plans your year and adjusts it to your decisions, and the seller re-prices its offer with a tool to push the term that earns it more. See [Agents](#agents) |
+| **Best Creative Build** | An original project made with Muse Image or Muse Wonder | An original Costa Rican town and cast. Muse Image draws the portraits, the scenes and ten different endings; Muse Wonder plans your year and writes how it ended |
+| **Most Viral Project** and **Community Vote** | The public's choice | The demo clip on X and the votes in the public gallery |
 
-Each role follows measured latency: only Spark answers inside the simulator's 8 s every time, so the
-slow writer, Wonder, only runs where you are not waiting. See
-[ADR 0004](docs/adr/0004-model-roles.md).
+### Meta models: who does what, and where it runs
+
+Five Meta models, one job each. Four run on the **Meta Model API** (`https://api.meta.ai/v1`). The open
+model, **Muse Spark Open, runs on Baseten** (`https://inference.baseten.co/v1`), and every character you
+talk to lives there. No amount, rate or balance comes from any of them: the C# engine and the backend
+compute every figure, and the models only choose how to tell it.
+
+| Model and ID | Runs on | What it does in the simulator | When it is called | Measured time |
+| --- | --- | --- | --- | --- |
+| **Muse Spark** `muse-spark-1.3` | Meta Model API | The live simulation director: writes the event of each month for your situation, calling read-only tools first. Also writes the Class Mode report from SQL figures | Each month, while you wait | 1.4 to 4.4 s |
+| **Muse Wonder** `muse-wonder-1.0` | Meta Model API | Plans your year (which concepts, in which order) and writes the story of your final report. Can also write extra fallback events offline | In the background after the first event, and at the end of the run; never on a live request | 5 to 17 s |
+| **Muse Spark Open** `meta-models/muse-spark-open-1026` | **Baseten** | Every character you talk to: the sellers who hide the insurance and the commission until you ask, the collectors, the gota a gota lender, the pyramid promoter and the people of the town. The seller is an agent that re-prices its offer with a tool | Each turn of a conversation | 1.9 to 5.3 s |
+| **Muse Voice Transcribe** `muse-voice-transcribe-1.0` | Meta Model API | Turns what you say into text, so you can negotiate out loud. Typing always works too | Each spoken turn | 0.7 to 1.5 s |
+| **Muse Image** `muse-image-1.0` | Meta Model API | Portraits, event scenes and the ten pictures of the ending, chosen by the engine's numbers. No image has text or numbers | Pre-generated once and shipped in the zip; never while you play | 14 to 17 s each |
+
+If Baseten fails, takes more than 5 s or reaches its own daily budget, the characters switch to Muse
+Spark on the Meta API; if a model fails altogether, scripted content answers. The panel on the right of
+the simulator and the `model_calls` table show which model and which provider answered every call, with
+its time and cost. Each role follows measured latency: only Spark answers inside the simulator's 8 s
+every time, so Wonder only runs where you are not waiting ([ADR 0004](docs/adr/0004-model-roles.md),
+[ADR 0002](docs/adr/0002-open-weights-npcs.md)).
 
 ### Agents
 
 On by default in the local backend, each behind its own switch in `server/.env`; if an agent fails, the single-call version answers, and if it takes too long, a scripted event does. See [ADR 0003](docs/adr/0003-agentic-game-master.md).
 
-- **Simulation director:** calls read-only tools such as `simulate_purchase` and `project_debt`, so the
-  consequences it narrates use real numbers.
-- **Season planner:** sets the teaching arc of the year and brings back the concepts a user
-  struggled with.
-- **Seller:** pushes longer terms to earn more commission, but can only quote figures from its
-  hidden sheet or its own tools.
+| Agent | Model and provider | What it decides | Its tools |
+| --- | --- | --- | --- |
+| **Simulation director** | Muse Spark, Meta API | Which event fits your month and how to tell it, after looking at your history and the real cost of each option | `get_player_history`, `get_concepts_not_yet_taught`, `simulate_purchase`, `project_debt` |
+| **Season planner** | Muse Wonder, Meta API, in the background | The teaching arc of your year: which concept comes when, bringing back the ones you struggled with | Your profile and your decisions so far |
+| **Seller** | Muse Spark Open, Baseten | Which term to push so it earns more commission, while answering honestly when you ask | `quote_term`, which re-prices the offer at another term with the engine's formula |
+
+Tools only read data or compute; none of them writes your state. Every amount an agent says comes
+from the hidden sheet or a tool, and the event still goes through the same range check as any other.
 
 ### Architecture
 
