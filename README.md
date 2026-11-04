@@ -78,7 +78,8 @@ commission only come out if you ask.
 
 It runs on your own computer with your own Meta key; there is no hosted service. [Download the Windows build](https://github.com/keylorpineda/ColonQuest/releases/latest),
 unzip it, double-click `start_colonquest.bat` and paste your key when it asks. It installs what it needs, starts the
-local backend and opens the simulator ([details](RUN_AND_BUILD.md#1-evaluate-it-with-your-own-key)). Choose **Guided simulation**,
+local backend and opens the simulator; the first start takes about a minute ([details](RUN_AND_BUILD.md#1-evaluate-it-with-your-own-key),
+[questions](RUN_AND_BUILD.md#questions-a-judge-may-have)). Choose **Guided simulation**,
 the first entry of the main menu. It is the real simulator on a short
 stretch of the town, for three months, and you only make the decisions:
 

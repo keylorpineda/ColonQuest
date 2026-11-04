@@ -23,6 +23,8 @@ There is no hosted service: nothing here talks to a server of ours.
 | [Run it with no keys](#without-keys) | Windows | 1 minute |
 | [Build the executable](#4-build-the-executable) | Unity 6000.3.27f1 and Python | 10 minutes |
 
+Any doubt: [Questions a judge may have](#questions-a-judge-may-have).
+
 ### 1. Evaluate it with your own key
 
 1. Download `ColonQuest-Windows.zip` from the [latest release](https://github.com/keylorpineda/ColonQuest/releases/latest) and unzip it.
@@ -34,7 +36,7 @@ That is all. The launcher does the rest, with no administrator rights and nothin
 
 - If [uv](https://docs.astral.sh/uv/) is missing, it installs it in your user folder with its official installer.
   uv brings its own Python 3.12, so you do not need Python.
-- It checks your key against Meta's list of models, which is free, and tells you if it was rejected.
+- It checks your key against Meta's list of models, which is free, and asks again if it was rejected.
 - It installs the backend, starts it at `http://localhost:8000/api` with its data in a local SQLite file,
   waits until it answers and opens `game/ColonQuest.exe`.
 
@@ -51,6 +53,41 @@ events and the scripted seller, with no internet.
 **From the repository, on any system.** With Python 3.12 and uv, `python scripts/run_local.py` does the same
 from a clone, and opens the build in `dist/` if there is one. `--no-open` only starts the backend and
 `--no-prompt` skips the questions.
+
+### Questions a judge may have
+
+**Do I have to install anything?** No. You need Windows 10 or 11 and internet. The first start downloads uv,
+Python 3.12 and the backend's libraries by itself, in about a minute (53 s on a clean Windows profile with
+no Python in our test); later starts take seconds. Nothing asks for administrator rights: uv goes to your user
+folder, `%USERPROFILE%\.local\bin`.
+
+**Windows shows a warning.** The executable and `start_colonquest.bat` are not code-signed, so SmartScreen may
+say "Windows protected your PC". Choose **More info** and **Run anyway**. If your antivirus blocks the uv
+installer, install [uv](https://docs.astral.sh/uv/) by hand and start again.
+
+**Where do I get the keys?** The Meta Model API key from [dev.meta.ai](https://dev.meta.ai), the one the
+hackathon gives you. The Baseten key is optional: without it, the characters answer through Muse Spark on
+the Meta API instead of Muse Spark Open.
+
+**I pasted a wrong key.** The launcher checks it for free against Meta's list of models and asks again. To
+change it later, edit `server/.env` or delete the `MODEL_API_KEY=` line, and start again.
+
+**What does it cost?** About $0.04 of Meta credit and $0.02 of Baseten credit for a three-month run, and about
+$0.10 for the whole feature demo. Images cost nothing: they come in the zip. The backend stops spending at
+$5 a day (`DAILY_BUDGET_USD` in `server/.env`).
+
+**Where does my data go?** Into a SQLite file in `server/`. Your keys stay on your computer; they only travel
+to Meta and Baseten, to call the models.
+
+**How do I know the live AI is on?** The console says `live AI`. In the simulator, press **L** to see every
+call with its model, its provider (Meta or Baseten), its time and its cost.
+
+**Port 8000 is taken.** Start it on another one from a console: `set PORT=8010` and then `start_colonquest.bat`.
+The launcher tells the simulator which port to use.
+
+**I use macOS or Linux.** The simulator is built for Windows only. On macOS or Linux you can run the backend
+and its tests (`python scripts/run_local.py --no-open`, with Python 3.12 and uv), and open the Unity project
+in Unity 6000.3.27f1.
 
 ### 2. The two env files
 
