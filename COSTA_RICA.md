@@ -3,6 +3,7 @@
 <p align="center">
   <a href="README.md"><img src="docs/assets/tab-readme-en.svg" alt="README"></a>
   <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
+  <a href="BENCHMARKS.md"><img src="docs/assets/tab-benchmarks-en.svg" alt="Benchmarks and model decisions"></a>
 </p>
 
 <p align="center">

@@ -3,6 +3,7 @@
 <p align="center">
   <a href="README.md"><img src="docs/assets/tab-readme-en.svg" alt="README"></a>
   <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
+  <a href="BENCHMARKS.md"><img src="docs/assets/tab-benchmarks-en.svg" alt="Benchmarks and model decisions"></a>
 </p>
 
 <p align="center">
