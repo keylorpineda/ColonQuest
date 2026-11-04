@@ -380,7 +380,7 @@ Reescribir `BuildHead` y `Eye` con la tabla de la sección 3:
    - Que la sombra, el orden por altura (`YSort`) y las colisiones sigan bien con los personajes más
      anchos o más altos.
    - Revisar el pueblo, la tienda, el banco y los interiores con el elenco completo.
-4. Tomar capturas nuevas para `docs/art/` y actualizar `docs/unity-alpha-status.md`.
+4. Tomar capturas nuevas para `docs/art/` y actualizar `docs/team-notes/unity-alpha-status.md`.
 5. Commitear las escenas regeneradas por separado
    (`chore(unity): regenerate scenes with the v2 cast [SCRUM-58]`), porque los diffs son grandes.
 
@@ -428,4 +428,4 @@ dibuja una tarjeta. Dos caminos:
 - [ ] EditMode y PlayMode en verde
 - [ ] Revisado en pantalla: caminar, saludar, hablar, interiores
 - [ ] FPS medido en el build WebGL
-- [ ] Capturas y `docs/unity-alpha-status.md` actualizados
+- [ ] Capturas y `docs/team-notes/unity-alpha-status.md` actualizados

@@ -1,6 +1,6 @@
 # Análisis: rúbrica, motor financiero, README y CLAUDE.md
 
-Fecha: 1 de noviembre de 2026. Lo que se revisó: [README.md](../README.md), [CLAUDE.md](../CLAUDE.md), el motor en
+Fecha: 1 de noviembre de 2026. Lo que se revisó: [README.md](../../README.md), [CLAUDE.md](../../CLAUDE.md), el motor en
 `unity/Assets/Scripts/Finance/`, sus pruebas, `server/tests/` y `.github/workflows/ci.yml`.
 Contexto: [INVESTIGACION_EVALUADORES_Y_GANADORES.md](INVESTIGACION_EVALUADORES_Y_GANADORES.md) y
 [DEMO_Y_VIDEO_POR_PERFIL.md](DEMO_Y_VIDEO_POR_PERFIL.md).
