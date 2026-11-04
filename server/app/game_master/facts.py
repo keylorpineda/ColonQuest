@@ -1,6 +1,6 @@
-"""What the player really has, so an event never talks about a thing the player does not own.
+"""What the user really has, so an event never talks about a thing the user does not own.
 
-The contract does not carry the player's belongings, but what matters here can be read from the
+The contract does not carry the user's belongings, but what matters here can be read from the
 state: a car leaves its mark in the history, and a car or a motorbike bought in installments stays
 in the installments.
 """
@@ -18,8 +18,8 @@ FRIDGE_WORDS = re.compile(r"\b(refri|refris|refrigeradora|refrigerador)\b", re.I
 BOUGHT_FRIDGE = "bought_furniture_fridge"
 WASHER_WORDS = re.compile(r"\b(lavadora|lavadoras)\b", re.IGNORECASE)
 
-# In these types something happens to the player's own things. An offer or a scam may well talk
-# about a motorbike the player could buy, or about a lender who comes riding one.
+# In these types something happens to the user's own things. An offer or a scam may well talk
+# about a motorbike the user could buy, or about a lender who comes riding one.
 OWN_THINGS_EVENTS = frozenset({EventType.EXPENSE, EventType.EMERGENCY})
 
 # The close of the month already charges these: a choice that pays them would charge them twice.
@@ -43,16 +43,16 @@ def owns_fridge(state: PlayerState) -> bool:
 
 
 def assumes_a_vehicle(event: GameEvent, state: PlayerState) -> bool:
-    """True when the event charges the player for a vehicle the player does not have."""
+    """True when the event charges the user for a vehicle the user does not have."""
     return not owns_vehicle(state) and _mentions(event, VEHICLE_WORDS)
 
 
 def assumes_missing_thing(event: GameEvent, state: PlayerState) -> bool:
-    """True when the event charges the player for a vehicle or an appliance the player lacks."""
+    """True when the event charges the user for a vehicle or an appliance the user lacks."""
     return (
         assumes_a_vehicle(event, state)
         or (not owns_fridge(state) and _mentions(event, FRIDGE_WORDS))
-        or _mentions(event, WASHER_WORDS)  # the game sells no washing machine for the room
+        or _mentions(event, WASHER_WORDS)  # the simulator sells no washing machine for the room
     )
 
 

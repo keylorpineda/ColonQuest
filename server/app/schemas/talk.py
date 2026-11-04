@@ -30,7 +30,7 @@ class TalkFact(StrEnum):
 
 
 class TalkSheetLine(ContractModel):
-    """One true thing about the deal, from the game's engine, worded for the character."""
+    """One true thing about the deal, from the simulator's engine, worded for the character."""
 
     fact: TalkFact
     text: Annotated[str, Field(min_length=1, max_length=200)]
@@ -46,7 +46,7 @@ class TalkRequest(ContractModel):
     text: Annotated[str, Field(min_length=1, max_length=500)]
     language: GameLanguage = GameLanguage.SPANISH
     sheet: Annotated[list[TalkSheetLine], Field(min_length=1, max_length=len(TalkFact))]
-    # The only figures the character may say. The game sends them: the model never computes one.
+    # The only figures the character may say. Unity sends them: the model never computes one.
     amounts: Annotated[list[Annotated[int, Field(ge=0, le=MAX_FIGURE)]], Field(max_length=20)]
     percents: Annotated[list[Annotated[int, Field(ge=0, le=1000)]], Field(max_length=10)]
     history: Annotated[list[TalkExchange], Field(default_factory=list, max_length=20)]

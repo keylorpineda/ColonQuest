@@ -1,4 +1,4 @@
-"""Monthly event produced by the game master and validated before reaching Unity."""
+"""Monthly event produced by the simulation director and validated before reaching Unity."""
 
 from typing import Annotated, Self
 

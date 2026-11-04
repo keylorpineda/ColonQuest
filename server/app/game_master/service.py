@@ -1,6 +1,6 @@
-"""Game master orchestration: budget -> limits -> cache -> model (one retry) -> clamp -> fallback.
+"""Director orchestration: budget -> limits -> cache -> model (one retry) -> clamp -> fallback.
 
-The game never breaks because of the model: every failure path ends in a hand-written event.
+The simulator never breaks because of the model: every failure path ends in a hand-written event.
 """
 
 import asyncio
@@ -149,7 +149,7 @@ class GameMaster:
                 await self._record_failure(ledger, session_id, model, started)
                 if attempt == MAX_ATTEMPTS:
                     raise
-                logger.warning("game master returned an invalid event, retrying")
+                logger.warning("simulation director returned an invalid event, retrying")
                 continue
             except ProviderError:
                 await self._record_failure(ledger, session_id, model, started)
@@ -165,11 +165,11 @@ class GameMaster:
             event, adjustments = clamp_event(result.value)
             if assumes_missing_thing(event, context.state) or is_dishonest(event):
                 if attempt == MAX_ATTEMPTS:
-                    raise ProviderResponseError("the event assumes something the player lacks")
-                logger.warning("game master assumed something the player lacks, retrying")
+                    raise ProviderResponseError("the event assumes something the user lacks")
+                logger.warning("simulation director assumed something the user lacks, retrying")
                 continue
             if adjustments:
-                logger.info("clamped game master event: %s", adjustments)
+                logger.info("clamped simulation director event: %s", adjustments)
             return event, adjustments
         raise AssertionError("unreachable")  # pragma: no cover
 

@@ -5,7 +5,7 @@ Usage (from server/, with MODEL_API_KEY in .env):
     IMAGE_TIMEOUT_S=120 uv run python scripts/generate_menu_art.py --out DIR --only 2
 
 Makes real, billed calls: $0.01 per image, one call per variant. Like the smoke test of the
-models it is a tool run by hand, outside the game, so it does not touch the database.
+models it is a tool run by hand, outside the simulator, so it does not touch the database.
 """
 
 import argparse
@@ -22,7 +22,7 @@ SIZE = "1920x1080"
 COST_PER_IMAGE = 0.01
 
 BASE = (
-    "Key art for a polished 2D indie PC game, one continuous wide landscape from edge to edge, in "
+    "Key art for a polished 2D PC simulator, one continuous wide landscape from edge to edge, in "
     "the style of a modern travel poster and a hand-inked graphic novel: confident ink linework "
     "with varied line weight, flat colors with two or three clean shadow tones, a harmonious, "
     "slightly muted limited palette, several overlapping layers of hills that get paler with "

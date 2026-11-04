@@ -33,12 +33,12 @@ def _values(enum: type[EventType | TeachingConcept]) -> str:
     return ", ".join(member.value for member in enum)
 
 
-SYSTEM_PROMPT = f"""You plan the 12-month season of "ColonQuest", a financial-literacy game \
+SYSTEM_PROMPT = f"""You plan the 12-month season of "ColonQuest", a financial-literacy simulator \
 for Costa Rican high-school students. Each month later gets one event built around your plan.
 
 - Return exactly 12 months, numbered 1 to 12 in order.
 - Cover at least {MIN_DISTINCT_CONCEPTS} different teaching concepts across the year.
-- Put the concepts most relevant to the player's situation early (a maxed-out card means \
+- Put the concepts most relevant to the user's situation early (a maxed-out card means \
 minimum_payment and compound_interest; informal loans mean informal_lending; large savings mean \
 pyramid_scheme).
 - Month 12 is December: aguinaldo and holidays, type one of {", ".join(sorted(DECEMBER_TYPES))}.
@@ -65,7 +65,7 @@ def build_user_prompt(state: PlayerState) -> str:
         "signals": state_signals(state),
         "suggestedTypes": {c.value: t.value for c, t in CONCEPT_EVENT_TYPE.items()},
     }
-    return "Plan the season for this player.\n" + json.dumps(
+    return "Plan the season for this user.\n" + json.dumps(
         payload, ensure_ascii=False, separators=(",", ":")
     )
 

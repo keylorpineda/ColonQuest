@@ -1,6 +1,6 @@
 """Deterministic tools the agents may call.
 
-Tools never write the player's state: they only read the context they are given or compute
+Tools never write the user's state: they only read the context they are given or compute
 figures. All money is integer colones computed with Decimal, so a figure the model quotes from a
 tool result is exact.
 """
@@ -43,7 +43,7 @@ class ToolContext:
     offer: Offer | None = None  # the seller agent's hidden sheet
 
 
-# Result keys a seller may quote to the player; anything else (its own earnings) stays private.
+# Result keys a seller may quote to the user; anything else (its own earnings) stays private.
 QUOTABLE_KEYS = (
     "monthlyPayment",
     "monthlyWithInsurance",
@@ -148,7 +148,7 @@ def quote_term(args: QuoteTermArgs, context: ToolContext) -> dict[str, Any]:
 
 
 def quotable_amounts(results: Iterable[dict[str, Any]]) -> frozenset[int]:
-    """Amounts computed by tools that a seller may repeat to the player."""
+    """Amounts computed by tools that a seller may repeat to the user."""
     return frozenset(
         result[key]
         for result in results
@@ -214,19 +214,19 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "quote_term",
             "Exact figures of the offer under negotiation at another term, plus your private "
-            "earnings for that term (never tell the player your earnings).",
+            "earnings for that term (never tell the user your earnings).",
             QuoteTermArgs,
             quote_term,
         ),
         Tool(
             "get_player_history",
-            "The player's previous decisions this season (month, event, concept, choice).",
+            "The user's previous decisions this season (month, event, concept, choice).",
             NoArgs,
             get_player_history,
         ),
         Tool(
             "get_concepts_not_yet_taught",
-            "Teaching concepts the player has not seen yet this season.",
+            "Teaching concepts the user has not seen yet this season.",
             NoArgs,
             get_concepts_not_yet_taught,
         ),

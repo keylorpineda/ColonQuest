@@ -30,7 +30,7 @@ async def talk(
     settings: AppSettings,
     talker: TalkerDep,
 ) -> TalkReply:
-    """The character's words, from the true sheet the game sends. 503 means: use the local rules."""
+    """The character's words, from the true sheet sent to it. 503 means: use the local rules."""
     game_session = await get_active_session(db, session_id)
     ledger = DbLedger(db, settings, game_session.client_hash)
     try:
