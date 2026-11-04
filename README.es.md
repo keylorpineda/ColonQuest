@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=4" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=5" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -118,7 +118,7 @@ Necesita el backend local con tu llave de Meta, porque los modelos corren ahí. 
 | Impacto | 30% | Cifras de Costa Rica con fuente, el salario mínimo y el tope de usura de la Ley 9859 reales en el motor, telemetría por decisión, Modo Clase para profesores |
 | Herramientas de Meta | 25% | Cinco modelos de Meta con un rol claro cada uno, más agentes con herramientas |
 | Demo | 25% | Una ruta guiada de tres meses y una demo de funciones en el menú; cada llamada a un modelo tiene tiempo límite y respaldo |
-| Profundidad técnica | 20% | Contratos validados, un motor exacto y más de 1 300 pruebas: NUnit del motor y pytest del servidor corren en CI, las de Unity en local |
+| Profundidad técnica | 20% | Contratos validados, un motor exacto y más de 1 300 pruebas: NUnit del motor, pytest del servidor y EditMode de Unity corren en CI con cada cambio |
 
 ### Modelos de Meta
 
@@ -136,8 +136,8 @@ que Wonder, el que mejor escribe, solo corre donde no estás esperando. Ver
 
 ### Agentes
 
-Detrás de banderas de configuración, ver [ADR 0003](docs/adr/0003-agentic-game-master.md) (en
-inglés).
+Encendidos por defecto en el backend local, cada uno con su propio interruptor en `server/.env`; si un agente
+falla, responde la versión de una sola llamada, y si tarda demasiado, un evento escrito a mano. Ver [ADR 0003](docs/adr/0003-agentic-game-master.md) (en inglés).
 
 - **Director de la simulación:** usa herramientas de solo lectura como `simulate_purchase` y `project_debt`, así
   las consecuencias que narra usan números reales.
@@ -158,19 +158,6 @@ de una simulación (unos $0,06) están en [Arquitectura](docs/architecture.md), 
 - Toda respuesta de un modelo se valida y tiene respaldo.
 - Toda llamada pasa por un control de costos diario.
 - Las llaves de API viven solo en el backend.
-
-### Accesibilidad
-
-| Área | Estado | Qué significa |
-| --- | --- | --- |
-| Voz opcional | Listo | Cada turno de negociación acepta texto |
-| Preguntas de un clic | Listo | Las preguntas clave son botones; escribir o hablar es opcional |
-| Lenguaje claro | Listo | Textos cortos en inglés sencillo o en español tico cotidiano |
-| Sin bloqueos | Listo | Si un modelo falla, entra contenido escrito a mano |
-| Página legible | Listo | Esta versión en texto, y la tarjeta se queda quieta si se pide menos movimiento |
-| Teclado | En progreso | Movimiento y paneles sin usar el mouse |
-| No solo color | En progreso | Cada color lleva también una etiqueta o un ícono |
-| Texto ajustable | Pendiente | Letra más grande en paneles y diálogos |
 
 ### Correrlo y armarlo
 
