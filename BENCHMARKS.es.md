@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/benchmarks-es.svg?v=1" width="100%" alt="La latencia y el costo de cada modelo de Meta en ColonQuest, medidos con llaves reales, y las decisiones que salieron de ahí. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/benchmarks-es.svg?v=2" width="100%" alt="La latencia y el costo de cada modelo de Meta en ColonQuest, medidos con llaves reales, y las decisiones que salieron de ahí. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details open>
