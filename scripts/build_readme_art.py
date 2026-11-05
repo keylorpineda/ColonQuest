@@ -337,6 +337,12 @@ COPY: dict[str, dict[str, Any]] = {
         "rule": ("The AI tells the story.", "The engine keeps the books."),
         "desc": "ColonQuest, a personal-finance simulator that feels like real life, from Costa Rica "
         "to the world. The full content of this card is repeated as text below it.",
+        "world": (
+            "BUILD FOR YOUR WORLD",
+            "Indie Developer Track, problem statement Build for Your World. Our world is Costa Rica: "
+            "people sign their first card, installments or loan without ever practicing. ColonQuest "
+            "lets them practice with the real rules, where a mistake costs nothing.",
+        ),
         "problem": (
             "THE PROBLEM",
             "In Costa Rica a third of monthly income goes to paying debts, more than half for those "
@@ -397,7 +403,7 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "categories_title": "CATEGORIES WE ENTER",
         "categories": [
-            ("Indie track", "Impact, Meta tools, demo and technical depth: the criteria above."),
+            ("Indie Developer Track", "Build for Your World. Our world is Costa Rica."),
             ("Best Build on Meta Open Weights", "Every character you talk to runs on Muse Spark Open in Baseten."),
             ("Best Agentic Use-Case", "Three agents with tools: the simulation director, the year planner and the seller."),
             ("Best Creative Build", "An original Costa Rican town. Muse Image draws it, Muse Wonder writes your year."),
@@ -454,6 +460,12 @@ COPY: dict[str, dict[str, Any]] = {
         "desc": "ColonQuest, un simulador de finanzas personales, de "
         "Costa Rica para el mundo. Todo el contenido de esta tarjeta se repite como texto debajo "
         "de ella.",
+        "world": (
+            "BUILD FOR YOUR WORLD",
+            "Indie Developer Track, problema Build for Your World. Nuestro mundo es Costa Rica: la "
+            "gente firma su primera tarjeta, sus cuotas o su préstamo sin haber practicado nunca. "
+            "ColonQuest les deja practicar con las reglas reales, donde un error no cuesta nada.",
+        ),
         "problem": (
             "EL PROBLEMA",
             "En Costa Rica un tercio del ingreso mensual se va en deudas, más de la mitad para quienes "
@@ -514,7 +526,7 @@ COPY: dict[str, dict[str, Any]] = {
         ],
         "categories_title": "CATEGORÍAS",
         "categories": [
-            ("Track Indie", "Impacto, herramientas de Meta, demo y técnica: los criterios de arriba."),
+            ("Indie Developer Track", "Build for Your World. Nuestro mundo es Costa Rica."),
             ("Best Build on Meta Open Weights", "Cada personaje con el que hablás corre en Muse Spark Open en Baseten."),
             ("Best Agentic Use-Case", "Tres agentes con herramientas: el director, el planificador y el vendedor."),
             ("Best Creative Build", "Un pueblo tico original. Muse Image lo dibuja, Muse Wonder escribe tu año."),
@@ -560,7 +572,7 @@ COPY: dict[str, dict[str, Any]] = {
 }
 
 # The other pages of the docs, per language: what each one says, block by block.
-COSTA_RICA_ICONS = ["coin", "person", "warning", "chart", "spark"]
+COSTA_RICA_ICONS = ["spark", "coin", "person", "warning", "chart", "spark"]
 RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
 BENCHMARK_ICONS = ["clock", "coin", "warning", "spark"]
 WORKFLOW_ICONS = ["chart", "terminal", "stack"]
@@ -635,6 +647,8 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "footer": "FROM COSTA RICA TO THE WORLD",
             "license": "Every figure, with its source, in the text below",
             "blocks": [
+                ("header", "BUILD FOR YOUR WORLD"),
+                ("paragraph", "We submit to the Indie Developer Track for the problem statement Build for Your World. Our world is Costa Rica, and these are the numbers of the problem we built for."),
                 ("header", "THE SHORT VERSION"),
                 ("stats", [
                     ("34%", "of monthly income goes to paying debts, on average."),
@@ -660,6 +674,8 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
             "footer": "FROM COSTA RICA TO THE WORLD",
             "license": "Cada cifra, con su fuente, en el texto de abajo",
             "blocks": [
+                ("header", "BUILD FOR YOUR WORLD"),
+                ("paragraph", "Participamos en el Indie Developer Track con el problema Build for Your World. Nuestro mundo es Costa Rica, y estas son las cifras del problema para el que lo construimos."),
                 ("header", "LA VERSIÓN CORTA"),
                 ("stats", [
                     ("34%", "del ingreso mensual se va en pagar deudas, en promedio."),
@@ -844,7 +860,7 @@ COMMANDS = [
     "python scripts/build_game.py",
 ]
 MEMBERS = ["Keylor Pineda", "Jefferson Abarca"]
-SECTION_ICONS = ["warning", "coin", "chart", "clock", "pyramid", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
+SECTION_ICONS = ["spark", "warning", "coin", "chart", "clock", "pyramid", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
 
 
 def wrap(text: str, width: int) -> list[str]:
@@ -1131,6 +1147,8 @@ def build(copy: dict[str, Any]) -> None:
     card = Card()
     card.y = 8
     hero(card, copy)
+    card.header(copy["world"][0])
+    card.paragraph(copy["world"][1])
     card.header(copy["problem"][0])
     card.paragraph(copy["problem"][1])
     tile_rows(card, copy["traps"], copy["stamp"])
