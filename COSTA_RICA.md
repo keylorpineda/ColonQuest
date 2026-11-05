@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/costa-rica-en.svg?v=3" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/costa-rica-en.svg?v=4" width="100%" alt="The situation of debt and financial education in Costa Rica, with cited figures. The full content of this card is available as text in the section below.">
 </p>
 
 <details open>
@@ -17,6 +17,13 @@
 
 Why a personal-finance simulator, and why here. No knowledge of the country is needed: amounts also come
 in dollars, and local words are explained below. Consulted on 2 November 2026.
+
+### Why Costa Rica: Build for Your World
+
+ColonQuest is submitted to the Indie Developer Track under the problem statement **Build for Your World**. Our world
+is Costa Rica, and this page is the problem we built for: debt that takes a third of the paycheck, almost no financial
+education, and street lenders far above the legal cap. How the simulator answers it is in the
+[README](README.md#indie-developer-track-build-for-your-world).
 
 ### In one minute
 
