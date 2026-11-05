@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=9" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=10" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -18,9 +18,34 @@
 
 **From Costa Rica to the World.** Un simulador de finanzas personales:
 vivís tres meses con un salario mínimo de Costa Rica, mientras te tratan de vender cosas. Hecho por
-DoWhile Team para el Meta Global AI Developer Hackathon 2026 (track Indie). Vos decidís, Muse Spark
+DoWhile Team para el Meta Global AI Developer Hackathon 2026, en el Indie Developer Track, para el problema
+Build for Your World. Vos decidís, Muse Spark
 narra, el motor en C# calcula los colones exactos y negociás con la voz. La IA cuenta la historia;
 el motor lleva las cuentas.
+
+### Indie Developer Track: Build for Your World
+
+Participamos en el **Indie Developer Track** con el problema **Build for Your World** ("construí para tu mundo").
+Nuestro mundo es Costa Rica, y elegimos el problema que vemos alrededor cada mes: la gente firma su primera tarjeta,
+sus primeras cuotas o su primer préstamo sin haber practicado nunca, y la cuenta llega después.
+
+- **Por qué este problema.** Un tercio del ingreso mensual se va en pagar deudas, y más de la mitad para quienes
+  ganan menos de ₡500 000. Ocho de cada diez personas nunca recibieron educación financiera. La ley de usura de 2020
+  puso tope a las tasas legales, pero los prestamistas gota a gota cobran muchas veces ese tope y llegan por WhatsApp,
+  Facebook y TikTok. Las cifras y sus fuentes están en [La situación en Costa Rica](COSTA_RICA.es.md).
+- **Por qué un simulador.** Nadie puede practicar un mal préstamo en la vida real sin pagarlo. Aquí un error no
+  cuesta nada, y su consecuencia aparece en los meses siguientes en vez de explicarse en una charla.
+- **Cómo lo ataca ColonQuest.** Vivís con el salario mínimo real de 2026, con la CCSS y la renta reales, una tarjeta
+  bajo el tope legal real de la Ley 9859, y las cuatro trampas que la gente de verdad se encuentra: cuotas con
+  costos escondidos, el pago mínimo, el prestamista gota a gota y la pirámide. La habilidad que entrena es la que te
+  protege: preguntar el costo total, la tasa y el seguro antes de firmar. El servidor registra cuáles de esas
+  preguntas hiciste, para que un profesor lo vea en el Modo Clase.
+- **Hecho desde aquí.** Español de Costa Rica e inglés, colones, SINPE, la soda, el INA y la UNA, el marchamo y el
+  aguinaldo. Corre en cualquier computadora de un colegio con Windows y la llave del propio colegio, sin un servicio
+  que pagar.
+- **From Costa Rica to the World.** El mismo problema existe donde el crédito es fácil y la educación financiera
+  escasea. Las reglas viven en el motor financiero, no en los modelos, así que otro país cambiaría su salario, sus
+  rebajos y su tope legal, y conservaría el resto.
 
 ### El problema
 
@@ -213,7 +238,7 @@ SQL; Muse Spark solo las explica.
 
 | Categoría | Qué pide | Dónde está en ColonQuest |
 | --- | --- | --- |
-| **Track Indie** | Un proyecto evaluado por impacto, uso de herramientas de Meta, demo y profundidad técnica | Los [criterios del jurado](#criterios-del-jurado) de arriba, y una ruta guiada de tres meses que se prueba en tres minutos |
+| **Indie Developer Track**, problema **Build for Your World** | Un proyecto para tu propio mundo, evaluado por impacto, uso de herramientas de Meta, demo y profundidad técnica | Nuestro mundo es Costa Rica: [por qué lo elegimos](#indie-developer-track-build-for-your-world), los [criterios del jurado](#criterios-del-jurado) de arriba, y una ruta guiada que se prueba en tres minutos |
 | **Best Build on Meta Open Weights** | Una parte central del proyecto corriendo en Muse Spark Open o Muse Glimmer | El centro del simulador es hablar con gente que quiere tu plata, y cada una corre en Muse Spark Open en Baseten: vendedores, cobradores, el prestamista, el de la pirámide y la gente del pueblo. Cada llamada registra su proveedor |
 | **Best Agentic Use-Case** | Agentes que deciden y ejecutan tareas de varios pasos | Tres agentes: el director de la simulación consulta cuatro herramientas de solo lectura antes de escribir (hasta 5 pasos en 10 s), el planificador arma tu año y lo ajusta a tus decisiones, y el vendedor vuelve a cotizar con una herramienta para empujar el plazo que más le deja. Ver [Agentes](#agentes) |
 | **Best Creative Build** | Un proyecto original hecho con Muse Image o Muse Wonder | Un pueblo y un elenco costarricenses originales. Muse Image dibuja los retratos, las escenas y diez finales distintos; Muse Wonder planifica tu año y escribe cómo terminó |
