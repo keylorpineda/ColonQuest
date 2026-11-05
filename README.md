@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=7" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=8" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -75,43 +75,75 @@ borrow. Muse Spark writes one event built for your situation and the C# engine a
 whole colones. When a seller shows up, you negotiate out loud: the real price, rate, insurance and
 commission only come out if you ask.
 
-### Try it in about three minutes
+### Try it
 
 It runs on your own computer with your own Meta key; there is no hosted service. [Download the Windows build](https://github.com/keylorpineda/ColonQuest/releases/latest),
 unzip it, double-click `start_colonquest.bat` and paste your key when it asks. It installs what it needs, starts the
 local backend and opens the simulator; the first start takes about a minute ([details](RUN_AND_BUILD.md#1-evaluate-it-with-your-own-key),
-[questions](RUN_AND_BUILD.md#questions-a-judge-may-have)). Choose **Guided simulation**,
-the first entry of the main menu. It is the real simulator on a short
-stretch of the town, for three months, and you only make the decisions:
+[questions](RUN_AND_BUILD.md#questions-a-judge-may-have)).
 
-1. **Month 1.** You say how you get to the end of the month. Your salary lands by SINPE, Muse Wonder
-   writes your year in the background, and the simulation director brings an event built for your situation.
-2. **Month 2.** An arrow leads you to the store, where the seller keeps quiet about what you do not
-   ask. Talk or type.
-3. **Month 3.** What comes next depends on your money: short of it, the lender and then the
-   collectors; with some to spare, a pyramid. You can ask them questions before you sign.
+### Three ways in, and why each one exists
 
-The panel on the right shows every real call as it happens, read back from the server: model,
-provider, latency and cost. Press **L** to hide it. The run ends with a report drawn from the engine's
-numbers: what you have, what you owe, your money month by month, your grades and a picture chosen by what happened in your run.
-The objectives, the arrow and the map marks work the same in the full **Story mode**, where the people
-on the street also talk to you through Muse Spark Open.
+The main menu offers three ways into the same simulator. They share the finance engine, the models and the backend;
+what changes is how much of the town you walk and how much time you need.
 
-### Try every feature in two minutes
+| Menu entry | What it is | Time | Why we built it |
+| --- | --- | --- | --- |
+| **Guided simulation** | The real simulator, three months, on a short stretch of the town. You only make the decisions | About 3 minutes | So a judge or a student sees a whole run, from the first salary to the final report, without learning the town first |
+| **Feature demo** | Each AI feature on its own screen, one click away, with what the model did beside it | About 2 minutes | So a judge can check every model, agent and guardrail directly, without having to reach it inside a run |
+| **Story mode** | The full open world, with three save slots | As long as you like | The way a student plays it for real: work shifts, rent, a car, a farm, the whole town |
 
-Choose **Feature demo** in the main menu to reach each feature on its own, with the same panel of
-real calls.
+If you only have a few minutes, start with **Guided simulation** and then open **Feature demo**.
 
-| Station | Try this | Models |
-| --- | --- | --- |
-| Simulation director | Pick a user's situation, then a choice, and see the engine apply it | Muse Spark with tools |
-| Negotiation | Talk or type to a seller and open the hidden sheet line by line | Muse Spark Open, Muse Voice Transcribe |
-| Debts and traps | Talk to the collector, the lender and the pyramid promoter, and open what they hide | Muse Spark Open, Muse Voice Transcribe |
-| Year plan and ending | Compare the plans for two profiles and read how a year ended | Muse Wonder |
-| Engine and guards | Try to sneak in an amount out of range, see the live budgets | None, by design |
-| Class Mode | Run a real test class of three simulated students, labelled as such | Muse Spark |
+### Guided simulation: a whole run in three minutes
+
+You choose how you get to the end of the month, and the engine sets your starting money. Both profiles earn the same
+salary: the 2026 minimum wage after CCSS and income tax.
+
+| Profile | Cash | Savings | Card balance |
+| --- | --- | --- | --- |
+| "I barely make it, with a loaded card" | ₡40 000 | ₡0 | ₡240 000 |
+| "I have some savings" | ₡120 000 | ₡400 000 | ₡40 000 |
+
+1. **Month 1.** Your salary lands by SINPE. Muse Wonder starts writing your year in the background, and the simulation
+   director brings an event built for your situation, with options whose cost the engine computes.
+2. **Month 2.** An arrow leads you to the store. The seller quotes a low monthly payment and keeps quiet about the
+   insurance, the commission and the total until you ask. Talk or type, or press the question buttons.
+3. **Month 3.** What comes next depends on your money after two months of your own decisions, not on the profile you
+   chose: short of a salary, the gota a gota lender, and the collectors if you sign; with money to spare, a friend with
+   a pyramid. You can ask them anything before you decide.
+
+The run ends with a report drawn from the engine's numbers: what you have, what you owe, your money month by month,
+your grades, the questions you asked and a picture chosen by what happened.
+
+To keep it to three minutes, the guided run stops the clock, takes out the traffic and the police, opens only the doors
+on its route and never touches your saved games. Everything else is the same as in story mode.
+
+**What to look for:** the seller never lies about a figure but hides what you do not ask; the total cost appears only
+after the right question; the engine refuses an amount out of range; and the panel on the right shows every real call
+as it happens, read back from the server, with its model, its provider (Meta API or Baseten), its time and its cost.
+Press **L** to hide it.
+
+### Feature demo: every AI piece, one click away
+
+Each station sends a real request to the backend and shows the answer next to why that model has that job.
+
+| Station | What you do | What it shows | Model and provider |
+| --- | --- | --- | --- |
+| Simulation director | Pick a user's situation, then a choice | The event the model writes, the tools it called and how the engine applies the choice | Muse Spark with tools, Meta API |
+| Negotiation | Talk or type to a seller, then open the hidden sheet | The seller only reveals the insurance and the commission when asked; the sheet opens line by line | Muse Spark Open on Baseten, Muse Voice Transcribe |
+| Debts and traps | Talk to the collector, the lender and the pyramid promoter | Each has its own personality and says the uncomfortable part only if you ask | Muse Spark Open on Baseten, Muse Voice Transcribe |
+| Year plan and ending | Compare the plans for two profiles, read how a year ended | The plan Muse Wonder writes in the background, and the story of an ending | Muse Wonder, Meta API |
+| Engine and guards | Try to sneak in an amount out of range | The engine rejects or clamps it, and the live daily budgets | None, on purpose |
+| Class Mode | Create a real test class of three simulated students, labelled as such | The teacher's panel: figures from SQL, explained in plain words by the model | Muse Spark, Meta API |
 
 It needs the local backend with your Meta key, because the models run there. A whole tour costs about $0.10.
+
+### Story mode: the whole town
+
+The free run: three months of four days each, with work shifts at the soda, rent, bills, a bank, a cooperative, a
+farm, a car agency, a hospital and a police station. The people on the street also talk to you through Muse Spark
+Open. The same objectives, arrow and map marks of the guided run tell you what comes next.
 
 ### Judging criteria
 
