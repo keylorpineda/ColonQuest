@@ -576,6 +576,7 @@ COSTA_RICA_ICONS = ["spark", "coin", "person", "warning", "chart", "spark"]
 RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
 BENCHMARK_ICONS = ["clock", "coin", "warning", "spark"]
 WORKFLOW_ICONS = ["chart", "terminal", "stack"]
+DOWNLOAD_ICONS = ["folder", "clock", "spark"]
 CONTRIBUTING_ICONS = ["folder", "terminal", "team", "warning"]
 SECURITY_ICONS = ["warning", "stack"]
 CONDUCT_ICONS = ["team", "person", "warning", "spark"]
@@ -737,6 +738,35 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ("terminal", ["start_colonquest.bat"]),
                 ("header", "ARMAR EL EJECUTABLE"),
                 ("terminal", ["cp colonquest.env.example colonquest.env", "python scripts/build_game.py"]),
+            ],
+        },
+    },
+    # The release page, where the DOWNLOAD button leads. English only, like the release notes.
+    "download": {
+        "en": {
+            "lang": "en",
+            "kicker": "FOR THE JUDGES",
+            "title": "DOWNLOAD",
+            "tagline": "One zip, your key, three minutes.",
+            "desc": "How to download ColonQuest and start it with your own Meta key, in three steps. The full content of this card is repeated as text below it.",
+            "icons": DOWNLOAD_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Your keys stay on your computer",
+            "blocks": [
+                ("header", "THREE STEPS"),
+                ("tiles", [
+                    ("folder", "1. Unzip", "ColonQuest-Windows.zip, at the bottom of this page."),
+                    ("bolt", "2. Double-click", "start_colonquest.bat, inside the folder."),
+                    ("spark", "3. Paste your key", "Your Meta key. Baseten is optional."),
+                ]),
+                ("header", "WHAT YOU NEED"),
+                ("stats", [
+                    ("0", "things to install by hand: no Python, no administrator rights."),
+                    ("1 min", "for the first start, which installs everything by itself."),
+                    ("$0.06", "of credit for a whole three-month run."),
+                ]),
+                ("header", "THEN"),
+                ("paragraph", "Choose Guided simulation for a whole run in three minutes, then Feature demo to try every AI piece one click away. Press L to see every model call."),
             ],
         },
     },
