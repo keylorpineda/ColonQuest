@@ -30,8 +30,8 @@ negociación funcionando.** Nada de esta tabla se hace a costa de eso.
 | Premio | Monto | Estado en el plan | Qué exige |
 | --- | --- | --- | --- |
 | Best Creative Build | $5K | **Entra seguro.** Ya lo cubre el diseño | Proyecto original con Muse Image o Muse Wonder |
-| Most Viral Project | $20K | **Entra seguro.** Es campaña, no código | Post del demo en X con más interacción hasta el 8 nov, 11:59 p. m. ET |
-| Community Vote | $10K | **Entra seguro.** Es campaña, no código | Más votos en la galería pública (ganador el 16 nov) |
+| Most Viral Project | $20K | **No entra (decidido el 4 nov).** El demo no se publica en ningún lado | Post del demo en X con más interacción |
+| Community Vote | $10K | **Entra.** Solo por la galería pública, sin campaña en redes | Más votos en la galería pública (ganador el 16 nov) |
 | Best Build on Meta Open Weights | $10K | **Entra (decidido el 28 oct).** Créditos de Baseten y Modal aprobados; los vendedores corren en Muse Spark Open en Baseten | Parte central del proyecto corriendo en Muse Glimmer o Muse Spark Open |
 | Best Agentic Use-Case | $5K | **Entra (decidido el 29 oct).** Director de la simulación con herramientas y planificador de temporada encendidos en Render | Agentes que deciden y ejecutan tareas de varios pasos |
 
@@ -384,23 +384,13 @@ Cada fase es un sprint de Jira (proyecto `SCRUM`). Detalle en `docs/workflow.md`
 | **Sprint 1: Foundations** (lun 26 y mar 27 oct) | Repo, FastAPI, proveedor de Meta, prueba de cada modelo (Wonder JSON, transcripción en español tico, una imagen). Esquemas Pydantic y contrato en `shared/`. Neon y migración base. Pedir créditos de Baseten, Modal y Fireworks | Proyecto Unity 2D, mapa cenital con 3 estaciones (cajero, tienda, casa), movimiento y colisiones | Cada modelo responde desde el backend; el personaje camina entre estaciones |
 | **Sprint 2: Working Month** (mié 28 y jue 29 oct) | Director de la simulación con validación, recorte de montos y eventos de respaldo. Control de costos. Motor financiero C# con tests. **[CONDICIONAL, decidir el 28]** proveedor open-weight para los personajes | Paneles overlay: alerta SINPE, estado de cuenta, ventana de decisión. Conexión al endpoint de eventos | Un mes completo funcional de punta a punta |
 | **Sprint 3: Negotiation & Deploy** (vie 30 y sáb 31 oct) | Negociación por texto y voz: transcripción, ficha oculta del vendedor, `keyQuestionsAsked`. Imágenes pre-generadas. Telemetría. Despliegue en Render. **[SI DA TIEMPO, decidir el 29]** director de la simulación con herramientas | Grabación de voz (jslib en WebGL), panel de negociación, retratos. Build WebGL desplegado | La negociación funciona en el build web desplegado (voz, o texto como respaldo) |
-| **Sprint 4: Pilot & Submission** (dom 1 y lun 2 nov) | **Prueba piloto con estudiantes** (mañana del 1). Modo Clase y panel del profesor si da tiempo. Correcciones, métricas para el video, README, publicar en la galería | Pulido, sonido, pantalla final. Video de 3 min para los jueces y clip vertical de 30 a 45 s para X | **Proyecto entregado el 2 de noviembre** |
-| Después de la entrega (hasta el 8 nov) | Vigilar gasto y errores de la demo en vivo | Campaña en X | Post en X con la mayor interacción posible |
+| **Sprint 4: Pilot & Submission** (dom 1 y lun 2 nov) | **Prueba piloto con estudiantes** (mañana del 1). Modo Clase y panel del profesor si da tiempo. Correcciones, métricas para el video, README, publicar en la galería | Pulido, sonido, pantalla final. Video de 3 min para los jueces | **Proyecto entregado el 2 de noviembre** |
 | Hasta el 16 nov | Campaña de votos de la comunidad | Campaña de votos de la comunidad | Votos en la galería pública |
 
-## Campaña para Most Viral y Community Vote (no es código)
+## Community Vote (no es código)
 
-- **Cuenta de X:** crearla o reactivarla ya. Publicar avances cortos durante el hackathon
-  (un GIF del personaje, el vendedor tico, el panel SINPE) para llegar al 2 de noviembre con
-  algo de audiencia.
-- **Clip para X (30 a 45 s, vertical):** la negociación con el vendedor que intenta meter el
-  seguro escondido. Español con subtítulos en inglés. Terminar con el link a la demo y a la
-  galería. Mencionar las cuentas oficiales del hackathon.
-- **Publicar el 2 o 3 de noviembre**, apenas se entregue, y moverlo en grupos de la UNA, comunidades tech de Costa
-  Rica, y con los estudiantes de la prueba piloto.
-- **Community Vote:** pedir votos con el link directo a la galería. Mensaje: un simulador
-  costarricense compitiendo en un hackathon mundial de Meta.
-- **Fecha límite del viral:** 8 de noviembre, 11:59 p. m. hora del Este (10:59 p. m. en Costa Rica).
+- Decidido el 4 de noviembre: **el demo no se publica en X ni en ningún otro lado**, así que Most Viral
+  Project no entra. Community Vote queda solo con la galería pública del hackathon (ganador el 16 nov).
 
 ## Riesgos conocidos
 
