@@ -25,7 +25,7 @@ by day. The rules for contributors are in [CONTRIBUTING](../CONTRIBUTING.md).
 | 150 | Jira tickets in project `SCRUM`, each with its own branch and pull request |
 | 142 | Pull requests merged into `develop`, every one with green CI |
 | 790+ | Commits since 26 October 2026, small and named after their ticket |
-| 5 | Tagged releases on `main`, each with the Windows zip |
+| v1.0.0+ | Tagged releases on `main`, each with the Windows zip |
 
 ## Tools
 
