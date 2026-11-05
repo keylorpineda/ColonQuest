@@ -367,6 +367,12 @@ COPY: dict[str, dict[str, Any]] = {
             "C# engine applies it in whole colones. When a seller shows up, you negotiate out "
             "loud: the real price, rate, insurance and commission only come out if you ask.",
         ),
+        "ways_title": "THREE WAYS IN",
+        "ways": [
+            ("bolt", "Guided simulation", "Three real months in three minutes. Start here."),
+            ("spark", "Feature demo", "Every AI piece, one click away, with its calls."),
+            ("person", "Story mode", "The whole town, with three save slots."),
+        ],
         "criteria_title": "JUDGING CRITERIA",
         "criteria": [
             ("Impact", 30, "Real Costa Rican figures, telemetry, Class Mode."),
@@ -471,6 +477,12 @@ COPY: dict[str, dict[str, Any]] = {
             "en C# lo aplica en colones enteros. Cuando aparece un vendedor, negociás en voz "
             "alta: el precio, la tasa, el seguro y la comisión reales solo salen si preguntás.",
         ),
+        "ways_title": "TRES FORMAS DE ENTRAR",
+        "ways": [
+            ("bolt", "Simulación guiada", "Tres meses reales en tres minutos. Empezá aquí."),
+            ("spark", "Demo de funciones", "Cada pieza de IA a un clic, con sus llamadas."),
+            ("person", "Modo historia", "Todo el pueblo, con tres partidas guardadas."),
+        ],
         "criteria_title": "CRITERIOS DEL JURADO",
         "criteria": [
             ("Impacto", 30, "Cifras reales de Costa Rica, telemetría, Modo Clase."),
@@ -818,7 +830,7 @@ COMMANDS = [
     "python scripts/build_game.py",
 ]
 MEMBERS = ["Keylor Pineda", "Jefferson Abarca"]
-SECTION_ICONS = ["warning", "coin", "chart", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
+SECTION_ICONS = ["warning", "coin", "chart", "clock", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
 
 
 def wrap(text: str, width: int) -> list[str]:
@@ -1113,6 +1125,8 @@ def build(copy: dict[str, Any]) -> None:
     card.paragraph(copy["why_close"])
     card.header(copy["month"][0])
     card.paragraph(copy["month"][1])
+    card.header(copy["ways_title"])
+    tile_rows(card, copy["ways"])
     card.header(copy["criteria_title"])
     criteria(card, copy)
     card.header(copy["categories_title"])
