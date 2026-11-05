@@ -102,4 +102,4 @@ backend can serve roughly 80 to 120 full runs a day before it falls back to Muse
 - [ADR 0002: open-weights characters](adr/0002-open-weights-npcs.md)
 - [ADR 0003: agentic simulation director](adr/0003-agentic-game-master.md)
 - [ADR 0004: model roles by measured latency](adr/0004-model-roles.md)
-- [Deployment](deployment.md)
+- [Benchmarks and model decisions](../BENCHMARKS.md)

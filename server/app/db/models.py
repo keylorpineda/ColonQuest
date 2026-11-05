@@ -1,4 +1,4 @@
-"""Database tables (see the Database section in CLAUDE.md)."""
+"""Database tables: classes, sessions, decisions, negotiations, model calls and cached images."""
 
 import uuid
 from datetime import datetime

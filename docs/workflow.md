@@ -34,7 +34,6 @@ by day. The rules for contributors are in [CONTRIBUTING](../CONTRIBUTING.md).
 | Jira (project `SCRUM`, [board](https://keylorpineda.atlassian.net/jira/software/projects/SCRUM/boards/1)) | Backlog, sprints, ticket status |
 | GitHub | Code, pull requests, CI and releases |
 | GitHub for Atlassian | Shows each ticket's branches, commits, pull requests and builds in Jira |
-| Atlassian MCP (`.mcp.json`) | Lets Claude Code read, create and move Jira tickets from the repository |
 
 Any branch, commit or pull request that contains a key like `SCRUM-12` shows up in that ticket's
 **Development** panel.

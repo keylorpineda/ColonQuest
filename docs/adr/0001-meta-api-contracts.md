@@ -8,8 +8,8 @@
 
 ## Context
 
-Before writing code against the Meta Model API we verified the four open questions from
-`CLAUDE.md` in the official documentation.
+Before writing code against the Meta Model API we verified our four open questions in the
+official documentation.
 
 ## Decisions
 
@@ -31,7 +31,7 @@ Before writing code against the Meta Model API we verified the four open questio
 - Output is always schema-constrained; `strict: true` additionally validates that the schema
   follows the strict subset (root object, no `allOf`/`oneOf`, `additionalProperties: false`,
   every property in `required`). Recursive schemas return HTTP 400.
-- We still validate every response with Pydantic (rule 3 in `CLAUDE.md`).
+- We still validate every response with Pydantic (a project rule: no model answer is used unvalidated).
 
 ### 2. Reasoning effort
 
