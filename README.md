@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=9" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=10" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -18,9 +18,33 @@
 
 **From Costa Rica to the World.** A personal-finance simulator: you live on a
 Costa Rican minimum wage for three months, while people try to sell you things. Built by the
-DoWhile Team for the Meta Global AI Developer Hackathon 2026 (Indie track). You decide, Muse Spark
+DoWhile Team for the Meta Global AI Developer Hackathon 2026, in the Indie Developer Track, for the problem statement
+Build for Your World. You decide, Muse Spark
 narrates, the C# engine computes the exact colones, and you negotiate by voice. The AI tells the
 story; the engine keeps the books.
+
+### Indie Developer Track: Build for Your World
+
+We submit to the **Indie Developer Track** under the problem statement **Build for Your World**. Our world is Costa
+Rica, and we chose the problem we see around us every month: people sign their first card, their first installment
+plan or their first loan without ever having practiced, and the bill comes later.
+
+- **Why this problem.** A third of monthly income goes to paying debts, and more than half for those who earn under
+  $1 000. Eight in ten people never had any financial education. The usury law of 2020 capped the legal rates, but
+  street lenders (gota a gota) charge many times that cap and reach people by WhatsApp, Facebook and TikTok. The
+  figures and their sources are in [The situation in Costa Rica](COSTA_RICA.md).
+- **Why a simulator.** Nobody can practice a bad loan in real life without paying for it. Here a mistake costs
+  nothing, and its consequence shows up in the next months instead of being explained in a lecture.
+- **How ColonQuest addresses it.** You live on the real 2026 minimum wage, with the real CCSS and income tax, a card
+  under the real legal cap of Law 9859, and the four traps people really meet: installments with hidden costs,
+  the minimum payment, the gota a gota lender and the pyramid. The skill it trains is the one that protects you:
+  asking for the total cost, the rate and the insurance before you sign. The server records which of those
+  questions you asked, so a teacher can see it in Class Mode.
+- **Made from here.** Costa Rican Spanish and English, colones, SINPE, the soda, the INA and the UNA, the marchamo
+  and the aguinaldo. It runs on any school computer with Windows and the school's own key, with no service to pay.
+- **From Costa Rica to the World.** The same problem exists wherever credit is easy and financial education is
+  scarce. The rules live in the finance engine, not in the models, so another country would change its salary, its
+  deductions and its legal cap, and keep the rest.
 
 ### The problem
 
@@ -209,7 +233,7 @@ SQL; Muse Spark only explains them.
 
 | Category | What it asks for | Where it is in ColonQuest |
 | --- | --- | --- |
-| **Indie track** | A project judged on impact, use of Meta tools, demo and technical depth | The [judging criteria](#judging-criteria) above, and a guided three-month run you can try in three minutes |
+| **Indie Developer Track**, problem statement **Build for Your World** | A project for your own world, judged on impact, use of Meta tools, demo and technical depth | Our world is Costa Rica: [why we chose it](#indie-developer-track-build-for-your-world), the [judging criteria](#judging-criteria) above, and a guided run you can try in three minutes |
 | **Best Build on Meta Open Weights** | A central part of the project running on Muse Spark Open or Muse Glimmer | The heart of the simulator is talking to people who want your money, and every one of them runs on Muse Spark Open in Baseten: sellers, collectors, the lender, the pyramid promoter and the townspeople. Each call records its provider |
 | **Best Agentic Use-Case** | Agents that decide and carry out tasks of several steps | Three agents: the simulation director calls four read-only tools before writing (up to 5 steps in 10 s), the season planner plans your year and adjusts it to your decisions, and the seller re-prices its offer with a tool to push the term that earns it more. See [Agents](#agents) |
 | **Best Creative Build** | An original project made with Muse Image or Muse Wonder | An original Costa Rican town and cast. Muse Image draws the portraits, the scenes and ten different endings; Muse Wonder plans your year and writes how it ended |
