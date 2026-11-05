@@ -58,10 +58,11 @@ las preguntas.
 
 ### Preguntas que puede tener un juez
 
-**¿Tengo que instalar algo?** No. Necesitás Windows 10 u 11 e internet. El primer arranque baja solo uv,
-Python 3.12 y las librerías del backend, en un minuto más o menos (53 s en un perfil de Windows limpio, sin
-Python, en nuestra prueba); los siguientes tardan segundos. Nada pide permisos de administrador: uv queda en tu
-carpeta de usuario, `%USERPROFILE%\.local\bin`.
+**¿Tengo que instalar algo?** A mano no, en nuestras pruebas. Necesitás Windows 10 u 11 e internet. El primer
+arranque baja solo uv, Python 3.12 y las librerías del backend, lo que tardó de 36 a 53 s en un perfil de Windows
+limpio, sin Python; con una conexión más lenta tarda más. uv queda en tu carpeta de usuario,
+`%USERPROFILE%\.local\bin`, así que no pidió permisos de administrador; una computadora administrada de un
+colegio o una empresa igual lo puede bloquear.
 
 **Windows muestra una advertencia.** El ejecutable y `start_colonquest.bat` no están firmados, así que
 SmartScreen puede decir "Windows protegió tu PC". Elegí **Más información** y **Ejecutar de todas formas**. Si tu

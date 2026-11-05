@@ -57,10 +57,11 @@ from a clone, and opens the build in `dist/` if there is one. `--no-open` only s
 
 ### Questions a judge may have
 
-**Do I have to install anything?** No. You need Windows 10 or 11 and internet. The first start downloads uv,
-Python 3.12 and the backend's libraries by itself, in about a minute (53 s on a clean Windows profile with
-no Python in our test); later starts take seconds. Nothing asks for administrator rights: uv goes to your user
-folder, `%USERPROFILE%\.local\bin`.
+**Do I have to install anything?** Not by hand, in our tests. You need Windows 10 or 11 and internet. The first
+start downloads uv, Python 3.12 and the backend's libraries by itself, which took 36 to 53 s on a clean Windows
+profile with no Python; on a slower connection it takes longer. uv goes to your user folder,
+`%USERPROFILE%\.local\bin`, so it did not ask for administrator rights; a managed school or company computer may
+still block it.
 
 **Windows shows a warning.** The executable and `start_colonquest.bat` are not code-signed, so SmartScreen may
 say "Windows protected your PC". Choose **More info** and **Run anyway**. If your antivirus blocks the uv
