@@ -54,3 +54,11 @@ Thumbs.db
 .claude/settings.local.json
 pytest.xml
 server/colonquest_local.db*
+
+# The team's own working files: kept on our computers, not published for the judges.
+CLAUDE.md
+.mcp.json
+docs/prompts/
+docs/team-notes/
+docs/art/characters-v2/
+docs/unity-mcp.md
