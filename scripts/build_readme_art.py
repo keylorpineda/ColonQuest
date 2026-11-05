@@ -373,6 +373,13 @@ COPY: dict[str, dict[str, Any]] = {
             ("spark", "Feature demo", "Every AI piece, one click away, with its calls."),
             ("person", "Story mode", "The whole town, with three save slots."),
         ],
+        "inside_title": "WHAT IS INSIDE",
+        "inside": [
+            ("coin", "Real money rules", "Minimum wage, CCSS, tax, card, installments."),
+            ("person", "A town to live in", "About 17 places, a job, courses, day and night."),
+            ("card", "A phone", "SINPE, bills, goals, search, a loan calculator."),
+            ("warning", "Consequences", "Collectors, power cuts, a cell, the hospital."),
+        ],
         "criteria_title": "JUDGING CRITERIA",
         "criteria": [
             ("Impact", 30, "Real Costa Rican figures, telemetry, Class Mode."),
@@ -482,6 +489,13 @@ COPY: dict[str, dict[str, Any]] = {
             ("bolt", "Simulación guiada", "Tres meses reales en tres minutos. Empezá aquí."),
             ("spark", "Demo de funciones", "Cada pieza de IA a un clic, con sus llamadas."),
             ("person", "Modo historia", "Todo el pueblo, con tres partidas guardadas."),
+        ],
+        "inside_title": "QUÉ TRAE",
+        "inside": [
+            ("coin", "Reglas reales de plata", "Salario mínimo, CCSS, renta, tarjeta, cuotas."),
+            ("person", "Un pueblo para vivir", "Unos 17 lugares, trabajo, cursos, día y noche."),
+            ("card", "Un celular", "SINPE, recibos, metas, buscador, calculadora."),
+            ("warning", "Consecuencias", "Cobradores, cortes de luz, celda, hospital."),
         ],
         "criteria_title": "CRITERIOS DEL JURADO",
         "criteria": [
@@ -830,7 +844,7 @@ COMMANDS = [
     "python scripts/build_game.py",
 ]
 MEMBERS = ["Keylor Pineda", "Jefferson Abarca"]
-SECTION_ICONS = ["warning", "coin", "chart", "clock", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
+SECTION_ICONS = ["warning", "coin", "chart", "clock", "pyramid", "spark", "bag", "bolt", "stack", "person", "terminal", "team"]
 
 
 def wrap(text: str, width: int) -> list[str]:
@@ -1127,6 +1141,8 @@ def build(copy: dict[str, Any]) -> None:
     card.paragraph(copy["month"][1])
     card.header(copy["ways_title"])
     tile_rows(card, copy["ways"])
+    card.header(copy["inside_title"])
+    tile_rows(card, copy["inside"])
     card.header(copy["criteria_title"])
     criteria(card, copy)
     card.header(copy["categories_title"])
