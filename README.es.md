@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=6" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=7" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -130,7 +130,7 @@ Necesita el backend local con tu llave de Meta, porque los modelos corren ahí. 
 | **Best Build on Meta Open Weights** | Una parte central del proyecto corriendo en Muse Spark Open o Muse Glimmer | El centro del simulador es hablar con gente que quiere tu plata, y cada una corre en Muse Spark Open en Baseten: vendedores, cobradores, el prestamista, el de la pirámide y la gente del pueblo. Cada llamada registra su proveedor |
 | **Best Agentic Use-Case** | Agentes que deciden y ejecutan tareas de varios pasos | Tres agentes: el director de la simulación consulta cuatro herramientas de solo lectura antes de escribir (hasta 5 pasos en 10 s), el planificador arma tu año y lo ajusta a tus decisiones, y el vendedor vuelve a cotizar con una herramienta para empujar el plazo que más le deja. Ver [Agentes](#agentes) |
 | **Best Creative Build** | Un proyecto original hecho con Muse Image o Muse Wonder | Un pueblo y un elenco costarricenses originales. Muse Image dibuja los retratos, las escenas y diez finales distintos; Muse Wonder planifica tu año y escribe cómo terminó |
-| **Most Viral Project** y **Community Vote** | La elección del público | El clip de la demo en X y los votos en la galería pública |
+| **Community Vote** | La elección del público | Los votos en la galería pública del hackathon |
 
 ### Modelos de Meta: quién hace qué y dónde corre
 
