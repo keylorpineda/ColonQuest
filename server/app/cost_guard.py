@@ -2,7 +2,8 @@
 daily budget of its provider: DAILY_BUDGET_USD for the Meta Model API and
 OPEN_WEIGHTS_DAILY_BUDGET_USD for the open-weights NPCs on Baseten.
 
-Prices are USD per million tokens from the Meta Model API price list in CLAUDE.md.
+Prices are USD per million tokens from the official Meta Model API and Baseten price
+lists (see BENCHMARKS.md).
 """
 
 import hashlib
