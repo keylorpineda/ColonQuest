@@ -4,6 +4,7 @@
   <a href="https://github.com/keylorpineda/ColonQuest/releases/latest"><img src="docs/assets/tab-download-en.svg" alt="Download the Windows build"></a>
   <a href="COSTA_RICA.md"><img src="docs/assets/tab-costa-rica-en.svg" alt="The situation in Costa Rica, with sources"></a>
   <a href="RUN_AND_BUILD.md"><img src="docs/assets/tab-run-en.svg" alt="Run and build, for the judges"></a>
+  <a href="BENCHMARKS.md"><img src="docs/assets/tab-benchmarks-en.svg" alt="Benchmarks and model decisions"></a>
 </p>
 
 <p align="center">
@@ -150,8 +151,8 @@ If Baseten fails, takes more than 5 s or reaches its own daily budget, the chara
 Spark on the Meta API; if a model fails altogether, scripted content answers. The panel on the right of
 the simulator and the `model_calls` table show which model and which provider answered every call, with
 its time and cost. Each role follows measured latency: only Spark answers inside the simulator's 8 s
-every time, so Wonder only runs where you are not waiting ([ADR 0004](docs/adr/0004-model-roles.md),
-[ADR 0002](docs/adr/0002-open-weights-npcs.md)).
+every time, so Wonder only runs where you are not waiting. Every measurement, the cost of a run and what we
+turned down: **[Benchmarks and model decisions](BENCHMARKS.md)**.
 
 ### Agents
 

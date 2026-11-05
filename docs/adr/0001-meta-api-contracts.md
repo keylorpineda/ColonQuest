@@ -1,6 +1,7 @@
 # ADR 0001: Meta Model API contracts
 
-- **Status:** Accepted
+- **Status:** Accepted, in force on 4 November 2026. Unity sends WAV, so no conversion is needed, and the backend
+  runs on the judge's computer instead of Render. Measured times and costs: [Benchmarks](../../BENCHMARKS.md).
 - **Date:** 2026-10-26
 - **Ticket:** SCRUM-19
 - **Source:** https://dev.meta.ai/docs (structured output, reasoning, speech to text, images)
