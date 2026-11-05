@@ -21,8 +21,8 @@ less reliable.
   `AGENT_TIMEOUT_S` (10 s); every step is recorded in `model_calls` (`endpoint=event_agent`).
 - **Agentic simulation director** (`AGENTIC_GAME_MASTER`): reads the history and computes figures before
   writing. The event is clamped like any model event. Provider errors fall back to the
-  single-call simulation director; a **timeout serves a hand-written event directly** (deviation from
-  CLAUDE.md, which says "use the base version") so a user never waits for a second model call
+  single-call simulation director; a **timeout serves a hand-written event directly** (a deviation from
+  the original plan, which said "use the base version") so a user never waits for a second model call
   after the full agent budget.
 - **Season planner** (`SEASON_PLANNER`, `app/game_master/planner.py`): the first event of a
   session stores the deterministic `default_plan`, ordered by the user's profile, and answers

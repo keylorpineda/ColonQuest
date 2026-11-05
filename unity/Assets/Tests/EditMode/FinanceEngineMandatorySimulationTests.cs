@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace ColonQuest.Finance.Tests
 {
     /// <summary>
-    /// Mandatory test suite required by <c>CLAUDE.md</c> and <c>SCRUM-38</c>:
+    /// Mandatory test suite required by the project rules and <c>SCRUM-38</c>:
     /// 1. Compound credit card interest when paying only the minimum across 12 months.
     /// 2. Total cost of installment purchases with insurance and commission matching backend offers.
     /// 3. Aguinaldo calculation across standard, partial-year, and variable-pay scenarios.
