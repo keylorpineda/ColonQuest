@@ -388,7 +388,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Best Build on Meta Open Weights", "Every character you talk to runs on Muse Spark Open in Baseten."),
             ("Best Agentic Use-Case", "Three agents with tools: the simulation director, the year planner and the seller."),
             ("Best Creative Build", "An original Costa Rican town. Muse Image draws it, Muse Wonder writes your year."),
-            ("Most Viral and Community Vote", "The demo clip on X and the votes in the public gallery."),
+            ("Community Vote", "The votes in the hackathon's public gallery."),
         ],
         "agents_title": "AGENTS",
         "agents": [
@@ -492,7 +492,7 @@ COPY: dict[str, dict[str, Any]] = {
             ("Best Build on Meta Open Weights", "Cada personaje con el que hablás corre en Muse Spark Open en Baseten."),
             ("Best Agentic Use-Case", "Tres agentes con herramientas: el director, el planificador y el vendedor."),
             ("Best Creative Build", "Un pueblo tico original. Muse Image lo dibuja, Muse Wonder escribe tu año."),
-            ("Most Viral y Community Vote", "El clip de la demo en X y los votos en la galería pública."),
+            ("Community Vote", "Los votos en la galería pública del hackathon."),
         ],
         "agents_title": "AGENTES",
         "agents": [
