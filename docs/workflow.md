@@ -57,7 +57,8 @@ the text negotiation were never on that list.
 
 ## Branches and releases
 
-- `develop` is the integration branch and the default on GitHub. Every pull request lands there.
+- `main` is the default branch on GitHub and holds the tagged releases. `develop` is the integration branch:
+  every feature pull request lands there.
 - Branches come from `develop` and name their ticket: `feat/SCRUM-12-game-master`, `fix/SCRUM-40-negative-cash`.
 - Feature pull requests are merged with rebase, so every small commit stays in the history.
 - `main` only receives tagged releases from `develop` (`release: vX.Y.Z`) or a `hotfix/*`. Each release carries
