@@ -537,6 +537,7 @@ COPY: dict[str, dict[str, Any]] = {
 COSTA_RICA_ICONS = ["coin", "person", "warning", "chart", "spark"]
 RUN_ICONS = ["bolt", "folder", "terminal", "stack"]
 BENCHMARK_ICONS = ["clock", "coin", "warning", "spark"]
+WORKFLOW_ICONS = ["chart", "terminal", "stack"]
 CONTRIBUTING_ICONS = ["folder", "terminal", "team", "warning"]
 SECURITY_ICONS = ["warning", "stack"]
 CONDUCT_ICONS = ["team", "person", "warning", "spark"]
@@ -698,6 +699,35 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
         },
     },
     # The community pages are written in English only, like the files GitHub links them from.
+    "workflow": {
+        "en": {
+            "lang": "en",
+            "kicker": "HOW WE WORKED",
+            "title": "WORKFLOW",
+            "tagline": "Jira tickets, small PRs, green CI.",
+            "desc": "How the DoWhile Team built ColonQuest: Jira sprints, one branch and pull request per ticket, the checks of CI and the releases. The full content of this card is repeated as text below it.",
+            "icons": WORKFLOW_ICONS,
+            "footer": "FROM COSTA RICA TO THE WORLD",
+            "license": "Every change traceable to a Jira ticket",
+            "blocks": [
+                ("header", "EIGHT DAYS, FOUR SPRINTS"),
+                ("stats", [
+                    ("150", "Jira tickets, each with its own branch and pull request."),
+                    ("142", "pull requests merged into develop, every one with green CI."),
+                    ("790+", "small commits since 26 October, all in the history."),
+                ]),
+                ("header", "WHAT CI CHECKS"),
+                ("tiles", [
+                    ("terminal", "Server", "Ruff, mypy --strict and pytest."),
+                    ("coin", "Finance engine", "Its NUnit tests, outside Unity."),
+                    ("bolt", "Unity", "EditMode tests on every change."),
+                    ("warning", "Jira", "Every title and branch names its ticket."),
+                ]),
+                ("header", "RELEASES"),
+                ("paragraph", "main only receives tagged releases from develop. Each one carries the Windows zip that a judge runs with their own key."),
+            ],
+        },
+    },
     "contributing": {
         "en": {
             "lang": "en",
