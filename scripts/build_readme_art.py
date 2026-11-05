@@ -601,7 +601,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ]),
                 ("header", "WHAT A RUN COSTS"),
                 ("stats", [
-                    ("$0.06", "a three-month run: $0.04 of Meta credit and $0.02 of Baseten."),
+                    ("~$0.06", "an estimate for a three-month run, from measured calls. It grows if you talk more."),
                     ("$0.0025", "one turn of a conversation on Baseten."),
                     ("$0", "in images per run: they come in the zip."),
                 ]),
@@ -628,7 +628,7 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ]),
                 ("header", "LO QUE CUESTA UNA SIMULACIÓN"),
                 ("stats", [
-                    ("$0,06", "tres meses: $0,04 de crédito de Meta y $0,02 de Baseten."),
+                    ("~$0,06", "estimado para tres meses, con llamadas medidas. Sube si conversás más."),
                     ("$0,0025", "un turno de conversación en Baseten."),
                     ("$0", "en imágenes por simulación: vienen en el zip."),
                 ]),
@@ -761,9 +761,9 @@ PAGES: dict[str, dict[str, dict[str, Any]]] = {
                 ]),
                 ("header", "WHAT YOU NEED"),
                 ("stats", [
-                    ("0", "things to install by hand: no Python, no administrator rights."),
-                    ("1 min", "for the first start, which installs everything by itself."),
-                    ("$0.06", "of credit for a whole three-month run."),
+                    ("Auto", "If uv and Python are missing, the launcher installs them in your user folder."),
+                    ("~1 min", "for the first start in our tests. It depends on your connection."),
+                    ("~$0.06", "of credit for a three-month run, estimated. More conversation, more cost."),
                 ]),
                 ("header", "THEN"),
                 ("paragraph", "Choose Guided simulation for a whole run in three minutes, then Feature demo to try every AI piece one click away. Press L to see every model call."),
