@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=8" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=10" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -18,9 +18,33 @@
 
 **From Costa Rica to the World.** A personal-finance simulator: you live on a
 Costa Rican minimum wage for three months, while people try to sell you things. Built by the
-DoWhile Team for the Meta Global AI Developer Hackathon 2026 (Indie track). You decide, Muse Spark
+DoWhile Team for the Meta Global AI Developer Hackathon 2026, in the Indie Developer Track, for the problem statement
+Build for Your World. You decide, Muse Spark
 narrates, the C# engine computes the exact colones, and you negotiate by voice. The AI tells the
 story; the engine keeps the books.
+
+### Indie Developer Track: Build for Your World
+
+We submit to the **Indie Developer Track** under the problem statement **Build for Your World**. Our world is Costa
+Rica, and we chose the problem we see around us every month: people sign their first card, their first installment
+plan or their first loan without ever having practiced, and the bill comes later.
+
+- **Why this problem.** A third of monthly income goes to paying debts, and more than half for those who earn under
+  $1 000. Eight in ten people never had any financial education. The usury law of 2020 capped the legal rates, but
+  street lenders (gota a gota) charge many times that cap and reach people by WhatsApp, Facebook and TikTok. The
+  figures and their sources are in [The situation in Costa Rica](COSTA_RICA.md).
+- **Why a simulator.** Nobody can practice a bad loan in real life without paying for it. Here a mistake costs
+  nothing, and its consequence shows up in the next months instead of being explained in a lecture.
+- **How ColonQuest addresses it.** You live on the real 2026 minimum wage, with the real CCSS and income tax, a card
+  under the real legal cap of Law 9859, and the four traps people really meet: installments with hidden costs,
+  the minimum payment, the gota a gota lender and the pyramid. The skill it trains is the one that protects you:
+  asking for the total cost, the rate and the insurance before you sign. The server records which of those
+  questions you asked, so a teacher can see it in Class Mode.
+- **Made from here.** Costa Rican Spanish and English, colones, SINPE, the soda, the INA and the UNA, the marchamo
+  and the aguinaldo. It runs on any school computer with Windows and the school's own key, with no service to pay.
+- **From Costa Rica to the World.** The same problem exists wherever credit is easy and financial education is
+  scarce. The rules live in the finance engine, not in the models, so another country would change its salary, its
+  deductions and its legal cap, and keep the rest.
 
 ### The problem
 
@@ -145,6 +169,57 @@ The free run: three months of four days each, with work shifts at the soda, rent
 farm, a car agency, a hospital and a police station. The people on the street also talk to you through Muse Spark
 Open. The same objectives, arrow and map marks of the guided run tell you what comes next.
 
+### Everything the simulator has
+
+ColonQuest is a gamified simulation: you live a young Costa Rican's first months on their own, in a town you walk
+around, and every colón follows the real rules. This is what is inside.
+
+**Your money, by the real rules.** The C# finance engine counts in whole colones and applies:
+
+- The 2026 minimum wage, with CCSS (10.83%) and income tax taken off, paid by SINPE.
+- Cash, a savings account at the bank and an emergency fund.
+- A credit card at 3% a month, with its minimum payment, its statement and interest on the balance.
+- Installment purchases with the insurance and the commission the seller does not mention.
+- Gota a gota loans and their collectors, and a pyramid that pays the first ones with the money of the last.
+- Electricity, water, internet and phone bills that pile up if you skip them, until the power is cut.
+- Rent or a mortgage, a car with a down payment and installments, a farm to invest in coffee or cattle, and furniture
+  bought cash or in installments.
+- The December bonus (aguinaldo) and the car tax (marchamo), for runs that reach December.
+
+**A town to live in.** About 17 places, each one a money decision: your mother's house, your rented room, Soda El
+Muelle where you work, the bank with its cash machines and deposit window, the cooperative, the farm, the store, the
+car agency, the real estate agency, the hospital, the police station, the corner shop, Don Rafa's garage, the INA and
+UNA courses, a quick-loans stall and an "investment" stand. Each day stands for a week, from 6:00 to 22:00, with
+traffic, pedestrians, a dog, boats, seagulls, the beach, nightfall with street lights and sound made in code.
+
+**Work and study.** Your first job has a time clock: arriving late gets a warning and then docked pay. In the
+afternoons you can take courses at the INA or the UNA to move up. You can also cook at home to save a little.
+
+**A phone (P).** SINPE notices, your bank, your bills, goals (an emergency fund, paying down the card, furnishing
+your room, saving, buying a motorbike), a search engine that explains each money idea in plain words, a loan
+calculator, a block puzzle and a casino with real stakes from your cash.
+
+**People who want your money.** Sellers who hide the costs until you ask, collectors at the curb, a gota a gota lender whose
+rate, once you ask, is many times the legal cap, a friend with a sure business, neighbors who chat, and a stranger who
+asks you to send money. They all speak through Muse Spark Open, by voice or by text, and none of them can invent a
+figure.
+
+**Consequences.** Walk into a stranger's house and the owner calls the police: one to three days in a cell, or bail.
+A car can run you over: the hospital and your health insurance decide what it costs. Skip the bills and the power
+goes out. Sign with the lender and the collectors come.
+
+**Guidance, so nobody gets lost.** An opening scene (you turn 18, your mother gives you a present, the phone brings
+your first job), a task list (Tab), objectives with an arrow and map marks, a minimap and a full map (M), subtitles,
+a HUD you can hide (H), the calls panel (L), pause, three save slots, English or Spanish, and sound settings.
+
+**The end of a run.** A report from the engine's numbers: what you have and what you owe, your money month by month,
+grades from A to D in budget, emergency fund, debts, installments and investments, the key questions you asked, what
+you bought, and one of ten pictures chosen by how it went.
+
+**For teachers.** Class Mode: the teacher gives the group a code and sees, per concept and with no personal data, who
+chose the risky option, who caught the trap in the negotiation and the average debt at the end. The figures come from
+SQL; Muse Spark only explains them.
+
 ### Judging criteria
 
 | Criterion | Weight | What we built |
@@ -158,7 +233,7 @@ Open. The same objectives, arrow and map marks of the guided run tell you what c
 
 | Category | What it asks for | Where it is in ColonQuest |
 | --- | --- | --- |
-| **Indie track** | A project judged on impact, use of Meta tools, demo and technical depth | The [judging criteria](#judging-criteria) above, and a guided three-month run you can try in three minutes |
+| **Indie Developer Track**, problem statement **Build for Your World** | A project for your own world, judged on impact, use of Meta tools, demo and technical depth | Our world is Costa Rica: [why we chose it](#indie-developer-track-build-for-your-world), the [judging criteria](#judging-criteria) above, and a guided run you can try in three minutes |
 | **Best Build on Meta Open Weights** | A central part of the project running on Muse Spark Open or Muse Glimmer | The heart of the simulator is talking to people who want your money, and every one of them runs on Muse Spark Open in Baseten: sellers, collectors, the lender, the pyramid promoter and the townspeople. Each call records its provider |
 | **Best Agentic Use-Case** | Agents that decide and carry out tasks of several steps | Three agents: the simulation director calls four read-only tools before writing (up to 5 steps in 10 s), the season planner plans your year and adjusts it to your decisions, and the seller re-prices its offer with a tool to push the term that earns it more. See [Agents](#agents) |
 | **Best Creative Build** | An original project made with Muse Image or Muse Wonder | An original Costa Rican town and cast. Muse Image draws the portraits, the scenes and ten different endings; Muse Wonder plans your year and writes how it ended |

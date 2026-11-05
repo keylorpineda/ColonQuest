@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/costa-rica-es.svg?v=3" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/costa-rica-es.svg?v=4" width="100%" alt="La situación de las deudas y la educación financiera en Costa Rica, con cifras citadas. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details open>
@@ -17,6 +17,13 @@
 
 Por qué un simulador de finanzas personales, y por qué aquí. No hace falta conocer el país: los montos también
 van en dólares y las palabras locales se explican abajo. Consultado el 2 de noviembre de 2026.
+
+### Por qué Costa Rica: Build for Your World
+
+ColonQuest participa en el Indie Developer Track con el problema **Build for Your World** ("construí para tu mundo").
+Nuestro mundo es Costa Rica, y esta página es el problema para el que lo construimos: deudas que se llevan un tercio
+del salario, casi nada de educación financiera y prestamistas en la calle muy por encima del tope legal. Cómo lo
+responde el simulador está en el [README](README.es.md#indie-developer-track-build-for-your-world).
 
 ### En un minuto
 

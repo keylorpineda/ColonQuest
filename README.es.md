@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=8" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=10" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -18,9 +18,34 @@
 
 **From Costa Rica to the World.** Un simulador de finanzas personales:
 vivís tres meses con un salario mínimo de Costa Rica, mientras te tratan de vender cosas. Hecho por
-DoWhile Team para el Meta Global AI Developer Hackathon 2026 (track Indie). Vos decidís, Muse Spark
+DoWhile Team para el Meta Global AI Developer Hackathon 2026, en el Indie Developer Track, para el problema
+Build for Your World. Vos decidís, Muse Spark
 narra, el motor en C# calcula los colones exactos y negociás con la voz. La IA cuenta la historia;
 el motor lleva las cuentas.
+
+### Indie Developer Track: Build for Your World
+
+Participamos en el **Indie Developer Track** con el problema **Build for Your World** ("construí para tu mundo").
+Nuestro mundo es Costa Rica, y elegimos el problema que vemos alrededor cada mes: la gente firma su primera tarjeta,
+sus primeras cuotas o su primer préstamo sin haber practicado nunca, y la cuenta llega después.
+
+- **Por qué este problema.** Un tercio del ingreso mensual se va en pagar deudas, y más de la mitad para quienes
+  ganan menos de ₡500 000. Ocho de cada diez personas nunca recibieron educación financiera. La ley de usura de 2020
+  puso tope a las tasas legales, pero los prestamistas gota a gota cobran muchas veces ese tope y llegan por WhatsApp,
+  Facebook y TikTok. Las cifras y sus fuentes están en [La situación en Costa Rica](COSTA_RICA.es.md).
+- **Por qué un simulador.** Nadie puede practicar un mal préstamo en la vida real sin pagarlo. Aquí un error no
+  cuesta nada, y su consecuencia aparece en los meses siguientes en vez de explicarse en una charla.
+- **Cómo lo ataca ColonQuest.** Vivís con el salario mínimo real de 2026, con la CCSS y la renta reales, una tarjeta
+  bajo el tope legal real de la Ley 9859, y las cuatro trampas que la gente de verdad se encuentra: cuotas con
+  costos escondidos, el pago mínimo, el prestamista gota a gota y la pirámide. La habilidad que entrena es la que te
+  protege: preguntar el costo total, la tasa y el seguro antes de firmar. El servidor registra cuáles de esas
+  preguntas hiciste, para que un profesor lo vea en el Modo Clase.
+- **Hecho desde aquí.** Español de Costa Rica e inglés, colones, SINPE, la soda, el INA y la UNA, el marchamo y el
+  aguinaldo. Corre en cualquier computadora de un colegio con Windows y la llave del propio colegio, sin un servicio
+  que pagar.
+- **From Costa Rica to the World.** El mismo problema existe donde el crédito es fácil y la educación financiera
+  escasea. Las reglas viven en el motor financiero, no en los modelos, así que otro país cambiaría su salario, sus
+  rebajos y su tope legal, y conservaría el resto.
 
 ### El problema
 
@@ -146,6 +171,60 @@ La simulación libre: tres meses de cuatro días cada uno, con turnos de trabajo
 cooperativa, finca, agencia de carros, hospital y comisaría. La gente de la calle también te habla con Muse Spark Open.
 Los mismos objetivos, la flecha y las marcas del mapa de la ruta guiada te dicen qué sigue.
 
+### Todo lo que tiene el simulador
+
+ColonQuest es una simulación gamificada: vivís los primeros meses por tu cuenta de un joven costarricense, en un pueblo
+que recorrés caminando, y cada colón sigue las reglas reales. Esto es lo que trae.
+
+**Tu plata, con las reglas reales.** El motor financiero en C# cuenta en colones enteros y aplica:
+
+- El salario mínimo de 2026, con el rebajo de la CCSS (10,83%) y la renta, pagado por SINPE.
+- Efectivo, una cuenta de ahorro en el banco y un fondo de emergencia.
+- Una tarjeta de crédito al 3% mensual, con su pago mínimo, su estado de cuenta e intereses sobre el saldo.
+- Compras a cuotas con el seguro y la comisión que el vendedor no menciona.
+- Préstamos gota a gota con sus cobradores, y una pirámide que les paga a los primeros con la plata de los últimos.
+- Recibos de luz, agua, internet y teléfono que se acumulan si no los pagás, hasta que te cortan la luz.
+- Alquiler o hipoteca, un carro con prima y cuotas, una finca para invertir en café o ganado, y muebles de contado o a
+  cuotas.
+- El aguinaldo y el marchamo de diciembre, para las simulaciones que llegan a diciembre.
+
+**Un pueblo para vivir.** Unos 17 lugares, cada uno una decisión de plata: la casa de tu mamá, tu cuarto alquilado,
+la Soda El Muelle donde trabajás, el banco con sus cajeros y su ventanilla, la cooperativa, la finca, la tienda, la
+agencia de carros, la inmobiliaria, el hospital, la comisaría, la pulpería, el taller de Don Rafa, los cursos del INA y
+la UNA, un puesto de préstamos rápidos y un stand de "inversiones". Cada día es una semana, de 6:00 a 22:00, con
+tránsito, gente caminando, un perro, botes, gaviotas, la playa, la noche con las luces de la calle y sonido hecho en
+código.
+
+**Trabajo y estudio.** Tu primer trabajo tiene reloj marcador: si llegás tarde, primero te avisan y después te
+rebajan. En las tardes podés llevar cursos en el INA o la UNA para crecer. También podés cocinar en casa para ahorrar un
+poco.
+
+**Un celular (P).** Avisos de SINPE, tu banco, tus recibos, metas (un fondo de emergencia, bajar la tarjeta, amueblar
+tu cuarto, ahorrar, comprar una moto), un buscador que explica cada idea de plata en palabras claras, una
+calculadora de préstamos, un juego de bloques y un casino que apuesta tu efectivo de verdad.
+
+**Gente que quiere tu plata.** Vendedores que esconden los costos hasta que preguntás, cobradores en la acera, un
+prestamista gota a gota cuya tasa, cuando preguntás, es muchas veces el tope legal, un amigo con un negocio seguro,
+vecinos que conversan y un desconocido que te pide que le mandés plata. Todos hablan con Muse Spark Open, por voz o
+por escrito, y ninguno puede inventar una cifra.
+
+**Consecuencias.** Si te metés en una casa ajena, el dueño llama a la policía: de uno a tres días en una celda, o la
+fianza. Un carro te puede atropellar: el hospital y tu seguro de salud deciden cuánto cuesta. Si no pagás los recibos,
+te cortan la luz. Si firmás con el prestamista, llegan los cobradores.
+
+**Guía, para que nadie se pierda.** Una escena de inicio (cumplís 18, tu mamá te da un regalo, el celular te trae tu
+primer trabajo), una lista de tareas (Tab), objetivos con flecha y marcas en el mapa, un minimapa y el mapa completo
+(M), subtítulos, un HUD que se puede esconder (H), el panel de llamadas (L), pausa, tres partidas guardadas, inglés o
+español, y ajustes de sonido.
+
+**El cierre de una simulación.** Un reporte con los números del motor: lo que tenés y lo que debés, tu plata mes a
+mes, notas de la A a la D en presupuesto, fondo de emergencia, deudas, cuotas e inversiones, las preguntas clave que
+hiciste, lo que compraste y una de diez imágenes elegida por cómo te fue.
+
+**Para profesores.** Modo Clase: el profesor le da un código al grupo y ve, por concepto y sin datos personales, quién
+eligió la opción riesgosa, quién detectó la trampa en la negociación y la deuda promedio al cierre. Las cifras salen de
+SQL; Muse Spark solo las explica.
+
 ### Criterios del jurado
 
 | Criterio | Peso | Qué construimos |
@@ -159,7 +238,7 @@ Los mismos objetivos, la flecha y las marcas del mapa de la ruta guiada te dicen
 
 | Categoría | Qué pide | Dónde está en ColonQuest |
 | --- | --- | --- |
-| **Track Indie** | Un proyecto evaluado por impacto, uso de herramientas de Meta, demo y profundidad técnica | Los [criterios del jurado](#criterios-del-jurado) de arriba, y una ruta guiada de tres meses que se prueba en tres minutos |
+| **Indie Developer Track**, problema **Build for Your World** | Un proyecto para tu propio mundo, evaluado por impacto, uso de herramientas de Meta, demo y profundidad técnica | Nuestro mundo es Costa Rica: [por qué lo elegimos](#indie-developer-track-build-for-your-world), los [criterios del jurado](#criterios-del-jurado) de arriba, y una ruta guiada que se prueba en tres minutos |
 | **Best Build on Meta Open Weights** | Una parte central del proyecto corriendo en Muse Spark Open o Muse Glimmer | El centro del simulador es hablar con gente que quiere tu plata, y cada una corre en Muse Spark Open en Baseten: vendedores, cobradores, el prestamista, el de la pirámide y la gente del pueblo. Cada llamada registra su proveedor |
 | **Best Agentic Use-Case** | Agentes que deciden y ejecutan tareas de varios pasos | Tres agentes: el director de la simulación consulta cuatro herramientas de solo lectura antes de escribir (hasta 5 pasos en 10 s), el planificador arma tu año y lo ajusta a tus decisiones, y el vendedor vuelve a cotizar con una herramienta para empujar el plazo que más le deja. Ver [Agentes](#agentes) |
 | **Best Creative Build** | Un proyecto original hecho con Muse Image o Muse Wonder | Un pueblo y un elenco costarricenses originales. Muse Image dibuja los retratos, las escenas y diez finales distintos; Muse Wonder planifica tu año y escribe cómo terminó |
