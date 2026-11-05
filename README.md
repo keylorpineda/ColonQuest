@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-en.svg?v=8" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
+  <img src="docs/assets/readme-en.svg?v=9" width="100%" alt="ColonQuest, a personal-finance simulator, from Costa Rica to the world. The full content of this card is available as text in the section below.">
 </p>
 
 <details>
@@ -144,6 +144,57 @@ It needs the local backend with your Meta key, because the models run there. A w
 The free run: three months of four days each, with work shifts at the soda, rent, bills, a bank, a cooperative, a
 farm, a car agency, a hospital and a police station. The people on the street also talk to you through Muse Spark
 Open. The same objectives, arrow and map marks of the guided run tell you what comes next.
+
+### Everything the simulator has
+
+ColonQuest is a gamified simulation: you live a young Costa Rican's first months on their own, in a town you walk
+around, and every colón follows the real rules. This is what is inside.
+
+**Your money, by the real rules.** The C# finance engine counts in whole colones and applies:
+
+- The 2026 minimum wage, with CCSS (10.83%) and income tax taken off, paid by SINPE.
+- Cash, a savings account at the bank and an emergency fund.
+- A credit card at 3% a month, with its minimum payment, its statement and interest on the balance.
+- Installment purchases with the insurance and the commission the seller does not mention.
+- Gota a gota loans and their collectors, and a pyramid that pays the first ones with the money of the last.
+- Electricity, water, internet and phone bills that pile up if you skip them, until the power is cut.
+- Rent or a mortgage, a car with a down payment and installments, a farm to invest in coffee or cattle, and furniture
+  bought cash or in installments.
+- The December bonus (aguinaldo) and the car tax (marchamo), for runs that reach December.
+
+**A town to live in.** About 17 places, each one a money decision: your mother's house, your rented room, Soda El
+Muelle where you work, the bank with its cash machines and deposit window, the cooperative, the farm, the store, the
+car agency, the real estate agency, the hospital, the police station, the corner shop, Don Rafa's garage, the INA and
+UNA courses, a quick-loans stall and an "investment" stand. Each day stands for a week, from 6:00 to 22:00, with
+traffic, pedestrians, a dog, boats, seagulls, the beach, nightfall with street lights and sound made in code.
+
+**Work and study.** Your first job has a time clock: arriving late gets a warning and then docked pay. In the
+afternoons you can take courses at the INA or the UNA to move up. You can also cook at home to save a little.
+
+**A phone (P).** SINPE notices, your bank, your bills, goals (an emergency fund, paying down the card, furnishing
+your room, saving, buying a motorbike), a search engine that explains each money idea in plain words, a loan
+calculator, a block puzzle and a casino with real stakes from your cash.
+
+**People who want your money.** Sellers who hide the costs until you ask, collectors at the curb, a gota a gota lender whose
+rate, once you ask, is many times the legal cap, a friend with a sure business, neighbors who chat, and a stranger who
+asks you to send money. They all speak through Muse Spark Open, by voice or by text, and none of them can invent a
+figure.
+
+**Consequences.** Walk into a stranger's house and the owner calls the police: one to three days in a cell, or bail.
+A car can run you over: the hospital and your health insurance decide what it costs. Skip the bills and the power
+goes out. Sign with the lender and the collectors come.
+
+**Guidance, so nobody gets lost.** An opening scene (you turn 18, your mother gives you a present, the phone brings
+your first job), a task list (Tab), objectives with an arrow and map marks, a minimap and a full map (M), subtitles,
+a HUD you can hide (H), the calls panel (L), pause, three save slots, English or Spanish, and sound settings.
+
+**The end of a run.** A report from the engine's numbers: what you have and what you owe, your money month by month,
+grades from A to D in budget, emergency fund, debts, installments and investments, the key questions you asked, what
+you bought, and one of ten pictures chosen by how it went.
+
+**For teachers.** Class Mode: the teacher gives the group a code and sees, per concept and with no personal data, who
+chose the risky option, who caught the trap in the negotiation and the average debt at the end. The figures come from
+SQL; Muse Spark only explains them.
 
 ### Judging criteria
 
