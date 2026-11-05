@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/readme-es.svg?v=7" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
+  <img src="docs/assets/readme-es.svg?v=8" width="100%" alt="ColonQuest, un simulador de finanzas personales, de Costa Rica para el mundo. Todo el contenido de esta tarjeta está disponible como texto en la sección de abajo.">
 </p>
 
 <details>
@@ -75,43 +75,76 @@ prestado. Muse Spark escribe un evento hecho para tu situación y el motor en C#
 colones enteros. Cuando aparece un vendedor, negociás en voz alta: el precio, la tasa, el seguro y
 la comisión reales solo salen si preguntás.
 
-### Probalo en unos tres minutos
+### Probalo
 
 Corre en tu propia computadora con tu propia llave de Meta; no hay ningún servicio en línea. [Bajá el simulador para Windows](https://github.com/keylorpineda/ColonQuest/releases/latest),
 descomprimilo, hacé doble clic en `start_colonquest.bat` y pegá tu llave cuando te la pida. Instala lo que necesita,
 levanta el backend local y abre el simulador; el primer arranque tarda un minuto ([detalles](RUN_AND_BUILD.es.md#1-evaluarlo-con-tu-propia-llave),
-[preguntas](RUN_AND_BUILD.es.md#preguntas-que-puede-tener-un-juez)). Elegí **Simulación guiada**,
-lo primero del menú. Es el simulador real en un tramo corto del pueblo,
-durante tres meses, y vos solo tomás las decisiones:
+[preguntas](RUN_AND_BUILD.es.md#preguntas-que-puede-tener-un-juez)).
 
-1. **Mes 1.** Decís cómo llegás a fin de mes. Te cae el salario por SINPE, Muse Wonder escribe tu año
-   en segundo plano y el director de la simulación trae un evento hecho para tu situación.
-2. **Mes 2.** Una flecha te lleva a la tienda, donde el vendedor se calla lo que no le preguntás.
-   Hablá o escribí.
-3. **Mes 3.** Lo que sigue depende de tu plata: si te falta, el prestamista y luego los cobradores; si
-   te sobra, una pirámide. Podés preguntarles antes de firmar.
+### Tres formas de entrar, y por qué existe cada una
 
-El panel de la derecha muestra cada llamada real mientras pasa, leída del servidor: modelo, proveedor,
-tiempo y costo. Se oculta con **L**. La simulación termina con un informe hecho con los números del motor:
-lo que tenés, lo que debés, tu plata mes a mes, tus notas y una imagen elegida por lo que pasó en tu simulación. Los objetivos, la flecha y las marcas del
-mapa funcionan igual en el **Modo historia** completo, donde la gente de la calle también te habla con
-Muse Spark Open.
+El menú principal ofrece tres entradas al mismo simulador. Comparten el motor financiero, los modelos y el backend; lo
+que cambia es cuánto del pueblo recorrés y cuánto tiempo necesitás.
 
-### Probá cada función en dos minutos
+| Entrada del menú | Qué es | Tiempo | Por qué la hicimos |
+| --- | --- | --- | --- |
+| **Simulación guiada** | El simulador real, tres meses, en un tramo corto del pueblo. Vos solo tomás las decisiones | Unos 3 minutos | Para que un juez o un estudiante vea una simulación completa, del primer salario al reporte final, sin aprenderse el pueblo antes |
+| **Demo de funciones** | Cada función de IA en su propia pantalla, a un clic, con lo que hizo el modelo al lado | Unos 2 minutos | Para que un juez revise cada modelo, agente y control directamente, sin tener que llegar a él dentro de una simulación |
+| **Modo historia** | El mundo abierto completo, con tres partidas guardadas | Lo que quieras | Como lo juega un estudiante de verdad: turnos de trabajo, alquiler, carro, finca, todo el pueblo |
 
-Elegí **Demo de funciones** en el menú para llegar a cada función por aparte, con el mismo panel de
-llamadas reales.
+Si tenés pocos minutos, empezá por **Simulación guiada** y después abrí **Demo de funciones**.
 
-| Estación | Qué probar | Modelos |
-| --- | --- | --- |
-| Director de la simulación | Elegí la situación de un usuario, luego una opción, y mirá cómo la aplica el motor | Muse Spark con herramientas |
-| Negociación | Hablale o escribile a un vendedor y abrí la ficha oculta línea por línea | Muse Spark Open, Muse Voice Transcribe |
-| Cobros y trampas | Hablá con el cobrador, el prestamista y el de la pirámide, y abrí lo que esconden | Muse Spark Open, Muse Voice Transcribe |
-| Plan y cierre | Compará los planes de dos perfiles y leé cómo terminó un año | Muse Wonder |
-| Motor y controles | Tratá de meter un monto fuera de rango y mirá los presupuestos en vivo | Ninguno, a propósito |
-| Modo Clase | Corré una clase de prueba real con tres estudiantes simulados, marcados como tales | Muse Spark |
+### Simulación guiada: una simulación completa en tres minutos
+
+Elegís cómo llegás a fin de mes y el motor pone tu plata inicial. Los dos perfiles ganan el mismo salario: el mínimo de
+2026 con el rebajo de la CCSS y la renta.
+
+| Perfil | Efectivo | Ahorro | Saldo de tarjeta |
+| --- | --- | --- | --- |
+| "Llego justo y con la tarjeta cargada" | ₡40 000 | ₡0 | ₡240 000 |
+| "Tengo algo ahorrado" | ₡120 000 | ₡400 000 | ₡40 000 |
+
+1. **Mes 1.** Te cae el salario por SINPE. Muse Wonder empieza a escribir tu año en segundo plano, y el director de la
+   simulación trae un evento hecho para tu situación, con opciones cuyo costo calcula el motor.
+2. **Mes 2.** Una flecha te lleva a la tienda. El vendedor te dice una cuota bajita y se calla el seguro, la comisión
+   y el total hasta que preguntás. Hablá o escribí, o usá los botones de preguntas.
+3. **Mes 3.** Lo que viene depende de tu plata después de dos meses de tus propias decisiones, no del perfil que
+   elegiste: si no te alcanza para un salario, el prestamista gota a gota, y los cobradores si firmás; con plata de
+   sobra, un amigo con una pirámide. Les podés preguntar lo que quieras antes de decidir.
+
+La simulación termina con un reporte hecho con los números del motor: lo que tenés, lo que debés, tu plata mes a mes,
+tus notas, las preguntas clave que hiciste y una imagen elegida por lo que pasó.
+
+Para que dure tres minutos, la ruta guiada detiene el reloj, quita el tránsito y la policía, abre solo las puertas de
+su recorrido y nunca toca tus partidas guardadas. Todo lo demás es igual que en el modo historia.
+
+**En qué fijarse:** el vendedor nunca miente en una cifra, pero se calla lo que no le preguntás; el costo total solo
+aparece después de la pregunta correcta; el motor rechaza un monto fuera de rango; y el panel de la derecha muestra
+cada llamada real mientras pasa, leída del servidor, con su modelo, su proveedor (API de Meta o Baseten), su tiempo y
+su costo. Apretá **L** para esconderlo.
+
+### Demo de funciones: cada pieza de IA, a un clic
+
+Cada estación le manda una solicitud real al backend y muestra la respuesta al lado de por qué ese modelo tiene ese
+trabajo.
+
+| Estación | Qué hacés | Qué muestra | Modelo y proveedor |
+| --- | --- | --- | --- |
+| Director de la simulación | Elegís la situación de un usuario y después una opción | El evento que escribe el modelo, las herramientas que llamó y cómo el motor aplica la opción | Muse Spark con herramientas, API de Meta |
+| Negociación | Le hablás o escribís a un vendedor y después abrís la ficha oculta | El vendedor solo dice el seguro y la comisión si le preguntás; la ficha se abre línea por línea | Muse Spark Open en Baseten, Muse Voice Transcribe |
+| Cobros y trampas | Le hablás al cobrador, al prestamista y al de la pirámide | Cada uno tiene su personalidad y solo dice lo incómodo si le preguntás | Muse Spark Open en Baseten, Muse Voice Transcribe |
+| Plan y cierre | Comparás los planes de dos perfiles y leés cómo terminó un año | El plan que Muse Wonder escribe en segundo plano y la historia de un final | Muse Wonder, API de Meta |
+| Motor y controles | Intentás meter un monto fuera de rango | El motor lo rechaza o lo recorta, y los presupuestos diarios en vivo | Ninguno, a propósito |
+| Modo Clase | Creás una clase de prueba real con tres estudiantes simulados, marcados como tales | El panel del profesor: cifras de SQL que el modelo explica en palabras claras | Muse Spark, API de Meta |
 
 Necesita el backend local con tu llave de Meta, porque los modelos corren ahí. Un recorrido completo cuesta unos $0,10.
+
+### Modo historia: todo el pueblo
+
+La simulación libre: tres meses de cuatro días cada uno, con turnos de trabajo en la soda, alquiler, recibos, banco,
+cooperativa, finca, agencia de carros, hospital y comisaría. La gente de la calle también te habla con Muse Spark Open.
+Los mismos objetivos, la flecha y las marcas del mapa de la ruta guiada te dicen qué sigue.
 
 ### Criterios del jurado
 
